@@ -2,6 +2,9 @@
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>vLLM perf-benchmark · 202</title>
 <style>
  :root{--bg:#eef2fa;--panel:#fff;--panel2:#f1f5fc;--border:#e0e6f1;--border2:#ccd6e8;
@@ -106,11 +109,29 @@
  .restab td.num{font-family:var(--mono);text-align:right;white-space:nowrap}
  .restab td:first-child{white-space:nowrap}
  .restab tr.baserow td{background:#e7ecf6}
+ .restab tr.r-measured td:first-child{border-left:3px solid #2563eb}
+ .restab tr.r-reported td:first-child{border-left:3px solid #d97706}
+ .restab td .tag-m{color:#2563eb;font-weight:700}
+ .restab td .tag-r{color:#d97706;font-weight:700}
  .restab.exp{table-layout:fixed}
- .restab.exp .c-row{width:150px}
- .restab.exp .c-val{width:170px}
- .restab.exp .c-d{width:140px}
- .restab.exp .c-r{width:90px}
+ .restab.exp .c-row{width:300px}
+ .restab.exp .c-val{width:150px}
+ .restab.exp .c-d{width:105px}
+ .restab.exp .c-r{width:70px}
+ .restab.exp th.r-rep{color:#b45309;background:#fff7ed}
+ .restab.exp th.r-meas{color:#1d4ed8;background:#eff5ff}
+ .restab.exp td.num .mv{display:inline-block;min-width:62px;text-align:right}
+ .restab.exp td.num .var{color:var(--mut);margin-left:6px}
+ .scalebox{margin:-14px 0 20px;padding:9px 12px;border-radius:0 0 12px 12px;background:#fff7ed;
+  border:1px solid #fed7aa;border-top:none;font-size:11.5px;line-height:1.5}
+ .scalebox.inv{background:#fef2f2;border-color:#fecaca}
+ .scalebox .sb-tag{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:700;
+  letter-spacing:.05em;color:#b45309;margin-bottom:3px}
+ .scalebox.inv .sb-tag{color:#b91c1c}
+ .scalebox .sb-s{font-weight:600;color:var(--fg)}
+ .scalebox .sb-l{color:var(--mut);margin-top:3px;font-size:11px;line-height:1.45}
+ .scalebox .sb-l b{color:var(--mut);font-weight:700;cursor:default}
+ .scalebox .sb-full{color:var(--mut)}
  .restab.exp .c-src{width:auto}
  .restab.exp th.num,.restab.exp td.num{text-align:right;padding-right:22px}
  .restab.exp td.src{white-space:normal;color:var(--mut)}
@@ -313,7 +334,7 @@ function experimentsOf(res){
  return [];
 }
 // harnesses that ALWAYS get a row (even when pending). plus any extra arm keys seen.
-const HARNESSES=['claude','claude + solution','codex','codex + solution'];
+const HARNESSES=['claude',"claude + PR's solution",'codex',"codex + PR's solution"];
 // higher-is-better units (throughput). everything else = time, lower-is-better.
 function higherBetter(unit){return /\/s$|\bit\/s\b|tok\/s|req\/s/.test(unit||'');}
 // speedup of `val` relative to `baseVal`, direction-aware for the unit. >1 = faster.
@@ -346,42 +367,77 @@ function dcell(d,unit){if(d==null)return '<td class="num muted">—</td>';
  const s=d>=0?'+':'−'; return `<td class="num">${s}${Math.abs(d).toFixed(3)} <span class="muted">${esc(unit)}</span></td>`;}
 function rcell(r){return r==null?'<td class="num muted">—</td>':`<td class="num">${r.toFixed(2)}×</td>`;}
 function gcells(val,baseV,unit){return dcell(deltaVs(val,baseV,unit),unit)+rcell(gainVs(val,baseV,unit));}
+const dblank='<td class="num muted">—</td>', rblank='<td class="num muted">—</td>';
+// REPORTED (orange) rows: fill Δ/× vs the author's REPORTED baseline; measured pair blank.
+function gcellsRep(val,repB,unit){
+ return dcell(deltaVs(val,repB,unit),unit)+rcell(gainVs(val,repB,unit))+dblank+rblank;}
+// MEASURED (blue) rows: reported pair blank; fill Δ/× vs OUR MEASURED baseline.
+function gcellsMeas(val,measB,unit){
+ return dblank+rblank+dcell(deltaVs(val,measB,unit),unit)+rcell(gainVs(val,measB,unit));}
 function expTable(exp){
  const a=exp.arms||{}, unit=exp.unit||'value';
  const baseV=(a.base||{}).mean;                     // before-merge baseline value, in unit
- const num=(m,sd)=> m==null?'—':`${(+m).toFixed(3)}${sd==null?'':` (±${(+sd).toFixed(3)})`}`;
- const bh=baseV!=null?`<span class="eb">baseline ${(+baseV).toFixed(3)} ${esc(unit)} (before PR merged)</span>`:'';
+ const num=(m,sd)=> m==null?'—':`<span class="mv">${(+m).toFixed(3)}</span>${sd==null?'':`<span class="var">(±${(+sd).toFixed(3)})</span>`}`;
+ const bh=baseV!=null?`<span class="eb">baseline (measured) ${(+baseV).toFixed(3)} ${esc(unit)}</span>`:'';
  let h=`<div class="expH">${esc(exp.name)} <span class="eu">${esc(unit)}</span>${bh}`+
    (exp.workload?`<span class="ew" title="${esc(exp.workload)}">${esc(exp.workload)}</span>`:'')+`</div>`;
- h+=`<table class="restab exp"><colgroup><col class="c-row"><col class="c-val"><col class="c-d"><col class="c-r"><col class="c-src"></colgroup>`+
-   `<thead><tr><th>row</th><th class="num">value · ${esc(unit)}</th><th class="num">Δ vs baseline</th><th class="num">× vs baseline</th><th>source</th></tr></thead><tbody>`;
- // baseline FIRST = tree before PR merged, our run. reference for every gain.
- h+=`<tr class="baserow"><td>baseline <span class="muted">before PR merged</span></td><td class="num">${num(baseV,(a.base||{}).sd)}</td>`+
-    `<td class="num">0.000 <span class="muted">${esc(unit)}</span></td><td class="num">1.00×</td><td class="src">our run of before-merge tree</td></tr>`;
- // reported (PR author) — resolved to an ABSOLUTE value in task units, gain vs OUR baseline
- const Rr=resolveReported(exp.reported,baseV,unit);
- if(Rr){
-  h+=`<tr><td>reported</td><td class="num">${Rr.value.toFixed(3)}</td>`+
-     gcells(Rr.value,baseV,unit)+
-     `<td class="src">PR author${Rr.authorBase!=null?' · from '+(+Rr.authorBase).toFixed(3):''} <span class="muted">(${esc(Rr.how)})</span></td></tr>`;
- }else{
-  h+=`<tr><td>reported</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="src">no number in PR</td></tr>`;}
- // measured = gold = expert patch, our run.
+ h+=`<table class="restab exp"><colgroup><col class="c-row"><col class="c-val"><col class="c-d"><col class="c-r"><col class="c-d"><col class="c-r"><col class="c-src"></colgroup>`+
+   `<thead><tr><th>row</th><th class="num">value · ${esc(unit)}</th>`+
+   `<th class="num r-rep">Δ vs reported</th><th class="num r-rep">× vs reported</th>`+
+   `<th class="num r-meas">Δ vs measured</th><th class="num r-meas">× vs measured</th><th>source</th></tr></thead><tbody>`;
+ // FOUR rows, two colors, grouped by WHICH-CODE (baselines together, solutions together):
+ //   within each pair, reported (orange) comes FIRST, measured (blue) AFTER.
+ // row order: baseline(reported) -> baseline(measured) -> solution(reported) -> solution(measured)
+ // bracket suffix is consistent per color: "(reported by PR's author)" / "(measured by us)"
+ // metric cols: Δ/× vs author's REPORTED baseline (repB), then Δ/× vs OUR MEASURED baseline (baseV)
+ const rep=exp.reported||null;
+ const authorHasBase = !!(rep && rep.base!=null);
+ const repB = authorHasBase ? +rep.base : null;   // author's OWN reported baseline (null if none)
+ const Rr=resolveReported(rep,baseV,unit);
  const goldV=(a.gold||{}).mean;
- h+=`<tr><td>measured <span class="muted">after PR merged</span></td><td class="num">${num(goldV,(a.gold||{}).sd)}</td>`+
-    gcells(goldV,baseV,unit)+
-    `<td class="src">our run of expert patch</td></tr>`;
+ const SM='<span class="tag-m">(measured by us)</span>', SR='<span class="tag-r">(reported by PR\'s author)</span>';
+ // 1. baseline (reported by PR's author) — author's OLD-code number, or — if absent.
+ if(authorHasBase){
+  h+=`<tr class="r-reported"><td>baseline ${SR}</td><td class="num">${num(+rep.base,0)}</td>`+
+     gcellsRep(+rep.base,repB,unit)+`<td class="src">PR author, old code</td></tr>`;
+ }else{
+  const miss = rep&&rep.pct!=null?'a ratio/%':(rep&&rep.delta!=null?'a delta':'no number');
+  h+=`<tr class="r-reported"><td>baseline ${SR}</td><td class="num muted">—</td>`+
+     `<td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="src">author gave ${esc(miss)} — using our baseline as reference</td></tr>`;
+ }
+ // 2. baseline (measured by us) — our run of before-merge tree. 1.00x reference.
+ h+=`<tr class="baserow r-measured"><td>baseline ${SM}</td><td class="num">${num(baseV,(a.base||{}).sd)}</td>`+
+    gcellsMeas(baseV,baseV,unit)+`<td class="src">our run of before-merge tree (base_sha) — 1.00× reference</td></tr>`;
+ // 3. PR's author solution (reported by PR's author) — author's NEW-code number, or — if absent.
+ if(Rr){
+  h+=`<tr class="r-reported"><td>PR's author solution ${SR}</td><td class="num">${num(Rr.value,0)}</td>`+
+     gcellsRep(Rr.value,Rr.authorBase,unit)+`<td class="src">PR author <span class="muted">(${esc(Rr.how)})</span></td></tr>`;
+ }else{
+  h+=`<tr class="r-reported"><td>PR's author solution ${SR}</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="src">no number in PR</td></tr>`;}
+ // 4. PR's author solution (measured by us) — our run of after-merge tree.
+ h+=`<tr class="r-measured"><td>PR's author solution ${SM}</td><td class="num">${num(goldV,(a.gold||{}).sd)}</td>`+
+    gcellsMeas(goldV,baseV,unit)+`<td class="src">our run of after-merge tree (merge_sha)</td></tr>`;
  // harness arms — ALWAYS show claude + codex (+ any extra arm present), pending if absent
  const keys=HARNESSES.concat(Object.keys(a).filter(k=>!['base','gold'].includes(k)&&!HARNESSES.includes(k)));
  keys.forEach(k=>{const arm=a[k];
   if(arm&&arm.mean!=null){
    h+=`<tr><td>${esc(k)}</td><td class="num">${num(arm.mean,arm.sd)}</td>`+
-      gcells(arm.mean,baseV,unit)+
+      gcellsMeas(arm.mean,baseV,unit)+
       `<td class="src">solver arm</td></tr>`;
   }else{
-   h+=`<tr><td>${esc(k)}</td><td class="num muted">pending</td><td class="num muted">—</td><td class="num muted">—</td><td class="src">not run yet</td></tr>`;}
+   h+=`<tr><td>${esc(k)}</td><td class="num muted">pending</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="src">not run yet</td></tr>`;}
  });
  h+='</tbody></table>';
+ // scale / comparability banner — makes the reported-vs-measured divergence fix VISIBLE
+ if(rep&&(rep.comparable===false||rep.workload_invalid||rep.scope||rep.scale_note||rep.scale_short)){
+  const inv=!!rep.workload_invalid;
+  const tag=inv?'WORKLOAD INVALID':(rep.comparable===false?'NOT 1:1':'SCALE NOTE');
+  const short=rep.scale_short||rep.scope||'';
+  h+=`<div class="scalebox${inv?' inv':''}"><span class="sb-tag">${tag}</span>`+
+     (short?` <span class="sb-s">${esc(short)}</span>`:'')+
+     (rep.scale_note?`<div class="sb-l" title="${esc(rep.scale_note)}"><b>details ▸</b> <span class="sb-full">${esc(rep.scale_note)}</span></div>`:'')+
+     `</div>`;
+ }
  return h;
 }
 function harnessTable(res){
@@ -389,7 +445,7 @@ function harnessTable(res){
  if(!exps.length){
   if(res&&res.schema==='experiments_v2') // ran, but correctness-only (no timing)
    return '<div class="muted" style="padding:8px 2px">correctness-only — no timing experiment'+(res.note?'. '+esc(res.note):'')+'</div>';
-  return '<div class="muted" style="padding:8px 2px">no measured experiments yet — run <code>./run.sh '+(res?res.pr:'')+'</code></div>';
+  return '<div class="muted" style="padding:8px 2px">no results yet — run <code>./run.sh '+(res?res.pr:'')+'</code></div>';
  }
  return exps.map(expTable).join('');
 }
@@ -411,7 +467,7 @@ async function showPR(pr){
    · reported: ${esc(r.reported_gain||'—')}</div>
   <!-- TOP: challenge results with harnesses -->
   <div class="dsec">
-   <div class="dsecH">challenge results · measured = 1.00× reference</div>
+   <div class="dsecH">challenge results · baseline (measured) = 1.00× reference · <span style="color:#2563eb">measured=our run</span> · <span style="color:#d97706">reported=PR author</span></div>
    ${harnessTable(res)}
    ${arms?`<div class="meta" style="margin-top:4px">tests: ${arms}</div>`:''}
   </div>
@@ -439,7 +495,7 @@ function render(){
  $('#ts').textContent = measured.length? ('updated '+ (RES[measured[0].pr]||{}).ts||'') : '';
  $('#stats').innerHTML=[
   ['total PRs',IDX.length,'a'],
-  ['measured',measured.length,'a'],
+  ['ran',measured.length,'a'],
   ['improved',imp,'g'],
   ['not / pending',IDX.length-imp,'r'],
  ].map(([k,v,c])=>`<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div></div>`).join('')
@@ -449,7 +505,7 @@ function render(){
     <i style="flex:1;background:var(--panel2)"></i></div>
     <div class="meta">${imp} improved · ${noi} not · ${IDX.length-measured.length} pending of ${IDX.length}</div></div>`;
 
- // top results · one table per (PR, experiment). measured = our run of expert patch = 1.00× ref.
+ // top results · one table per (PR, experiment). baseline (measured) = 1.00× ref.
  const latRows=measured.map(r=>RES[r.pr]).filter(r=>experimentsOf(r).length);
  if(latRows.length){
   let h='';
@@ -458,8 +514,8 @@ function render(){
    h+=`<div style="margin:14px 0 4px;font-weight:700;font-size:12.5px">${prCell}</div>`;
    h+=experimentsOf(r).map(expTable).join('');
   });
-  $('#restabWrap').innerHTML='<h2 style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:0 0 8px">experiment results · one table per experiment · measured = 1.00× reference, variance in (±)</h2>'+h;
- } else $('#restabWrap').innerHTML='<table class="restab"><tbody><tr><td class="muted">no measured experiments yet — run <code>./run.sh</code></td></tr></tbody></table>';
+  $('#restabWrap').innerHTML='<h2 style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:0 0 8px">experiment results · one table per experiment · baseline (measured) = 1.00× reference, variance in (±)</h2>'+h;
+ } else $('#restabWrap').innerHTML='<table class="restab"><tbody><tr><td class="muted">no results yet — run <code>./run.sh</code></td></tr></tbody></table>';
 
  // per-PR cards
  const rows=IDX.filter(r=>{

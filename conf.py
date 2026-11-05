@@ -141,6 +141,19 @@ def main():
     cmd = sys.argv[1]
 
     if cmd == "solvers":
+        # dict_of_harnesses.json is the source of truth; config.yaml:solvers is
+        # a legacy fallback used only if the JSON is missing.
+        import json
+        jpath = os.path.join(HERE, "dict_of_harnesses.json")
+        if os.path.exists(jpath):
+            with open(jpath) as f:
+                hs = json.load(f).get("harnesses", [])
+            for s in hs:
+                if not s.get("enabled", False):
+                    continue
+                guided = "1" if s.get("guided") else "0"
+                print(f"{s.get('key','')}\t{s.get('model','')}\t{s.get('cmd','')}\t{guided}")
+            return
         for s in _merge_solver_block(cfg):
             if str(s.get("enabled")).lower() != "true":
                 continue

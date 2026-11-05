@@ -24,7 +24,10 @@
    "note": "runs = per allocate-block size; speedup = mean of per-size base/gold ratios",
    "reported": {
     "base": 0.15,
-    "patch": 0.008
+    "patch": 0.008,
+    "scope": "per-op TRACE in a serving run",
+    "comparable": false,
+    "scale_note": "PR gave TWO measurements from DIFFERENT harnesses: (1) engine 'benchmark scripts' on a GPU box, single aggregate per-op, 0.15ms->0.008ms (~19x, screenshots only); (2) benchmark_block_pool.py, which the author described only as 'cut in half' (~2x, no typed numbers). OUR bench IS benchmark_block_pool.py, so the ~2x claim is the right comparator (measured 1.83x = match). The 19x headline is the engine-script scope where fixed per-call python overhead dominates a GPU-fast path -- NOT reproducible on, nor scale-comparable to, a CPU linked-list microbench. Author never claimed benchmark_block_pool gives 19x."
    },
    "arms": {
     "base": {
@@ -61,7 +64,10 @@
    "note": "runs = per allocate-block size; speedup = mean of per-size base/gold ratios",
    "reported": {
     "base": 0.033,
-    "patch": 0.009
+    "patch": 0.009,
+    "scope": "per-op TRACE in a serving run",
+    "comparable": false,
+    "scale_note": "Same as get_new_blocks: 33us->9us is the engine-script TRACE aggregate (GPU box), benchmark_block_pool is 'cut in half' ~2x (measured 1.71x = match). Our base free=0.101ms is NOT 3x the author's 33us 'baseline' -- it is the 500-block-size row average; the 33us is a single engine-aggregate per-call figure from a different harness. Harness mismatch, not a scale error. Pure-python linked-list pointer reduction (popleft_n/append_n), no GPU involved in the list logic."
    },
    "arms": {
     "base": {

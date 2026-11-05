@@ -1,0 +1,11 @@
+{
+ "pr": 37225,
+ "needs": "gpu",
+ "cluster": "none_gpu",
+ "model": null,
+ "cmd": "python benchmarks/benchmark_topk_topp.py --batch-sizes 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+ "workload_kind": "repo_benchmark",
+ "all_clusters": [
+  "none_gpu"
+ ]
+}

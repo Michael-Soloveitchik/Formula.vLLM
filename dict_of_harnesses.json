@@ -1,0 +1,37 @@
+{
+ "_doc": "Single source of truth for solver harnesses. run_one.sh reads this via conf.py (conf.py falls back to config.yaml:solvers only if this file is absent). Each entry: key = the arm name shown in the dashboard (MUST match web/index.html HARNESSES). guided=false -> objective has the '## Expert solution' section STRIPPED (blind FormulaCode: discover the optimization). guided=true -> full problem.md incl. the expert's merged patch, asked to beat it. The runner invokes:  <cmd> \"<objective>\"  inside a copy of the base_sha tree; the command edits ./vllm and exits.",
+ "harnesses": [
+  {
+   "key": "claude",
+   "model": "claude-opus-4-8",
+   "cmd": "claude -p --model=claude-opus-4-8",
+   "guided": false,
+   "enabled": true,
+   "env": ["ANTHROPIC_BASE_URL", "ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_MODEL"]
+  },
+  {
+   "key": "claude + PR's solution",
+   "model": "claude-opus-4-8",
+   "cmd": "claude -p --model=claude-opus-4-8",
+   "guided": true,
+   "enabled": true,
+   "env": ["ANTHROPIC_BASE_URL", "ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_MODEL"]
+  },
+  {
+   "key": "codex",
+   "model": "gpt-6.1-sol",
+   "cmd": "codex exec --skip-git-repo-check",
+   "guided": false,
+   "enabled": true,
+   "env": ["LITELLM_API_KEY", "LITELLM_KEY"]
+  },
+  {
+   "key": "codex + PR's solution",
+   "model": "gpt-6.1-sol",
+   "cmd": "codex exec --skip-git-repo-check",
+   "guided": true,
+   "enabled": true,
+   "env": ["LITELLM_API_KEY", "LITELLM_KEY"]
+  }
+ ]
+}

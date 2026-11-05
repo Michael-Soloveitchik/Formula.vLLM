@@ -24,7 +24,10 @@
    "note": "PREFERRED approach: imported the standalone vllm/v1/spec_decode/ngram_proposer.py module directly from each mounted source tree (self-contained, only numpy/numba/typing deps) and timed .propose(). base=pure-python KMP loop; gold=numba @jit(nopython=True) kernels. runs = per-repeat cumulative seconds; speedup_x = mean of per-repeat base/gold ratios. numba not baked in image -> installed at runtime via pip (numba 0.68.1, arm64 wheel); worked.",
    "reported": {
     "base": 54.3,
-    "patch": 1.9
+    "patch": 1.9,
+    "scope": "cumulative over a full ShareGPT 5K-request E2E serving run (propose() called once per decode step per request = hundreds of thousands of calls)",
+    "comparable": false,
+    "scale_note": "SAME unit (s) but NOT scale-comparable to our microbench. Our 'base' 0.257s is cumulative over 5000 single-sequence propose() calls; the PR's 54.3s is cumulative over a full ShareGPT 5K-REQUEST serving run (~200x more cumulative work; exact call count not derivable since per-call cost differs between synthetic and real token streams). Direction + ratio (ours 71x vs reported ~29x) are genuine; absolute seconds are not 1:1."
    },
    "arms": {
     "base": {

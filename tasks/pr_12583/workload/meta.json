@@ -1,0 +1,12 @@
+{
+ "pr": 12583,
+ "needs": "gpu",
+ "cluster": "mixtral",
+ "model": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+ "cmd": "python3 benchmarks/kernels/benchmark_moe.py --model mistralai/Mixtral-8x7B-Instruct-v0.1 --tp-size 2 --dtype auto --seed 0",
+ "workload_kind": "repo_benchmark",
+ "all_clusters": [
+  "none_gpu",
+  "mixtral"
+ ]
+}

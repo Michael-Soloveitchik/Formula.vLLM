@@ -1,0 +1,11 @@
+{
+ "pr": 27673,
+ "needs": "cpu",
+ "cluster": "none_cpu",
+ "model": null,
+ "cmd": "python3 tasks/pr_27673/bench.py",
+ "workload_kind": "microbench_in_pr",
+ "all_clusters": [
+  "none_cpu"
+ ]
+}

@@ -6,3 +6,5 @@ __pycache__/
 *.pyc
 # the vLLM clone is NOT vendored — set VLLM_GIT
 vllm/
+# shared model weights, fetch-on-demand per cluster (download.sh), never committed
+.weights/

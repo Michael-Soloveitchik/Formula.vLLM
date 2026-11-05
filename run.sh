@@ -5,6 +5,7 @@
 #   ./run.sh all             # all 202 PRs
 #   ./run.sh 21222 21627     # specific PRs
 #   ./run.sh interesting     # a named set from config.yaml
+#   ./run.sh workloads       # run per-PR workload/ images by cluster (GPU box)
 #
 # Per PR: build image at base_sha, run REAL test_patch for base(FAIL) +
 # gold(PASS) + each enabled solver, measure latency with repeats->variance,
@@ -12,6 +13,13 @@
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"; cd "$HERE"
 mkdir -p .work results
+
+# workloads mode: iterate clusters in order, download weights once per cluster,
+# build+run each per-PR workload/ image for both arms. Delegated to run_workloads.sh.
+if [ "${1:-}" = "workloads" ]; then
+  shift
+  exec bash "$HERE/run_workloads.sh" "$@"
+fi
 
 if [ $# -eq 0 ]; then
   default=$(python3 conf.py get run.default)

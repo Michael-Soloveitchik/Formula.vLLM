@@ -24,7 +24,11 @@
    "note": "FINDING: PR #6779 does NOT touch make_tensor_with_pad; that fn is BYTE-IDENTICAL at base and gold (already the np.full/make_ndarray_with_pad array path). The real change is the INPUT fed to it inside SamplingTensors.from_sampling_metadata/from_lists: base builds List[List[int]] via list(seq_data.prompt_token_ids) (tuple->list copies); gold passes seq_data.prompt_token_ids_array (array('l')) directly, SequenceData now storing tokens as array. Benchmark loads the REAL unmodified make_tensor_with_pad from each mounted tree by source (vllm import chain needs the absent _custom_ops C ext) and replicates the exact per-arm prep path. speedup_x = mean of per-run base/gold ratios.",
    "reported": {
     "base": 79.0,
-    "patch": 22.0
+    "patch": 22.0,
+    "scope": "PR microbench of the FULL from_sampling_metadata / SamplingTensors.from_lists build (NVTX-profiled), input_len=1024 batch=2048 -> 79->22ms (~3.6x)",
+    "comparable": false,
+    "scale_short": "We isolate only the token-store+pad sub-op; author timed the whole metadata build. TO MAKE 1:1: widen our bench to the full from_sampling_metadata build.",
+    "scale_note": "SAME unit (ms) but NOT 1:1. The PR does NOT optimize make_tensor_with_pad (byte-identical across arms); the real change is SequenceData storing tokens as array.array('l') so from_sampling_metadata appends arrays directly instead of list(...) copies. Author's 79->22ms (3.6x) is the WHOLE sampler-metadata build stage; our 54.7->2.7ms (20x) isolates just the token-store+pad sub-op the array change accelerates. TO MAKE SAME ENCLOSING SCOPE: time the full from_sampling_metadata build (not just the pad sub-op) so our ratio converges toward the author's 3.6x. E2E (separate arm) is the headline the author/reviewer agreed on: ~18.9%."
    },
    "arms": {
     "base": {
@@ -61,7 +65,10 @@
    "note": "needs GPU model, reported-only",
    "reported": {
     "base": 24.76,
-    "patch": 29.44
+    "patch": 29.44,
+    "scope": "E2E Qwen-1.5-0.5B offline throughput (GPU)",
+    "comparable": false,
+    "scale_note": "E2E it/s on GPU (24.76->29.44). NOT run here (CPU arm Mac). Row left as reported-only."
    },
    "arms": {}
   }

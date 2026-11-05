@@ -1,0 +1,62 @@
+{
+ "_doc": "Clusters group PRs by hardware target + shared model so weights download ONCE and same-model tasks run back-to-back. run.sh workloads iterates clusters in `order`. download.sh fetches into .weights/<key> (gitignored); nothing downloads until run on the target box. GPU clusters skip when no --gpus present (rows stay reported-only/pending).",
+ "weights_dir": ".weights",
+ "order": ["none_cpu", "none_gpu", "opt125m", "qwen05b", "llama8b_fp8", "mixtral"],
+ "clusters": {
+  "none_cpu": {
+   "needs": "cpu",
+   "model": null,
+   "size": "0",
+   "download": null,
+   "prs": [6779, 13365, 21222, 21281, 27673, 27793, 29499, 32975, 33593, 39328],
+   "notes": "Pure-CPU microbench / repo_benchmark / pytest. No weights. Runs + measures here on arm Mac."
+  },
+  "none_gpu": {
+   "needs": "gpu",
+   "model": null,
+   "size": "0",
+   "download": null,
+   "prs": [6442, 12583, 23504, 33538, 37225, 41163],
+   "notes": "GPU kernel / Triton microbench, no model weights but needs CUDA. Scaffold only here; execute on GPU box. 12583 also loads Mixtral config via --model (see mixtral cluster)."
+  },
+  "opt125m": {
+   "needs": "gpu",
+   "model": "facebook/opt-125m",
+   "hf_id": "facebook/opt-125m",
+   "size": "~250MB",
+   "download": "hf",
+   "prs": [16436, 22940],
+   "notes": "Serving / throughput bench on opt-125m. Smallest real model."
+  },
+  "qwen05b": {
+   "needs": "gpu",
+   "model": "Qwen/Qwen2-0.5B",
+   "hf_id": "Qwen/Qwen2-0.5B",
+   "size": "~1GB",
+   "download": "hf",
+   "prs": [6779, 28280],
+   "notes": "6779 e2e_qwen05b arm (it/s) + 28280 serving. 6779's CPU microbench arm is in none_cpu; only the e2e arm needs this."
+  },
+  "llama8b_fp8": {
+   "needs": "gpu",
+   "model": "neuralmagic/Meta-Llama-3-8B-Instruct-FP8",
+   "hf_id": "neuralmagic/Meta-Llama-3-8B-Instruct-FP8",
+   "dataset": "ShareGPT_V3_unfiltered_cleaned_split",
+   "dataset_url": "https://huggingface.co/datasets/anon8231489123/ShareGPT_Vicuna_unfiltered/resolve/main/ShareGPT_V3_unfiltered_cleaned_split.json",
+   "size": "~8.6GB (model) + ~650MB (ShareGPT)",
+   "download": "hf+dataset",
+   "prs": [9972, 28280],
+   "notes": "Prefix-caching serving (9972) + 28280 sharegpt serving. Large; only on GPU box with disk."
+  },
+  "mixtral": {
+   "needs": "gpu",
+   "model": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+   "hf_id": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+   "size": "~90GB",
+   "download": "hf",
+   "gated": "ALLOW_MIXTRAL",
+   "prs": [12583],
+   "notes": "DEFERRED to LAST. ~90GB, multi-GPU TP=2. download.sh refuses unless ALLOW_MIXTRAL=1. Run only on a box that can hold it."
+  }
+ }
+}

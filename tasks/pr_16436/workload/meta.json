@@ -1,0 +1,11 @@
+{
+ "pr": 16436,
+ "needs": "gpu",
+ "cluster": "opt125m",
+ "model": "facebook/opt-125m",
+ "cmd": "python3 benchmarks/benchmark_serving.py --backend vllm --model facebook/opt-125m --dataset-name random --random-input-len 1000 --random-output-len 100 --num-prompts 100",
+ "workload_kind": "serving",
+ "all_clusters": [
+  "opt125m"
+ ]
+}

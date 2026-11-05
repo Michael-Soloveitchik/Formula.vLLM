@@ -23,8 +23,11 @@
    "workload": "200 seqs x 2000 tokens; isolated SlowIncrementalDetokenizer per-token output-count check (slice vs tracked), 7 repeats",
    "note": "approach=fallback (self-contained, both arms in ONE process on the same CPU, no cross-container noise). Reproduces the exact changed inner logic: base recomputes len(self.token_ids[self.prompt_len:]) per token (slice alloc), gold uses num_output_tokens()==len(token_ids)-prompt_len. speedup_x = mean of per-repeat base/gold ratios. NOTE: the real full detokenizer path was ALSO driven (PYTHONPATH=/src, real gpt2 tokenizer via transformers, real SlowIncrementalDetokenizer.update() loop, batched updates, long prompt); there the native tokenizer decode (~5us/tok) dominates and the slice removal is below run-to-run noise (real base ~5.36 us/tok vs gold ~6.39 us/tok, i.e. no measurable end-to-end gain). The isolated fallback below matches the PR's own reported methodology of timing the detokenizer PYTHON logic in isolation.",
    "reported": {
-    "base": 1.628,
-    "patch": 1.0
+    "base": 0.03936,
+    "patch": 0.02418,
+    "scope": "benchmark_detokenizer_min_tokens.py: 39.36 ns/token -> 24.18 ns/token (1.628x, -38.57%) -- but this benchmarks the min_tokens offset-accumulation loop that was REVERTED, not the merged change",
+    "comparable": false,
+    "scale_note": "UNIT-BUG FIXED + SCOPE CAVEAT. Earlier this field held base=1.628/patch=1.0, pasting the SPEEDUP RATIO as an absolute us/tok value; real PR numbers are 39.36->24.18 ns/token = 0.03936->0.02418 us/tok. BUT the 1.628x is unrepresentative TWICE OVER: (1) the PR's benchmark_detokenizer_min_tokens.py times a synthetic pure-Python int/str accumulation loop (new_chars_len += len(piece) vs stop_check_offset += len(piece)) with NO tokenizer / NO update() / NO slice -- it measures the min_tokens stop_check_offset change, which was REVERTED (njhill 2026-02-06; only num_output_tokens was merged). (2) njhill noted the common case is 1 token/update where the change is MORE work, so the benchmark doesn't reflect production. Our microbench isolates the actually-merged num_output_tokens() slice-vs-count primitive (base ~1.33 us/tok, 11x). Direction agrees; the PR's 1.628x and our 11x measure different code and are not comparable."
    },
    "arms": {
     "base": {

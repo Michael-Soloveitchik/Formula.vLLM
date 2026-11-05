@@ -24,7 +24,11 @@
    "note": "runs = per allocate-block size, median of 3 reps; speedup = mean of per-size base/gold ratios",
    "reported": {
     "base": 0.13,
-    "patch": 0.03
+    "patch": 0.03,
+    "scope": "per-call TRACE of allocate_new_block, measured on top of PR #21222",
+    "comparable": false,
+    "workload_invalid": true,
+    "scale_note": "WORKLOAD INVALID (measured 1.007x is meaningless, do not trust). The PR cuts 4->2 dict lookups of the same key in _maybe_evict_cached_block, but that body ONLY runs when block_hash is not None AND block_hash in cached_block_hash_to_block (a cached block being evicted). Our benchmark_block_pool sweep pulls free blocks with block_hash=None, so BOTH arms hit the membership-fail early-out and the 4->2 reduction never executes. FIX NEEDED: enable_caching=True; assign each test block a non-None block_hash; pre-populate cached_block_hash_to_block[block_hash]={block_id:block} so the membership HITS; loop _maybe_evict_cached_block on those cached blocks (re-insert each iter). Only then does base pay 4 same-key hashes vs gold's 2 -> expect ~2x isolated (author's 4.3x is a profiler trace delta on top of #21222, an upper bound incl. surrounding overhead). Author number 0.13->0.03ms published as prose, no input sizes."
    },
    "arms": {
     "base": {

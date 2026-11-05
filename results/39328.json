@@ -24,7 +24,10 @@
    "note": "base = recompute inspect.getsource+sha256 each call; gold = functools.cache wrapped (cold miss then hits); speedup = mean of per-repeat base/gold ratios",
    "reported": {
     "base": 32.5,
-    "patch": 11.3
+    "patch": 11.3,
+    "scope": "ms per 'cache lookup' (PR body does not define granularity; likely per-uuid() computation -- inferred, not quoted)",
+    "comparable": false,
+    "scale_note": "SAME unit (ms) but NOT scale-comparable. Reported 32.5->11.3ms is the PR's 'cache lookup time' whose scope the PR body does NOT specify (inferred to be per full uuid() computation over the pass classes). Our bench = ms per SINGLE hash_source() call (total_ms/n_lookups over 5 objects), so ~92x smaller. Ratio also differs (measured 354x vs reported 2.88x): our gold is a pure functools.cache HIT (trivial) vs base paying getsource+sha256 every call; the PR's 2.88x is diluted because uuid() does other non-cached work. Direction genuine; absolute ms and ratio not 1:1."
    },
    "arms": {
     "base": {

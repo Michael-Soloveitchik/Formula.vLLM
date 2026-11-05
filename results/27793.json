@@ -3,7 +3,7 @@
  "pr_url": "https://github.com/vllm-project/vllm/pull/27793",
  "title": "[Core][Observability] Add KV cache residency metrics (#27793)",
  "field": "scheduling",
- "reported_gain": "0.1%",
+ "reported_gain": "N/A (observability feature; author claims <0.1% overhead/request at 1% sampling, not a speedup)",
  "base_sha": "ec7035c9d40cda43fa9c3d2d1c148b1382aa04a4",
  "merge_sha": "cabc77cc86586206134a19e3e70aa401ec30b71f",
  "arms": {
@@ -17,7 +17,7 @@
  "improved": true,
  "schema": "experiments_v2",
  "experiments": [],
- "note": "correctness-only PR (KV residency metrics). No timing experiment \u2014 overhead ~48 bytes/block, zero runtime cost when disabled. Validated by pytest with deterministic fake clock.",
+ "note": "OBSERVABILITY FEATURE, not a perf optimization. Title: '[Core][Observability] Add KV cache residency metrics'. Adds 3 Prometheus histograms (kv_block_lifetime/idle_before_evict/reuse_gap) behind --kv-cache-metrics flags (default 1% sampling) via new KVCacheMetricsCollector in block_pool hot paths (on_block_allocated/accessed/evicted), each guarded by `if self.metrics_collector:` so disabled=zero cost. The '0.1%' is the author's OVERHEAD ceiling (~365ns/block @1% sampling), NOT a gain. No base-vs-gold speedup exists; correctness-only is correct. If benchmarked, it would measure feature OVERHEAD (lower-is-better, inverted), not improvement.",
  "environment": "n/a (correctness-only)",
  "ts": "2026-11-04T00:00:00Z"
 }

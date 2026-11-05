@@ -1,0 +1,11 @@
+{
+ "pr": 21222,
+ "needs": "cpu",
+ "cluster": "none_cpu",
+ "model": null,
+ "cmd": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
+ "workload_kind": "repo_benchmark",
+ "all_clusters": [
+  "none_cpu"
+ ]
+}

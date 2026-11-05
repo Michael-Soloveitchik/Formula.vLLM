@@ -179,7 +179,7 @@
   "hardware": [
    "agnostic"
   ],
-  "reported_gain": "18%",
+  "reported_gain": "18% (e2e 24.76->29.44 it/s)",
   "gain_kind": "pct",
   "gain_evidence": "Nice to see an 18% speedup from this optimization.",
   "base_sha": "084a01fd3544557990f8af8af6fd3c1185bae848",
@@ -1659,7 +1659,7 @@
   "hardware": [
    "agnostic"
   ],
-  "reported_gain": "0.1%",
+  "reported_gain": "N/A (observability feature; <0.1% overhead, not a speedup)",
   "gain_kind": "pct",
   "gain_evidence": "Assuming typical request latency of 100-500ms, this represents **< 0.1% overhead per request**.",
   "base_sha": "ec7035c9d40cda43fa9c3d2d1c148b1382aa04a4",
@@ -1928,7 +1928,7 @@
   "hardware": [
    "agnostic"
   ],
-  "reported_gain": "27%",
+  "reported_gain": "27% (rearrange 1370->1077ms E2E); 20-25% per primitive",
   "gain_kind": "pct",
   "gain_evidence": "~27% speedup",
   "base_sha": "0ada960a20766fa1de9063576979f9d807583785",
