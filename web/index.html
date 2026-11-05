@@ -7,25 +7,35 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>vLLM perf-benchmark · 202</title>
 <style>
- :root{--bg:#eef2fa;--panel:#fff;--panel2:#f1f5fc;--border:#e0e6f1;--border2:#ccd6e8;
-  --fg:#141c33;--mut:#5f6b86;--faint:#9aa5bd;--acc:#3b6fe0;--acc2:#7a5cff;
-  --grn:#15935a;--org:#c7791a;--red:#e0485f;--sel:#e4edff;
-  --grad:linear-gradient(120deg,#3b6fe0,#6a5cff 55%,#8f55ff);
+ :root{--bg:#f7f9ff;--panel:#fff;--panel2:#f3f6ff;--border:#e6ebf7;--border2:#d3dcf0;
+  --fg:#101830;--mut:#5b6885;--faint:#98a3bb;--acc:#2f6bff;--acc2:#8a4dff;--cyan:#12c2e9;
+  --grn:#12b26b;--org:#e08a1e;--red:#ef4e6a;--sel:#e9f0ff;
+  --grad:linear-gradient(120deg,#12c2e9,#2f6bff 45%,#8a4dff 85%,#ff5fa2);
+  --glow:0 10px 30px rgba(47,107,255,.10),0 2px 6px rgba(16,24,48,.05);
   --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;
   --mono:ui-monospace,SFMono-Regular,Menlo,monospace}
  *{box-sizing:border-box}
  html,body{height:100%}
  body{margin:0;font:13px/1.5 var(--ui);color:var(--fg);
-  background:radial-gradient(1200px 600px at 0% 0%,#eaf0ff 0,transparent 55%),radial-gradient(1000px 500px at 100% 100%,#f3ecff 0,transparent 50%),var(--bg)}
- header{background:var(--grad);color:#fff;padding:14px 20px;box-shadow:0 2px 10px rgba(80,70,200,.28);
-  display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;position:sticky;top:0;z-index:20}
- header h1{font-size:15px;font-weight:700;margin:0;letter-spacing:.02em}
- header .sub{color:#e3e9ff;font-size:12px}
+  background:radial-gradient(900px 520px at -5% -10%,#dff5ff 0,transparent 60%),radial-gradient(900px 520px at 105% -10%,#efe4ff 0,transparent 55%),radial-gradient(800px 500px at 50% 110%,#ffe8f3 0,transparent 55%),var(--bg);
+  background-attachment:fixed}
+ header{background:rgba(255,255,255,.78);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);
+  color:var(--fg);padding:12px 22px;border-bottom:1px solid rgba(47,107,255,.14);box-shadow:0 6px 24px rgba(47,107,255,.08);
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;position:sticky;top:0;z-index:20}
+ header::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--grad)}
+ header .logo{display:inline-flex;align-items:center;filter:drop-shadow(0 2px 4px rgba(47,107,255,.25))}
+ header h1{font-size:21px;font-weight:800;margin:0;letter-spacing:-.01em;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+ header .sub{color:var(--mut);font-size:12px}
+ header .live{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--grn);background:#e6f9ef;border:1px solid #bdeed3;border-radius:20px;padding:2px 9px}
+ header .live i{width:7px;height:7px;border-radius:50%;background:var(--grn);box-shadow:0 0 0 0 rgba(18,178,107,.5);animation:pulse 1.8s infinite}
+ @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(18,178,107,.45)}70%{box-shadow:0 0 0 7px rgba(18,178,107,0)}100%{box-shadow:0 0 0 0 rgba(18,178,107,0)}}
+ header .gh{margin-left:auto;font-size:12px;font-weight:700;color:var(--acc);text-decoration:none;border:1px solid var(--border2);background:#fff;border-radius:20px;padding:4px 12px;transition:.15s}
+ header .gh:hover{border-color:var(--acc);box-shadow:0 0 0 3px rgba(47,107,255,.14)}
  /* app shell: left tree + main content */
  #app{display:grid;grid-template-columns:280px 1fr;align-items:start}
  /* ---- LEFT TREE PANE ---- */
  #left{border-right:1px solid var(--border);height:calc(100vh - 50px);overflow:auto;position:sticky;top:50px;
-  background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.4))}
+  background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,.6))}
  #left .lh{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);padding:12px 14px 4px}
  #left .lsearch{padding:0 12px 10px;border-bottom:1px solid var(--border)}
  #left .lsearch input{width:100%;background:var(--panel);border:1px solid var(--border2);border-radius:9px;padding:7px 10px;font:13px var(--ui);color:var(--fg)}
@@ -65,7 +75,7 @@
  .wrap{max-width:1180px;margin:0 auto;padding:18px}
  /* PR detail panel (top of main content) */
  #detailWrap{margin-bottom:18px}
- .detail{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:15px 18px;box-shadow:0 2px 8px rgba(23,32,58,.06)}
+ .detail{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:15px 18px;box-shadow:var(--glow)}
  .detail h2{margin:0 0 3px;font-size:15px;line-height:1.3}
  .detail .dmeta{color:var(--mut);font-size:11.5px;font-family:var(--mono);word-break:break-all;margin:4px 0 10px;padding-bottom:10px;border-bottom:1px solid var(--border)}
  .detail .dmeta a{color:var(--acc);text-decoration:none;font-weight:600}
@@ -92,23 +102,38 @@
  .lat.d td{padding:2px 6px;font-size:12px;font-family:var(--mono)}
  .lat.d td:first-child{color:var(--mut);font-family:var(--ui)}
  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
- .stat{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:13px 15px;
-  box-shadow:0 1px 2px rgba(23,32,58,.05),0 2px 8px rgba(23,32,58,.05)}
- .stat .k{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}
- .stat .v{font-size:23px;font-weight:700;margin-top:2px;font-family:var(--mono)}
- .stat .v.g{color:var(--grn)} .stat .v.r{color:var(--red)} .stat .v.a{color:var(--acc)}
- .bar{display:flex;height:9px;border-radius:6px;overflow:hidden;margin-top:9px;background:var(--panel2)}
- .bar i{display:block}
+ .stat{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:14px 16px;position:relative;overflow:hidden;
+  box-shadow:var(--glow);transition:transform .15s,box-shadow .15s}
+ .stat::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--grad);opacity:.9}
+ .stat:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(47,107,255,.16),0 2px 6px rgba(16,24,48,.06)}
+ .stat .k{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--mut)}
+ .stat .v{font-size:30px;font-weight:800;margin-top:2px;font-family:var(--mono);letter-spacing:-.02em;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+ .stat .v.g{background:linear-gradient(120deg,#12b26b,#28d58a);-webkit-background-clip:text;background-clip:text}
+ .stat .v.r{background:linear-gradient(120deg,#ef4e6a,#ff8a5b);-webkit-background-clip:text;background-clip:text}
+ .stat .v.a{background:linear-gradient(120deg,#2f6bff,#12c2e9);-webkit-background-clip:text;background-clip:text}
+ .stat .pc{font-size:10.5px;color:var(--faint);margin-top:1px;font-weight:600}
+ .stat .v.c{background:linear-gradient(120deg,#12c2e9,#2f6bff);-webkit-background-clip:text;background-clip:text}
+ .stat.prog .k .kk{font-weight:600;text-transform:none;letter-spacing:0;color:var(--faint);margin-left:6px}
+ .seg{display:block;height:100%} .s-meas{background:linear-gradient(90deg,#12c2e9,#2f6bff)} .s-proc{background:linear-gradient(90deg,#a78bfa,#c4b5fd)}
+ .s-pend{background:var(--panel2)} .s-imp{background:linear-gradient(90deg,#12b26b,#28d58a)} .s-solv{background:linear-gradient(90deg,#ff5fa2,#ff8a5b)}
+ .legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:9px;font-size:11.5px;color:var(--mut)}
+ .legend span{display:inline-flex;align-items:center;gap:6px} .legend b{color:var(--fg);font-family:var(--mono)}
+ .legend .sw{width:10px;height:10px;border-radius:3px;display:inline-block} .legend .sep{width:1px;height:14px;background:var(--border2)}
+ .bar{display:flex;height:12px;border-radius:8px;overflow:hidden;margin-top:10px;background:var(--panel2);box-shadow:inset 0 1px 2px rgba(16,24,48,.06)}
+ .bar i{display:block;transition:width .6s ease}
  .ctl{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
  input,select{background:var(--panel);border:1px solid var(--border2);border-radius:9px;padding:7px 10px;font:13px var(--ui);color:var(--fg)}
  .ctl input{flex:1;min-width:180px}
- .restab{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--border);
-  border-radius:12px;overflow:hidden;margin-bottom:20px;box-shadow:0 2px 8px rgba(23,32,58,.05)}
+ .restab{width:100%;border-collapse:separate;border-spacing:0;background:var(--panel);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;margin-bottom:20px;box-shadow:var(--glow)}
  .restab th,.restab td{padding:8px 11px;text-align:left;border-bottom:1px solid var(--border);font-size:12.5px}
- .restab th{background:var(--panel2);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
+ .restab tbody tr{transition:background .12s}
+ .restab tbody tr:hover td{background:#f6f9ff}
+ .restab th{background:var(--panel2);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}
  .restab td.num{font-family:var(--mono);text-align:right;white-space:nowrap}
  .restab td:first-child{white-space:nowrap}
- .restab tr.baserow td{background:#e7ecf6}
+ .restab tr.baserow td{background:#eef3ff}
  .restab tr.r-measured td:first-child{border-left:3px solid #2563eb}
  .restab tr.r-reported td:first-child{border-left:3px solid #d97706}
  .restab td .tag-m{color:#2563eb;font-weight:700}
@@ -138,31 +163,43 @@
  .expH .eb{font-family:var(--mono);font-size:10px;color:var(--mut);font-weight:600;margin-left:2px}
  .restab tr:last-child td{border-bottom:none}
  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
- .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:13px 15px;
-  box-shadow:0 1px 2px rgba(23,32,58,.05)}
+ .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:13px 15px;
+  box-shadow:var(--glow);transition:transform .15s,box-shadow .15s}
+ .card:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(47,107,255,.14),0 2px 6px rgba(16,24,48,.06)}
  .card h3{margin:0 0 3px;font-size:13px;font-weight:700;display:flex;gap:7px;align-items:baseline}
  .card h3 a{color:var(--acc);text-decoration:none} .card h3 a:hover{text-decoration:underline}
  .card .t{color:var(--fg);font-weight:600;font-size:12.5px;line-height:1.35}
  .meta{color:var(--mut);font-size:11px;margin-top:5px;font-family:var(--mono);word-break:break-all}
  .chip{display:inline-block;padding:1px 8px;border-radius:20px;font-size:10px;font-weight:700;border:1px solid transparent}
  .chip.field{color:var(--acc);background:var(--sel);border-color:#c7d7fb}
- .chip.imp{color:var(--grn);background:#e5f6ec;border-color:#bfe8d1}
- .chip.no{color:var(--red);background:#fde9ed;border-color:#f6c6d0}
- .chip.pend{color:var(--org);background:#fcf1df;border-color:#f0dcb4}
+ .chip.imp{color:#0b8a52;background:#e3f8ec;border-color:#b6ecd0}
+ .chip.no{color:#d13a55;background:#ffe9ee;border-color:#ffc6d2}
+ .chip.pend{color:#b86a0c;background:#fff3df;border-color:#ffdfae}
  .lat{margin-top:9px;border-top:1px dashed var(--border);padding-top:8px}
  .lat table{width:100%;border-collapse:collapse}
  .lat td{padding:2px 4px;font-size:11.5px;font-family:var(--mono)}
  .lat td:first-child{color:var(--mut);font-family:var(--ui)}
  .lat td.n{text-align:right}
+ .secH{font-size:13px;font-weight:800;letter-spacing:.02em;margin:4px 0 10px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase}
+ .secH span{font-size:11px;font-weight:600;letter-spacing:0;text-transform:none;-webkit-text-fill-color:var(--mut)}
  .muted{color:var(--faint)}
  footer{color:var(--faint);font-size:11px;text-align:center;padding:16px}
  ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:20px;border:2px solid var(--bg)}::-webkit-scrollbar-thumb:hover{background:var(--faint)}
 </style></head>
 <body>
 <header>
- <h1>vLLM perf-benchmark</h1>
- <span class="sub">202 PRs · idea A · base_sha→merge_sha · live results</span>
+ <span class="logo" aria-hidden="true"><svg viewBox="0 0 64 32" width="54" height="27"><defs><linearGradient id="lg" x1="0" x2="1"><stop offset="0" stop-color="#12c2e9"/><stop offset=".5" stop-color="#2f6bff"/><stop offset="1" stop-color="#8a4dff"/></linearGradient></defs>
+  <path d="M2 20h8l6-9h20l6 9h18" fill="none" stroke="url(#lg)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M16 11l5-6h14l5 6" fill="none" stroke="url(#lg)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="16" cy="24" r="5" fill="#101830"/><circle cx="16" cy="24" r="2" fill="#12c2e9"/>
+  <circle cx="48" cy="24" r="5" fill="#101830"/><circle cx="48" cy="24" r="2" fill="#8a4dff"/>
+  <path d="M55 17h7M54 13h5" stroke="#ff5fa2" stroke-width="2.5" stroke-linecap="round"/></svg></span>
+ <h1>Formula.vLLM</h1>
+ <span class="sub">202 real vLLM perf PRs · did the speedup reproduce?</span>
+ <span class="live"><i></i>live</span>
  <span class="sub" id="ts"></span>
+ <a class="gh" href="https://github.com/Michael-Soloveitchik/Formula.vLLM" target="_blank" rel="noopener">GitHub ↗</a>
 </header>
 <div id="app">
  <div id="left">
@@ -496,21 +533,35 @@ async function showPR(pr){
 function render(){
  const q=$('#q').value.trim().toLowerCase(), ff=$('#field').value, sf=$('#status').value;
  // stats over ALL measured
- const measured=IDX.filter(r=>RES[r.pr]);
- const imp=measured.filter(r=>RES[r.pr].improved).length;
- const noi=measured.length-imp;
- $('#ts').textContent = measured.length? ('updated '+ (RES[measured[0].pr]||{}).ts||'') : '';
+ // processed = we ran the PR (result exists); measured = our own numbers exist for
+ // base AND gold on >=1 experiment; improved = correctness gate (after-merge reproduces)
+ const processed=IDX.filter(r=>RES[r.pr]);
+ const hasMeas=res=>experimentsOf(res).some(e=>e.arms&&e.arms.base&&e.arms.base.mean!=null&&e.arms.gold&&e.arms.gold.mean!=null);
+ const measured=processed.filter(r=>hasMeas(RES[r.pr]));
+ const imp=processed.filter(r=>RES[r.pr].improved).length;
+ const N=IDX.length, nP=processed.length, nM=measured.length;
+ const solvedN=IDX.filter(r=>isSolved(r.pr)).length;
+ $('#ts').textContent = nP? ('updated '+ (RES[processed[0].pr]||{}).ts||'') : '';
+ const pct=x=>N?(x/N*100):0;
  $('#stats').innerHTML=[
-  ['total PRs',IDX.length,'a'],
-  ['ran',measured.length,'a'],
+  ['total PRs',N,'a'],
+  ['processed',nP,'a'],
+  ['measured',nM,'c'],
   ['improved',imp,'g'],
-  ['not / pending',IDX.length-imp,'r'],
- ].map(([k,v,c])=>`<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div></div>`).join('')
- + `<div class="stat" style="grid-column:1/-1"><div class="k">correctness gate (after-merge reproduces)</div>
-    <div class="bar"><i style="width:${measured.length?imp/measured.length*100:0}%;background:var(--grn)"></i>
-    <i style="width:${measured.length?noi/measured.length*100:0}%;background:var(--red)"></i>
-    <i style="flex:1;background:var(--panel2)"></i></div>
-    <div class="meta">${imp} improved · ${noi} not · ${IDX.length-measured.length} pending of ${IDX.length}</div></div>`;
+ ].map(([k,v,c])=>`<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="pc">${k==='total PRs'?'202 real vLLM perf PRs':(pct(v).toFixed(0)+'% of '+N)}</div></div>`).join('')
+ + `<div class="stat prog" style="grid-column:1/-1"><div class="k">progress <span class="kk">processed → measured → improved · of ${N} PRs</span></div>
+    <div class="bar">
+     <i class="seg s-meas" style="width:${pct(nM)}%" title="measured: ${nM}"></i>
+     <i class="seg s-proc" style="width:${pct(nP-nM)}%" title="processed, not yet measured: ${nP-nM}"></i>
+     <i class="seg s-pend" style="flex:1" title="pending: ${N-nP}"></i></div>
+    <div class="legend">
+     <span><i class="sw s-meas"></i>measured <b>${nM}</b></span>
+     <span><i class="sw s-proc"></i>processed, not measured <b>${nP-nM}</b></span>
+     <span><i class="sw s-pend"></i>pending <b>${N-nP}</b></span>
+     <span class="sep"></span>
+     <span><i class="sw s-imp"></i>improved (gate) <b>${imp}</b></span>
+     <span><i class="sw s-solv"></i>solver arms <b>${solvedN}</b></span>
+    </div></div>`;
 
  // top results · one table per (PR, experiment). baseline (measured) = 1.00× ref.
  const latRows=measured.map(r=>RES[r.pr]).filter(r=>experimentsOf(r).length);
@@ -521,7 +572,7 @@ function render(){
    h+=`<div style="margin:14px 0 4px;font-weight:700;font-size:12.5px">${prCell}</div>`;
    h+=experimentsOf(r).map(expTable).join('');
   });
-  $('#restabWrap').innerHTML='<h2 style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:0 0 8px">experiment results · one table per experiment · baseline (measured) = 1.00× reference, variance in (±)</h2>'+h;
+  $('#restabWrap').innerHTML='<h2 class="secH">experiment results <span>one table per experiment · baseline (measured) = 1.00× reference · variance in (±)</span></h2>'+h;
  } else $('#restabWrap').innerHTML='<table class="restab"><tbody><tr><td class="muted">no results yet — run <code>./run.sh</code></td></tr></tbody></table>';
 
  // per-PR cards
