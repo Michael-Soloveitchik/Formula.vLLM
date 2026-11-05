@@ -3,35 +3,43 @@
  "harnesses": [
   {
    "key": "claude",
-   "model": "claude-opus-4-8",
-   "cmd": "claude -p --model=claude-opus-4-8",
+   "model": "claude-fable-5-1",
+   "cmd": "claude -p --model claude-fable-5-1 --permission-mode acceptEdits --allowedTools \"Read,Edit,Write,Glob,Grep,Bash(python3:*),Bash(python:*)\"",
    "guided": false,
    "enabled": true,
-   "env": ["ANTHROPIC_BASE_URL", "ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_MODEL"]
+   "env": []
   },
   {
    "key": "claude + PR's solution",
-   "model": "claude-opus-4-8",
-   "cmd": "claude -p --model=claude-opus-4-8",
+   "model": "claude-fable-5-1",
+   "cmd": "claude -p --model claude-fable-5-1 --permission-mode acceptEdits --allowedTools \"Read,Edit,Write,Glob,Grep,Bash(python3:*),Bash(python:*)\"",
    "guided": true,
    "enabled": true,
-   "env": ["ANTHROPIC_BASE_URL", "ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_MODEL"]
+   "env": []
   },
   {
    "key": "codex",
    "model": "gpt-6.1-sol",
    "cmd": "codex exec --skip-git-repo-check",
    "guided": false,
-   "enabled": true,
-   "env": ["LITELLM_API_KEY", "LITELLM_KEY"]
+   "enabled": false,
+   "env": [
+    "LITELLM_API_KEY",
+    "LITELLM_KEY"
+   ],
+   "_note": "codex CLI not installed on this GPU box"
   },
   {
    "key": "codex + PR's solution",
    "model": "gpt-6.1-sol",
    "cmd": "codex exec --skip-git-repo-check",
    "guided": true,
-   "enabled": true,
-   "env": ["LITELLM_API_KEY", "LITELLM_KEY"]
+   "enabled": false,
+   "env": [
+    "LITELLM_API_KEY",
+    "LITELLM_KEY"
+   ],
+   "_note": "codex CLI not installed on this GPU box"
   }
  ]
 }

@@ -8,3 +8,6 @@ __pycache__/
 vllm/
 # shared model weights, fetch-on-demand per cluster (download.sh), never committed
 .weights/
+# runner / dashboard logs
+.work_build_*.log
+.serve.log

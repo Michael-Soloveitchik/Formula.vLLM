@@ -1,0 +1,51 @@
+# vLLM GPU image from the PyPI WHEEL (no source build) + the PR's own source
+# trees cloned INSIDE the image. Used for pure-python / Triton PRs on GPUs the
+# cu121 source build cannot target (e.g. RTX 5070 Ti, sm_120).
+#
+#   VLLM_VERSION = first PyPI release AFTER the PR's merge_sha, so the wheel's
+#                  compiled ops match the gold tree.
+#   BASE_SHA / MERGE_SHA = the PR's pre-merge and merged commits; each is
+#                  fetched (depth 1) and exported to /base and /gold.
+#
+# Arms are then .py-tree swaps of /base, /gold or a solver tree over the
+# wheel's site-packages/vllm inside this same image (FormulaCode isolation).
+# Nothing vLLM-related is needed on the host.
+#
+# Build:
+#   docker build -t vllm-task:<pr> -f Dockerfile.gpu-wheel \
+#       --build-arg VLLM_VERSION=0.18.0 \
+#       --build-arg BASE_SHA=<sha> --build-arg MERGE_SHA=<sha> .
+ARG CUDA_TAG=12.8.1-base-ubuntu22.04
+FROM nvidia/cuda:${CUDA_TAG}
+
+ENV DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 PYTHONDONTWRITEBYTECODE=1
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends python3 python3-pip python3-dev git \
+    && rm -rf /var/lib/apt/lists/*
+
+ARG VLLM_VERSION
+RUN pip install --upgrade pip \
+    && pip install "vllm==${VLLM_VERSION}" pytest pytest-asyncio
+
+# Runtime extras, in their own layer so the big wheel layer above stays cached:
+#   gcc/libc6-dev : Triton JIT compiles its CUDA driver shim with a host C compiler
+#   tblib         : imported by vLLM's tests/conftest.py (not a vllm dependency)
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends gcc libc6-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install tblib
+
+# PR trees: shallow-fetch exactly the two commits, export, drop the .git.
+ARG BASE_SHA
+ARG MERGE_SHA
+RUN set -e; mkdir -p /base /gold /tmp/vllm-git && cd /tmp/vllm-git \
+    && git init -q && git remote add origin https://github.com/vllm-project/vllm.git \
+    && git fetch -q --depth 1 origin "${BASE_SHA}" \
+    && git archive "${BASE_SHA}" | tar -x -C /base \
+    && git fetch -q --depth 1 origin "${MERGE_SHA}" \
+    && git archive "${MERGE_SHA}" | tar -x -C /gold \
+    && cd / && rm -rf /tmp/vllm-git \
+    && echo "${BASE_SHA}" > /base/.sha && echo "${MERGE_SHA}" > /gold/.sha
+
+WORKDIR /workspace
+ENTRYPOINT ["/bin/bash"]

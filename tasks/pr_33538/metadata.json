@@ -1,0 +1,83 @@
+{
+ "pr": 33538,
+ "title": "[Kernel] Triton-based Top-k and Top-p sampler kernels (#33538)",
+ "field": "scheduling",
+ "date": "2026-02-17",
+ "hardware": [
+  "agnostic"
+ ],
+ "url": "https://github.com/vllm-project/vllm/pull/33538",
+ "base_sha": "dc5fa77a4eb6680339cb77abe713fb22d7795560",
+ "merge_sha": "c656ba3b4d2cda82ca753eefde4b10cbf04c0a3f",
+ "source_files": [
+  "vllm/v1/sample/ops/topk_topp_sampler.py",
+  "vllm/v1/sample/ops/topk_topp_triton.py",
+  "vllm/utils/math_utils.py"
+ ],
+ "test_files": [
+  "tests/v1/sample/test_topk_topp_sampler.py"
+ ],
+ "wheel": "0.16.0",
+ "wheel_note": "first PyPI release after merge (v0.16.0rc1 tag at merge); compiled ops match gold tree; arms are .py swaps inside this image. Needed because the cu121 source build cannot target sm_120 (RTX 5070 Ti).",
+ "workload": {
+  "kind": "repo_benchmark",
+  "script": "benchmarks/benchmark_topk_topp.py",
+  "cmd": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+  "unit": "ms",
+  "needs": "gpu",
+  "headline": "topk_whole_b16_v32768",
+  "base_note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+ },
+ "perf_gain": {
+  "top_gain": "up to 9.94x vs PyTorch topk sampler (batch 4, vocab 32768)",
+  "gain_kind": "unit",
+  "gain_evidence": "faster triton topk/topp sampler kernels"
+ },
+ "needs": "gpu",
+ "experiments": [
+  {
+   "name": "topk_whole_b16_v32768",
+   "reported": {
+    "base": 0.28,
+    "patch": 0.067
+   }
+  },
+  {
+   "name": "topp_whole_b16_v32768",
+   "reported": {
+    "base": 0.361,
+    "patch": 0.184
+   }
+  },
+  {
+   "name": "topk_topp_whole_b16_v32768",
+   "reported": {
+    "base": 0.242,
+    "patch": 0.093
+   }
+  },
+  {
+   "name": "mixed_partial_b16_v32768",
+   "reported": {
+    "base": 0.266,
+    "patch": 0.205
+   }
+  },
+  {
+   "name": "topk_whole_b1_v32768",
+   "reported": {
+    "base": 0.101,
+    "patch": 0.065
+   }
+  },
+  {
+   "name": "topk_whole_b128_v32768",
+   "reported": null
+  },
+  {
+   "name": "topk_topp_whole_b2048_v131072",
+   "reported": null
+  }
+ ],
+ "experiments_note": "reported = PR author's table (ms), same scenario key as benchmark_topk_topp.py SUMMARY TABLE: <scenario>_b<batch>_v<vocab>"
+}

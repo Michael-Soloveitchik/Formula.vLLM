@@ -18,7 +18,7 @@ machine:
 # where the vLLM git clone lives on the target box (needed to export base_sha
 # and merge_sha trees). The clone is huge, so it is NOT vendored in this repo.
 paths:
-  vllm_git: ../../vllm   # override with: export VLLM_GIT=/abs/path/to/vllm
+  vllm_git: ../../vllm   # ONLY for source-mode (Dockerfile.gpu). Wheel-mode tasks clone inside the image; no host clone needed.
 
 # measurement: repeat each timing to get mean + variance (see rules.md noise model)
 measure:
@@ -90,3 +90,5 @@ run:
     # all 20 PRs with a mined, runnable workload (workloads.json)
     workloads: [21222, 21281, 9972, 22940, 12583, 23504, 16436, 6779, 6442, 13365, 37225, 33538, 41163, 33593, 27793, 39328, 32975, 29499, 27673, 28280]
     interesting: [21222, 21281, 6779, 13365, 27793]
+    # GPU Triton sampler PRs, run via the pip wheel image (tasks/pr_<n>/metadata.json:wheel)
+    gpu_triton: [37225, 33538]
