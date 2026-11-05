@@ -11,3 +11,5 @@ vllm/
 # runner / dashboard logs
 .work_build_*.log
 .serve.log
+results/.lock
+results/.tmp-*
