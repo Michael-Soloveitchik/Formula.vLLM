@@ -17,37 +17,37 @@
   --mono:ui-monospace,SFMono-Regular,Menlo,monospace}
  *{box-sizing:border-box}
  html,body{height:100%}
- body{margin:0;font:13px/1.5 var(--ui);color:var(--fg);
+ body{margin:0;font:13.5px/1.5 var(--ui);color:var(--fg);
   background:radial-gradient(900px 520px at -5% -10%,#cfe5ff 0,transparent 60%),radial-gradient(900px 520px at 105% -10%,#d6ecff 0,transparent 55%),radial-gradient(800px 500px at 50% 110%,#dbe8ff 0,transparent 55%),var(--bg);
   background-attachment:fixed}
- header{background:#fffdf9;backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);
+ header{background:linear-gradient(180deg,#f3f7ff,#e9f1ff);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);
   color:var(--fg);padding:10px 26px 10px 16px;border-bottom:1px solid rgba(11,140,232,.14);box-shadow:0 6px 24px rgba(11,140,232,.08);
-  display:flex;align-items:center;gap:14px;flex-wrap:wrap;position:sticky;top:0;z-index:20}
+  display:flex;flex-direction:column;align-items:center;gap:4px;position:sticky;top:0;z-index:20}
  header::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--grad)}
  header .logo{display:inline-flex;align-items:center}
- header .logo img{height:120px;width:auto;display:block}
+ header .logo img{height:118px;width:auto;display:block;filter:drop-shadow(0 6px 14px rgba(23,42,92,.14))}
  header h1{display:none;font-size:24px;font-weight:800;margin:0;letter-spacing:-.01em;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
  header .sub{color:var(--mut);font-size:14px;font-weight:600}
- header .hbox{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+ header .hbox{display:flex;flex-direction:row;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap}
  header .hbox .sub{font-size:15px;font-weight:700;color:var(--navy)}
  header .hbox #ts{font-size:12px;font-weight:500;color:var(--mut)}
  header .live{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#b35f00;background:#fff3df;border:1px solid #ffd99a;border-radius:20px;padding:2px 9px}
  header .live i{width:7px;height:7px;border-radius:50%;background:var(--org);box-shadow:0 0 0 0 rgba(255,154,31,.5);animation:pulse 1.8s infinite}
  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,154,31,.45)}70%{box-shadow:0 0 0 7px rgba(255,154,31,0)}100%{box-shadow:0 0 0 0 rgba(255,154,31,0)}}
- header .gh{margin-left:auto;font-size:12px;font-weight:700;color:var(--acc);text-decoration:none;border:1px solid var(--border2);background:#fff;border-radius:20px;padding:4px 12px;transition:.15s}
+ header .gh{margin-left:0;font-size:12px;font-weight:700;color:var(--acc);text-decoration:none;border:1px solid var(--border2);background:#fff;border-radius:20px;padding:4px 12px;transition:.15s}
  header .gh:hover{border-color:var(--acc);box-shadow:0 0 0 3px rgba(11,140,232,.14)}
  /* app shell: left tree + main content */
  #app{display:grid;grid-template-columns:250px minmax(0,1fr);align-items:start}
  #app>*{min-width:0}
  /* ---- LEFT TREE PANE ---- */
- #left{border-right:1px solid var(--border);height:calc(100vh - 141px);overflow:auto;position:sticky;top:141px;
+ #left{border-right:1px solid var(--border);height:calc(100vh - var(--hh,180px));overflow:auto;position:sticky;top:var(--hh,180px);
   background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(236,243,255,.7))}
  #left .lh{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);padding:12px 14px 4px}
  #left .lsearch{padding:0 12px 10px;border-bottom:1px solid var(--border)}
  #left .lsearch input{width:100%;background:var(--panel);border:1px solid var(--border2);border-radius:9px;padding:7px 10px;font:13px var(--ui);color:var(--fg)}
  #left .lsearch input:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px rgba(59,111,224,.18)}
  .treeCount{color:var(--mut);font-size:11px;font-weight:600;padding:8px 14px 2px}
- .tree{font-size:12.5px;padding:2px 0 40px}
+ .tree{font-size:13px;padding:2px 0 40px}
  .tnode{cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;user-select:none}
  .tfield{padding:5px 12px;font-weight:700;color:var(--fg);border-radius:6px;margin:1px 6px}
  .tfield:hover{background:var(--panel2)}
@@ -100,7 +100,7 @@
  .dsec:first-of-type{border-top:none;padding-top:0;margin-top:10px}
  .dsecH{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:0 0 7px}
  .detail .restab{margin-bottom:12px}
- .expH{font-size:12.5px;font-weight:700;margin:8px 0 4px;display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
+ .expH{font-size:13px;font-weight:700;margin:8px 0 4px;display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
  .expH .eu{font-family:var(--mono);font-size:10px;color:var(--acc);font-weight:600}
  .expH .ew{font-size:10px;color:var(--faint);font-weight:500;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
  .lat.d{margin-top:9px;border-top:1px dashed var(--border);padding-top:8px}
@@ -123,7 +123,7 @@
  .stat.prog .k .kk{font-weight:600;text-transform:none;letter-spacing:0;color:var(--faint);margin-left:6px}
  .seg{display:block;height:100%} .s-meas{background:linear-gradient(90deg,#1aa7ff,#0b8ce8)} .s-proc{background:#c6e4fb}
  .s-pend{background:#eceff4} .s-imp{background:var(--gradw)} .s-solv{background:#2457d8}
- .legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:9px;font-size:11.5px;color:var(--mut)}
+ .legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:9px;font-size:12px;color:var(--mut)}
  .legend span{display:inline-flex;align-items:center;gap:6px} .legend b{color:var(--fg);font-family:var(--mono)}
  .legend .sw{width:10px;height:10px;border-radius:3px;display:inline-block} .legend .sep{width:1px;height:14px;background:var(--border2)}
  .bar{display:flex;height:12px;border-radius:8px;overflow:hidden;margin-top:10px;background:var(--panel2);box-shadow:inset 0 1px 2px rgba(16,24,48,.06)}
@@ -133,7 +133,7 @@
  .ctl input{flex:1;min-width:180px}
  .restab{width:100%;border-collapse:separate;border-spacing:0;background:var(--panel);border:1px solid var(--border);
   border-radius:12px;overflow:hidden;margin-bottom:14px;box-shadow:var(--glow)}
- .restab th,.restab td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--border);font-size:13px;line-height:1.4}
+ .restab th,.restab td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--border);font-size:13.5px;line-height:1.4}
  .restab tbody tr{transition:background .12s}
  .restab tbody tr:hover td{background:#f6f9ff}
  .restab th{background:#f8fafc;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
@@ -156,7 +156,7 @@
  .restab.exp td.num .mv{display:inline-block;width:64px;text-align:right}
  .restab.exp td.num .var{color:var(--faint);display:inline-block;width:66px;text-align:left;margin-left:4px;font-size:11.5px}
  .scalebox{margin:-8px 0 16px;padding:8px 12px;border-radius:0 0 12px 12px;background:#fff9ef;
-  border:1px solid #ffe2b3;border-top:none;font-size:12px;line-height:1.5}
+  border:1px solid #ffe2b3;border-top:none;font-size:12.5px;line-height:1.5}
  .scalebox.inv{background:#fef2f2;border-color:#fecaca}
  .scalebox .sb-tag{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:700;
   letter-spacing:.05em;color:#b35f00;margin-bottom:3px}
@@ -203,8 +203,8 @@
  <span class="sub">202 real vLLM perf PRs · did the speedup reproduce?</span>
  <span class="live"><i></i>live</span>
  <span class="sub" id="ts"></span>
- </div>
  <a class="gh" href="https://github.com/Michael-Soloveitchik/Formula.vLLM" target="_blank" rel="noopener">GitHub ↗</a>
+ </div>
 </header>
 <div id="app">
  <div id="left">
@@ -247,6 +247,8 @@ const FOLDER=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-
 
 async function boot(){
  const no={cache:'no-store'};
+ const setHH=()=>document.documentElement.style.setProperty('--hh',document.querySelector('header').offsetHeight+'px');
+ setHH(); window.addEventListener('resize',setHH); document.querySelector('header img').addEventListener('load',setHH);
  IDX=await fetch('../index.json',no).then(r=>r.json()).catch(()=>[]);
  const all=await fetch('../results/all.json',no).then(r=>r.json()).catch(()=>[]);
  RES={}; all.forEach(r=>RES[r.pr]=r);
