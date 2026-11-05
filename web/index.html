@@ -139,7 +139,7 @@
  .restab th{background:#f8fafc;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
  .restab td.num{font-family:var(--mono);text-align:right;white-space:nowrap}
  .restab td:first-child{white-space:nowrap}
- .restab.exp td:first-child{white-space:normal;line-height:1.3}
+ .restab.exp td:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
  .restab tr.baserow td{background:#f2f8ff}
  .restab tr.r-reported td{background:#fffcf3}
  .restab tr.r-measured td:first-child{border-left:3px solid #0b8ce8}
@@ -147,7 +147,7 @@
  .restab td .tag-m{color:#0b8ce8;font-weight:600}
  .restab td .tag-r{color:#b97a00;font-weight:600}
  .restab.exp{table-layout:fixed}
- .restab.exp .c-row{width:215px}
+ .restab.exp .c-row{width:330px}
  .restab.exp .c-val{width:150px}
  .restab.exp .c-d{width:96px}
  .restab.exp .c-r{width:64px}
@@ -167,7 +167,7 @@
  .scalebox .sb-full{color:var(--mut)}
  .restab.exp .c-src{width:auto}
  .restab.exp th.num,.restab.exp td.num{text-align:right;padding-right:10px;padding-left:4px}
- .restab.exp td.src{white-space:normal;color:var(--mut)}
+ .restab.exp td.src{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--mut)}
  .expH .eb{font-family:var(--mono);font-size:10px;color:var(--mut);font-weight:600;margin-left:2px}
  .restab tr:last-child td{border-bottom:none}
  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
@@ -444,7 +444,7 @@ function expTable(exp){
  const repB = authorHasBase ? +rep.base : null;   // author's OWN reported baseline (null if none)
  const Rr=resolveReported(rep,baseV,unit);
  const goldV=(a.gold||{}).mean;
- const SM='<span class="tag-m">(measured by us)</span>', SR='<span class="tag-r">(reported by PR\'s author)</span>';
+ const SM='<span class="tag-m">(measured by us)</span>', SR='<span class="tag-r">(reported by author)</span>';
  // 1. baseline (reported by PR's author) — author's OLD-code number, or — if absent.
  if(authorHasBase){
   h+=`<tr class="r-reported"><td>baseline ${SR}</td><td class="num">${num(+rep.base,0)}</td>`+
@@ -456,7 +456,7 @@ function expTable(exp){
  }
  // 2. baseline (measured by us) — our run of before-merge tree. 1.00x reference.
  h+=`<tr class="baserow r-measured"><td>baseline ${SM}</td><td class="num">${num(baseV,(a.base||{}).sd)}</td>`+
-    gcellsMeas(baseV,baseV,unit)+`<td class="src">our run of before-merge tree (base_sha) — 1.00× reference</td></tr>`;
+    gcellsMeas(baseV,baseV,unit)+`<td class="src" title="our run of before-merge tree (base_sha) — 1.00× reference">our run of before-merge tree (base_sha) — 1.00× reference</td></tr>`;
  // 3. PR's author solution (reported by PR's author) — author's NEW-code number, or — if absent.
  if(Rr){
   h+=`<tr class="r-reported"><td>PR's author solution ${SR}</td><td class="num">${num(Rr.value,0)}</td>`+
@@ -465,7 +465,7 @@ function expTable(exp){
   h+=`<tr class="r-reported"><td>PR's author solution ${SR}</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="src">no number in PR</td></tr>`;}
  // 4. PR's author solution (measured by us) — our run of after-merge tree.
  h+=`<tr class="r-measured"><td>PR's author solution ${SM}</td><td class="num">${num(goldV,(a.gold||{}).sd)}</td>`+
-    gcellsMeas(goldV,baseV,unit)+`<td class="src">our run of after-merge tree (merge_sha)</td></tr>`;
+    gcellsMeas(goldV,baseV,unit)+`<td class="src" title="our run of after-merge tree (merge_sha)">our run of after-merge tree (merge_sha)</td></tr>`;
  // harness arms — ALWAYS show claude + codex (+ any extra arm present), pending if absent
  const keys=HARNESSES.concat(Object.keys(a).filter(k=>!['base','gold'].includes(k)&&!HARNESSES.includes(k)));
  keys.forEach(k=>{const arm=a[k];
