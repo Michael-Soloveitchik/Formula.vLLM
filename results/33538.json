@@ -11,19 +11,14 @@
    },
    "arms": {
     "gold": {
-     "mean": 0.1202,
-     "sd": 0.0477,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.0654,
-     "sd": 0.023,
-     "n": 5
+     "mean": 0.0934,
+     "sd": 0.0289,
+     "n": 10
     },
     "base": {
-     "mean": 1.2936,
-     "sd": 0.1189,
-     "n": 5
+     "mean": 1.2221,
+     "sd": 0.0196,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -38,19 +33,14 @@
    },
    "arms": {
     "gold": {
-     "mean": 0.3236,
-     "sd": 0.0413,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1732,
-     "sd": 0.0104,
-     "n": 5
+     "mean": 0.3141,
+     "sd": 0.0208,
+     "n": 10
     },
     "base": {
-     "mean": 1.2468,
-     "sd": 0.0609,
-     "n": 5
+     "mean": 1.2462,
+     "sd": 0.0183,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -65,19 +55,14 @@
    },
    "arms": {
     "gold": {
-     "mean": 0.1156,
-     "sd": 0.0377,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.0946,
-     "sd": 0.0428,
-     "n": 5
+     "mean": 0.129,
+     "sd": 0.0447,
+     "n": 10
     },
     "base": {
-     "mean": 1.3732,
-     "sd": 0.0681,
-     "n": 5
+     "mean": 1.3459,
+     "sd": 0.0972,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -92,19 +77,14 @@
    },
    "arms": {
     "gold": {
-     "mean": 0.0916,
-     "sd": 0.018,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.0576,
-     "sd": 0.0098,
-     "n": 5
+     "mean": 0.1149,
+     "sd": 0.0423,
+     "n": 10
     },
     "base": {
-     "mean": 1.3516,
-     "sd": 0.0142,
-     "n": 5
+     "mean": 1.3431,
+     "sd": 0.0965,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -119,19 +99,14 @@
    },
    "arms": {
     "gold": {
-     "mean": 0.0984,
-     "sd": 0.0212,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.0786,
-     "sd": 0.0239,
-     "n": 5
+     "mean": 0.1025,
+     "sd": 0.0203,
+     "n": 10
     },
     "base": {
-     "mean": 0.2596,
-     "sd": 0.0941,
-     "n": 5
+     "mean": 0.2932,
+     "sd": 0.0971,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -143,19 +118,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.3816,
-     "sd": 0.129,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.2422,
-     "sd": 0.0112,
-     "n": 5
+     "mean": 0.3133,
+     "sd": 0.0312,
+     "n": 10
     },
     "base": {
-     "mean": 1.302,
-     "sd": 0.3511,
-     "n": 5
+     "mean": 1.1515,
+     "sd": 0.0144,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -167,19 +137,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 6.3332,
-     "sd": 0.0033,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 4.277,
-     "sd": 0.0077,
-     "n": 5
+     "mean": 6.3832,
+     "sd": 0.0596,
+     "n": 10
     },
     "base": {
-     "mean": 94.0016,
-     "sd": 0.0569,
-     "n": 5
+     "mean": 94.0276,
+     "sd": 0.035,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -191,19 +156,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.5258,
-     "sd": 0.0022,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.2952,
-     "sd": 0.0016,
-     "n": 5
+     "mean": 0.5261,
+     "sd": 0.0031,
+     "n": 10
     },
     "base": {
-     "mean": 5.8938,
-     "sd": 0.0206,
-     "n": 5
+     "mean": 5.88,
+     "sd": 0.0088,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -215,19 +175,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.1596,
-     "sd": 0.0089,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1072,
-     "sd": 0.0094,
-     "n": 5
+     "mean": 0.1707,
+     "sd": 0.0058,
+     "n": 10
     },
     "base": {
-     "mean": 2.098,
-     "sd": 0.0191,
-     "n": 5
+     "mean": 2.1249,
+     "sd": 0.0166,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -239,19 +194,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.2194,
-     "sd": 0.0058,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1302,
-     "sd": 0.0061,
-     "n": 5
+     "mean": 0.2193,
+     "sd": 0.0049,
+     "n": 10
     },
     "base": {
-     "mean": 0.7694,
-     "sd": 0.0124,
-     "n": 5
+     "mean": 0.8006,
+     "sd": 0.0515,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -263,19 +213,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.1778,
-     "sd": 0.0103,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1616,
-     "sd": 0.0514,
-     "n": 5
+     "mean": 0.1855,
+     "sd": 0.0145,
+     "n": 10
     },
     "base": {
-     "mean": 0.461,
-     "sd": 0.1573,
-     "n": 5
+     "mean": 0.4097,
+     "sd": 0.1132,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -287,19 +232,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.1102,
-     "sd": 0.0303,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.073,
-     "sd": 0.0139,
-     "n": 5
+     "mean": 0.1107,
+     "sd": 0.029,
+     "n": 10
     },
     "base": {
-     "mean": 0.3984,
-     "sd": 0.1569,
-     "n": 5
+     "mean": 0.337,
+     "sd": 0.1059,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -311,19 +251,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 6.5826,
-     "sd": 0.025,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 4.3374,
-     "sd": 0.0175,
-     "n": 5
+     "mean": 6.5977,
+     "sd": 0.0292,
+     "n": 10
     },
     "base": {
-     "mean": 94.044,
-     "sd": 0.0348,
-     "n": 5
+     "mean": 94.0664,
+     "sd": 0.039,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -335,19 +270,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 1.9294,
-     "sd": 0.0023,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 1.2622,
-     "sd": 0.0129,
-     "n": 5
+     "mean": 1.9505,
+     "sd": 0.0489,
+     "n": 10
     },
     "base": {
-     "mean": 23.2188,
-     "sd": 0.0091,
-     "n": 5
+     "mean": 23.2065,
+     "sd": 0.0149,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -359,19 +289,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.1542,
-     "sd": 0.0049,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1286,
-     "sd": 0.0015,
-     "n": 5
+     "mean": 0.154,
+     "sd": 0.0037,
+     "n": 10
     },
     "base": {
-     "mean": 5.0994,
-     "sd": 0.0137,
-     "n": 5
+     "mean": 5.081,
+     "sd": 0.0091,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -383,19 +308,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.0712,
-     "sd": 0.0045,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.059,
-     "sd": 0.0233,
-     "n": 5
+     "mean": 0.0956,
+     "sd": 0.0283,
+     "n": 10
     },
     "base": {
-     "mean": 1.149,
-     "sd": 0.0072,
-     "n": 5
+     "mean": 1.147,
+     "sd": 0.012,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -407,19 +327,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.1416,
-     "sd": 0.0125,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1042,
-     "sd": 0.0052,
-     "n": 5
+     "mean": 0.1423,
+     "sd": 0.0134,
+     "n": 10
     },
     "base": {
-     "mean": 0.565,
-     "sd": 0.0042,
-     "n": 5
+     "mean": 0.5821,
+     "sd": 0.0471,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -431,19 +346,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.0992,
-     "sd": 0.0654,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.0536,
-     "sd": 0.0147,
-     "n": 5
+     "mean": 0.0927,
+     "sd": 0.0295,
+     "n": 10
     },
     "base": {
-     "mean": 1.236,
-     "sd": 0.0111,
-     "n": 5
+     "mean": 1.2204,
+     "sd": 0.03,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -455,19 +365,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.0688,
-     "sd": 0.0352,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.0636,
-     "sd": 0.0221,
-     "n": 5
+     "mean": 0.0827,
+     "sd": 0.0219,
+     "n": 10
     },
     "base": {
-     "mean": 0.3256,
-     "sd": 0.1021,
-     "n": 5
+     "mean": 0.2589,
+     "sd": 0.036,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -479,19 +384,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.072,
-     "sd": 0.0262,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.043,
-     "sd": 0.0089,
-     "n": 5
+     "mean": 0.0797,
+     "sd": 0.0306,
+     "n": 10
     },
     "base": {
-     "mean": 0.2766,
-     "sd": 0.0943,
-     "n": 5
+     "mean": 0.2974,
+     "sd": 0.1077,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -503,19 +403,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 2.1,
-     "sd": 0.0069,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 1.8988,
-     "sd": 0.0098,
-     "n": 5
+     "mean": 2.1038,
+     "sd": 0.0053,
+     "n": 10
     },
     "base": {
-     "mean": 81.5542,
-     "sd": 0.0573,
-     "n": 5
+     "mean": 81.5582,
+     "sd": 0.0266,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -527,19 +422,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.6456,
-     "sd": 0.0013,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.5442,
-     "sd": 0.0073,
-     "n": 5
+     "mean": 0.6475,
+     "sd": 0.0032,
+     "n": 10
     },
     "base": {
-     "mean": 20.4182,
-     "sd": 0.0228,
-     "n": 5
+     "mean": 20.4319,
+     "sd": 0.0215,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -551,19 +441,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.4244,
-     "sd": 0.006,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.3172,
-     "sd": 0.0008,
-     "n": 5
+     "mean": 0.4224,
+     "sd": 0.0114,
+     "n": 10
     },
     "base": {
-     "mean": 5.8762,
-     "sd": 0.0062,
-     "n": 5
+     "mean": 5.8787,
+     "sd": 0.0083,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -575,19 +460,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.1638,
-     "sd": 0.0135,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1162,
-     "sd": 0.0045,
-     "n": 5
+     "mean": 0.175,
+     "sd": 0.0114,
+     "n": 10
     },
     "base": {
-     "mean": 2.1132,
-     "sd": 0.0081,
-     "n": 5
+     "mean": 2.1223,
+     "sd": 0.0147,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -599,19 +479,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.233,
-     "sd": 0.0678,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1264,
-     "sd": 0.0009,
-     "n": 5
+     "mean": 0.1908,
+     "sd": 0.0074,
+     "n": 10
     },
     "base": {
-     "mean": 6.45,
-     "sd": 0.9625,
-     "n": 5
+     "mean": 5.4204,
+     "sd": 1.9086,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -623,19 +498,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.1834,
-     "sd": 0.0181,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1364,
-     "sd": 0.0265,
-     "n": 5
+     "mean": 0.2041,
+     "sd": 0.0377,
+     "n": 10
     },
     "base": {
-     "mean": 0.3906,
-     "sd": 0.0487,
-     "n": 5
+     "mean": 0.4852,
+     "sd": 0.1143,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -647,19 +517,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.1162,
-     "sd": 0.0216,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.0744,
-     "sd": 0.0148,
-     "n": 5
+     "mean": 0.1067,
+     "sd": 0.0297,
+     "n": 10
     },
     "base": {
-     "mean": 0.3992,
-     "sd": 0.1681,
-     "n": 5
+     "mean": 0.3699,
+     "sd": 0.1408,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -671,19 +536,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 2.112,
-     "sd": 0.0166,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 1.553,
-     "sd": 0.0026,
-     "n": 5
+     "mean": 2.1054,
+     "sd": 0.0099,
+     "n": 10
     },
     "base": {
-     "mean": 23.2142,
-     "sd": 0.0122,
-     "n": 5
+     "mean": 23.2145,
+     "sd": 0.009,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -695,19 +555,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.299,
-     "sd": 0.0275,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.396,
-     "sd": 0.0766,
-     "n": 5
+     "mean": 0.3078,
+     "sd": 0.0592,
+     "n": 10
     },
     "base": {
-     "mean": 5.0932,
-     "sd": 0.0145,
-     "n": 5
+     "mean": 5.2143,
+     "sd": 0.4122,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -719,19 +574,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.1538,
-     "sd": 0.0341,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.0996,
-     "sd": 0.0013,
-     "n": 5
+     "mean": 0.1401,
+     "sd": 0.0098,
+     "n": 10
     },
     "base": {
-     "mean": 4.5176,
-     "sd": 1.4069,
-     "n": 5
+     "mean": 4.8427,
+     "sd": 1.889,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -743,19 +593,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.138,
-     "sd": 0.0149,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1024,
-     "sd": 0.0065,
-     "n": 5
+     "mean": 0.1348,
+     "sd": 0.009,
+     "n": 10
     },
     "base": {
-     "mean": 0.2988,
-     "sd": 0.0718,
-     "n": 5
+     "mean": 0.3261,
+     "sd": 0.0932,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -767,19 +612,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 4.0822,
-     "sd": 0.0038,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 3.7568,
-     "sd": 0.0118,
-     "n": 5
+     "mean": 4.1014,
+     "sd": 0.0296,
+     "n": 10
     },
     "base": {
-     "mean": 81.5568,
-     "sd": 0.0346,
-     "n": 5
+     "mean": 81.5991,
+     "sd": 0.0716,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -791,19 +631,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 1.2574,
-     "sd": 0.0026,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 1.0574,
-     "sd": 0.0009,
-     "n": 5
+     "mean": 1.2609,
+     "sd": 0.002,
+     "n": 10
     },
     "base": {
-     "mean": 20.4318,
-     "sd": 0.0197,
-     "n": 5
+     "mean": 20.4298,
+     "sd": 0.0183,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -815,19 +650,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.3428,
-     "sd": 0.0116,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.298,
-     "sd": 0.001,
-     "n": 5
+     "mean": 0.3399,
+     "sd": 0.007,
+     "n": 10
     },
     "base": {
-     "mean": 5.5888,
-     "sd": 0.071,
-     "n": 5
+     "mean": 5.5748,
+     "sd": 0.0379,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -839,19 +669,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.3288,
-     "sd": 0.0085,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1878,
-     "sd": 0.0026,
-     "n": 5
+     "mean": 0.3252,
+     "sd": 0.004,
+     "n": 10
     },
     "base": {
-     "mean": 1.2272,
-     "sd": 0.0066,
-     "n": 5
+     "mean": 1.2443,
+     "sd": 0.0174,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -863,19 +688,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.2886,
-     "sd": 0.0098,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.2586,
-     "sd": 0.0051,
-     "n": 5
+     "mean": 0.2887,
+     "sd": 0.0124,
+     "n": 10
     },
     "base": {
-     "mean": 0.8796,
-     "sd": 0.012,
-     "n": 5
+     "mean": 0.8778,
+     "sd": 0.0107,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -887,19 +707,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.3062,
-     "sd": 0.013,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.17,
-     "sd": 0.0067,
-     "n": 5
+     "mean": 0.3039,
+     "sd": 0.0077,
+     "n": 10
     },
     "base": {
-     "mean": 1.2758,
-     "sd": 0.0163,
-     "n": 5
+     "mean": 1.2491,
+     "sd": 0.0205,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -911,19 +726,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.0724,
-     "sd": 0.0236,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.0684,
-     "sd": 0.0241,
-     "n": 5
+     "mean": 0.0899,
+     "sd": 0.031,
+     "n": 10
     },
     "base": {
-     "mean": 0.263,
-     "sd": 0.0164,
-     "n": 5
+     "mean": 0.3715,
+     "sd": 0.1143,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -935,19 +745,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.0892,
-     "sd": 0.0265,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.0414,
-     "sd": 0.0109,
-     "n": 5
+     "mean": 0.0738,
+     "sd": 0.0231,
+     "n": 10
     },
     "base": {
-     "mean": 0.2706,
-     "sd": 0.0951,
-     "n": 5
+     "mean": 0.2792,
+     "sd": 0.1052,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -959,19 +764,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 4.3734,
-     "sd": 0.0083,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 4.004,
-     "sd": 0.0236,
-     "n": 5
+     "mean": 4.3698,
+     "sd": 0.028,
+     "n": 10
     },
     "base": {
-     "mean": 89.228,
-     "sd": 0.0161,
-     "n": 5
+     "mean": 89.2539,
+     "sd": 0.0275,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -983,19 +783,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 4.489,
-     "sd": 0.0221,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 2.69,
-     "sd": 0.0188,
-     "n": 5
+     "mean": 4.4934,
+     "sd": 0.0194,
+     "n": 10
     },
     "base": {
-     "mean": 21.9902,
-     "sd": 0.024,
-     "n": 5
+     "mean": 22.0076,
+     "sd": 0.0178,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1007,19 +802,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.6386,
-     "sd": 0.0038,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.5896,
-     "sd": 0.0034,
-     "n": 5
+     "mean": 0.6381,
+     "sd": 0.0037,
+     "n": 10
     },
     "base": {
-     "mean": 5.57,
-     "sd": 0.0295,
-     "n": 5
+     "mean": 5.5727,
+     "sd": 0.023,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1031,19 +821,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.6186,
-     "sd": 0.005,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.3662,
-     "sd": 0.0083,
-     "n": 5
+     "mean": 0.6239,
+     "sd": 0.0141,
+     "n": 10
     },
     "base": {
-     "mean": 1.24,
-     "sd": 0.0136,
-     "n": 5
+     "mean": 1.2355,
+     "sd": 0.0074,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1055,19 +840,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.2844,
-     "sd": 0.0049,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.2608,
-     "sd": 0.0023,
-     "n": 5
+     "mean": 0.293,
+     "sd": 0.0121,
+     "n": 10
     },
     "base": {
-     "mean": 0.9338,
-     "sd": 0.0699,
-     "n": 5
+     "mean": 0.8846,
+     "sd": 0.0165,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1079,19 +859,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.2722,
-     "sd": 0.0156,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.2456,
-     "sd": 0.0122,
-     "n": 5
+     "mean": 0.2658,
+     "sd": 0.019,
+     "n": 10
     },
     "base": {
-     "mean": 0.3322,
-     "sd": 0.1049,
-     "n": 5
+     "mean": 0.3263,
+     "sd": 0.1034,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1103,19 +878,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 0.2924,
-     "sd": 0.0043,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1668,
-     "sd": 0.005,
-     "n": 5
+     "mean": 0.2964,
+     "sd": 0.0125,
+     "n": 10
     },
     "base": {
-     "mean": 0.3418,
-     "sd": 0.1086,
-     "n": 5
+     "mean": 0.2911,
+     "sd": 0.1032,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1127,19 +897,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 8.5438,
-     "sd": 0.0308,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 7.7934,
-     "sd": 0.0423,
-     "n": 5
+     "mean": 8.5648,
+     "sd": 0.076,
+     "n": 10
     },
     "base": {
-     "mean": 89.2988,
-     "sd": 0.0619,
-     "n": 5
+     "mean": 89.3227,
+     "sd": 0.1171,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1151,19 +916,14 @@
    "reported": null,
    "arms": {
     "gold": {
-     "mean": 8.9244,
-     "sd": 0.0529,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 5.29,
-     "sd": 0.0307,
-     "n": 5
+     "mean": 8.946,
+     "sd": 0.0364,
+     "n": 10
     },
     "base": {
-     "mean": 22.017,
-     "sd": 0.0406,
-     "n": 5
+     "mean": 21.9972,
+     "sd": 0.0166,
+     "n": 10
     }
    },
    "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1181,7 +941,7 @@
   "mode": "wheel",
   "wheel": "0.16.0",
   "workload_cmd": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
-  "repeats": 5
+  "repeats": 10
  },
  "arms": {
   "base": {
@@ -1191,14 +951,6 @@
   "gold": {
    "tests": "PASS",
    "slug": "gold"
-  },
-  "claude": {
-   "tests": "FAIL",
-   "slug": "claude"
-  },
-  "claude + PR's solution": {
-   "tests": "PASS",
-   "slug": "claude___PR_s_solution"
   }
  },
  "improved": true,
@@ -1207,868 +959,628 @@
    "mixed_partial_b128_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 0.5258,
-     "sd": 0.0022,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.2952,
-     "sd": 0.0016,
-     "n": 5
+     "mean": 0.5261,
+     "sd": 0.0031,
+     "n": 10
     }
    },
    "mixed_partial_b128_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 0.1596,
-     "sd": 0.0089,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1072,
-     "sd": 0.0094,
-     "n": 5
+     "mean": 0.1707,
+     "sd": 0.0058,
+     "n": 10
     }
    },
    "mixed_partial_b16_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 0.2194,
-     "sd": 0.0058,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1302,
-     "sd": 0.0061,
-     "n": 5
+     "mean": 0.2193,
+     "sd": 0.0049,
+     "n": 10
     }
    },
    "mixed_partial_b16_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 0.0916,
-     "sd": 0.018,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.0576,
-     "sd": 0.0098,
-     "n": 5
+     "mean": 0.1149,
+     "sd": 0.0423,
+     "n": 10
     }
    },
    "mixed_partial_b1_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 0.1778,
-     "sd": 0.0103,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1616,
-     "sd": 0.0514,
-     "n": 5
+     "mean": 0.1855,
+     "sd": 0.0145,
+     "n": 10
     }
    },
    "mixed_partial_b1_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 0.1102,
-     "sd": 0.0303,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.073,
-     "sd": 0.0139,
-     "n": 5
+     "mean": 0.1107,
+     "sd": 0.029,
+     "n": 10
     }
    },
    "mixed_partial_b2048_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 6.5826,
-     "sd": 0.025,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 4.3374,
-     "sd": 0.0175,
-     "n": 5
+     "mean": 6.5977,
+     "sd": 0.0292,
+     "n": 10
     }
    },
    "mixed_partial_b2048_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 1.9294,
-     "sd": 0.0023,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 1.2622,
-     "sd": 0.0129,
-     "n": 5
+     "mean": 1.9505,
+     "sd": 0.0489,
+     "n": 10
     }
    },
    "topk_partial_b128_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 0.1542,
-     "sd": 0.0049,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1286,
-     "sd": 0.0015,
-     "n": 5
+     "mean": 0.154,
+     "sd": 0.0037,
+     "n": 10
     }
    },
    "topk_partial_b128_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 0.0712,
-     "sd": 0.0045,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.059,
-     "sd": 0.0233,
-     "n": 5
+     "mean": 0.0956,
+     "sd": 0.0283,
+     "n": 10
     }
    },
    "topk_partial_b16_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 0.1416,
-     "sd": 0.0125,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1042,
-     "sd": 0.0052,
-     "n": 5
+     "mean": 0.1423,
+     "sd": 0.0134,
+     "n": 10
     }
    },
    "topk_partial_b16_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 0.0992,
-     "sd": 0.0654,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.0536,
-     "sd": 0.0147,
-     "n": 5
+     "mean": 0.0927,
+     "sd": 0.0295,
+     "n": 10
     }
    },
    "topk_partial_b1_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 0.0688,
-     "sd": 0.0352,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.0636,
-     "sd": 0.0221,
-     "n": 5
+     "mean": 0.0827,
+     "sd": 0.0219,
+     "n": 10
     }
    },
    "topk_partial_b1_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 0.072,
-     "sd": 0.0262,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.043,
-     "sd": 0.0089,
-     "n": 5
+     "mean": 0.0797,
+     "sd": 0.0306,
+     "n": 10
     }
    },
    "topk_partial_b2048_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 2.1,
-     "sd": 0.0069,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 1.8988,
-     "sd": 0.0098,
-     "n": 5
+     "mean": 2.1038,
+     "sd": 0.0053,
+     "n": 10
     }
    },
    "topk_partial_b2048_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 0.6456,
-     "sd": 0.0013,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.5442,
-     "sd": 0.0073,
-     "n": 5
+     "mean": 0.6475,
+     "sd": 0.0032,
+     "n": 10
     }
    },
    "topk_topp_whole_b128_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 0.4244,
-     "sd": 0.006,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.3172,
-     "sd": 0.0008,
-     "n": 5
+     "mean": 0.4224,
+     "sd": 0.0114,
+     "n": 10
     }
    },
    "topk_topp_whole_b128_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 0.1638,
-     "sd": 0.0135,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1162,
-     "sd": 0.0045,
-     "n": 5
+     "mean": 0.175,
+     "sd": 0.0114,
+     "n": 10
     }
    },
    "topk_topp_whole_b16_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 0.233,
-     "sd": 0.0678,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1264,
-     "sd": 0.0009,
-     "n": 5
+     "mean": 0.1908,
+     "sd": 0.0074,
+     "n": 10
     }
    },
    "topk_topp_whole_b16_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 0.1156,
-     "sd": 0.0377,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.0946,
-     "sd": 0.0428,
-     "n": 5
+     "mean": 0.129,
+     "sd": 0.0447,
+     "n": 10
     }
    },
    "topk_topp_whole_b1_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 0.1834,
-     "sd": 0.0181,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1364,
-     "sd": 0.0265,
-     "n": 5
+     "mean": 0.2041,
+     "sd": 0.0377,
+     "n": 10
     }
    },
    "topk_topp_whole_b1_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 0.1162,
-     "sd": 0.0216,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.0744,
-     "sd": 0.0148,
-     "n": 5
+     "mean": 0.1067,
+     "sd": 0.0297,
+     "n": 10
     }
    },
    "topk_topp_whole_b2048_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 6.3332,
-     "sd": 0.0033,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 4.277,
-     "sd": 0.0077,
-     "n": 5
+     "mean": 6.3832,
+     "sd": 0.0596,
+     "n": 10
     }
    },
    "topk_topp_whole_b2048_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 2.112,
-     "sd": 0.0166,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 1.553,
-     "sd": 0.0026,
-     "n": 5
+     "mean": 2.1054,
+     "sd": 0.0099,
+     "n": 10
     }
    },
    "topk_whole_b128_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 0.299,
-     "sd": 0.0275,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.396,
-     "sd": 0.0766,
-     "n": 5
+     "mean": 0.3078,
+     "sd": 0.0592,
+     "n": 10
     }
    },
    "topk_whole_b128_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 0.3816,
-     "sd": 0.129,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.2422,
-     "sd": 0.0112,
-     "n": 5
+     "mean": 0.3133,
+     "sd": 0.0312,
+     "n": 10
     }
    },
    "topk_whole_b16_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 0.1538,
-     "sd": 0.0341,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.0996,
-     "sd": 0.0013,
-     "n": 5
+     "mean": 0.1401,
+     "sd": 0.0098,
+     "n": 10
     }
    },
    "topk_whole_b16_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 0.1202,
-     "sd": 0.0477,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.0654,
-     "sd": 0.023,
-     "n": 5
+     "mean": 0.0934,
+     "sd": 0.0289,
+     "n": 10
     }
    },
    "topk_whole_b1_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 0.138,
-     "sd": 0.0149,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1024,
-     "sd": 0.0065,
-     "n": 5
+     "mean": 0.1348,
+     "sd": 0.009,
+     "n": 10
     }
    },
    "topk_whole_b1_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 0.0984,
-     "sd": 0.0212,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.0786,
-     "sd": 0.0239,
-     "n": 5
+     "mean": 0.1025,
+     "sd": 0.0203,
+     "n": 10
     }
    },
    "topk_whole_b2048_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 4.0822,
-     "sd": 0.0038,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 3.7568,
-     "sd": 0.0118,
-     "n": 5
+     "mean": 4.1014,
+     "sd": 0.0296,
+     "n": 10
     }
    },
    "topk_whole_b2048_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 1.2574,
-     "sd": 0.0026,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 1.0574,
-     "sd": 0.0009,
-     "n": 5
+     "mean": 1.2609,
+     "sd": 0.002,
+     "n": 10
     }
    },
    "topp_partial_b128_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 0.3428,
-     "sd": 0.0116,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.298,
-     "sd": 0.001,
-     "n": 5
+     "mean": 0.3399,
+     "sd": 0.007,
+     "n": 10
     }
    },
    "topp_partial_b128_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 0.3288,
-     "sd": 0.0085,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1878,
-     "sd": 0.0026,
-     "n": 5
+     "mean": 0.3252,
+     "sd": 0.004,
+     "n": 10
     }
    },
    "topp_partial_b16_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 0.2886,
-     "sd": 0.0098,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.2586,
-     "sd": 0.0051,
-     "n": 5
+     "mean": 0.2887,
+     "sd": 0.0124,
+     "n": 10
     }
    },
    "topp_partial_b16_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 0.3062,
-     "sd": 0.013,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.17,
-     "sd": 0.0067,
-     "n": 5
+     "mean": 0.3039,
+     "sd": 0.0077,
+     "n": 10
     }
    },
    "topp_partial_b1_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 0.0724,
-     "sd": 0.0236,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.0684,
-     "sd": 0.0241,
-     "n": 5
+     "mean": 0.0899,
+     "sd": 0.031,
+     "n": 10
     }
    },
    "topp_partial_b1_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 0.0892,
-     "sd": 0.0265,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.0414,
-     "sd": 0.0109,
-     "n": 5
+     "mean": 0.0738,
+     "sd": 0.0231,
+     "n": 10
     }
    },
    "topp_partial_b2048_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 4.3734,
-     "sd": 0.0083,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 4.004,
-     "sd": 0.0236,
-     "n": 5
+     "mean": 4.3698,
+     "sd": 0.028,
+     "n": 10
     }
    },
    "topp_partial_b2048_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 4.489,
-     "sd": 0.0221,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 2.69,
-     "sd": 0.0188,
-     "n": 5
+     "mean": 4.4934,
+     "sd": 0.0194,
+     "n": 10
     }
    },
    "topp_whole_b128_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 0.6386,
-     "sd": 0.0038,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.5896,
-     "sd": 0.0034,
-     "n": 5
+     "mean": 0.6381,
+     "sd": 0.0037,
+     "n": 10
     }
    },
    "topp_whole_b128_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 0.6186,
-     "sd": 0.005,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.3662,
-     "sd": 0.0083,
-     "n": 5
+     "mean": 0.6239,
+     "sd": 0.0141,
+     "n": 10
     }
    },
    "topp_whole_b16_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 0.2844,
-     "sd": 0.0049,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.2608,
-     "sd": 0.0023,
-     "n": 5
+     "mean": 0.293,
+     "sd": 0.0121,
+     "n": 10
     }
    },
    "topp_whole_b16_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 0.3236,
-     "sd": 0.0413,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1732,
-     "sd": 0.0104,
-     "n": 5
+     "mean": 0.3141,
+     "sd": 0.0208,
+     "n": 10
     }
    },
    "topp_whole_b1_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 0.2722,
-     "sd": 0.0156,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.2456,
-     "sd": 0.0122,
-     "n": 5
+     "mean": 0.2658,
+     "sd": 0.019,
+     "n": 10
     }
    },
    "topp_whole_b1_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 0.2924,
-     "sd": 0.0043,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 0.1668,
-     "sd": 0.005,
-     "n": 5
+     "mean": 0.2964,
+     "sd": 0.0125,
+     "n": 10
     }
    },
    "topp_whole_b2048_v131072": {
     "unit": "ms",
     "gold": {
-     "mean": 8.5438,
-     "sd": 0.0308,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 7.7934,
-     "sd": 0.0423,
-     "n": 5
+     "mean": 8.5648,
+     "sd": 0.076,
+     "n": 10
     }
    },
    "topp_whole_b2048_v32768": {
     "unit": "ms",
     "gold": {
-     "mean": 8.9244,
-     "sd": 0.0529,
-     "n": 5
-    },
-    "claude + PR's solution": {
-     "mean": 5.29,
-     "sd": 0.0307,
-     "n": 5
+     "mean": 8.946,
+     "sd": 0.0364,
+     "n": 10
     }
    }
   },
   "pytorch_ref": {
    "topk_whole_b1_v32768": {
-    "mean": 0.2596,
-    "sd": 0.0941,
-    "n": 5
+    "mean": 0.2932,
+    "sd": 0.0971,
+    "n": 10
    },
    "topk_partial_b1_v32768": {
-    "mean": 0.2766,
-    "sd": 0.0943,
-    "n": 5
+    "mean": 0.2974,
+    "sd": 0.1077,
+    "n": 10
    },
    "topp_whole_b1_v32768": {
-    "mean": 0.3418,
-    "sd": 0.1086,
-    "n": 5
+    "mean": 0.2911,
+    "sd": 0.1032,
+    "n": 10
    },
    "topp_partial_b1_v32768": {
-    "mean": 0.2706,
-    "sd": 0.0951,
-    "n": 5
+    "mean": 0.2792,
+    "sd": 0.1052,
+    "n": 10
    },
    "topk_topp_whole_b1_v32768": {
-    "mean": 0.3992,
-    "sd": 0.1681,
-    "n": 5
+    "mean": 0.3699,
+    "sd": 0.1408,
+    "n": 10
    },
    "mixed_partial_b1_v32768": {
-    "mean": 0.3984,
-    "sd": 0.1569,
-    "n": 5
+    "mean": 0.337,
+    "sd": 0.1059,
+    "n": 10
    },
    "topk_whole_b16_v32768": {
-    "mean": 1.2936,
-    "sd": 0.1189,
-    "n": 5
+    "mean": 1.2221,
+    "sd": 0.0196,
+    "n": 10
    },
    "topk_partial_b16_v32768": {
-    "mean": 1.236,
-    "sd": 0.0111,
-    "n": 5
+    "mean": 1.2204,
+    "sd": 0.03,
+    "n": 10
    },
    "topp_whole_b16_v32768": {
-    "mean": 1.2468,
-    "sd": 0.0609,
-    "n": 5
+    "mean": 1.2462,
+    "sd": 0.0183,
+    "n": 10
    },
    "topp_partial_b16_v32768": {
-    "mean": 1.2758,
-    "sd": 0.0163,
-    "n": 5
+    "mean": 1.2491,
+    "sd": 0.0205,
+    "n": 10
    },
    "topk_topp_whole_b16_v32768": {
-    "mean": 1.3732,
-    "sd": 0.0681,
-    "n": 5
+    "mean": 1.3459,
+    "sd": 0.0972,
+    "n": 10
    },
    "mixed_partial_b16_v32768": {
-    "mean": 1.3516,
-    "sd": 0.0142,
-    "n": 5
+    "mean": 1.3431,
+    "sd": 0.0965,
+    "n": 10
    },
    "topk_whole_b128_v32768": {
-    "mean": 1.302,
-    "sd": 0.3511,
-    "n": 5
+    "mean": 1.1515,
+    "sd": 0.0144,
+    "n": 10
    },
    "topk_partial_b128_v32768": {
-    "mean": 1.149,
-    "sd": 0.0072,
-    "n": 5
+    "mean": 1.147,
+    "sd": 0.012,
+    "n": 10
    },
    "topp_whole_b128_v32768": {
-    "mean": 1.24,
-    "sd": 0.0136,
-    "n": 5
+    "mean": 1.2355,
+    "sd": 0.0074,
+    "n": 10
    },
    "topp_partial_b128_v32768": {
-    "mean": 1.2272,
-    "sd": 0.0066,
-    "n": 5
+    "mean": 1.2443,
+    "sd": 0.0174,
+    "n": 10
    },
    "topk_topp_whole_b128_v32768": {
-    "mean": 2.1132,
-    "sd": 0.0081,
-    "n": 5
+    "mean": 2.1223,
+    "sd": 0.0147,
+    "n": 10
    },
    "mixed_partial_b128_v32768": {
-    "mean": 2.098,
-    "sd": 0.0191,
-    "n": 5
+    "mean": 2.1249,
+    "sd": 0.0166,
+    "n": 10
    },
    "topk_whole_b2048_v32768": {
-    "mean": 20.4318,
-    "sd": 0.0197,
-    "n": 5
+    "mean": 20.4298,
+    "sd": 0.0183,
+    "n": 10
    },
    "topk_partial_b2048_v32768": {
-    "mean": 20.4182,
-    "sd": 0.0228,
-    "n": 5
+    "mean": 20.4319,
+    "sd": 0.0215,
+    "n": 10
    },
    "topp_whole_b2048_v32768": {
-    "mean": 22.017,
-    "sd": 0.0406,
-    "n": 5
+    "mean": 21.9972,
+    "sd": 0.0166,
+    "n": 10
    },
    "topp_partial_b2048_v32768": {
-    "mean": 21.9902,
-    "sd": 0.024,
-    "n": 5
+    "mean": 22.0076,
+    "sd": 0.0178,
+    "n": 10
    },
    "topk_topp_whole_b2048_v32768": {
-    "mean": 23.2142,
-    "sd": 0.0122,
-    "n": 5
+    "mean": 23.2145,
+    "sd": 0.009,
+    "n": 10
    },
    "mixed_partial_b2048_v32768": {
-    "mean": 23.2188,
-    "sd": 0.0091,
-    "n": 5
+    "mean": 23.2065,
+    "sd": 0.0149,
+    "n": 10
    },
    "topk_whole_b1_v131072": {
-    "mean": 0.2988,
-    "sd": 0.0718,
-    "n": 5
+    "mean": 0.3261,
+    "sd": 0.0932,
+    "n": 10
    },
    "topk_partial_b1_v131072": {
-    "mean": 0.3256,
-    "sd": 0.1021,
-    "n": 5
+    "mean": 0.2589,
+    "sd": 0.036,
+    "n": 10
    },
    "topp_whole_b1_v131072": {
-    "mean": 0.3322,
-    "sd": 0.1049,
-    "n": 5
+    "mean": 0.3263,
+    "sd": 0.1034,
+    "n": 10
    },
    "topp_partial_b1_v131072": {
-    "mean": 0.263,
-    "sd": 0.0164,
-    "n": 5
+    "mean": 0.3715,
+    "sd": 0.1143,
+    "n": 10
    },
    "topk_topp_whole_b1_v131072": {
-    "mean": 0.3906,
-    "sd": 0.0487,
-    "n": 5
+    "mean": 0.4852,
+    "sd": 0.1143,
+    "n": 10
    },
    "mixed_partial_b1_v131072": {
-    "mean": 0.461,
-    "sd": 0.1573,
-    "n": 5
+    "mean": 0.4097,
+    "sd": 0.1132,
+    "n": 10
    },
    "topk_whole_b16_v131072": {
-    "mean": 4.5176,
-    "sd": 1.4069,
-    "n": 5
+    "mean": 4.8427,
+    "sd": 1.889,
+    "n": 10
    },
    "topk_partial_b16_v131072": {
-    "mean": 0.565,
-    "sd": 0.0042,
-    "n": 5
+    "mean": 0.5821,
+    "sd": 0.0471,
+    "n": 10
    },
    "topp_whole_b16_v131072": {
-    "mean": 0.9338,
-    "sd": 0.0699,
-    "n": 5
+    "mean": 0.8846,
+    "sd": 0.0165,
+    "n": 10
    },
    "topp_partial_b16_v131072": {
-    "mean": 0.8796,
-    "sd": 0.012,
-    "n": 5
+    "mean": 0.8778,
+    "sd": 0.0107,
+    "n": 10
    },
    "topk_topp_whole_b16_v131072": {
-    "mean": 6.45,
-    "sd": 0.9625,
-    "n": 5
+    "mean": 5.4204,
+    "sd": 1.9086,
+    "n": 10
    },
    "mixed_partial_b16_v131072": {
-    "mean": 0.7694,
-    "sd": 0.0124,
-    "n": 5
+    "mean": 0.8006,
+    "sd": 0.0515,
+    "n": 10
    },
    "topk_whole_b128_v131072": {
-    "mean": 5.0932,
-    "sd": 0.0145,
-    "n": 5
+    "mean": 5.2143,
+    "sd": 0.4122,
+    "n": 10
    },
    "topk_partial_b128_v131072": {
-    "mean": 5.0994,
-    "sd": 0.0137,
-    "n": 5
+    "mean": 5.081,
+    "sd": 0.0091,
+    "n": 10
    },
    "topp_whole_b128_v131072": {
-    "mean": 5.57,
-    "sd": 0.0295,
-    "n": 5
+    "mean": 5.5727,
+    "sd": 0.023,
+    "n": 10
    },
    "topp_partial_b128_v131072": {
-    "mean": 5.5888,
-    "sd": 0.071,
-    "n": 5
+    "mean": 5.5748,
+    "sd": 0.0379,
+    "n": 10
    },
    "topk_topp_whole_b128_v131072": {
-    "mean": 5.8762,
-    "sd": 0.0062,
-    "n": 5
+    "mean": 5.8787,
+    "sd": 0.0083,
+    "n": 10
    },
    "mixed_partial_b128_v131072": {
-    "mean": 5.8938,
-    "sd": 0.0206,
-    "n": 5
+    "mean": 5.88,
+    "sd": 0.0088,
+    "n": 10
    },
    "topk_whole_b2048_v131072": {
-    "mean": 81.5568,
-    "sd": 0.0346,
-    "n": 5
+    "mean": 81.5991,
+    "sd": 0.0716,
+    "n": 10
    },
    "topk_partial_b2048_v131072": {
-    "mean": 81.5542,
-    "sd": 0.0573,
-    "n": 5
+    "mean": 81.5582,
+    "sd": 0.0266,
+    "n": 10
    },
    "topp_whole_b2048_v131072": {
-    "mean": 89.2988,
-    "sd": 0.0619,
-    "n": 5
+    "mean": 89.3227,
+    "sd": 0.1171,
+    "n": 10
    },
    "topp_partial_b2048_v131072": {
-    "mean": 89.228,
-    "sd": 0.0161,
-    "n": 5
+    "mean": 89.2539,
+    "sd": 0.0275,
+    "n": 10
    },
    "topk_topp_whole_b2048_v131072": {
-    "mean": 94.0016,
-    "sd": 0.0569,
-    "n": 5
+    "mean": 94.0276,
+    "sd": 0.035,
+    "n": 10
    },
    "mixed_partial_b2048_v131072": {
-    "mean": 94.044,
-    "sd": 0.0348,
-    "n": 5
+    "mean": 94.0664,
+    "sd": 0.039,
+    "n": 10
    }
   }
  },
@@ -2076,41 +1588,17 @@
   "base": {
    "tests": {
     "bytes": 2076,
-    "tail": "precationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n\n==================================== ERRORS ====================================\n__________ ERROR collecting tests/v1/sample/test_topk_topp_sampler.py __________\nImportError while importing test module '/t/tests/v1/sample/test_topk_topp_sampler.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/usr/lib/python3.10/importlib/__init__.py:126: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntests/v1/sample/test_topk_topp_sampler.py:8: in <module>\n    from vllm.v1.sample.ops.topk_topp_sampler import apply_top_k_top_p_pytorch\nE   ImportError: cannot import name 'apply_top_k_top_p_pytorch' from 'vllm.v1.sample.ops.topk_topp_sampler' (/usr/local/lib/python3.10/dist-packages/vllm/v1/sample/ops/topk_topp_sampler.py)\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nERROR tests/v1/sample/test_topk_topp_sampler.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 warning, 1 error in 0.78s\n"
+    "tail": "precationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n\n==================================== ERRORS ====================================\n__________ ERROR collecting tests/v1/sample/test_topk_topp_sampler.py __________\nImportError while importing test module '/t/tests/v1/sample/test_topk_topp_sampler.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/usr/lib/python3.10/importlib/__init__.py:126: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntests/v1/sample/test_topk_topp_sampler.py:8: in <module>\n    from vllm.v1.sample.ops.topk_topp_sampler import apply_top_k_top_p_pytorch\nE   ImportError: cannot import name 'apply_top_k_top_p_pytorch' from 'vllm.v1.sample.ops.topk_topp_sampler' (/usr/local/lib/python3.10/dist-packages/vllm/v1/sample/ops/topk_topp_sampler.py)\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nERROR tests/v1/sample/test_topk_topp_sampler.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 warning, 1 error in 0.79s\n"
    },
    "workload_runs": 1
   },
   "gold": {
    "tests": {
     "bytes": 1256,
-    "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n.s...................................................................... [ 80%]\n..................                                                       [100%]\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n89 passed, 1 skipped, 1 warning in 50.94s\n"
+    "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n.s...................................................................... [ 80%]\n..................                                                       [100%]\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n89 passed, 1 skipped, 1 warning in 52.18s\n"
    },
-   "workload_runs": 5
-  },
-  "claude": {
-   "tests": {
-    "bytes": 2076,
-    "tail": "precationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n\n==================================== ERRORS ====================================\n__________ ERROR collecting tests/v1/sample/test_topk_topp_sampler.py __________\nImportError while importing test module '/t/tests/v1/sample/test_topk_topp_sampler.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/usr/lib/python3.10/importlib/__init__.py:126: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntests/v1/sample/test_topk_topp_sampler.py:8: in <module>\n    from vllm.v1.sample.ops.topk_topp_sampler import apply_top_k_top_p_pytorch\nE   ImportError: cannot import name 'apply_top_k_top_p_pytorch' from 'vllm.v1.sample.ops.topk_topp_sampler' (/usr/local/lib/python3.10/dist-packages/vllm/v1/sample/ops/topk_topp_sampler.py)\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nERROR tests/v1/sample/test_topk_topp_sampler.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 warning, 1 error in 0.80s\n"
-   },
-   "solve": {
-    "bytes": 0,
-    "tail": ""
-   },
-   "workload_runs": 6,
-   "patch_bytes": 48
-  },
-  "claude + PR's solution": {
-   "tests": {
-    "bytes": 1256,
-    "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n.s...................................................................... [ 80%]\n..................                                                       [100%]\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n89 passed, 1 skipped, 1 warning in 32.29s\n"
-   },
-   "solve": {
-    "bytes": 1385,
-    "tail": "Done. Solution = gold's three files plus three low-risk changes to `vllm/v1/sample/ops/topk_topp_triton.py`.\n\n**What changed vs gold**\n- Kernel launched with `num_warps=16` (gold used Triton default 4). Per-row loops over 8192-wide tiles and 18-iteration ternary search are latency-bound inside one program per row, so 4x more threads per program cuts per-pass time.\n- `multi_processor_count` cached per device instead of `get_device_properties` call on every invocation.\n- `reset_buffer_cache` no longer drops the 200-entry lookup tables. Benchmark calls it right before timed iterations, so gold paid a Python-list-to-GPU copy inside iteration 0. Scratch buffer still cleared, memory numbers unchanged in spirit.\n\n**Measured in task docker image (RTX 5070 Ti, same benchmark harness, best of 3)**\n\n| scenario b16 v32k | gold (warps=4) | mine (warps=16) |\n|---|---|---|\n| topk_whole | 0.064 ms | 0.043 ms |\n| topp_whole | 0.289 ms | 0.167 ms |\n| topk_topp_whole | 0.095 ms | 0.052 ms |\n| mixed_partial | 0.066 ms | 0.052 ms |\n\nKept-count diff vs PyTorch reference = 0 on all four scenarios.\n\n**Verification**: `tests/v1/sample/test_topk_topp_sampler.py` in `vllm-task:33538` image with my tree swapped in: 89 passed, 1 skipped. Matches gold's test log.\n\n**Not done**: deeper rewrite (radix-select top-k, in-register row) skipped. 15-min solver cap made it too risky to land untested.\n"
-   },
-   "workload_runs": 5,
-   "patch_bytes": 5430
+   "workload_runs": 10
   }
  },
- "ts": "2026-11-05T13:26:04Z"
+ "ts": "2026-11-05T14:27:55Z"
 }
