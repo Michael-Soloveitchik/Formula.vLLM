@@ -13,7 +13,7 @@
   "vllm/v1/worker/block_table.py"
  ],
  "test_files": [
-  "tests/v1/worker/test_gpu_input_batch.py"
+  "/task/tests/test_block_table_slot_mapping.py"
  ],
  "wheel": "0.10.1",
  "wheel_note": "first PyPI release after merge (2025-08-19 > 2025-08-15). Its torch pin resolves to 2.7.1+cu126 (no sm_120), so torch_fix swaps in torch 2.7.1+cu128 (same version, Blackwell-capable).",
@@ -53,7 +53,7 @@
   }
  ],
  "experiments_note": "reported pct = author's end-to-end throughput gain; dashboard applies it to our measured baseline",
- "test_note": "PR changed only block_table.py; test_gpu_input_batch.py builds BlockTable/InputBatch and checks slot mappings. Perf-only PR: base and gold both expected PASS.",
+ "test_note": "Vendored oracle (tasks/pr_22940/tests): the merge-tree tests/v1/worker/test_gpu_input_batch.py imports LogitsProcessorManager, renamed in the 0.10.1 wheel, so it cannot collect in files-swap mode. Perf-only PR: base and gold both expected PASS.",
  "torch_fix": "torch==2.7.1 --index-url https://download.pytorch.org/whl/cu128",
  "extra_pip": "transformers==4.56.2 pandas datasets",
  "extra_pip_note": "vllm 0.10.1 only lower-bounds transformers; pip resolved 5.x which breaks ProcessorMixin. 4.56.2 is the contemporary release (Aug 2025). pandas/datasets: benchmark_dataset.py imports.",
