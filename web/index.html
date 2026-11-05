@@ -196,6 +196,9 @@
  .secH{font-size:14px;font-weight:800;letter-spacing:.03em;margin:6px 0 8px;padding-left:10px;border-left:4px solid var(--acc);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
   background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase}
  .secH span{font-size:11px;font-weight:600;letter-spacing:0;text-transform:none;-webkit-text-fill-color:var(--mut)}
+ .prHead{margin:14px 0 4px;font-weight:700;font-size:13px;display:flex;align-items:center;gap:8px}
+ .prHead.sel{background:var(--sel);border:1px solid #bfe0fb;border-radius:10px;padding:6px 10px;margin-top:6px}
+ .prHead a{color:var(--acc);text-decoration:none}
  .muted{color:var(--faint)}
  footer{color:var(--faint);font-size:11px;text-align:center;padding:16px}
  ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:20px;border:2px solid var(--bg)}::-webkit-scrollbar-thumb:hover{background:var(--faint)}
@@ -241,6 +244,7 @@
 const $=s=>document.querySelector(s);
 const esc=s=>(s==null?'':(''+s)).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 let IDX=[], RES={}, AREA={};   // AREA: pr -> {field, area}
+let SEL=null;    // PR selected in the tree: its results go to the top of the list
 let TFILT='all';   // tree scope: all | run (has a measured result) | solved (has a harness arm)
 // run  = we executed the workload (result exists in RES)
 // solved = a solver harness arm (not base/gold) landed in that result
@@ -508,6 +512,7 @@ function harnessTable(res){
 
 // ---------- PR DETAIL PANEL (challenge results TOP · PR info BOTTOM) ----------
 async function showPR(pr){
+ SEL=pr; render(); window.scrollTo({top:0,behavior:'smooth'});
  const r=IDX.find(x=>x.pr===pr)||{pr}, res=RES[pr];
  const D=$('#detailWrap');
  const url='https://github.com/vllm-project/vllm/pull/'+pr;
@@ -576,12 +581,15 @@ function render(){
     </div></div>`;
 
  // top results · one table per (PR, experiment). baseline (measured) = 1.00× ref.
- const latRows=measured.map(r=>RES[r.pr]).filter(r=>experimentsOf(r).length);
- if(latRows.length){
+ let latRows=measured.map(r=>RES[r.pr]).filter(r=>experimentsOf(r).length);
+ if(SEL!=null){const i=latRows.findIndex(r=>r.pr===SEL); if(i>0){const [x]=latRows.splice(i,1); latRows.unshift(x);}}
+ if(latRows.length||SEL!=null){
   let h='';
+  if(SEL!=null&&!latRows.some(r=>r.pr===SEL)){const ix=IDX.find(r=>r.pr===SEL)||{};
+   h+=`<div class="prHead sel"><a href="https://github.com/vllm-project/vllm/pull/${SEL}" target="_blank">#${SEL}</a> <span class="muted">${esc(shortTitle(ix.title))}</span> <span class="chip pend">no measured results yet</span></div>`;}
   latRows.forEach(r=>{
    const prCell=`<a href="${r.pr_url}" target="_blank">#${r.pr}</a> <span class="muted">${esc(shortTitle(r.title))}</span>`;
-   h+=`<div style="margin:14px 0 4px;font-weight:700;font-size:12.5px">${prCell}</div>`;
+   h+=`<div class="prHead${r.pr===SEL?' sel':''}">${prCell}${r.pr===SEL?' <span class="chip field">selected</span>':''}</div>`;
    h+=experimentsOf(r).map(expTable).join('');
   });
   $('#restabWrap').innerHTML='<h2 class="secH">experiment results <span>one table per experiment · baseline (measured) = 1.00× reference · variance in (±)</span></h2>'+h;
