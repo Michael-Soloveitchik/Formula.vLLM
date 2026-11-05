@@ -50,11 +50,14 @@ Measured in Docker, 5 repeats per arm (mean ± sd), author's own benchmark comma
 
 | PR | metric | base | gold (merged PR) | ours | author | claude | claude + PR's solution |
 |---|---|---|---|---|---|---|---|
-| [#37225](https://github.com/vllm-project/vllm/pull/37225) top-k search | topk_whole b2048 v32k, ms | 1.259 ± 0.003 | 0.958 ± 0.003 | **1.31×** | 1.38× | = base (timed out) | = base (timed out) |
-| [#33538](https://github.com/vllm-project/vllm/pull/33538) Triton top-k/top-p | topk_whole b16 v32k, ms | 1.294 (PyTorch sort) | 0.120 ± 0.048 | **10.8×** | 4.2× | FAIL (timed out) | 0.065 ms, PASS |
+| [#37225](https://github.com/vllm-project/vllm/pull/37225) top-k search | topk_whole b2048 v32k, ms | 1.259 ± 0.003 | 0.958 ± 0.003 | **1.31×** | 1.38× | **0.839 ± 0.166, PASS** (40 min) | **0.778 ± 0.037, PASS** |
+| [#33538](https://github.com/vllm-project/vllm/pull/33538) Triton top-k/top-p | topk_whole b16 v32k, ms (10 repeats) | 1.222 ± 0.020 (PyTorch sort) | 0.093 ± 0.029 | **13×** | 4.2× | rerun pending | rerun pending |
 | [#41163](https://github.com/vllm-project/vllm/pull/41163) AllPool.forward | median, µs | 120.2 ± 19.7 | 84.4 ± 17.3 | **1.42×** | 1.51× | **12.1 µs, PASS** | 12.1 µs, PASS |
 | [#22940](https://github.com/vllm-project/vllm/pull/22940) slot mapping | opt-125m, output tok/s | 2270 ± 12 | 2280 ± 16 | +0.4 % | +2.07 % | 2280, PASS | 2282, PASS |
 
+- #37225: with a 40-minute budget the blind claude arm rewrote the Triton search (611 added
+  lines, kernel file only) and beats the merged PR: 0.839 vs 0.958 ms on top-k, 0.795 vs
+  1.590 ms on top-k+top-p; 89 hidden tests pass. With a 15-minute budget it produced nothing.
 - #41163: both claude arms beat the author's patch ~7× by also caching the first-token
   indices on the CPU (no device sync at all); hidden pooling test passes.
 - #22940: GPU-bound workload on this box; the slot-mapping CPU gain is inside the noise.
