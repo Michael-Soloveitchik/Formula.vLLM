@@ -81,7 +81,7 @@ RUN pip install --upgrade pip && pip install "vllm${{VLLM_VERSION:+==$VLLM_VERSI
 # Optional torch swap (e.g. the wheel pins a cu126 torch that lacks sm_120):
 # metadata.json:"torch_fix": "torch==2.7.1 --index-url https://download.pytorch.org/whl/cu128"
 ARG TORCH_FIX="{torch_fix}"
-RUN [ -z "$TORCH_FIX" ] || pip install $TORCH_FIX
+RUN [ -z "$TORCH_FIX" ] || pip install --force-reinstall $TORCH_FIX
 # Runtime extras in their own layer (keeps the wheel layer cached):
 #   gcc/libc6-dev : Triton JIT compiles its CUDA driver shim with a host C compiler
 #   tblib         : imported by vLLM's tests/conftest.py (not a vllm dependency)
