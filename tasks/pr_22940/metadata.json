@@ -56,5 +56,7 @@
  "test_note": "PR changed only block_table.py; test_gpu_input_batch.py builds BlockTable/InputBatch and checks slot mappings. Perf-only PR: base and gold both expected PASS.",
  "torch_fix": "torch==2.7.1 --index-url https://download.pytorch.org/whl/cu128",
  "extra_pip": "transformers==4.56.2 pandas datasets",
- "extra_pip_note": "vllm 0.10.1 only lower-bounds transformers; pip resolved 5.x which breaks ProcessorMixin. 4.56.2 is the contemporary release (Aug 2025). pandas/datasets: benchmark_dataset.py imports."
+ "extra_pip_note": "vllm 0.10.1 only lower-bounds transformers; pip resolved 5.x which breaks ProcessorMixin. 4.56.2 is the contemporary release (Aug 2025). pandas/datasets: benchmark_dataset.py imports.",
+ "swap": "files",
+ "swap_note": "whole-tree swap fails: the Aug-15 tree registers _C::aqlm_gemm fake impls that the 0.10.1 wheel (post AQLM removal) lacks. files mode overlays only block_table.py (base vs merge) on the wheel's own tree."
 }

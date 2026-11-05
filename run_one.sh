@@ -57,6 +57,8 @@ for k in sys.argv[1].split('.'):
 print(' '.join(v) if isinstance(v,list) else v)" "$1"; }
 TESTS="$(meta test_files)"
 WHEEL="$(meta wheel)"
+SWAP="$(meta swap)"; SWAP="${SWAP:-tree}"      # tree = whole vllm/ .py tree per arm; files = only source_files
+SRC_FILES="$(meta source_files)"
 WL_CMD="$(meta workload.cmd)"
 OBJ="$(cat "$TASK/problem.md" 2>/dev/null || echo "Optimize PR #$PR; make the hidden tests pass.")"
 IMG="vllm-task:${PR}"
@@ -111,7 +113,7 @@ fi
 
 # =============================== REAL RUN ====================================
 preflight
-say "mode=$MODE base=$BASE merge=$MERGE wheel=${WHEEL:--} engine=$ENGINE repeats=$REPEATS"
+say "mode=$MODE swap=$SWAP base=$BASE merge=$MERGE wheel=${WHEEL:--} engine=$ENGINE repeats=$REPEATS"
 
 if [ "$KEEP_WORK" = 1 ] && [ -f "$WORK/arms.json" ]; then
   say "KEEP_WORK=1: reusing refs in $WORK (skipping checkout/build/base+gold measurement)"
@@ -148,11 +150,25 @@ fi  # KEEP_WORK (checkout/build)
 # kernel the PR introduces) cannot leak into the base arm; compiled .so stay.
 # tests/ + benchmarks/ are copied to /t WITHOUT a sibling vllm/ package, so
 # `import vllm` always resolves to site-packages (= the swapped arm).
+if [ "$SWAP" = files ]; then
+# files mode: keep the wheel's own .py tree (consistent with its compiled ops) and
+# overlay ONLY the PR's source files from the arm (missing in arm -> removed).
+PRELUDE='
+set -e
+site=$(python3 -c "import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))")
+for f in '"$SRC_FILES"'; do
+  if [ -f "/arm/$f" ]; then mkdir -p "$site/$(dirname "$f")"; cp "/arm/$f" "$site/$f"; else rm -f "$site/$f"; fi
+done
+'
+else
 PRELUDE='
 set -e
 site=$(python3 -c "import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))")
 find "$site/vllm" -name "*.py" -delete
 cp -a /arm/vllm/. "$site/vllm/"
+'
+fi
+PRELUDE="$PRELUDE"'
 rm -rf /t && mkdir -p /t && cd /gold
 for d in tests benchmarks pyproject.toml conftest.py; do [ -e "$d" ] && cp -a "$d" /t/; done
 cd /t
