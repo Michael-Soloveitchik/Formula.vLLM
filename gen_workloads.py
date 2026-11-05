@@ -82,6 +82,10 @@ RUN pip install --upgrade pip && pip install "vllm${{VLLM_VERSION:+==$VLLM_VERSI
 # metadata.json:"torch_fix": "torch==2.7.1 --index-url https://download.pytorch.org/whl/cu128"
 ARG TORCH_FIX="{torch_fix}"
 RUN [ -z "$TORCH_FIX" ] || pip install --force-reinstall $TORCH_FIX
+# Optional extra pins/packages the bench or tests need but the wheel does not pin
+# (metadata.json:"extra_pip", e.g. "transformers==4.56.2 pandas datasets")
+ARG EXTRA_PIP="{extra_pip}"
+RUN [ -z "$EXTRA_PIP" ] || pip install $EXTRA_PIP
 # Runtime extras in their own layer (keeps the wheel layer cached):
 #   gcc/libc6-dev : Triton JIT compiles its CUDA driver shim with a host C compiler
 #   tblib         : imported by vLLM's tests/conftest.py (not a vllm dependency)
@@ -198,6 +202,7 @@ def main():
             pr=pr_s, title=title, deps=CPU_DEPS,
             wheel=task_meta(pr_s).get("wheel", ""),
             torch_fix=task_meta(pr_s).get("torch_fix", ""),
+            extra_pip=task_meta(pr_s).get("extra_pip", ""),
             base_sha=ix.get("base_sha") or "", merge_sha=ix.get("merge_sha") or "")
         open(os.path.join(wdir, "Dockerfile"), "w").write(df)
 
