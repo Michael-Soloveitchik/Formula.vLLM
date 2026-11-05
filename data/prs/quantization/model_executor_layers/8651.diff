@@ -1,0 +1,14 @@
+diff --git a/vllm/model_executor/layers/quantization/fp8.py b/vllm/model_executor/layers/quantization/fp8.py
+index a1be45a49e94..4969ee559522 100644
+--- a/vllm/model_executor/layers/quantization/fp8.py
++++ b/vllm/model_executor/layers/quantization/fp8.py
+@@ -355,7 +355,8 @@ def apply(self,
+             input_scale=layer.input_scale,
+             bias=bias,
+             cutlass_fp8_supported=self.cutlass_fp8_supported,
+-            use_per_token_if_dynamic=False)
++            # Default to using per_token quantization if cutlass is supported
++            use_per_token_if_dynamic=self.cutlass_fp8_supported)
+ 
+ 
+ class Fp8MoEMethod(FusedMoEMethodBase):

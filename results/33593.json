@@ -1,0 +1,149 @@
+{
+ "pr": 33593,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/33593",
+ "title": "[Perf] Optimize Python Slice for Structured Output using `islice` instead of [:] (#33593)",
+ "field": "decoding_tpot",
+ "reported_gain": "0.5%",
+ "base_sha": "c38b8d5a317da356353a0a9ae1ab87f612267fb3",
+ "merge_sha": "9ce8fad2a9fe010ede46b085f6cb4099c8ec402d",
+ "arms": {
+  "base": {
+   "tests": "FAIL"
+  },
+  "gold": {
+   "tests": "PASS"
+  }
+ },
+ "improved": true,
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "membership_present",
+   "unit": "s/call",
+   "workload": "SIZE=100_000, end-token at 10%% in; `tok not in input_ids[:-1]` vs `tok not in islice(input_ids,0,len-1)`; INNER=200 calls/block, 18 paired samples, best-of + mean\u00b1sd",
+   "note": "Real PR hot path (reasoning parser extract_content_ids). Marker present early -> islice short-circuits + copies nothing; list[:-1] copies all N first. Gold wins.",
+   "reported": {
+    "base": 0.0034,
+    "patch": 1e-06
+   },
+   "arms": {
+    "base": {
+     "mean": 0.000358804,
+     "sd": 4.6743e-05,
+     "runs": [
+      0.000330733,
+      0.000377697,
+      0.000326645,
+      0.000345245,
+      0.000507789,
+      0.000329285,
+      0.000316241,
+      0.000341058,
+      0.000351174,
+      0.000400607,
+      0.000339538,
+      0.000377984,
+      0.000366388,
+      0.000344082,
+      0.000430289,
+      0.00033626,
+      0.000326537,
+      0.000310923
+     ]
+    },
+    "gold": {
+     "mean": 0.000155275,
+     "sd": 1.0947e-05,
+     "runs": [
+      0.000159376,
+      0.000169886,
+      0.000143453,
+      0.000149218,
+      0.000163265,
+      0.000155865,
+      0.00016565,
+      0.000155066,
+      0.000146417,
+      0.000169359,
+      0.000145489,
+      0.000183984,
+      0.000145105,
+      0.000150742,
+      0.00015026,
+      0.000152459,
+      0.000144649,
+      0.000144703
+     ],
+     "speedup_x": 2.3142,
+     "speedup_sd": 0.2775,
+     "counts": true
+    }
+   }
+  },
+  {
+   "name": "membership_absent",
+   "unit": "s/call",
+   "workload": "SIZE=100_000, end-token absent; same two idioms; INNER=200, 18 paired samples",
+   "note": "HONEST TRADEOFF: when the token is absent both scan all N, but list[:-1] is a C-level memcpy + C-level `in`, while islice yields through the Python iterator protocol per element. Gold is SLOWER here. Net PR win depends on how often reasoning has already ended (present case dominates in practice).",
+   "reported": {
+    "base": 0.0056,
+    "patch": 0.0047
+   },
+   "arms": {
+    "base": {
+     "mean": 0.001291289,
+     "sd": 0.000529284,
+     "runs": [
+      0.001199808,
+      0.001103488,
+      0.001139905,
+      0.001095942,
+      0.001149443,
+      0.001095101,
+      0.001143228,
+      0.001148784,
+      0.00345858,
+      0.001183188,
+      0.001342441,
+      0.001288587,
+      0.001156719,
+      0.00118306,
+      0.001126867,
+      0.00116652,
+      0.001102764,
+      0.001158777
+     ]
+    },
+    "gold": {
+     "mean": 0.001658282,
+     "sd": 0.000147542,
+     "runs": [
+      0.001612199,
+      0.001790975,
+      0.001551818,
+      0.001517835,
+      0.001523724,
+      0.001485493,
+      0.001909483,
+      0.001542935,
+      0.00170378,
+      0.002030049,
+      0.00167952,
+      0.001712967,
+      0.00149505,
+      0.00150705,
+      0.001802099,
+      0.001664878,
+      0.001622824,
+      0.001696395
+     ],
+     "speedup_x": 0.7813,
+     "speedup_sd": 0.3093,
+     "counts": true
+    }
+   }
+  }
+ ],
+ "environment": "docker python:3.12-slim cpu, colima arm64",
+ "ts": "2026-11-04T00:00:00Z"
+}

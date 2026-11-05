@@ -1,0 +1,134 @@
+{
+ "pr": 29499,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/29499",
+ "title": "[EPLB] Optimize EPLB with numpy (#29499)",
+ "field": "parallelism",
+ "reported_gain": "27%",
+ "base_sha": "0ada960a20766fa1de9063576979f9d807583785",
+ "merge_sha": "6170d47d2220bc464fb561b93caf799a7560e304",
+ "arms": {
+  "base": {
+   "tests": "FAIL"
+  },
+  "gold": {
+   "tests": "PASS"
+  }
+ },
+ "improved": true,
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "move_from_buffer",
+   "unit": "ms/op",
+   "workload": "per-rank mapping over 16 local experts (2048-slot cluster); 5 repeats x best-of-100",
+   "note": "inline-from-diff: exact duplicate-resolution mapping body copied verbatim from base_sha / merge_sha (tensor .copy_ excluded as arm-identical). per-rank body over num_local_experts=16 rows; numpy overhead dominates at this size so gold is slower. unit ms/op. speedup = mean of per-repeat base/gold ratios",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 0.00181,
+     "sd": 5e-05,
+     "runs": [
+      0.00185,
+      0.001792,
+      0.001866,
+      0.001816,
+      0.001724
+     ]
+    },
+    "gold": {
+     "mean": 0.008454,
+     "sd": 0.003279,
+     "runs": [
+      0.005669,
+      0.005882,
+      0.012448,
+      0.012491,
+      0.005782
+     ],
+     "speedup_x": 0.245,
+     "speedup_sd": 0.08,
+     "counts": true
+    }
+   }
+  },
+  {
+   "name": "get_ep_ranks_with_expert",
+   "unit": "ms/op",
+   "workload": "128 ranks x 16 local = 2048 physical slots, 256 logical experts; 5 repeats x best-of-100",
+   "note": "isolated import of real function from each tree. base loops get_ep_ranks_with_expert over all unique experts; gold makes one get_ep_ranks_with_experts_batch call. unit ms/op (whole-layer rank-map computation). speedup = mean of per-repeat base/gold ratios",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 24.043582,
+     "sd": 0.559845,
+     "runs": [
+      24.96972,
+      24.388491,
+      23.435503,
+      23.733472,
+      23.690724
+     ]
+    },
+    "gold": {
+     "mean": 2.900953,
+     "sd": 0.032188,
+     "runs": [
+      2.862138,
+      2.861013,
+      2.929905,
+      2.92577,
+      2.92594
+     ],
+     "speedup_x": 8.291,
+     "speedup_sd": 0.282,
+     "counts": true
+    }
+   }
+  },
+  {
+   "name": "move_to_buffer",
+   "unit": "ms/op",
+   "workload": "per-rank mapping over 16 local experts (2048-slot cluster); 5 repeats x best-of-100",
+   "note": "inline-from-diff: exact index-mapping body copied verbatim from base_sha / merge_sha (P2P + .copy_ excluded as arm-identical). per-rank body over num_local_experts=16 rows; numpy overhead dominates at this size so gold is slower. unit ms/op. speedup = mean of per-repeat base/gold ratios",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 0.026854,
+     "sd": 0.000414,
+     "runs": [
+      0.027419,
+      0.02668,
+      0.027144,
+      0.026824,
+      0.026203
+     ]
+    },
+    "gold": {
+     "mean": 0.040745,
+     "sd": 0.000316,
+     "runs": [
+      0.040228,
+      0.041051,
+      0.040838,
+      0.041051,
+      0.040555
+     ],
+     "speedup_x": 0.659,
+     "speedup_sd": 0.013,
+     "counts": true
+    }
+   }
+  }
+ ],
+ "environment": "docker vllm-cpu-bench:21222 (python 3.12.16, numpy 2.5.4, torch 2.15.0+cpu), colima arm64 Mac; identical image for both arms, only vllm/ source tree differs (PYTHONPATH). get_ep_ranks_with_expert via isolated import of real function; move_to_buffer/move_from_buffer via inline-from-diff of the exact mapping body the PR changed (multi-rank process group + GPU P2P cannot run in a single CPU container; P2P/.copy_ are arm-identical and excluded)",
+ "ts": "2026-11-04T00:00:00Z"
+}

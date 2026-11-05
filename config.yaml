@@ -1,0 +1,92 @@
+# benchmark config — self-contained. Push this dir to GitHub, clone on the
+# GPU box (Ubuntu + NVIDIA RTX 3060 Ti, 8 GB), set the two paths below, run.
+#
+# A "solver" produces a SOURCE patch given the pre-PR base_sha tree + the task
+# objective. We always run the two reference arms (base, gold) plus every
+# enabled solver. A solver is just a shell command: the runner invokes
+#     <cmd> <task_objective>
+# inside the task work dir; the command edits ./vllm and exits.
+
+machine:
+  os: ubuntu
+  gpu: nvidia-rtx-3060ti
+  vram_gb: 8
+  cuda: "12.1"           # match the torch wheel in the image
+  default_model: facebook/opt-125m   # 8 GB -> small models only
+  dtype: float16
+
+# where the vLLM git clone lives on the target box (needed to export base_sha
+# and merge_sha trees). The clone is huge, so it is NOT vendored in this repo.
+paths:
+  vllm_git: ../../vllm   # override with: export VLLM_GIT=/abs/path/to/vllm
+
+# measurement: repeat each timing to get mean + variance (see rules.md noise model)
+measure:
+  repeats: 5             # independent runs per arm (for variance / ±sd)
+  pairs: 9               # A-B-B-A paired samples inside one run
+  inner: 1000            # calls per timed block
+  warmup: 2
+  k_sigma: 3.0           # theta = clip(k*sigma, theta_min, theta_max)
+  theta_min: 0.01
+  theta_max: 0.50
+
+# reference arms always measured
+arms:
+  base: {kind: reference, tree: base_sha}      # pre-PR  -> expect tests FAIL
+  gold: {kind: reference, tree: merge_sha}     # expert  -> expect tests PASS
+
+# ---------------------------------------------------------------------------
+# solvers: one line each = harness x model x cmd. The runner reads `cmd` and
+# runs it as:  cmd + ' ' + <task objective text>  in the task work dir.
+# Enable/disable with `enabled`. Env vars listed in `env` must be exported.
+#
+# NOTE: the GPU box has NO IBM LiteLLM, so codex (litellm-wired) is off there.
+# ---------------------------------------------------------------------------
+solvers:
+  # `guided: false` -> objective has the "## Expert solution" section STRIPPED
+  # (blind FormulaCode: discover the optimization). `guided: true` -> full
+  # problem.md incl. expert solution, asked to beat it. Harness names MUST match
+  # the HTML arm keys: claude / claude + solution / codex / codex + solution.
+  - harness: claude
+    model: claude-opus-4-8
+    cmd: "claude -p --model=claude-opus-4-8"
+    guided: false
+    enabled: true
+    env: [ANTHROPIC_BASE_URL, ANTHROPIC_AUTH_TOKEN, ANTHROPIC_MODEL]
+
+  - harness: claude + solution
+    model: claude-opus-4-8
+    cmd: "claude -p --model=claude-opus-4-8"
+    guided: true
+    enabled: true
+    env: [ANTHROPIC_BASE_URL, ANTHROPIC_AUTH_TOKEN, ANTHROPIC_MODEL]
+
+  - harness: codex
+    model: gpt-6.1-sol
+    cmd: "codex exec --skip-git-repo-check"
+    guided: false
+    enabled: true
+    env: [LITELLM_API_KEY, LITELLM_KEY]
+
+  - harness: codex + solution
+    model: gpt-6.1-sol
+    cmd: "codex exec --skip-git-repo-check"
+    guided: true
+    enabled: true
+    env: [LITELLM_API_KEY, LITELLM_KEY]
+
+  - harness: qwen
+    model: qwen3-8-27b
+    cmd: "qwen_agent.sh"
+    guided: false
+    enabled: false        # local vLLM Qwen, if served
+
+# which PRs to run by default (ids, or 'all', or a named set from below)
+run:
+  default: interesting        # see interesting_prs.md
+  sets:
+    # CPU-runnable workloads (needs:cpu in workloads.json) — no CUDA kernels
+    cpu: [21222, 21281, 6779, 13365, 27793, 29499, 32975, 33593, 39328]
+    # all 20 PRs with a mined, runnable workload (workloads.json)
+    workloads: [21222, 21281, 9972, 22940, 12583, 23504, 16436, 6779, 6442, 13365, 37225, 33538, 41163, 33593, 27793, 39328, 32975, 29499, 27673, 28280]
+    interesting: [21222, 21281, 6779, 13365, 27793]

@@ -1,0 +1,182 @@
+diff --git a/vllm/reasoning/abs_reasoning_parsers.py b/vllm/reasoning/abs_reasoning_parsers.py
+index 496eaaf3f366..83c3e6b90ac2 100644
+--- a/vllm/reasoning/abs_reasoning_parsers.py
++++ b/vllm/reasoning/abs_reasoning_parsers.py
+@@ -4,7 +4,7 @@
+ import importlib
+ import os
+ from abc import abstractmethod
+-from collections.abc import Callable, Sequence
++from collections.abc import Callable, Iterable, Sequence
+ from functools import cached_property
+ from typing import TYPE_CHECKING, Any
+ 
+@@ -68,7 +68,7 @@ def is_reasoning_end(self, input_ids: Sequence[int]) -> bool:
+         """
+ 
+     def is_reasoning_end_streaming(
+-        self, input_ids: Sequence[int], delta_ids: Sequence[int]
++        self, input_ids: Sequence[int], delta_ids: Iterable[int]
+     ) -> bool:
+         """
+         Check if the reasoning content ends in the input_ids on a
+diff --git a/vllm/reasoning/basic_parsers.py b/vllm/reasoning/basic_parsers.py
+index c066032fb325..5b1c0111cdd7 100644
+--- a/vllm/reasoning/basic_parsers.py
++++ b/vllm/reasoning/basic_parsers.py
+@@ -2,7 +2,8 @@
+ # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+ 
+ from abc import abstractmethod
+-from collections.abc import Sequence
++from collections.abc import Iterable, Sequence
++from itertools import islice
+ from typing import TYPE_CHECKING, Any
+ 
+ from vllm.entrypoints.openai.engine.protocol import DeltaMessage
+@@ -77,7 +78,7 @@ def is_reasoning_end(self, input_ids: Sequence[int]) -> bool:
+         return False
+ 
+     def is_reasoning_end_streaming(
+-        self, input_ids: Sequence[int], delta_ids: Sequence[int]
++        self, input_ids: Sequence[int], delta_ids: Iterable[int]
+     ) -> bool:
+         end_token_id = self.end_token_id
+         return end_token_id in delta_ids
+@@ -86,7 +87,7 @@ def extract_content_ids(self, input_ids: list[int]) -> list[int]:
+         """
+         Extract the content after the end tokens
+         """
+-        if self.end_token_id not in input_ids[:-1]:
++        if self.end_token_id not in islice(input_ids, 0, max(0, len(input_ids) - 1)):
+             return []
+         else:
+             return input_ids[input_ids.index(self.end_token_id) + 1 :]
+diff --git a/vllm/reasoning/deepseek_v3_reasoning_parser.py b/vllm/reasoning/deepseek_v3_reasoning_parser.py
+index e40f225907d5..c2efe650089d 100644
+--- a/vllm/reasoning/deepseek_v3_reasoning_parser.py
++++ b/vllm/reasoning/deepseek_v3_reasoning_parser.py
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: Apache-2.0
+ # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+ 
+-from collections.abc import Sequence
++from collections.abc import Iterable, Sequence
+ 
+ from transformers import PreTrainedTokenizerBase
+ 
+@@ -41,7 +41,7 @@ def is_reasoning_end(self, input_ids: Sequence[int]) -> bool:
+         return self._parser.is_reasoning_end(input_ids)
+ 
+     def is_reasoning_end_streaming(
+-        self, input_ids: Sequence[int], delta_ids: Sequence[int]
++        self, input_ids: Sequence[int], delta_ids: Iterable[int]
+     ) -> bool:
+         return self._parser.is_reasoning_end_streaming(input_ids, delta_ids)
+ 
+diff --git a/vllm/reasoning/identity_reasoning_parser.py b/vllm/reasoning/identity_reasoning_parser.py
+index e1106362dfff..3c76901a31a3 100644
+--- a/vllm/reasoning/identity_reasoning_parser.py
++++ b/vllm/reasoning/identity_reasoning_parser.py
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: Apache-2.0
+ # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+ 
+-from collections.abc import Sequence
++from collections.abc import Iterable, Sequence
+ 
+ from transformers import PreTrainedTokenizerBase
+ 
+@@ -36,7 +36,7 @@ def is_reasoning_end(self, input_ids: Sequence[int]) -> bool:
+         return True
+ 
+     def is_reasoning_end_streaming(
+-        self, input_ids: Sequence[int], delta_ids: Sequence[int]
++        self, input_ids: Sequence[int], delta_ids: Iterable[int]
+     ) -> bool:
+         return True
+ 
+diff --git a/vllm/reasoning/mistral_reasoning_parser.py b/vllm/reasoning/mistral_reasoning_parser.py
+index d7347462692a..c085ba4e4f21 100644
+--- a/vllm/reasoning/mistral_reasoning_parser.py
++++ b/vllm/reasoning/mistral_reasoning_parser.py
+@@ -69,7 +69,7 @@ def end_token(self) -> str:
+     def is_reasoning_end(self, input_ids: Sequence[int]) -> bool:
+         has_eot_token = False
+ 
+-        for id in input_ids[::-1]:
++        for id in reversed(input_ids):
+             if id == self.start_token_id:
+                 # Reasoning ends only if a BOT token is found before a EOT token.
+                 return has_eot_token
+diff --git a/vllm/reasoning/step3_reasoning_parser.py b/vllm/reasoning/step3_reasoning_parser.py
+index 4758246acb3e..d932ba8b62dd 100644
+--- a/vllm/reasoning/step3_reasoning_parser.py
++++ b/vllm/reasoning/step3_reasoning_parser.py
+@@ -1,7 +1,8 @@
+ # SPDX-License-Identifier: Apache-2.0
+ # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+ 
+-from collections.abc import Sequence
++from collections.abc import Iterable, Sequence
++from itertools import islice
+ 
+ import regex as re
+ from transformers import PreTrainedTokenizerBase
+@@ -104,13 +105,15 @@ def is_reasoning_end(self, input_ids: Sequence[int]) -> bool:
+         return self.think_end_token_id in input_ids
+ 
+     def is_reasoning_end_streaming(
+-        self, input_ids: Sequence[int], delta_ids: Sequence[int]
++        self, input_ids: Sequence[int], delta_ids: Iterable[int]
+     ) -> bool:
+         end_token_id = self.think_end_token_id
+         return end_token_id in delta_ids
+ 
+     def extract_content_ids(self, input_ids: list[int]) -> list[int]:
+-        if self.think_end_token_id not in input_ids[:-1]:
++        if self.think_end_token_id not in islice(
++            input_ids, 0, max(0, len(input_ids) - 1)
++        ):
+             return []
+         else:
+             return input_ids[input_ids.index(self.think_end_token_id) + 1 :]
+diff --git a/vllm/reasoning/step3p5_reasoning_parser.py b/vllm/reasoning/step3p5_reasoning_parser.py
+index b93f551426fb..af9aa4b4141b 100644
+--- a/vllm/reasoning/step3p5_reasoning_parser.py
++++ b/vllm/reasoning/step3p5_reasoning_parser.py
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: Apache-2.0
+ # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+ 
+-from collections.abc import Sequence
++from collections.abc import Iterable, Sequence
+ 
+ from vllm.entrypoints.openai.chat_completion.protocol import (
+     ChatCompletionRequest,
+@@ -51,7 +51,7 @@ def is_reasoning_end(self, input_ids: Sequence[int]) -> bool:
+         return self.end_offset < 1
+ 
+     def is_reasoning_end_streaming(
+-        self, input_ids: Sequence[int], delta_ids: Sequence[int]
++        self, input_ids: Sequence[int], delta_ids: Iterable[int]
+     ) -> bool:
+         if self.end_token_id in input_ids and self.end_offset > 0:
+             self.end_offset -= 1
+diff --git a/vllm/v1/structured_output/__init__.py b/vllm/v1/structured_output/__init__.py
+index 921bee6a647a..cd17a21d9b3b 100644
+--- a/vllm/v1/structured_output/__init__.py
++++ b/vllm/v1/structured_output/__init__.py
+@@ -324,8 +324,11 @@ def should_advance(self, request: "Request") -> bool:
+         # Check if reasoning ends in *this* step
+         delta_from = request.num_computed_tokens - request.num_output_placeholders
+         all_token_ids = request.all_token_ids
++        start = (
++            delta_from if delta_from >= 0 else max(len(all_token_ids) + delta_from, 0)
++        )
+         if self.reasoner.is_reasoning_end_streaming(
+-            all_token_ids, all_token_ids[delta_from:]
++            all_token_ids, itertools.islice(all_token_ids, start, None)
+         ):
+             # Reasoning just ended, so we shouldn't advance til
+             # next pass

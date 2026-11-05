@@ -1,0 +1,60 @@
+{
+ "pr": 21281,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/21281",
+ "title": "[Core] Minimize number of dict lookup in _maybe_evict_cached_block (#21281)",
+ "field": "scheduling",
+ "base_sha": "e7b204268132cb775c139574c1ff4ad7e15c8f66",
+ "merge_sha": "af376ca19d4588b1d5ace72ffc0b4bbd778c15f2",
+ "reported_gain": "77% (0.13ms\u21920.03ms)",
+ "arms": {
+  "base": {
+   "tests": "FAIL"
+  },
+  "gold": {
+   "tests": "PASS"
+  }
+ },
+ "improved": true,
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "allocate_new_block",
+   "unit": "ms/op",
+   "workload": "block_pool sweep 10/50/100/500/1000 blocks, 1000 iters (evict path)",
+   "note": "runs = per allocate-block size, median of 3 reps; speedup = mean of per-size base/gold ratios",
+   "reported": {
+    "base": 0.13,
+    "patch": 0.03
+   },
+   "arms": {
+    "base": {
+     "mean": 0.174353,
+     "sd": 0.216158,
+     "runs": [
+      0.003969,
+      0.019962,
+      0.048273,
+      0.221984,
+      0.577576
+     ]
+    },
+    "gold": {
+     "mean": 0.161171,
+     "sd": 0.184676,
+     "runs": [
+      0.003931,
+      0.02218,
+      0.046476,
+      0.246428,
+      0.48684
+     ],
+     "speedup_x": 1.007,
+     "speedup_sd": 0.106,
+     "counts": true
+    }
+   }
+  }
+ ],
+ "environment": "docker python:3.12-slim cpu colima arm64 \u2014 identical image both arms, only vllm/ differs",
+ "ts": "2026-11-04T00:00:00Z"
+}

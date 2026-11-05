@@ -1,0 +1,64 @@
+{
+ "pr": 32975,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/32975",
+ "title": "[Perf] Optimize detokenizer python logic (#32975)",
+ "field": "scheduling",
+ "reported_gain": "1.628x, 38.57%",
+ "base_sha": "97fa8f65909d4d8f2eb0edc2137fb22f576a5b25",
+ "merge_sha": "e1060a71a1bb96103ce9ca98345184dcdc982467",
+ "arms": {
+  "base": {
+   "tests": "FAIL"
+  },
+  "gold": {
+   "tests": "PASS"
+  }
+ },
+ "improved": true,
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "detokenize",
+   "unit": "us/tok",
+   "workload": "200 seqs x 2000 tokens; isolated SlowIncrementalDetokenizer per-token output-count check (slice vs tracked), 7 repeats",
+   "note": "approach=fallback (self-contained, both arms in ONE process on the same CPU, no cross-container noise). Reproduces the exact changed inner logic: base recomputes len(self.token_ids[self.prompt_len:]) per token (slice alloc), gold uses num_output_tokens()==len(token_ids)-prompt_len. speedup_x = mean of per-repeat base/gold ratios. NOTE: the real full detokenizer path was ALSO driven (PYTHONPATH=/src, real gpt2 tokenizer via transformers, real SlowIncrementalDetokenizer.update() loop, batched updates, long prompt); there the native tokenizer decode (~5us/tok) dominates and the slice removal is below run-to-run noise (real base ~5.36 us/tok vs gold ~6.39 us/tok, i.e. no measurable end-to-end gain). The isolated fallback below matches the PR's own reported methodology of timing the detokenizer PYTHON logic in isolation.",
+   "reported": {
+    "base": 1.628,
+    "patch": 1.0
+   },
+   "arms": {
+    "base": {
+     "mean": 1.330579,
+     "sd": 0.012124,
+     "runs": [
+      1.322138,
+      1.333397,
+      1.322168,
+      1.322721,
+      1.320539,
+      1.336379,
+      1.356709
+     ]
+    },
+    "gold": {
+     "mean": 0.117099,
+     "sd": 0.000396,
+     "runs": [
+      0.117234,
+      0.11725,
+      0.116556,
+      0.117155,
+      0.116553,
+      0.117773,
+      0.117172
+     ],
+     "speedup_x": 11.362829,
+     "speedup_sd": 0.093282,
+     "counts": true
+    }
+   }
+  }
+ ],
+ "environment": "docker vllm-cpu-bench:32975 (python:3.12-slim + CPU torch + transformers + gguf), PYTHONPATH=/src with per-arm vllm source tree mounted ro; colima arm64 Mac (aarch64), py 3.12.16; identical image for both arms, only vllm/ source differs",
+ "ts": "2026-11-04T00:00:00Z"
+}

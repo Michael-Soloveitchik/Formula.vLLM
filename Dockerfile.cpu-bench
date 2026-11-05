@@ -1,0 +1,42 @@
+# CPU-only benchmark image for vLLM PR 21222 block_pool benchmark.
+# We do NOT install vllm or compile its C extension. The vllm/ source tree is
+# mounted at runtime on PYTHONPATH. Only pure-python deps + CPU torch are baked.
+FROM python:3.12-slim
+
+ENV PIP_NO_CACHE_DIR=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    VLLM_TARGET_DEVICE=cpu
+
+# CPU torch (arm64 wheel exists on the cpu index) + pure-python deps that the
+# import chain of vllm.v1.core.block_pool transitively needs.
+RUN pip install --index-url https://download.pytorch.org/whl/cpu torch \
+ && pip install \
+      numpy \
+      pydantic \
+      psutil \
+      tabulate \
+      cloudpickle \
+      msgspec \
+      typing_extensions \
+      transformers \
+      regex \
+      filelock \
+      huggingface_hub \
+      cachetools \
+      pillow \
+      py-cpuinfo \
+      cbor2 \
+      pyzmq \
+      blake3 \
+      pybase64 \
+      prometheus_client \
+      fastapi \
+      openai \
+      aiohttp \
+      requests \
+      diskcache
+
+WORKDIR /bench
+CMD ["python3", "benchmarks/kv_cache/benchmark_block_pool.py", \
+     "--num-iteration", "1000", \
+     "--allocate-blocks", "10", "50", "100", "500", "1000"]

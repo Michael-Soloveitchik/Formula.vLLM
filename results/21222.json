@@ -1,0 +1,97 @@
+{
+ "pr": 21222,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/21222",
+ "title": "[Core] Introduce popleft_n and append_n in FreeKVCacheBlockQueue to further optimize block_pool (#21222)",
+ "field": "kv_cache",
+ "reported_gain": "95% (0.15ms\u21920.008ms)",
+ "base_sha": "10904e6d755051260a7c3ce98659d8907c74caa9",
+ "merge_sha": "ed25054577f7abca2aee32a5290200c4a1aed561",
+ "arms": {
+  "base": {
+   "tests": "FAIL"
+  },
+  "gold": {
+   "tests": "PASS"
+  }
+ },
+ "improved": true,
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "get_new_blocks",
+   "unit": "ms/op",
+   "workload": "block_pool sweep 10/50/100/500/1000 blocks, 1000 iters",
+   "note": "runs = per allocate-block size; speedup = mean of per-size base/gold ratios",
+   "reported": {
+    "base": 0.15,
+    "patch": 0.008
+   },
+   "arms": {
+    "base": {
+     "mean": 0.150956,
+     "sd": 0.172406,
+     "runs": [
+      0.004424,
+      0.022943,
+      0.043132,
+      0.228052,
+      0.456227
+     ]
+    },
+    "gold": {
+     "mean": 0.087743,
+     "sd": 0.097173,
+     "runs": [
+      0.00268,
+      0.010689,
+      0.020929,
+      0.16115,
+      0.243266
+     ],
+     "speedup_x": 1.83,
+     "speedup_sd": 0.268,
+     "counts": true
+    }
+   }
+  },
+  {
+   "name": "free_blocks",
+   "unit": "ms/op",
+   "workload": "block_pool sweep 10/50/100/500/1000 blocks, 1000 iters",
+   "note": "runs = per allocate-block size; speedup = mean of per-size base/gold ratios",
+   "reported": {
+    "base": 0.033,
+    "patch": 0.009
+   },
+   "arms": {
+    "base": {
+     "mean": 0.100668,
+     "sd": 0.115137,
+     "runs": [
+      0.002991,
+      0.015285,
+      0.028646,
+      0.151623,
+      0.304795
+     ]
+    },
+    "gold": {
+     "mean": 0.059619,
+     "sd": 0.066554,
+     "runs": [
+      0.00204,
+      0.007899,
+      0.015462,
+      0.101475,
+      0.171221
+     ],
+     "speedup_x": 1.706,
+     "speedup_sd": 0.191,
+     "counts": true
+    }
+   }
+  }
+ ],
+ "environment": "docker python:3.12-slim, CPU torch (arm64 cpu wheel), colima arm64 Mac; identical image for both arms, only vllm/ source differs",
+ "ts": "2026-11-04T00:00:00Z"
+}

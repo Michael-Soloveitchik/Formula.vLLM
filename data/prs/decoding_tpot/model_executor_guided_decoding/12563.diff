@@ -1,0 +1,15 @@
+diff --git a/vllm/model_executor/guided_decoding/xgrammar_decoding.py b/vllm/model_executor/guided_decoding/xgrammar_decoding.py
+index 2d8594cb8aaf..ee30ce96f0a1 100644
+--- a/vllm/model_executor/guided_decoding/xgrammar_decoding.py
++++ b/vllm/model_executor/guided_decoding/xgrammar_decoding.py
+@@ -307,8 +307,8 @@ def __call__(self, input_ids: list[int],
+         # Note: In this method, if the tensors have different dimensions
+         # on CPU device fails, but on GPU it runs without error. Hence the
+         # unsqueeze above for scores, to match the token bitmask shape
+-        xgr.apply_token_bitmask_inplace(scores,
+-                                        self.token_bitmask.to(scores.device))
++        xgr.apply_token_bitmask_inplace(
++            scores, self.token_bitmask.to(scores.device, non_blocking=True))
+         if device_type != "cuda":
+             scores = scores.to(dtype).to(device_type).squeeze()
+ 

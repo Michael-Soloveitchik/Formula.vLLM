@@ -1,0 +1,21 @@
+diff --git a/vllm/model_executor/layers/quantization/auto_round.py b/vllm/model_executor/layers/quantization/auto_round.py
+index fb285413ba9e..1ca92273430d 100644
+--- a/vllm/model_executor/layers/quantization/auto_round.py
++++ b/vllm/model_executor/layers/quantization/auto_round.py
+@@ -327,6 +327,8 @@ def apply_gptq_quant_layer(self,
+ 
+         if isinstance(layer, FusedMoE):
+             if use_marlin:
++                return GPTQMarlinMoEMethod(quant_args_marlin, layer.moe)
++            else:
+                 from vllm.model_executor.layers.quantization.moe_wna16 import (
+                     MoeWNA16Config)
+ 
+@@ -339,7 +341,6 @@ def apply_gptq_quant_layer(self,
+                 }
+                 return MoeWNA16Config.from_config(config).get_quant_method(
+                     layer, prefix)
+-            return GPTQMarlinMoEMethod(quant_args_marlin, layer.moe)
+ 
+         if isinstance(layer, (LinearBase, ParallelLMHead)):
+             if use_marlin:

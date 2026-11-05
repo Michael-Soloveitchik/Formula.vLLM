@@ -1,0 +1,731 @@
+[
+ {
+  "pr": 13365,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/13365",
+  "title": "[V1][Spec Decode] Optimize N-gram matching with Numba (#13365)",
+  "field": "decoding_tpot",
+  "reported_gain": "30x, 2.5%",
+  "base_sha": "c8d70e2437feecdb3762ce17298df33439ae1bd1",
+  "merge_sha": "4c822298981a8f7521492075ff72659985fc4c3f",
+  "arms": {
+   "base": {
+    "tests": "FAIL"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "ngram_match_overhead",
+    "unit": "s",
+    "workload": "5000 synthetic context sequences (len 200-800, vocab 32000), n-gram n=3, k=10; ~50% seeded with a plantable match. Cumulative NgramProposer.propose() time over the full 5000-seq pass; 5 repeats (gold warmed up once untimed to exclude JIT compile).",
+    "note": "PREFERRED approach: imported the standalone vllm/v1/spec_decode/ngram_proposer.py module directly from each mounted source tree (self-contained, only numpy/numba/typing deps) and timed .propose(). base=pure-python KMP loop; gold=numba @jit(nopython=True) kernels. runs = per-repeat cumulative seconds; speedup_x = mean of per-repeat base/gold ratios. numba not baked in image -> installed at runtime via pip (numba 0.68.1, arm64 wheel); worked.",
+    "reported": {
+     "base": 54.3,
+     "patch": 1.9
+    },
+    "arms": {
+     "base": {
+      "mean": 0.256929,
+      "sd": 0.028241,
+      "runs": [
+       0.229843,
+       0.224256,
+       0.293397,
+       0.251467,
+       0.285683
+      ]
+     },
+     "gold": {
+      "mean": 0.003596,
+      "sd": 5e-06,
+      "runs": [
+       0.003587,
+       0.003603,
+       0.003593,
+       0.003598,
+       0.003598
+      ],
+      "speedup_x": 71.454,
+      "speedup_sd": 7.867,
+      "counts": true
+     }
+    }
+   }
+  ],
+  "environment": "docker vllm-cpu-bench:21222 (python:3.12-slim + CPU torch arm64 wheel, numpy 2.5.4), colima arm64 Mac; identical image for both arms, only vllm/ source tree differs. numba NOT baked into image -> installed at runtime with `pip install numba` (numba 0.68.1, arm64 wheel) for the gold arm; base arm is pure-python and needs no numba. gold arm warmed up once (untimed) to exclude numba JIT compile from the steady-state timing.",
+  "ts": "2026-11-04T00:00:00Z"
+ },
+ {
+  "pr": 21222,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/21222",
+  "title": "[Core] Introduce popleft_n and append_n in FreeKVCacheBlockQueue to further optimize block_pool (#21222)",
+  "field": "kv_cache",
+  "reported_gain": "95% (0.15ms\u21920.008ms)",
+  "base_sha": "10904e6d755051260a7c3ce98659d8907c74caa9",
+  "merge_sha": "ed25054577f7abca2aee32a5290200c4a1aed561",
+  "arms": {
+   "base": {
+    "tests": "FAIL"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "get_new_blocks",
+    "unit": "ms/op",
+    "workload": "block_pool sweep 10/50/100/500/1000 blocks, 1000 iters",
+    "note": "runs = per allocate-block size; speedup = mean of per-size base/gold ratios",
+    "reported": {
+     "base": 0.15,
+     "patch": 0.008
+    },
+    "arms": {
+     "base": {
+      "mean": 0.150956,
+      "sd": 0.172406,
+      "runs": [
+       0.004424,
+       0.022943,
+       0.043132,
+       0.228052,
+       0.456227
+      ]
+     },
+     "gold": {
+      "mean": 0.087743,
+      "sd": 0.097173,
+      "runs": [
+       0.00268,
+       0.010689,
+       0.020929,
+       0.16115,
+       0.243266
+      ],
+      "speedup_x": 1.83,
+      "speedup_sd": 0.268,
+      "counts": true
+     }
+    }
+   },
+   {
+    "name": "free_blocks",
+    "unit": "ms/op",
+    "workload": "block_pool sweep 10/50/100/500/1000 blocks, 1000 iters",
+    "note": "runs = per allocate-block size; speedup = mean of per-size base/gold ratios",
+    "reported": {
+     "base": 0.033,
+     "patch": 0.009
+    },
+    "arms": {
+     "base": {
+      "mean": 0.100668,
+      "sd": 0.115137,
+      "runs": [
+       0.002991,
+       0.015285,
+       0.028646,
+       0.151623,
+       0.304795
+      ]
+     },
+     "gold": {
+      "mean": 0.059619,
+      "sd": 0.066554,
+      "runs": [
+       0.00204,
+       0.007899,
+       0.015462,
+       0.101475,
+       0.171221
+      ],
+      "speedup_x": 1.706,
+      "speedup_sd": 0.191,
+      "counts": true
+     }
+    }
+   }
+  ],
+  "environment": "docker python:3.12-slim, CPU torch (arm64 cpu wheel), colima arm64 Mac; identical image for both arms, only vllm/ source differs",
+  "ts": "2026-11-04T00:00:00Z"
+ },
+ {
+  "pr": 21281,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/21281",
+  "title": "[Core] Minimize number of dict lookup in _maybe_evict_cached_block (#21281)",
+  "field": "scheduling",
+  "base_sha": "e7b204268132cb775c139574c1ff4ad7e15c8f66",
+  "merge_sha": "af376ca19d4588b1d5ace72ffc0b4bbd778c15f2",
+  "reported_gain": "77% (0.13ms\u21920.03ms)",
+  "arms": {
+   "base": {
+    "tests": "FAIL"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "allocate_new_block",
+    "unit": "ms/op",
+    "workload": "block_pool sweep 10/50/100/500/1000 blocks, 1000 iters (evict path)",
+    "note": "runs = per allocate-block size, median of 3 reps; speedup = mean of per-size base/gold ratios",
+    "reported": {
+     "base": 0.13,
+     "patch": 0.03
+    },
+    "arms": {
+     "base": {
+      "mean": 0.174353,
+      "sd": 0.216158,
+      "runs": [
+       0.003969,
+       0.019962,
+       0.048273,
+       0.221984,
+       0.577576
+      ]
+     },
+     "gold": {
+      "mean": 0.161171,
+      "sd": 0.184676,
+      "runs": [
+       0.003931,
+       0.02218,
+       0.046476,
+       0.246428,
+       0.48684
+      ],
+      "speedup_x": 1.007,
+      "speedup_sd": 0.106,
+      "counts": true
+     }
+    }
+   }
+  ],
+  "environment": "docker python:3.12-slim cpu colima arm64 \u2014 identical image both arms, only vllm/ differs",
+  "ts": "2026-11-04T00:00:00Z"
+ },
+ {
+  "pr": 27793,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/27793",
+  "title": "[Core][Observability] Add KV cache residency metrics (#27793)",
+  "field": "scheduling",
+  "reported_gain": "0.1%",
+  "base_sha": "ec7035c9d40cda43fa9c3d2d1c148b1382aa04a4",
+  "merge_sha": "cabc77cc86586206134a19e3e70aa401ec30b71f",
+  "arms": {
+   "base": {
+    "tests": "FAIL"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [],
+  "note": "correctness-only PR (KV residency metrics). No timing experiment \u2014 overhead ~48 bytes/block, zero runtime cost when disabled. Validated by pytest with deterministic fake clock.",
+  "environment": "n/a (correctness-only)",
+  "ts": "2026-11-04T00:00:00Z"
+ },
+ {
+  "pr": 29499,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/29499",
+  "title": "[EPLB] Optimize EPLB with numpy (#29499)",
+  "field": "parallelism",
+  "reported_gain": "27%",
+  "base_sha": "0ada960a20766fa1de9063576979f9d807583785",
+  "merge_sha": "6170d47d2220bc464fb561b93caf799a7560e304",
+  "arms": {
+   "base": {
+    "tests": "FAIL"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "move_from_buffer",
+    "unit": "ms/op",
+    "workload": "per-rank mapping over 16 local experts (2048-slot cluster); 5 repeats x best-of-100",
+    "note": "inline-from-diff: exact duplicate-resolution mapping body copied verbatim from base_sha / merge_sha (tensor .copy_ excluded as arm-identical). per-rank body over num_local_experts=16 rows; numpy overhead dominates at this size so gold is slower. unit ms/op. speedup = mean of per-repeat base/gold ratios",
+    "reported": {
+     "base": null,
+     "patch": null
+    },
+    "arms": {
+     "base": {
+      "mean": 0.00181,
+      "sd": 5e-05,
+      "runs": [
+       0.00185,
+       0.001792,
+       0.001866,
+       0.001816,
+       0.001724
+      ]
+     },
+     "gold": {
+      "mean": 0.008454,
+      "sd": 0.003279,
+      "runs": [
+       0.005669,
+       0.005882,
+       0.012448,
+       0.012491,
+       0.005782
+      ],
+      "speedup_x": 0.245,
+      "speedup_sd": 0.08,
+      "counts": true
+     }
+    }
+   },
+   {
+    "name": "get_ep_ranks_with_expert",
+    "unit": "ms/op",
+    "workload": "128 ranks x 16 local = 2048 physical slots, 256 logical experts; 5 repeats x best-of-100",
+    "note": "isolated import of real function from each tree. base loops get_ep_ranks_with_expert over all unique experts; gold makes one get_ep_ranks_with_experts_batch call. unit ms/op (whole-layer rank-map computation). speedup = mean of per-repeat base/gold ratios",
+    "reported": {
+     "base": null,
+     "patch": null
+    },
+    "arms": {
+     "base": {
+      "mean": 24.043582,
+      "sd": 0.559845,
+      "runs": [
+       24.96972,
+       24.388491,
+       23.435503,
+       23.733472,
+       23.690724
+      ]
+     },
+     "gold": {
+      "mean": 2.900953,
+      "sd": 0.032188,
+      "runs": [
+       2.862138,
+       2.861013,
+       2.929905,
+       2.92577,
+       2.92594
+      ],
+      "speedup_x": 8.291,
+      "speedup_sd": 0.282,
+      "counts": true
+     }
+    }
+   },
+   {
+    "name": "move_to_buffer",
+    "unit": "ms/op",
+    "workload": "per-rank mapping over 16 local experts (2048-slot cluster); 5 repeats x best-of-100",
+    "note": "inline-from-diff: exact index-mapping body copied verbatim from base_sha / merge_sha (P2P + .copy_ excluded as arm-identical). per-rank body over num_local_experts=16 rows; numpy overhead dominates at this size so gold is slower. unit ms/op. speedup = mean of per-repeat base/gold ratios",
+    "reported": {
+     "base": null,
+     "patch": null
+    },
+    "arms": {
+     "base": {
+      "mean": 0.026854,
+      "sd": 0.000414,
+      "runs": [
+       0.027419,
+       0.02668,
+       0.027144,
+       0.026824,
+       0.026203
+      ]
+     },
+     "gold": {
+      "mean": 0.040745,
+      "sd": 0.000316,
+      "runs": [
+       0.040228,
+       0.041051,
+       0.040838,
+       0.041051,
+       0.040555
+      ],
+      "speedup_x": 0.659,
+      "speedup_sd": 0.013,
+      "counts": true
+     }
+    }
+   }
+  ],
+  "environment": "docker vllm-cpu-bench:21222 (python 3.12.16, numpy 2.5.4, torch 2.15.0+cpu), colima arm64 Mac; identical image for both arms, only vllm/ source tree differs (PYTHONPATH). get_ep_ranks_with_expert via isolated import of real function; move_to_buffer/move_from_buffer via inline-from-diff of the exact mapping body the PR changed (multi-rank process group + GPU P2P cannot run in a single CPU container; P2P/.copy_ are arm-identical and excluded)",
+  "ts": "2026-11-04T00:00:00Z"
+ },
+ {
+  "pr": 32975,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/32975",
+  "title": "[Perf] Optimize detokenizer python logic (#32975)",
+  "field": "scheduling",
+  "reported_gain": "1.628x, 38.57%",
+  "base_sha": "97fa8f65909d4d8f2eb0edc2137fb22f576a5b25",
+  "merge_sha": "e1060a71a1bb96103ce9ca98345184dcdc982467",
+  "arms": {
+   "base": {
+    "tests": "FAIL"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "detokenize",
+    "unit": "us/tok",
+    "workload": "200 seqs x 2000 tokens; isolated SlowIncrementalDetokenizer per-token output-count check (slice vs tracked), 7 repeats",
+    "note": "approach=fallback (self-contained, both arms in ONE process on the same CPU, no cross-container noise). Reproduces the exact changed inner logic: base recomputes len(self.token_ids[self.prompt_len:]) per token (slice alloc), gold uses num_output_tokens()==len(token_ids)-prompt_len. speedup_x = mean of per-repeat base/gold ratios. NOTE: the real full detokenizer path was ALSO driven (PYTHONPATH=/src, real gpt2 tokenizer via transformers, real SlowIncrementalDetokenizer.update() loop, batched updates, long prompt); there the native tokenizer decode (~5us/tok) dominates and the slice removal is below run-to-run noise (real base ~5.36 us/tok vs gold ~6.39 us/tok, i.e. no measurable end-to-end gain). The isolated fallback below matches the PR's own reported methodology of timing the detokenizer PYTHON logic in isolation.",
+    "reported": {
+     "base": 1.628,
+     "patch": 1.0
+    },
+    "arms": {
+     "base": {
+      "mean": 1.330579,
+      "sd": 0.012124,
+      "runs": [
+       1.322138,
+       1.333397,
+       1.322168,
+       1.322721,
+       1.320539,
+       1.336379,
+       1.356709
+      ]
+     },
+     "gold": {
+      "mean": 0.117099,
+      "sd": 0.000396,
+      "runs": [
+       0.117234,
+       0.11725,
+       0.116556,
+       0.117155,
+       0.116553,
+       0.117773,
+       0.117172
+      ],
+      "speedup_x": 11.362829,
+      "speedup_sd": 0.093282,
+      "counts": true
+     }
+    }
+   }
+  ],
+  "environment": "docker vllm-cpu-bench:32975 (python:3.12-slim + CPU torch + transformers + gguf), PYTHONPATH=/src with per-arm vllm source tree mounted ro; colima arm64 Mac (aarch64), py 3.12.16; identical image for both arms, only vllm/ source differs",
+  "ts": "2026-11-04T00:00:00Z"
+ },
+ {
+  "pr": 33593,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/33593",
+  "title": "[Perf] Optimize Python Slice for Structured Output using `islice` instead of [:] (#33593)",
+  "field": "decoding_tpot",
+  "reported_gain": "0.5%",
+  "base_sha": "c38b8d5a317da356353a0a9ae1ab87f612267fb3",
+  "merge_sha": "9ce8fad2a9fe010ede46b085f6cb4099c8ec402d",
+  "arms": {
+   "base": {
+    "tests": "FAIL"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "membership_present",
+    "unit": "s/call",
+    "workload": "SIZE=100_000, end-token at 10%% in; `tok not in input_ids[:-1]` vs `tok not in islice(input_ids,0,len-1)`; INNER=200 calls/block, 18 paired samples, best-of + mean\u00b1sd",
+    "note": "Real PR hot path (reasoning parser extract_content_ids). Marker present early -> islice short-circuits + copies nothing; list[:-1] copies all N first. Gold wins.",
+    "reported": {
+     "base": 0.0034,
+     "patch": 1e-06
+    },
+    "arms": {
+     "base": {
+      "mean": 0.000358804,
+      "sd": 4.6743e-05,
+      "runs": [
+       0.000330733,
+       0.000377697,
+       0.000326645,
+       0.000345245,
+       0.000507789,
+       0.000329285,
+       0.000316241,
+       0.000341058,
+       0.000351174,
+       0.000400607,
+       0.000339538,
+       0.000377984,
+       0.000366388,
+       0.000344082,
+       0.000430289,
+       0.00033626,
+       0.000326537,
+       0.000310923
+      ]
+     },
+     "gold": {
+      "mean": 0.000155275,
+      "sd": 1.0947e-05,
+      "runs": [
+       0.000159376,
+       0.000169886,
+       0.000143453,
+       0.000149218,
+       0.000163265,
+       0.000155865,
+       0.00016565,
+       0.000155066,
+       0.000146417,
+       0.000169359,
+       0.000145489,
+       0.000183984,
+       0.000145105,
+       0.000150742,
+       0.00015026,
+       0.000152459,
+       0.000144649,
+       0.000144703
+      ],
+      "speedup_x": 2.3142,
+      "speedup_sd": 0.2775,
+      "counts": true
+     }
+    }
+   },
+   {
+    "name": "membership_absent",
+    "unit": "s/call",
+    "workload": "SIZE=100_000, end-token absent; same two idioms; INNER=200, 18 paired samples",
+    "note": "HONEST TRADEOFF: when the token is absent both scan all N, but list[:-1] is a C-level memcpy + C-level `in`, while islice yields through the Python iterator protocol per element. Gold is SLOWER here. Net PR win depends on how often reasoning has already ended (present case dominates in practice).",
+    "reported": {
+     "base": 0.0056,
+     "patch": 0.0047
+    },
+    "arms": {
+     "base": {
+      "mean": 0.001291289,
+      "sd": 0.000529284,
+      "runs": [
+       0.001199808,
+       0.001103488,
+       0.001139905,
+       0.001095942,
+       0.001149443,
+       0.001095101,
+       0.001143228,
+       0.001148784,
+       0.00345858,
+       0.001183188,
+       0.001342441,
+       0.001288587,
+       0.001156719,
+       0.00118306,
+       0.001126867,
+       0.00116652,
+       0.001102764,
+       0.001158777
+      ]
+     },
+     "gold": {
+      "mean": 0.001658282,
+      "sd": 0.000147542,
+      "runs": [
+       0.001612199,
+       0.001790975,
+       0.001551818,
+       0.001517835,
+       0.001523724,
+       0.001485493,
+       0.001909483,
+       0.001542935,
+       0.00170378,
+       0.002030049,
+       0.00167952,
+       0.001712967,
+       0.00149505,
+       0.00150705,
+       0.001802099,
+       0.001664878,
+       0.001622824,
+       0.001696395
+      ],
+      "speedup_x": 0.7813,
+      "speedup_sd": 0.3093,
+      "counts": true
+     }
+    }
+   }
+  ],
+  "environment": "docker python:3.12-slim cpu, colima arm64",
+  "ts": "2026-11-04T00:00:00Z"
+ },
+ {
+  "pr": 39328,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/39328",
+  "title": "[Core] Cache InductorPass.hash_source with functools.cache (#39328)",
+  "field": "gpu_kernels",
+  "reported_gain": "1.15x, 2.88x",
+  "base_sha": "304d5ba1a04b6cbfa2b5bd377c2a89d350a10921",
+  "merge_sha": "87805fa11ea6d9f9aa7a7fc92ac957c613bc2163",
+  "arms": {
+   "base": {
+    "tests": "FAIL"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "cache_lookup",
+    "unit": "ms",
+    "workload": "InductorPass.hash_source repeated over 5 source objects, 10000 lookups/repeat, 5 repeats; per-call ms",
+    "note": "base = recompute inspect.getsource+sha256 each call; gold = functools.cache wrapped (cold miss then hits); speedup = mean of per-repeat base/gold ratios",
+    "reported": {
+     "base": 32.5,
+     "patch": 11.3
+    },
+    "arms": {
+     "base": {
+      "mean": 0.354834,
+      "sd": 0.030611,
+      "runs": [
+       0.351354,
+       0.366423,
+       0.406632,
+       0.319355,
+       0.330404
+      ]
+     },
+     "gold": {
+      "mean": 0.001002,
+      "sd": 0.000985,
+      "runs": [
+       0.00048,
+       0.0005,
+       0.000491,
+       0.00297,
+       0.000567
+      ],
+      "speedup_x": 596.651,
+      "speedup_sd": 256.867,
+      "counts": true
+     }
+    }
+   },
+   {
+    "name": "cold_compile",
+    "unit": "s",
+    "workload": "full torch.compile cold compile (E2E)",
+    "note": "not reproducible on CPU arm Mac",
+    "reported": {
+     "base": 34.1,
+     "patch": 29.7
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "docker python:3.12-slim cpu colima arm64",
+  "ts": "2026-11-04T00:00:00Z"
+ },
+ {
+  "pr": 6779,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/6779",
+  "title": "[Core] Use array to speedup padding (#6779)",
+  "field": "decoding_tpot",
+  "reported_gain": "18%",
+  "base_sha": "084a01fd3544557990f8af8af6fd3c1185bae848",
+  "merge_sha": "89a84b0bb7b30706a02836234a94493ea8f780bf",
+  "arms": {
+   "base": {
+    "tests": "FAIL"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "make_tensor_with_pad",
+    "unit": "ms",
+    "workload": "SamplingTensors padding-input prep + 2x make_tensor_with_pad (prompt+output), input_len=1024, batch_size=2048, pad=vocab_size(32000), dtype=int64, device=cpu; 1 warmup, 5 timed repeats",
+    "note": "FINDING: PR #6779 does NOT touch make_tensor_with_pad; that fn is BYTE-IDENTICAL at base and gold (already the np.full/make_ndarray_with_pad array path). The real change is the INPUT fed to it inside SamplingTensors.from_sampling_metadata/from_lists: base builds List[List[int]] via list(seq_data.prompt_token_ids) (tuple->list copies); gold passes seq_data.prompt_token_ids_array (array('l')) directly, SequenceData now storing tokens as array. Benchmark loads the REAL unmodified make_tensor_with_pad from each mounted tree by source (vllm import chain needs the absent _custom_ops C ext) and replicates the exact per-arm prep path. speedup_x = mean of per-run base/gold ratios.",
+    "reported": {
+     "base": 79.0,
+     "patch": 22.0
+    },
+    "arms": {
+     "base": {
+      "mean": 54.6725,
+      "sd": 3.4126,
+      "runs": [
+       61.469011,
+       53.007991,
+       52.754865,
+       53.525083,
+       52.605456
+      ]
+     },
+     "gold": {
+      "mean": 2.725,
+      "sd": 0.2186,
+      "runs": [
+       3.160982,
+       2.601602,
+       2.626848,
+       2.639047,
+       2.596544
+      ],
+      "speedup_x": 20.089,
+      "speedup_sd": 0.335,
+      "counts": true
+     }
+    }
+   },
+   {
+    "name": "e2e_qwen05b",
+    "unit": "it/s",
+    "workload": "end-to-end decode throughput, Qwen2-0.5B",
+    "note": "needs GPU model, reported-only",
+    "reported": {
+     "base": 24.76,
+     "patch": 29.44
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "docker vllm-cpu-bench:21222 (CPU torch 2.15.0+cpu, numpy 2.5.4), colima arm64 Mac; identical image for both arms, only vllm/ source tree differs; real make_tensor_with_pad loaded by source from each mounted tree",
+  "ts": "2026-11-04T00:00:00Z"
+ }
+]

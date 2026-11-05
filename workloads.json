@@ -1,0 +1,274 @@
+{
+ "21222": {
+  "pr": 21222,
+  "field": "kv_cache",
+  "title": "[Core] Introduce popleft_n and append_n in FreeKVCacheBlockQueue (#21222)",
+  "workload_kind": "repo_benchmark",
+  "script": "benchmarks/kv_cache/benchmark_block_pool.py",
+  "cmd": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
+  "needs": "cpu",
+  "notes": "Pure Python microbench; imports vllm.v1.core.block_pool.BlockPool + vllm.utils, no CUDA. One run prints both ops.",
+  "experiments": [
+   {"name": "get_new_blocks", "unit": "us/op", "parse": "get_new_blocks avg", "reported": {"base": 150.0, "patch": 8.0}},
+   {"name": "free_blocks",    "unit": "us/op", "parse": "free_blocks avg",    "reported": {"base": 33.0,  "patch": 9.0}}
+  ]
+ },
+ "21281": {
+  "pr": 21281,
+  "field": "scheduling",
+  "title": "[Core] Minimize number of dict lookup in _maybe_evict_cached_block (#21281)",
+  "workload_kind": "repo_benchmark",
+  "script": "benchmarks/kv_cache/benchmark_block_pool.py",
+  "cmd": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
+  "needs": "cpu",
+  "notes": "Builds on 21222; same block_pool microbench exercises the evict/allocate path. CPU-only.",
+  "experiments": [
+   {"name": "allocate_new_block", "unit": "us/op", "parse": "get_new_blocks avg", "reported": {"base": 130.0, "patch": 30.0}}
+  ]
+ },
+ "9972": {
+  "pr": 9972,
+  "field": "scheduling",
+  "title": "[V1] Prefix caching (take 2) (#9972)",
+  "workload_kind": "serving",
+  "script": "benchmarks/benchmark_prefix_caching.py",
+  "cmd": "VLLM_USE_V1=1 python3 benchmarks/benchmark_prefix_caching.py --model neuralmagic/Meta-Llama-3-8B-Instruct-FP8 --num-prompts 200 --repeat-count 2 --input-length-range 256:512 --dataset-path ./ShareGPT_V3_unfiltered_cleaned_split.json --seed 0 --enable-prefix-caching",
+  "needs": "gpu",
+  "notes": "Offline batching bench; needs model + ShareGPT dataset. GPU serving run. Numbers are cache-enabled (49% hit).",
+  "experiments": [
+   {"name": "input_throughput",  "unit": "tok/s", "parse": "input tok/s",  "reported": {"base": 17916.0, "patch": 32258.0}},
+   {"name": "output_throughput", "unit": "tok/s", "parse": "output tok/s", "reported": {"base": 485.0,   "patch": 874.0}},
+   {"name": "cost_time",         "unit": "s",     "parse": "cost time",    "reported": {"base": 8.49,    "patch": 4.83}}
+  ]
+ },
+ "22940": {
+  "pr": 22940,
+  "field": "kv_cache",
+  "title": "[Core] direct indexing on self.block_table_np in compute_slot_mapping (#22940)",
+  "workload_kind": "serving",
+  "script": "benchmarks/benchmark_throughput.py",
+  "cmd": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 30000",
+  "needs": "gpu",
+  "notes": "Throughput bench with facebook/opt-125m. Per-op win in a trace; e2e via benchmark_throughput.",
+  "experiments": [
+   {"name": "compute_slot_mapping", "unit": "us/call", "parse": "trace", "reported": {"base": 400.0, "patch": 22.0}},
+   {"name": "throughput",           "unit": "req/s",   "parse": "Throughput req/s", "reported": {"base": 268.45, "patch": 274.01}}
+  ]
+ },
+ "12583": {
+  "pr": 12583,
+  "field": "quantization",
+  "title": "Expert Parallelism (EP) Support for DeepSeek V2 (#12583)",
+  "workload_kind": "repo_benchmark",
+  "script": "benchmarks/kernels/benchmark_moe.py",
+  "cmd": "python3 benchmarks/kernels/benchmark_moe.py --model mistralai/Mixtral-8x7B-Instruct-v0.1 --tp-size 2 --dtype auto --seed 0",
+  "needs": "gpu",
+  "notes": "FusedMoE Triton kernel microbench, GPU-only. PR gives no before/after numbers (design doc).",
+  "experiments": [
+   {"name": "fused_moe_kernel", "unit": "us", "parse": "kernel us", "reported": {"base": null, "patch": null}}
+  ]
+ },
+ "23504": {
+  "pr": 23504,
+  "field": "quantization",
+  "title": "[Perf] Add Triton config for DeepSeek V3 FP8 EP32 H200 (#23504)",
+  "workload_kind": "repo_benchmark",
+  "script": "benchmarks/kernels/benchmark_w8a8_block_fp8.py",
+  "cmd": "python3 benchmarks/kernels/benchmark_w8a8_block_fp8.py --tp-size 8 --input-type fp8 --out-dtype float16 --block-n 128 --block-k 128",
+  "needs": "gpu",
+  "notes": "W8A8 block FP8 Triton kernel tuning; GPU-only (H200 config).",
+  "experiments": [
+   {"name": "serving_throughput", "unit": "tok/s", "parse": "total tok/s", "reported": {"base": 16776.0, "patch": 16872.0}},
+   {"name": "w8a8_kernel",        "unit": "us",    "parse": "kernel us",    "reported": {"base": null,    "patch": null}}
+  ]
+ },
+ "16436": {
+  "pr": 16436,
+  "field": "decoding_tpot",
+  "title": "[Core] Speed up decode by remove synchronizing operation in sampler (#16436)",
+  "workload_kind": "serving",
+  "script": "benchmarks/benchmark_serving.py",
+  "cmd": "python3 benchmarks/benchmark_serving.py --backend vllm --model facebook/opt-125m --dataset-name random --random-input-len 1000 --random-output-len 100 --num-prompts 100",
+  "needs": "gpu",
+  "notes": "Removes CUDA sync in apply_penalties; win via GPU serving + trace. ~8% decode for small models.",
+  "experiments": [
+   {"name": "tpot",       "unit": "ms",    "parse": "Mean TPOT", "reported": {"base": null, "patch": null}},
+   {"name": "itl",        "unit": "ms",    "parse": "Mean ITL",  "reported": {"base": null, "patch": null}},
+   {"name": "throughput", "unit": "tok/s", "parse": "Output token throughput", "reported": {"base": null, "patch": null}}
+  ]
+ },
+ "6779": {
+  "pr": 6779,
+  "field": "decoding_tpot",
+  "title": "[Core] Use array to speedup padding (#6779)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_6779/bench.py",
+  "cmd": "python3 tasks/pr_6779/bench.py",
+  "needs": "cpu",
+  "notes": "Microbench pasted in PR body; make_tensor_with_pad over SequenceData, input_len=1024 batch=2048. v0 API.",
+  "experiments": [
+   {"name": "make_tensor_with_pad", "unit": "ms", "parse": "latency ms", "reported": {"base": 79.0, "patch": 22.0}},
+   {"name": "e2e_qwen05b",          "unit": "it/s", "parse": "it/s",     "reported": {"base": 24.76, "patch": 29.44}}
+  ]
+ },
+ "6442": {
+  "pr": 6442,
+  "field": "scheduling",
+  "title": "[Core] Use numpy to speed up padded token processing (#6442)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_6442/bench.py",
+  "cmd": "python3 tasks/pr_6442/bench.py",
+  "needs": "gpu",
+  "notes": "Microbench imports v0 vllm Sampler; large batch, A100. ~50% sampler speedup.",
+  "experiments": [
+   {"name": "sampler_latency", "unit": "ms", "parse": "latency ms", "reported": {"base": 2.0, "patch": 1.0}}
+  ]
+ },
+ "13365": {
+  "pr": 13365,
+  "field": "decoding_tpot",
+  "title": "[V1][Spec Decode] Optimize N-gram matching with Numba (#13365)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_13365/bench.py",
+  "cmd": "python3 tasks/pr_13365/bench.py",
+  "needs": "cpu",
+  "notes": "Numba-JIT N-gram matcher; CPU-only. Driver times NgramProposer.propose over ShareGPT token seqs.",
+  "experiments": [
+   {"name": "ngram_match_overhead", "unit": "s", "parse": "cumulative s", "reported": {"base": 54.3, "patch": 1.9}}
+  ]
+ },
+ "37225": {
+  "pr": 37225,
+  "field": "gpu_kernels",
+  "title": "[Perf] Optimize top-k search in apply_top_k_top_p_triton sampler (#37225)",
+  "workload_kind": "repo_benchmark",
+  "script": "benchmarks/benchmark_topk_topp.py",
+  "cmd": "python benchmarks/benchmark_topk_topp.py --batch-sizes 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+  "needs": "gpu",
+  "notes": "CUDA-only (aborts without torch.cuda). topk_whole b2048/32k 0.761->0.550ms.",
+  "experiments": [
+   {"name": "topk",      "unit": "ms", "parse": "topk_whole", "reported": {"base": 0.761, "patch": 0.550}},
+   {"name": "topk_topp", "unit": "ms", "parse": "topk_topp",  "reported": {"base": null,  "patch": null}}
+  ]
+ },
+ "33538": {
+  "pr": 33538,
+  "field": "scheduling",
+  "title": "[Kernel] Triton-based Top-k and Top-p sampler kernels (#33538)",
+  "workload_kind": "repo_benchmark",
+  "script": "benchmarks/benchmark_topk_topp.py",
+  "cmd": "python benchmarks/benchmark_topk_topp.py",
+  "needs": "gpu",
+  "notes": "Adds Triton sampler + bench script. Triton vs PyTorch sort-based. CUDA-only.",
+  "experiments": [
+   {"name": "topk_whole_b4_v32k", "unit": "ms", "parse": "topk_whole", "reported": {"base": 0.666, "patch": 0.067}}
+  ]
+ },
+ "41163": {
+  "pr": 41163,
+  "field": "gpu_kernels",
+  "title": "[Perf] Optimize AllPool.forward by slicing first, 51% faster (#41163)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_41163/bench.py",
+  "cmd": "python3 tasks/pr_41163/bench.py",
+  "needs": "gpu",
+  "notes": "Self-contained microbench; AllPool.forward, cuda:0, HIDDEN=4096, 64x128 seqs. Wall-clock (host sync).",
+  "experiments": [
+   {"name": "allpool_forward", "unit": "us", "parse": "median us", "reported": {"base": 59.89, "patch": 39.65}}
+  ]
+ },
+ "33593": {
+  "pr": 33593,
+  "field": "decoding_tpot",
+  "title": "[Perf] Optimize Python Slice for Structured Output using islice (#33593)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_33593/bench.py",
+  "cmd": "python3 tasks/pr_33593/bench.py",
+  "needs": "cpu",
+  "notes": "Pure-Python microbench, SIZE=2M N=1M R=5; list[:N] vs islice, create + sum.",
+  "experiments": [
+   {"name": "create_slice", "unit": "s", "parse": "create best", "reported": {"base": 0.0034, "patch": 0.000001}},
+   {"name": "sum_slice",    "unit": "s", "parse": "sum best",    "reported": {"base": 0.0056, "patch": 0.0047}}
+  ]
+ },
+ "27793": {
+  "pr": 27793,
+  "field": "scheduling",
+  "title": "[Core][Observability] Add KV cache residency metrics (#27793)",
+  "workload_kind": "pytest_bench",
+  "script": "tests/v1/core/test_kv_cache_metrics.py",
+  "cmd": "pytest -v tests/v1/core/test_kv_cache_metrics.py",
+  "needs": "cpu",
+  "notes": "Correctness-only; deterministic fake clock. No timing number (overhead ~48 bytes/block, zero cost when off).",
+  "experiments": []
+ },
+ "39328": {
+  "pr": 39328,
+  "field": "gpu_kernels",
+  "title": "[Core] Cache InductorPass.hash_source with functools.cache (#39328)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_39328/bench.py",
+  "cmd": "python3 tasks/pr_39328/bench.py",
+  "needs": "cpu",
+  "notes": "functools.cache over inspect.getsource; CPU-only hashing path.",
+  "experiments": [
+   {"name": "cache_lookup",  "unit": "ms", "parse": "lookup ms",  "reported": {"base": 32.50, "patch": 11.30}},
+   {"name": "cold_compile",  "unit": "s",  "parse": "compile s",  "reported": {"base": 34.10, "patch": 29.70}}
+  ]
+ },
+ "32975": {
+  "pr": 32975,
+  "field": "scheduling",
+  "title": "[Perf] Optimize detokenizer python logic (#32975)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_32975/bench.py",
+  "cmd": "python3 tasks/pr_32975/bench.py",
+  "needs": "cpu",
+  "notes": "Pure-Python detokenizer change (num_output_tokens avoids slice). 1.628x / 38.57%.",
+  "experiments": [
+   {"name": "detokenize", "unit": "us/tok", "parse": "per tok", "reported": {"base": 1.628, "patch": 1.0}}
+  ]
+ },
+ "29499": {
+  "pr": 29499,
+  "field": "parallelism",
+  "title": "[EPLB] Optimize EPLB with numpy (#29499)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_29499/bench.py",
+  "cmd": "python3 tasks/pr_29499/bench.py",
+  "needs": "cpu",
+  "notes": "EPLB algo on CPU torch tensors. Three primitives rewritten in numpy.",
+  "experiments": [
+   {"name": "move_from_buffer",       "unit": "us", "parse": "move_from_buffer", "reported": {"base": null, "patch": null}},
+   {"name": "get_ep_ranks_with_expert","unit": "us", "parse": "get_ep_ranks",    "reported": {"base": null, "patch": null}},
+   {"name": "move_to_buffer",         "unit": "us", "parse": "move_to_buffer",   "reported": {"base": null, "patch": null}}
+  ]
+ },
+ "27673": {
+  "pr": 27673,
+  "field": "scheduling",
+  "title": "[Core] Early return in SlidingWindowManager.remove_skipped_blocks (#27673)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_27673/bench.py",
+  "cmd": "python3 tasks/pr_27673/bench.py",
+  "needs": "cpu",
+  "notes": "Pure-Python early return; driver times remove_skipped_blocks on the no-op path (CPU).",
+  "experiments": [
+   {"name": "remove_skipped_blocks", "unit": "us", "parse": "latency us", "reported": {"base": 6.3, "patch": 1.6}}
+  ]
+ },
+ "28280": {
+  "pr": 28280,
+  "field": "gpu_kernels",
+  "title": "[Kernel] Optimization of the mm_k operator (#28280)",
+  "workload_kind": "serving",
+  "script": "benchmarks/benchmark_serving.py",
+  "cmd": "vllm bench serve --num-prompts 100 --dataset-name sharegpt",
+  "needs": "gpu",
+  "notes": "Triton matmul (EVEN_K masking). PR gives serving numbers only (C500/H800).",
+  "experiments": [
+   {"name": "output_throughput", "unit": "tok/s", "parse": "Output token throughput", "reported": {"base": 267.82, "patch": 296.95}},
+   {"name": "tpot",              "unit": "ms",    "parse": "Mean TPOT",               "reported": {"base": 67.93,  "patch": 61.74}}
+  ]
+ }
+}

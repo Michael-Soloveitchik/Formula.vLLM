@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>vLLM perf-benchmark · 202</title>
+<style>
+ :root{--bg:#eef2fa;--panel:#fff;--panel2:#f1f5fc;--border:#e0e6f1;--border2:#ccd6e8;
+  --fg:#141c33;--mut:#5f6b86;--faint:#9aa5bd;--acc:#3b6fe0;--acc2:#7a5cff;
+  --grn:#15935a;--org:#c7791a;--red:#e0485f;--sel:#e4edff;
+  --grad:linear-gradient(120deg,#3b6fe0,#6a5cff 55%,#8f55ff);
+  --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace}
+ *{box-sizing:border-box}
+ html,body{height:100%}
+ body{margin:0;font:13px/1.5 var(--ui);color:var(--fg);
+  background:radial-gradient(1200px 600px at 0% 0%,#eaf0ff 0,transparent 55%),radial-gradient(1000px 500px at 100% 100%,#f3ecff 0,transparent 50%),var(--bg)}
+ header{background:var(--grad);color:#fff;padding:14px 20px;box-shadow:0 2px 10px rgba(80,70,200,.28);
+  display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;position:sticky;top:0;z-index:20}
+ header h1{font-size:15px;font-weight:700;margin:0;letter-spacing:.02em}
+ header .sub{color:#e3e9ff;font-size:12px}
+ /* app shell: left tree + main content */
+ #app{display:grid;grid-template-columns:280px 1fr;align-items:start}
+ /* ---- LEFT TREE PANE ---- */
+ #left{border-right:1px solid var(--border);height:calc(100vh - 50px);overflow:auto;position:sticky;top:50px;
+  background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.4))}
+ #left .lh{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);padding:12px 14px 4px}
+ #left .lsearch{padding:0 12px 10px;border-bottom:1px solid var(--border)}
+ #left .lsearch input{width:100%;background:var(--panel);border:1px solid var(--border2);border-radius:9px;padding:7px 10px;font:13px var(--ui);color:var(--fg)}
+ #left .lsearch input:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px rgba(59,111,224,.18)}
+ .treeCount{color:var(--mut);font-size:11px;font-weight:600;padding:8px 14px 2px}
+ .tree{font-size:12.5px;padding:2px 0 40px}
+ .tnode{cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;user-select:none}
+ .tfield{padding:5px 12px;font-weight:700;color:var(--fg);border-radius:6px;margin:1px 6px}
+ .tfield:hover{background:var(--panel2)}
+ .tfield>.gname{background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+ .tfield>.cnt{margin-left:auto;background:var(--panel2);color:var(--mut);font-size:10px;font-weight:600;padding:0 7px;border-radius:20px;font-family:var(--mono)}
+ .tfield:hover>.cnt{background:var(--sel);color:var(--acc)}
+ .children{overflow:hidden;position:relative;transition:max-height .22s ease}
+ .children::before{content:"";position:absolute;left:21px;top:0;bottom:4px;width:1px;background:var(--border2)}
+ .tpr{padding:2px 12px 2px 30px;color:var(--fg);overflow:hidden;text-overflow:ellipsis;border-radius:6px;margin:0 6px;position:relative;max-width:252px}
+ .tpr:hover{background:var(--panel2);color:var(--acc)}
+ .tpr.sel{background:var(--sel);color:#0d2d78;font-weight:600}
+ .tpr.sel::before{content:"";position:absolute;left:19px;top:3px;bottom:3px;width:3px;border-radius:3px;background:var(--acc)}
+ .tpr .n{color:var(--acc);font-weight:700;font-family:var(--mono);font-size:11px;flex:none}
+ .tpr .tt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .caret{display:inline-block;width:11px;color:var(--faint);font-size:9px;transition:transform .18s;flex:none;opacity:.7}
+ .caret.open{transform:rotate(90deg)}
+ .fico{flex:none;width:12px;height:12px;opacity:.55}
+ .fico svg{width:12px;height:12px;display:block}
+ .chips-mini{margin-left:auto;display:inline-flex;gap:3px;padding-left:6px;flex:none}
+ .dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+ .dot.g{background:var(--grn)}.dot.r{background:var(--red)}.dot.o{background:var(--org)}.dot.a{background:var(--acc)}
+ .treeLgd{font-size:10px;color:var(--mut);padding:6px 14px 2px;display:flex;flex-wrap:wrap;gap:3px 10px}
+ .treeLgd span{display:inline-flex;align-items:center;gap:4px}
+ .tfilt{display:flex;gap:4px;padding:8px 12px 4px}
+ .tfilt button{flex:1;background:var(--panel);border:1px solid var(--border2);border-radius:8px;padding:5px 0;font:600 11px var(--ui);color:var(--mut);cursor:pointer;transition:.12s}
+ .tfilt button:hover{border-color:var(--acc);color:var(--acc)}
+ .tfilt button.on{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 1px 5px rgba(80,70,200,.3)}
+ .tfilt button .c{opacity:.7;font-weight:500;margin-left:3px}
+ .empty{color:var(--faint);padding:30px 16px;text-align:center}
+ /* ---- MAIN CONTENT (unchanged logic) ---- */
+ .wrap{max-width:1180px;margin:0 auto;padding:18px}
+ /* PR detail panel (top of main content) */
+ #detailWrap{margin-bottom:18px}
+ .detail{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:15px 18px;box-shadow:0 2px 8px rgba(23,32,58,.06)}
+ .detail h2{margin:0 0 3px;font-size:15px;line-height:1.3}
+ .detail .dmeta{color:var(--mut);font-size:11.5px;font-family:var(--mono);word-break:break-all;margin:4px 0 10px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+ .detail .dmeta a{color:var(--acc);text-decoration:none;font-weight:600}
+ .detail .dmeta a:hover{text-decoration:underline}
+ .detail .close{float:right;cursor:pointer;color:var(--faint);font-size:16px;line-height:1;padding:2px 6px;border-radius:6px}
+ .detail .close:hover{background:var(--panel2);color:var(--red)}
+ .md{font-size:13px;line-height:1.55;max-height:460px;overflow:auto}
+ .md h1,.md h2,.md h3{margin:12px 0 5px;font-weight:700}
+ .md h1{font-size:15px} .md h2{font-size:14px} .md h3{font-size:13px;color:var(--mut)}
+ .md code{font-family:var(--mono);background:var(--panel2);padding:1px 4px;border-radius:4px;font-size:12px}
+ .md pre{background:#fbfcff;border:1px solid var(--border);border-radius:8px;padding:9px 11px;overflow:auto}
+ .md pre code{background:none;padding:0}
+ .md a{color:var(--acc)} .md ul{margin:4px 0;padding-left:20px} .md li{margin:1px 0}
+ .md strong{font-weight:700}
+ .dsec{margin-top:12px;padding-top:10px;border-top:1px solid var(--border)}
+ .dsec:first-of-type{border-top:none;padding-top:0;margin-top:10px}
+ .dsecH{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:0 0 7px}
+ .detail .restab{margin-bottom:12px}
+ .expH{font-size:11px;font-weight:700;margin:10px 0 5px;display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
+ .expH .eu{font-family:var(--mono);font-size:10px;color:var(--acc);font-weight:600}
+ .expH .ew{font-size:10px;color:var(--faint);font-weight:500;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .lat.d{margin-top:9px;border-top:1px dashed var(--border);padding-top:8px}
+ .lat.d table{width:100%;border-collapse:collapse}
+ .lat.d td{padding:2px 6px;font-size:12px;font-family:var(--mono)}
+ .lat.d td:first-child{color:var(--mut);font-family:var(--ui)}
+ .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+ .stat{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:13px 15px;
+  box-shadow:0 1px 2px rgba(23,32,58,.05),0 2px 8px rgba(23,32,58,.05)}
+ .stat .k{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}
+ .stat .v{font-size:23px;font-weight:700;margin-top:2px;font-family:var(--mono)}
+ .stat .v.g{color:var(--grn)} .stat .v.r{color:var(--red)} .stat .v.a{color:var(--acc)}
+ .bar{display:flex;height:9px;border-radius:6px;overflow:hidden;margin-top:9px;background:var(--panel2)}
+ .bar i{display:block}
+ .ctl{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+ input,select{background:var(--panel);border:1px solid var(--border2);border-radius:9px;padding:7px 10px;font:13px var(--ui);color:var(--fg)}
+ .ctl input{flex:1;min-width:180px}
+ .restab{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;margin-bottom:20px;box-shadow:0 2px 8px rgba(23,32,58,.05)}
+ .restab th,.restab td{padding:8px 11px;text-align:left;border-bottom:1px solid var(--border);font-size:12.5px}
+ .restab th{background:var(--panel2);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
+ .restab td.num{font-family:var(--mono);text-align:right;white-space:nowrap}
+ .restab td:first-child{white-space:nowrap}
+ .restab tr.baserow td{background:#e7ecf6}
+ .restab.exp{table-layout:fixed}
+ .restab.exp .c-row{width:150px}
+ .restab.exp .c-val{width:170px}
+ .restab.exp .c-d{width:140px}
+ .restab.exp .c-r{width:90px}
+ .restab.exp .c-src{width:auto}
+ .restab.exp th.num,.restab.exp td.num{text-align:right;padding-right:22px}
+ .restab.exp td.src{white-space:normal;color:var(--mut)}
+ .expH .eb{font-family:var(--mono);font-size:10px;color:var(--mut);font-weight:600;margin-left:2px}
+ .restab tr:last-child td{border-bottom:none}
+ .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+ .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:13px 15px;
+  box-shadow:0 1px 2px rgba(23,32,58,.05)}
+ .card h3{margin:0 0 3px;font-size:13px;font-weight:700;display:flex;gap:7px;align-items:baseline}
+ .card h3 a{color:var(--acc);text-decoration:none} .card h3 a:hover{text-decoration:underline}
+ .card .t{color:var(--fg);font-weight:600;font-size:12.5px;line-height:1.35}
+ .meta{color:var(--mut);font-size:11px;margin-top:5px;font-family:var(--mono);word-break:break-all}
+ .chip{display:inline-block;padding:1px 8px;border-radius:20px;font-size:10px;font-weight:700;border:1px solid transparent}
+ .chip.field{color:var(--acc);background:var(--sel);border-color:#c7d7fb}
+ .chip.imp{color:var(--grn);background:#e5f6ec;border-color:#bfe8d1}
+ .chip.no{color:var(--red);background:#fde9ed;border-color:#f6c6d0}
+ .chip.pend{color:var(--org);background:#fcf1df;border-color:#f0dcb4}
+ .lat{margin-top:9px;border-top:1px dashed var(--border);padding-top:8px}
+ .lat table{width:100%;border-collapse:collapse}
+ .lat td{padding:2px 4px;font-size:11.5px;font-family:var(--mono)}
+ .lat td:first-child{color:var(--mut);font-family:var(--ui)}
+ .lat td.n{text-align:right}
+ .muted{color:var(--faint)}
+ footer{color:var(--faint);font-size:11px;text-align:center;padding:16px}
+ ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:20px;border:2px solid var(--bg)}::-webkit-scrollbar-thumb:hover{background:var(--faint)}
+</style></head>
+<body>
+<header>
+ <h1>vLLM perf-benchmark</h1>
+ <span class="sub">202 PRs · idea A · base_sha→merge_sha · live results</span>
+ <span class="sub" id="ts"></span>
+</header>
+<div id="app">
+ <div id="left">
+  <div class="lh">Fields → PRs</div>
+  <div class="lsearch"><input id="tq" placeholder="search pr / title…"></div>
+  <div class="tfilt" id="tfilt">
+   <button data-f="all" class="on">all<span class="c" id="cAll"></span></button>
+   <button data-f="run">run<span class="c" id="cRun"></span></button>
+   <button data-f="solved">solved<span class="c" id="cSolved"></span></button>
+  </div>
+  <div class="treeCount" id="treeCount"></div>
+  <div class="treeLgd"><span><i class="dot g"></i>improved</span><span><i class="dot r"></i>not</span><span><i class="dot o"></i>pending</span><span><i class="dot a"></i>harness run</span></div>
+  <div class="tree" id="tree"><div class="empty">loading…</div></div>
+ </div>
+ <div class="wrap">
+  <div id="detailWrap"></div>
+  <div class="stats" id="stats"></div>
+  <div id="restabWrap"></div>
+  <div class="ctl">
+   <input id="q" placeholder="search pr / title…">
+   <select id="field"><option value="">all fields</option></select>
+   <select id="status"><option value="">all</option><option value="improved">improved</option><option value="not">not improved</option><option value="pending">pending</option></select>
+  </div>
+  <div class="grid" id="grid"></div>
+  <footer>live: reads <code>index.json</code> + <code>results/all.json</code> · reload to refresh</footer>
+ </div>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>(s==null?'':(''+s)).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+let IDX=[], RES={}, AREA={};   // AREA: pr -> {field, area}
+let TFILT='all';   // tree scope: all | run (has a measured result) | solved (has a harness arm)
+// run  = we executed the workload (result exists in RES)
+// solved = a solver harness arm (not base/gold) landed in that result
+function isRun(pr){return !!RES[pr];}
+function isSolved(pr){const r=RES[pr];return !!(r&&r.arms&&Object.keys(r.arms).some(k=>k!=='base'&&k!=='gold'));}
+function passTFilt(pr){return TFILT==='all'?true:TFILT==='run'?isRun(pr):isSolved(pr);}
+// light inline folder icon (mimics data/viewer.html)
+const FOLDER=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>`;
+
+async function boot(){
+ const no={cache:'no-store'};
+ IDX=await fetch('../index.json',no).then(r=>r.json()).catch(()=>[]);
+ const all=await fetch('../results/all.json',no).then(r=>r.json()).catch(()=>[]);
+ RES={}; all.forEach(r=>RES[r.pr]=r);
+ // build pr -> {field, area} map from the full crawl jsonl (needed to construct md paths).
+ // only keep rows that belong to our 202-PR benchmark set.
+ const want=new Set(IDX.map(r=>r.pr));
+ const jl=await fetch('../data/index.jsonl',no).then(r=>r.text()).catch(()=>'');
+ jl.split('\n').forEach(line=>{
+  if(!line) return;
+  try{const r=JSON.parse(line); if(want.has(r.pr)) AREA[r.pr]={field:r.field,area:r.area};}catch(e){}
+ });
+ const fields=[...new Set(IDX.map(r=>r.field).filter(Boolean))].sort();
+ fields.forEach(f=>$('#field').add(new Option(f,f)));
+ ['q','field','status'].forEach(id=>$('#'+id).addEventListener('input',render));
+ $('#tq').addEventListener('input',buildTree);
+ $('#tfilt').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+  TFILT=b.dataset.f;
+  $('#tfilt').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+  buildTree();}));
+ $('#cAll').textContent=IDX.length;
+ $('#cRun').textContent=IDX.filter(r=>isRun(r.pr)).length;
+ $('#cSolved').textContent=IDX.filter(r=>isSolved(r.pr)).length;
+ buildTree();
+ render();
+}
+function fmt(x,d=3){return (x==null||isNaN(x))?'—':(+x).toFixed(d)}
+function statusOf(pr){const r=RES[pr]; if(!r)return 'pending'; return r.improved?'improved':'not'}
+
+// ---------- LEFT TREE ----------
+function mdPath(pr){const a=AREA[pr]; if(!a||!a.field||!a.area)return null;
+ return `../data/prs/${a.field}/${a.area.replace(/\//g,'_')}/${pr}.md`;}
+function shortTitle(t){return (t||'').replace(/\s*\(#\d+\)\s*$/,'');}
+
+function buildTree(){
+ const q=$('#tq').value.trim().toLowerCase();
+ const rows=IDX.filter(r=>{
+  if(!passTFilt(r.pr)) return false;
+  if(!q) return true;
+  return (''+r.pr).includes(q) || (r.title||'').toLowerCase().includes(q);
+ });
+ $('#treeCount').textContent=`${rows.length} PR${rows.length===1?'':'s'}${TFILT==='all'?'':' · '+TFILT}`;
+ const el=$('#tree'); el.innerHTML='';
+ if(!rows.length){el.innerHTML='<div class="empty">no '+(TFILT==='all'?'':TFILT+' ')+'PRs match</div>';return;}
+ // group by field
+ const t={};
+ rows.forEach(r=>{const f=r.field||'∅ no field';(t[f]=t[f]||[]).push(r);});
+ const keys=Object.keys(t).sort((a,b)=>t[b].length-t[a].length);  // field count desc
+ keys.forEach(k=>{
+  const list=t[k].sort((x,y)=>x.pr-y.pr);                          // PRs by number
+  const openAll=!!q||TFILT!=='all';                                // auto-expand when searching or scoped
+  const gd=mk('div','tnode tfield',`<span class="caret${openAll?' open':''}">▶</span><span class="fico">${FOLDER}</span><span class="gname">${esc(k)}</span><span class="cnt">${list.length}</span>`);
+  const gc=mk('div','children'+(openAll?'':' closed'));
+  if(!openAll) gc.style.maxHeight='0px';
+  list.forEach(r=>gc.appendChild(prRow(r)));
+  gd.addEventListener('click',()=>toggle(gd,gc));
+  el.appendChild(gd); el.appendChild(gc);
+ });
+}
+function prRow(r){
+ const res=RES[r.pr], st=statusOf(r.pr);
+ const stDot=st==='improved'?'<span class="dot g" title="improved"></span>':
+   st==='not'?'<span class="dot r" title="not improved"></span>':'<span class="dot o" title="pending"></span>';
+ // harness-run dot: any solver arm (not base/gold) present in results
+ const hasH=res&&res.arms&&Object.keys(res.arms).some(k=>k!=='base'&&k!=='gold');
+ const hDot=hasH?'<span class="dot a" title="harness run"></span>':'';
+ const chips=`<span class="chips-mini">${stDot}${hDot}</span>`;
+ const pd=mk('div','tnode tpr',`<span class="n">#${r.pr}</span> <span class="tt">${esc(shortTitle(r.title))}</span>${chips}`);
+ pd.dataset.pr=r.pr;
+ pd.title='#'+r.pr+' · '+(r.title||'');
+ pd.addEventListener('click',ev=>{ev.stopPropagation();
+  document.querySelectorAll('.tpr.sel').forEach(n=>n.classList.remove('sel'));
+  pd.classList.add('sel'); showPR(r.pr);});
+ return pd;
+}
+function toggle(headEl,childEl){
+ const open=!childEl.classList.contains('closed');
+ const c=headEl.querySelector('.caret');
+ if(open){
+  childEl.style.maxHeight=childEl.scrollHeight+'px';requestAnimationFrame(()=>childEl.style.maxHeight='0px');
+  childEl.classList.add('closed');c&&c.classList.remove('open');
+ }else{
+  childEl.classList.remove('closed');childEl.style.maxHeight=childEl.scrollHeight+'px';
+  c&&c.classList.add('open');
+  setTimeout(()=>{if(!childEl.classList.contains('closed'))childEl.style.maxHeight='none';},240);
+ }
+}
+function mk(tag,cls,html){const d=document.createElement(tag);d.className=cls;if(html!=null)d.innerHTML=html;return d;}
+
+// ---------- tiny markdown -> html ----------
+function mdToHtml(src){
+ const lines=(src||'').replace(/\r/g,'').split('\n');
+ let out='',inCode=false,inList=false;
+ const inline=s=>esc(s)
+   .replace(/`([^`]+)`/g,'<code>$1</code>')
+   .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+   .replace(/\[([^\]]+)\]\((https?:[^)]+)\)/g,'<a href="$2" target="_blank">$1</a>');
+ const closeList=()=>{if(inList){out+='</ul>';inList=false;}};
+ for(let raw of lines){
+  if(raw.trim().startsWith('```')){
+   if(inCode){out+='</code></pre>';inCode=false;}
+   else{closeList();out+='<pre><code>';inCode=true;}
+   continue;
+  }
+  if(inCode){out+=esc(raw)+'\n';continue;}
+  const h=raw.match(/^(#{1,6})\s+(.*)$/);
+  if(h){closeList();const n=Math.min(3,h[1].length);out+=`<h${n}>${inline(h[2])}</h${n}>`;continue;}
+  const li=raw.match(/^\s*[-*]\s+(.*)$/);
+  if(li){if(!inList){out+='<ul>';inList=true;}out+=`<li>${inline(li[1])}</li>`;continue;}
+  if(!raw.trim()){closeList();continue;}
+  out+=`<p style="margin:5px 0">${inline(raw)}</p>`;
+ }
+ if(inCode)out+='</code></pre>'; closeList();
+ return out;
+}
+
+// ---------- per-experiment results table (reported / measured / <harness_i>) ----------
+// One table PER experiment. measured = our run of expert (gold) patch = 1.00x ref; variance in (±).
+// A PR carries res.experiments[] (schema experiments_v2). Legacy res.latency -> single synthetic exp.
+function experimentsOf(res){
+ if(!res) return [];
+ if(res.experiments) return res.experiments;
+ if(res.latency){const L=res.latency;
+  const rep=L.reported&&(L.reported.get_new_blocks||Object.values(L.reported)[0]);
+  return [{name:L.workload||'latency',unit:L.unit||'',
+    reported:rep?{base:rep.base_us,patch:rep.patch_us}:null,
+    arms:Object.assign({base:L.base},L.arms||{})}];}
+ return [];
+}
+// harnesses that ALWAYS get a row (even when pending). plus any extra arm keys seen.
+const HARNESSES=['claude','claude + solution','codex','codex + solution'];
+// higher-is-better units (throughput). everything else = time, lower-is-better.
+function higherBetter(unit){return /\/s$|\bit\/s\b|tok\/s|req\/s/.test(unit||'');}
+// speedup of `val` relative to `baseVal`, direction-aware for the unit. >1 = faster.
+function gainVs(val,baseVal,unit){
+ if(val==null||baseVal==null||!val||!baseVal) return null;
+ return higherBetter(unit)? val/baseVal : baseVal/val;
+}
+// resolve the PR author's REPORTED absolute value in the task unit.
+// reported may carry:
+//   {base, patch}  -> both absolute; value=patch, authorBase=base
+//   {delta, base?} -> an improvement magnitude in units; value = base±delta
+//   {pct,   base?} -> a fractional improvement;         value = base*(1±pct)
+// base defaults to OUR measured baseline when the author gave none.
+// sign direction-aware: throughput improves UP, time improves DOWN.
+function resolveReported(rep,baseV,unit){
+ if(!rep) return null;
+ const up=higherBetter(unit);
+ if(rep.patch!=null) return {value:+rep.patch, authorBase:rep.base!=null?+rep.base:null, how:'absolute'};
+ if(rep.delta!=null){const ab=rep.base!=null?+rep.base:baseV; if(ab==null) return null;
+  return {value: up? ab+Math.abs(rep.delta): ab-Math.abs(rep.delta), authorBase:ab, how:rep.base!=null?'author base ± diff':'our baseline ± diff'};}
+ if(rep.pct!=null){const ab=rep.base!=null?+rep.base:baseV; if(ab==null) return null;
+  const f=Math.abs(rep.pct)>1?rep.pct/100:rep.pct;
+  return {value: up? ab*(1+f): ab*(1-f), authorBase:ab, how:rep.base!=null?'author base ± %':'our baseline ± %'};}
+ return null;
+}
+// Δ vs baseline in task units. positive = improvement (direction-aware).
+function deltaVs(val,baseV,unit){if(val==null||baseV==null)return null;
+ return higherBetter(unit)? val-baseV : baseV-val;}
+function dcell(d,unit){if(d==null)return '<td class="num muted">—</td>';
+ const s=d>=0?'+':'−'; return `<td class="num">${s}${Math.abs(d).toFixed(3)} <span class="muted">${esc(unit)}</span></td>`;}
+function rcell(r){return r==null?'<td class="num muted">—</td>':`<td class="num">${r.toFixed(2)}×</td>`;}
+function gcells(val,baseV,unit){return dcell(deltaVs(val,baseV,unit),unit)+rcell(gainVs(val,baseV,unit));}
+function expTable(exp){
+ const a=exp.arms||{}, unit=exp.unit||'value';
+ const baseV=(a.base||{}).mean;                     // before-merge baseline value, in unit
+ const num=(m,sd)=> m==null?'—':`${(+m).toFixed(3)}${sd==null?'':` (±${(+sd).toFixed(3)})`}`;
+ const bh=baseV!=null?`<span class="eb">baseline ${(+baseV).toFixed(3)} ${esc(unit)} (before PR merged)</span>`:'';
+ let h=`<div class="expH">${esc(exp.name)} <span class="eu">${esc(unit)}</span>${bh}`+
+   (exp.workload?`<span class="ew" title="${esc(exp.workload)}">${esc(exp.workload)}</span>`:'')+`</div>`;
+ h+=`<table class="restab exp"><colgroup><col class="c-row"><col class="c-val"><col class="c-d"><col class="c-r"><col class="c-src"></colgroup>`+
+   `<thead><tr><th>row</th><th class="num">value · ${esc(unit)}</th><th class="num">Δ vs baseline</th><th class="num">× vs baseline</th><th>source</th></tr></thead><tbody>`;
+ // baseline FIRST = tree before PR merged, our run. reference for every gain.
+ h+=`<tr class="baserow"><td>baseline <span class="muted">before PR merged</span></td><td class="num">${num(baseV,(a.base||{}).sd)}</td>`+
+    `<td class="num">0.000 <span class="muted">${esc(unit)}</span></td><td class="num">1.00×</td><td class="src">our run of before-merge tree</td></tr>`;
+ // reported (PR author) — resolved to an ABSOLUTE value in task units, gain vs OUR baseline
+ const Rr=resolveReported(exp.reported,baseV,unit);
+ if(Rr){
+  h+=`<tr><td>reported</td><td class="num">${Rr.value.toFixed(3)}</td>`+
+     gcells(Rr.value,baseV,unit)+
+     `<td class="src">PR author${Rr.authorBase!=null?' · from '+(+Rr.authorBase).toFixed(3):''} <span class="muted">(${esc(Rr.how)})</span></td></tr>`;
+ }else{
+  h+=`<tr><td>reported</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="src">no number in PR</td></tr>`;}
+ // measured = gold = expert patch, our run.
+ const goldV=(a.gold||{}).mean;
+ h+=`<tr><td>measured <span class="muted">after PR merged</span></td><td class="num">${num(goldV,(a.gold||{}).sd)}</td>`+
+    gcells(goldV,baseV,unit)+
+    `<td class="src">our run of expert patch</td></tr>`;
+ // harness arms — ALWAYS show claude + codex (+ any extra arm present), pending if absent
+ const keys=HARNESSES.concat(Object.keys(a).filter(k=>!['base','gold'].includes(k)&&!HARNESSES.includes(k)));
+ keys.forEach(k=>{const arm=a[k];
+  if(arm&&arm.mean!=null){
+   h+=`<tr><td>${esc(k)}</td><td class="num">${num(arm.mean,arm.sd)}</td>`+
+      gcells(arm.mean,baseV,unit)+
+      `<td class="src">solver arm</td></tr>`;
+  }else{
+   h+=`<tr><td>${esc(k)}</td><td class="num muted">pending</td><td class="num muted">—</td><td class="num muted">—</td><td class="src">not run yet</td></tr>`;}
+ });
+ h+='</tbody></table>';
+ return h;
+}
+function harnessTable(res){
+ const exps=experimentsOf(res);
+ if(!exps.length){
+  if(res&&res.schema==='experiments_v2') // ran, but correctness-only (no timing)
+   return '<div class="muted" style="padding:8px 2px">correctness-only — no timing experiment'+(res.note?'. '+esc(res.note):'')+'</div>';
+  return '<div class="muted" style="padding:8px 2px">no measured experiments yet — run <code>./run.sh '+(res?res.pr:'')+'</code></div>';
+ }
+ return exps.map(expTable).join('');
+}
+
+// ---------- PR DETAIL PANEL (challenge results TOP · PR info BOTTOM) ----------
+async function showPR(pr){
+ const r=IDX.find(x=>x.pr===pr)||{pr}, res=RES[pr];
+ const D=$('#detailWrap');
+ const url='https://github.com/vllm-project/vllm/pull/'+pr;
+ const st=statusOf(pr);
+ const stChip=st==='improved'?'<span class="chip imp">improved</span>':
+   st==='not'?'<span class="chip no">not improved</span>':'<span class="chip pend">pending</span>';
+ const arms=res?Object.entries(res.arms||{}).map(([k,v])=>`${esc(k)}:${esc(v.tests)}`).join(' · '):'';
+ D.innerHTML=`<div class="detail">
+  <span class="close" title="close" onclick="document.getElementById('detailWrap').innerHTML='';document.querySelectorAll('.tpr.sel').forEach(n=>n.classList.remove('sel'))">×</span>
+  <h2>#${pr} ${esc(shortTitle(r.title))}</h2>
+  <div class="dmeta"><span class="chip field">${esc(r.field||'—')}</span> ${stChip}
+   · <a href="${url}" target="_blank">GitHub PR #${pr}</a>
+   · reported: ${esc(r.reported_gain||'—')}</div>
+  <!-- TOP: challenge results with harnesses -->
+  <div class="dsec">
+   <div class="dsecH">challenge results · measured = 1.00× reference</div>
+   ${harnessTable(res)}
+   ${arms?`<div class="meta" style="margin-top:4px">tests: ${arms}</div>`:''}
+  </div>
+  <!-- BOTTOM: PR info -->
+  <div class="dsec">
+   <div class="dsecH">PR info · base ${esc((r.base_sha||'').slice(0,10))} → merge ${esc((r.merge_sha||'').slice(0,10))}</div>
+   <div class="md" id="mdbody"><span class="muted">loading detail…</span></div>
+  </div>
+ </div>`;
+ const p=mdPath(pr);
+ if(!p){$('#mdbody').innerHTML='<span class="muted">no detail file (missing area mapping)</span>';return;}
+ try{
+  const t=await fetch(p,{cache:'no-store'}).then(x=>{if(!x.ok)throw 0;return x.text();});
+  $('#mdbody').innerHTML=mdToHtml(t);
+ }catch(e){$('#mdbody').innerHTML='<span class="muted">could not load '+esc(p)+'</span>';}
+}
+
+// ---------- MAIN CONTENT (stats + results table + cards) ----------
+function render(){
+ const q=$('#q').value.trim().toLowerCase(), ff=$('#field').value, sf=$('#status').value;
+ // stats over ALL measured
+ const measured=IDX.filter(r=>RES[r.pr]);
+ const imp=measured.filter(r=>RES[r.pr].improved).length;
+ const noi=measured.length-imp;
+ $('#ts').textContent = measured.length? ('updated '+ (RES[measured[0].pr]||{}).ts||'') : '';
+ $('#stats').innerHTML=[
+  ['total PRs',IDX.length,'a'],
+  ['measured',measured.length,'a'],
+  ['improved',imp,'g'],
+  ['not / pending',IDX.length-imp,'r'],
+ ].map(([k,v,c])=>`<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div></div>`).join('')
+ + `<div class="stat" style="grid-column:1/-1"><div class="k">correctness gate (after-merge reproduces)</div>
+    <div class="bar"><i style="width:${measured.length?imp/measured.length*100:0}%;background:var(--grn)"></i>
+    <i style="width:${measured.length?noi/measured.length*100:0}%;background:var(--red)"></i>
+    <i style="flex:1;background:var(--panel2)"></i></div>
+    <div class="meta">${imp} improved · ${noi} not · ${IDX.length-measured.length} pending of ${IDX.length}</div></div>`;
+
+ // top results · one table per (PR, experiment). measured = our run of expert patch = 1.00× ref.
+ const latRows=measured.map(r=>RES[r.pr]).filter(r=>experimentsOf(r).length);
+ if(latRows.length){
+  let h='';
+  latRows.forEach(r=>{
+   const prCell=`<a href="${r.pr_url}" target="_blank">#${r.pr}</a> <span class="muted">${esc(shortTitle(r.title))}</span>`;
+   h+=`<div style="margin:14px 0 4px;font-weight:700;font-size:12.5px">${prCell}</div>`;
+   h+=experimentsOf(r).map(expTable).join('');
+  });
+  $('#restabWrap').innerHTML='<h2 style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:0 0 8px">experiment results · one table per experiment · measured = 1.00× reference, variance in (±)</h2>'+h;
+ } else $('#restabWrap').innerHTML='<table class="restab"><tbody><tr><td class="muted">no measured experiments yet — run <code>./run.sh</code></td></tr></tbody></table>';
+
+ // per-PR cards
+ const rows=IDX.filter(r=>{
+  if(ff&&r.field!==ff)return false;
+  const st=statusOf(r.pr); if(sf&&st!==sf)return false;
+  if(q&&!((''+r.pr).includes(q)||(r.title||'').toLowerCase().includes(q)))return false;
+  return true;});
+ $('#grid').innerHTML=rows.map(r=>{
+  const res=RES[r.pr], st=statusOf(r.pr);
+  const stChip=st==='improved'?'<span class="chip imp">improved</span>':
+    st==='not'?'<span class="chip no">not improved</span>':'<span class="chip pend">pending</span>';
+  let lat='';
+  const exps=experimentsOf(res);
+  if(exps.length){
+   lat='<div class="lat"><table>'+exps.map(e=>{const a=e.arms||{},g=a.gold||{};
+     return `<tr><td>${esc(e.name)}</td><td class="n">${fmt(g.mean)} ${esc(e.unit||'')}${g.speedup_x!=null?' · '+fmt(g.speedup_x,1)+'×':''}</td></tr>`;}).join('')+
+    '</table></div>';}
+  const arms=res?Object.entries(res.arms||{}).map(([k,v])=>`${k}:${v.tests}`).join(' · '):'';
+  return `<div class="card">
+   <h3><a href="${r.pr?('https://github.com/vllm-project/vllm/pull/'+r.pr):'#'}" target="_blank">#${r.pr}</a>
+     <span class="chip field">${r.field||'—'}</span> ${stChip}</h3>
+   <div class="t">${(r.title||'').replace(/</g,'&lt;')}</div>
+   <div class="meta">reported: ${r.reported_gain||'—'} · base ${(r.base_sha||'').slice(0,10)} → merge ${(r.merge_sha||'').slice(0,10)}</div>
+   ${arms?`<div class="meta">tests: ${arms}</div>`:''}
+   ${lat}
+  </div>`;}).join('')||'<div class="muted">no match</div>';
+}
+boot();
+</script>
+</body></html>

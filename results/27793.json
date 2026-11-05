@@ -1,0 +1,23 @@
+{
+ "pr": 27793,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/27793",
+ "title": "[Core][Observability] Add KV cache residency metrics (#27793)",
+ "field": "scheduling",
+ "reported_gain": "0.1%",
+ "base_sha": "ec7035c9d40cda43fa9c3d2d1c148b1382aa04a4",
+ "merge_sha": "cabc77cc86586206134a19e3e70aa401ec30b71f",
+ "arms": {
+  "base": {
+   "tests": "FAIL"
+  },
+  "gold": {
+   "tests": "PASS"
+  }
+ },
+ "improved": true,
+ "schema": "experiments_v2",
+ "experiments": [],
+ "note": "correctness-only PR (KV residency metrics). No timing experiment \u2014 overhead ~48 bytes/block, zero runtime cost when disabled. Validated by pytest with deterministic fake clock.",
+ "environment": "n/a (correctness-only)",
+ "ts": "2026-11-04T00:00:00Z"
+}

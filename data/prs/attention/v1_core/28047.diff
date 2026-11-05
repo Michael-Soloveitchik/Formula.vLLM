@@ -1,0 +1,19 @@
+diff --git a/vllm/v1/core/single_type_kv_cache_manager.py b/vllm/v1/core/single_type_kv_cache_manager.py
+index 4aeb17a156bb..e8a0a39b1f90 100644
+--- a/vllm/v1/core/single_type_kv_cache_manager.py
++++ b/vllm/v1/core/single_type_kv_cache_manager.py
+@@ -737,6 +737,14 @@ def allocate_new_blocks(
+             )
+         return super().allocate_new_blocks(request_id, num_tokens)
+ 
++    def get_num_skipped_tokens(self, num_computed_tokens: int) -> int:
++        """
++        Get the number of tokens whose mamba state are not needed anymore. Mamba only
++        need to keep the state of the last computed token, so we return
++        num_computed_tokens - 1.
++        """
++        return num_computed_tokens - 1
++
+ 
+ class CrossAttentionManager(SingleTypeKVCacheManager):
+     """Manager for cross-attention KV cache in encoder-decoder models."""

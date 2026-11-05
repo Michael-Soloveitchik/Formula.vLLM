@@ -1,0 +1,71 @@
+{
+ "pr": 39328,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/39328",
+ "title": "[Core] Cache InductorPass.hash_source with functools.cache (#39328)",
+ "field": "gpu_kernels",
+ "reported_gain": "1.15x, 2.88x",
+ "base_sha": "304d5ba1a04b6cbfa2b5bd377c2a89d350a10921",
+ "merge_sha": "87805fa11ea6d9f9aa7a7fc92ac957c613bc2163",
+ "arms": {
+  "base": {
+   "tests": "FAIL"
+  },
+  "gold": {
+   "tests": "PASS"
+  }
+ },
+ "improved": true,
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "cache_lookup",
+   "unit": "ms",
+   "workload": "InductorPass.hash_source repeated over 5 source objects, 10000 lookups/repeat, 5 repeats; per-call ms",
+   "note": "base = recompute inspect.getsource+sha256 each call; gold = functools.cache wrapped (cold miss then hits); speedup = mean of per-repeat base/gold ratios",
+   "reported": {
+    "base": 32.5,
+    "patch": 11.3
+   },
+   "arms": {
+    "base": {
+     "mean": 0.354834,
+     "sd": 0.030611,
+     "runs": [
+      0.351354,
+      0.366423,
+      0.406632,
+      0.319355,
+      0.330404
+     ]
+    },
+    "gold": {
+     "mean": 0.001002,
+     "sd": 0.000985,
+     "runs": [
+      0.00048,
+      0.0005,
+      0.000491,
+      0.00297,
+      0.000567
+     ],
+     "speedup_x": 596.651,
+     "speedup_sd": 256.867,
+     "counts": true
+    }
+   }
+  },
+  {
+   "name": "cold_compile",
+   "unit": "s",
+   "workload": "full torch.compile cold compile (E2E)",
+   "note": "not reproducible on CPU arm Mac",
+   "reported": {
+    "base": 34.1,
+    "patch": 29.7
+   },
+   "arms": {}
+  }
+ ],
+ "environment": "docker python:3.12-slim cpu colima arm64",
+ "ts": "2026-11-04T00:00:00Z"
+}

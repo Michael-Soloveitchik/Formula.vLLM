@@ -1,0 +1,13 @@
+diff --git a/vllm/lora/ops/triton_ops/utils.py b/vllm/lora/ops/triton_ops/utils.py
+index 51535f32c136..f0cb9a5c0499 100644
+--- a/vllm/lora/ops/triton_ops/utils.py
++++ b/vllm/lora/ops/triton_ops/utils.py
+@@ -251,7 +251,7 @@ def get_lora_op_configs(
+     else:
+         default = {
+             "block_m": 64,
+-            "block_n": 128,
++            "block_n": max(64, next_power_of_2(128 // num_slices)),
+             "block_k": 16,
+             "num_warps": 4,
+             "num_ctas": 1,

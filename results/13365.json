@@ -1,0 +1,60 @@
+{
+ "pr": 13365,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/13365",
+ "title": "[V1][Spec Decode] Optimize N-gram matching with Numba (#13365)",
+ "field": "decoding_tpot",
+ "reported_gain": "30x, 2.5%",
+ "base_sha": "c8d70e2437feecdb3762ce17298df33439ae1bd1",
+ "merge_sha": "4c822298981a8f7521492075ff72659985fc4c3f",
+ "arms": {
+  "base": {
+   "tests": "FAIL"
+  },
+  "gold": {
+   "tests": "PASS"
+  }
+ },
+ "improved": true,
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "ngram_match_overhead",
+   "unit": "s",
+   "workload": "5000 synthetic context sequences (len 200-800, vocab 32000), n-gram n=3, k=10; ~50% seeded with a plantable match. Cumulative NgramProposer.propose() time over the full 5000-seq pass; 5 repeats (gold warmed up once untimed to exclude JIT compile).",
+   "note": "PREFERRED approach: imported the standalone vllm/v1/spec_decode/ngram_proposer.py module directly from each mounted source tree (self-contained, only numpy/numba/typing deps) and timed .propose(). base=pure-python KMP loop; gold=numba @jit(nopython=True) kernels. runs = per-repeat cumulative seconds; speedup_x = mean of per-repeat base/gold ratios. numba not baked in image -> installed at runtime via pip (numba 0.68.1, arm64 wheel); worked.",
+   "reported": {
+    "base": 54.3,
+    "patch": 1.9
+   },
+   "arms": {
+    "base": {
+     "mean": 0.256929,
+     "sd": 0.028241,
+     "runs": [
+      0.229843,
+      0.224256,
+      0.293397,
+      0.251467,
+      0.285683
+     ]
+    },
+    "gold": {
+     "mean": 0.003596,
+     "sd": 0.000005,
+     "runs": [
+      0.003587,
+      0.003603,
+      0.003593,
+      0.003598,
+      0.003598
+     ],
+     "speedup_x": 71.454,
+     "speedup_sd": 7.867,
+     "counts": true
+    }
+   }
+  }
+ ],
+ "environment": "docker vllm-cpu-bench:21222 (python:3.12-slim + CPU torch arm64 wheel, numpy 2.5.4), colima arm64 Mac; identical image for both arms, only vllm/ source tree differs. numba NOT baked into image -> installed at runtime with `pip install numba` (numba 0.68.1, arm64 wheel) for the gold arm; base arm is pure-python and needs no numba. gold arm warmed up once (untimed) to exclude numba JIT compile from the steady-state timing.",
+ "ts": "2026-11-04T00:00:00Z"
+}
