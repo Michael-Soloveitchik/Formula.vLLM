@@ -11,21 +11,54 @@
     "scale_short": "author: 30000 prompts on H100-class GPU; ours: 2000 prompts on RTX 5070 Ti",
     "scale_note": "Author reported +2.07% end-to-end throughput at 30000 prompts; we run 2000 prompts per repeat on an RTX 5070 Ti. Ratio is the comparable quantity, not absolute tok/s."
    },
-   "arms": {}
+   "arms": {
+    "base": {
+     "mean": 2270.438,
+     "sd": 12.0601,
+     "n": 5
+    },
+    "gold": {
+     "mean": 2279.978,
+     "sd": 15.9962,
+     "n": 5
+    }
+   }
   },
   {
    "name": "throughput_total_tok_s",
    "unit": "tok/s",
    "workload": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 2000 --dtype float16",
    "reported": null,
-   "arms": {}
+   "arms": {
+    "base": {
+     "mean": 26487.506,
+     "sd": 140.8211,
+     "n": 5
+    },
+    "gold": {
+     "mean": 26598.798,
+     "sd": 186.7255,
+     "n": 5
+    }
+   }
   },
   {
    "name": "throughput_req_s",
-   "unit": "tok/s",
+   "unit": "req/s",
    "workload": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 2000 --dtype float16",
    "reported": null,
-   "arms": {}
+   "arms": {
+    "base": {
+     "mean": 30.274,
+     "sd": 0.1613,
+     "n": 5
+    },
+    "gold": {
+     "mean": 30.4,
+     "sd": 0.214,
+     "n": 5
+    }
+   }
   }
  ],
  "pr": 22940,
@@ -50,60 +83,68 @@
   "gold": {
    "tests": "FAIL",
    "slug": "gold"
-  },
-  "claude": {
-   "tests": "FAIL",
-   "slug": "claude"
-  },
-  "claude + PR's solution": {
-   "tests": "FAIL",
-   "slug": "claude___PR_s_solution"
   }
  },
  "improved": false,
  "latency": {
-  "scenarios": {},
+  "scenarios": {
+   "throughput_output_tok_s": {
+    "unit": "tok/s",
+    "base": {
+     "mean": 2270.438,
+     "sd": 12.0601,
+     "n": 5
+    },
+    "gold": {
+     "mean": 2279.978,
+     "sd": 15.9962,
+     "n": 5
+    }
+   },
+   "throughput_req_s": {
+    "unit": "req/s",
+    "base": {
+     "mean": 30.274,
+     "sd": 0.1613,
+     "n": 5
+    },
+    "gold": {
+     "mean": 30.4,
+     "sd": 0.214,
+     "n": 5
+    }
+   },
+   "throughput_total_tok_s": {
+    "unit": "tok/s",
+    "base": {
+     "mean": 26487.506,
+     "sd": 140.8211,
+     "n": 5
+    },
+    "gold": {
+     "mean": 26598.798,
+     "sd": 186.7255,
+     "n": 5
+    }
+   }
+  },
   "pytorch_ref": {}
  },
  "logs": {
   "base": {
    "tests": {
-    "bytes": 1699,
-    "tail": "_getattr__\n    module = import_module(module_name, __package__)\n/usr/local/lib/python3.10/dist-packages/vllm/entrypoints/llm.py:24: in <module>\n    from vllm.engine.llm_engine import LLMEngine\n/usr/local/lib/python3.10/dist-packages/vllm/engine/llm_engine.py:30: in <module>\n    from vllm.executor.executor_base import ExecutorBase\n/usr/local/lib/python3.10/dist-packages/vllm/executor/executor_base.py:18: in <module>\n    from vllm.model_executor.layers.sampler import SamplerOutput\n/usr/local/lib/python3.10/dist-packages/vllm/model_executor/layers/sampler.py:16: in <module>\n    from vllm.model_executor.layers.utils import apply_penalties\n/usr/local/lib/python3.10/dist-packages/vllm/model_executor/layers/utils.py:8: in <module>\n    from vllm import _custom_ops as ops\n/usr/local/lib/python3.10/dist-packages/vllm/_custom_ops.py:480: in <module>\n    def _aqlm_gemm_fake(input: torch.Tensor, codes: torch.Tensor,\n/usr/local/lib/python3.10/dist-packages/torch/library.py:1023: in register\n    use_lib._register_fake(op_name, func, _stacklevel=stacklevel + 1)\n/usr/local/lib/python3.10/dist-packages/torch/library.py:214: in _register_fake\n    handle = entry.fake_impl.register(func_to_register, source)\n/usr/local/lib/python3.10/dist-packages/torch/_library/fake_impl.py:31: in register\n    if torch._C._dispatch_has_kernel_for_dispatch_key(self.qualname, \"Meta\"):\nE   RuntimeError: operator _C::aqlm_gemm does not exist\nINFO 11-05 13:27:38 [__init__.py:241] Automatically detected platform cuda.\n"
+    "bytes": 1780,
+    "tail": "ytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n\n==================================== ERRORS ====================================\n___________ ERROR collecting tests/v1/worker/test_gpu_input_batch.py ___________\nImportError while importing test module '/t/tests/v1/worker/test_gpu_input_batch.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/usr/lib/python3.10/importlib/__init__.py:126: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntests/v1/worker/test_gpu_input_batch.py:16: in <module>\n    from vllm.v1.sample.logits_processor import LogitsProcessorManager\nE   ImportError: cannot import name 'LogitsProcessorManager' from 'vllm.v1.sample.logits_processor' (/usr/local/lib/python3.10/dist-packages/vllm/v1/sample/logits_processor/__init__.py)\n------------------------------- Captured stdout --------------------------------\nINFO 11-05 13:34:32 [__init__.py:241] Automatically detected platform cuda.\n=========================== short test summary info ============================\nERROR tests/v1/worker/test_gpu_input_batch.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 error in 0.14s\n"
    },
-   "workload_runs": 1
+   "workload_runs": 5
   },
   "gold": {
    "tests": {
-    "bytes": 1699,
-    "tail": "_getattr__\n    module = import_module(module_name, __package__)\n/usr/local/lib/python3.10/dist-packages/vllm/entrypoints/llm.py:24: in <module>\n    from vllm.engine.llm_engine import LLMEngine\n/usr/local/lib/python3.10/dist-packages/vllm/engine/llm_engine.py:30: in <module>\n    from vllm.executor.executor_base import ExecutorBase\n/usr/local/lib/python3.10/dist-packages/vllm/executor/executor_base.py:18: in <module>\n    from vllm.model_executor.layers.sampler import SamplerOutput\n/usr/local/lib/python3.10/dist-packages/vllm/model_executor/layers/sampler.py:16: in <module>\n    from vllm.model_executor.layers.utils import apply_penalties\n/usr/local/lib/python3.10/dist-packages/vllm/model_executor/layers/utils.py:8: in <module>\n    from vllm import _custom_ops as ops\n/usr/local/lib/python3.10/dist-packages/vllm/_custom_ops.py:480: in <module>\n    def _aqlm_gemm_fake(input: torch.Tensor, codes: torch.Tensor,\n/usr/local/lib/python3.10/dist-packages/torch/library.py:1023: in register\n    use_lib._register_fake(op_name, func, _stacklevel=stacklevel + 1)\n/usr/local/lib/python3.10/dist-packages/torch/library.py:214: in _register_fake\n    handle = entry.fake_impl.register(func_to_register, source)\n/usr/local/lib/python3.10/dist-packages/torch/_library/fake_impl.py:31: in register\n    if torch._C._dispatch_has_kernel_for_dispatch_key(self.qualname, \"Meta\"):\nE   RuntimeError: operator _C::aqlm_gemm does not exist\nINFO 11-05 13:27:42 [__init__.py:241] Automatically detected platform cuda.\n"
+    "bytes": 1780,
+    "tail": "ytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n\n==================================== ERRORS ====================================\n___________ ERROR collecting tests/v1/worker/test_gpu_input_batch.py ___________\nImportError while importing test module '/t/tests/v1/worker/test_gpu_input_batch.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/usr/lib/python3.10/importlib/__init__.py:126: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntests/v1/worker/test_gpu_input_batch.py:16: in <module>\n    from vllm.v1.sample.logits_processor import LogitsProcessorManager\nE   ImportError: cannot import name 'LogitsProcessorManager' from 'vllm.v1.sample.logits_processor' (/usr/local/lib/python3.10/dist-packages/vllm/v1/sample/logits_processor/__init__.py)\n------------------------------- Captured stdout --------------------------------\nINFO 11-05 13:34:37 [__init__.py:241] Automatically detected platform cuda.\n=========================== short test summary info ============================\nERROR tests/v1/worker/test_gpu_input_batch.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 error in 0.17s\n"
    },
-   "workload_runs": 1
-  },
-  "claude": {
-   "tests": {
-    "bytes": 1699,
-    "tail": "_getattr__\n    module = import_module(module_name, __package__)\n/usr/local/lib/python3.10/dist-packages/vllm/entrypoints/llm.py:24: in <module>\n    from vllm.engine.llm_engine import LLMEngine\n/usr/local/lib/python3.10/dist-packages/vllm/engine/llm_engine.py:30: in <module>\n    from vllm.executor.executor_base import ExecutorBase\n/usr/local/lib/python3.10/dist-packages/vllm/executor/executor_base.py:18: in <module>\n    from vllm.model_executor.layers.sampler import SamplerOutput\n/usr/local/lib/python3.10/dist-packages/vllm/model_executor/layers/sampler.py:16: in <module>\n    from vllm.model_executor.layers.utils import apply_penalties\n/usr/local/lib/python3.10/dist-packages/vllm/model_executor/layers/utils.py:8: in <module>\n    from vllm import _custom_ops as ops\n/usr/local/lib/python3.10/dist-packages/vllm/_custom_ops.py:480: in <module>\n    def _aqlm_gemm_fake(input: torch.Tensor, codes: torch.Tensor,\n/usr/local/lib/python3.10/dist-packages/torch/library.py:1023: in register\n    use_lib._register_fake(op_name, func, _stacklevel=stacklevel + 1)\n/usr/local/lib/python3.10/dist-packages/torch/library.py:214: in _register_fake\n    handle = entry.fake_impl.register(func_to_register, source)\n/usr/local/lib/python3.10/dist-packages/torch/_library/fake_impl.py:31: in register\n    if torch._C._dispatch_has_kernel_for_dispatch_key(self.qualname, \"Meta\"):\nE   RuntimeError: operator _C::aqlm_gemm does not exist\nINFO 11-05 13:31:16 [__init__.py:241] Automatically detected platform cuda.\n"
-   },
-   "solve": {
-    "bytes": 1603,
-    "tail": "ble_flat_np`, a zero-copy ravel view of the NumPy block table, plus `block_shift` / `block_mask` when block size is power of two.\n- `compute_slot_mapping` on pow2 path: `positions & mask` written straight into `slot_mapping_np`, index = `(positions >> shift) + req_indices * M`, gather with `take` on flat view, OR in `block << shift`. All int64 div/mod gone, no Torch, no table copy.\n- Non-pow2 fallback: `np.divmod` + `take` + in-place multiply/add. Same semantics as base.\n\n**Why faster than gold**\nGold already drops the Torch copy but still does int64 `//` and `%` (about 1 ns/elt each) plus two temporaries. Shift/mask are ~10x cheaper and offsets land in output buffer directly.\n\n**Micro-bench, local numpy 2.4.2, same table layout as opt-125m**\n\n| n tokens | gold | new |\n|---|---|---|\n| 256 | 3.09 \u00b5s | 2.50 \u00b5s |\n| 2048 | 9.23 \u00b5s | 4.93 \u00b5s |\n| 8192 | 29.67 \u00b5s | 11.81 \u00b5s |\n\n**Verification**\n- Equivalence vs base implementation: exact match, block sizes 1/2/16/32/3/5/48, n up to 4096. `clear()` keeps flat view coherent.\n- Hidden test `tests/v1/worker/test_gpu_input_batch.py` in image `vllm-task:22940` with envfix: 5 passed. New attributes are plain ints plus one ndarray view, so `_compare_objs` stays happy.\n\n**Caveat**\nImage still broken for harness as-is (aqlm fake ops, torchaudio). Memory updated with reliable ast-based aqlm strip. End-to-end throughput not measured here; per-call gain is 2.5x gold at prefill size, 1.2x at decode size, so expect at least gold's +2 % end-to-end.\n"
-   },
-   "workload_runs": 2,
-   "patch_bytes": 3214
-  },
-  "claude + PR's solution": {
-   "tests": {
-    "bytes": 1699,
-    "tail": "_getattr__\n    module = import_module(module_name, __package__)\n/usr/local/lib/python3.10/dist-packages/vllm/entrypoints/llm.py:24: in <module>\n    from vllm.engine.llm_engine import LLMEngine\n/usr/local/lib/python3.10/dist-packages/vllm/engine/llm_engine.py:30: in <module>\n    from vllm.executor.executor_base import ExecutorBase\n/usr/local/lib/python3.10/dist-packages/vllm/executor/executor_base.py:18: in <module>\n    from vllm.model_executor.layers.sampler import SamplerOutput\n/usr/local/lib/python3.10/dist-packages/vllm/model_executor/layers/sampler.py:16: in <module>\n    from vllm.model_executor.layers.utils import apply_penalties\n/usr/local/lib/python3.10/dist-packages/vllm/model_executor/layers/utils.py:8: in <module>\n    from vllm import _custom_ops as ops\n/usr/local/lib/python3.10/dist-packages/vllm/_custom_ops.py:480: in <module>\n    def _aqlm_gemm_fake(input: torch.Tensor, codes: torch.Tensor,\n/usr/local/lib/python3.10/dist-packages/torch/library.py:1023: in register\n    use_lib._register_fake(op_name, func, _stacklevel=stacklevel + 1)\n/usr/local/lib/python3.10/dist-packages/torch/library.py:214: in _register_fake\n    handle = entry.fake_impl.register(func_to_register, source)\n/usr/local/lib/python3.10/dist-packages/torch/_library/fake_impl.py:31: in register\n    if torch._C._dispatch_has_kernel_for_dispatch_key(self.qualname, \"Meta\"):\nE   RuntimeError: operator _C::aqlm_gemm does not exist\nINFO 11-05 13:33:16 [__init__.py:241] Automatically detected platform cuda.\n"
-   },
-   "solve": {
-    "bytes": 1429,
-    "tail": "Done. Arm was wiped clean; re-applied known solution, verified in task image.\n\n**Change** (only `vllm/v1/worker/block_table.py`):\n- `__init__`: keep `block_table_flat_np = block_table_np.ravel()` (view, no copy); precompute `block_shift`/`block_mask` when `block_size` is power of two.\n- `compute_slot_mapping`: pow2 path = `bitwise_and(positions, mask, out=slot)`, `idx = positions >> shift; idx += req*M`, `slot |= flat.take(idx) << shift`. Non-pow2 fallback = `np.divmod` + `take` + in-place multiply/add. Zero torch round-trip, zero int64 division.\n\n**Microbench in `vllm-task:22940`** (\u00b5s/call, min of 7\u00d7200):\n\n| block_size | n | base | gold | arm |\n|---|---|---|---|---|\n| 16 | 256 | 7.8 | 3.1 | 2.6 |\n| 16 | 8192 | 38.5 | 28.6 | 11.7 |\n| 1 / 32 | 8192 | ~40 | ~28.7 | ~11.8 |\n| 3 / 48 (non-pow2) | 8192 | ~40 | ~28.7 | ~23.9 |\n\nOutput bit-identical to base and gold for all block sizes tested (`EQUIV OK`).\n\n**Hidden test** `tests/v1/worker/test_gpu_input_batch.py`: 5/5 pass with in-container envfix (strip aqlm `register_fake` blocks, drop torchaudio). Without envfix, test fails with `RuntimeError: operator _C::aqlm_gemm does not exist` \u2014 same for base and gold, pipeline already records FAIL for all three arms. Image problem, not arm.\n\n**Caveat:** headline metric is end-to-end tok/s. 17 \u00b5s/step saved vs gold on opt-125m; expect arm \u2265 gold within noise, not big delta. Memory note updated with quick re-apply path.\n"
-   },
-   "workload_runs": 1,
-   "patch_bytes": 3104
+   "workload_runs": 5
   }
  },
- "ts": "2026-11-05T13:33:22Z"
+ "ts": "2026-11-05T13:50:51Z"
 }
