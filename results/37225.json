@@ -19,6 +19,16 @@
      "mean": 0.9584,
      "sd": 0.0027,
      "n": 5
+    },
+    "claude": {
+     "mean": 1.2671,
+     "sd": 0.0174,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 1.2704,
+     "sd": 0.0204,
+     "n": 5
     }
    }
   },
@@ -39,6 +49,16 @@
     "gold": {
      "mean": 3.552,
      "sd": 0.0169,
+     "n": 5
+    },
+    "claude": {
+     "mean": 4.0635,
+     "sd": 0.1893,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 4.1222,
+     "sd": 0.2682,
      "n": 5
     }
    }
@@ -61,6 +81,16 @@
      "mean": 1.5902,
      "sd": 0.011,
      "n": 5
+    },
+    "claude": {
+     "mean": 2.1091,
+     "sd": 0.0064,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 2.1128,
+     "sd": 0.0073,
+     "n": 5
     }
    }
   },
@@ -81,6 +111,16 @@
     "gold": {
      "mean": 5.1634,
      "sd": 0.0231,
+     "n": 5
+    },
+    "claude": {
+     "mean": 6.3765,
+     "sd": 0.0054,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 6.3788,
+     "sd": 0.0065,
      "n": 5
     }
    }
@@ -103,6 +143,16 @@
      "mean": 0.1066,
      "sd": 0.0171,
      "n": 5
+    },
+    "claude": {
+     "mean": 0.1065,
+     "sd": 0.007,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.1046,
+     "sd": 0.009,
+     "n": 5
     }
    }
   },
@@ -120,6 +170,16 @@
     "gold": {
      "mean": 0.5242,
      "sd": 0.0016,
+     "n": 5
+    },
+    "claude": {
+     "mean": 0.5302,
+     "sd": 0.0037,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.5318,
+     "sd": 0.0045,
      "n": 5
     }
    }
@@ -139,6 +199,16 @@
      "mean": 0.1654,
      "sd": 0.0075,
      "n": 5
+    },
+    "claude": {
+     "mean": 0.1778,
+     "sd": 0.0192,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.1818,
+     "sd": 0.0275,
+     "n": 5
     }
    }
   },
@@ -156,6 +226,16 @@
     "gold": {
      "mean": 5.9894,
      "sd": 0.0157,
+     "n": 5
+    },
+    "claude": {
+     "mean": 6.5868,
+     "sd": 0.0073,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 6.5866,
+     "sd": 0.0049,
      "n": 5
     }
    }
@@ -175,6 +255,16 @@
      "mean": 1.597,
      "sd": 0.0116,
      "n": 5
+    },
+    "claude": {
+     "mean": 1.9378,
+     "sd": 0.0039,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 1.9352,
+     "sd": 0.0011,
+     "n": 5
     }
    }
   },
@@ -192,6 +282,16 @@
     "gold": {
      "mean": 0.1352,
      "sd": 0.0031,
+     "n": 5
+    },
+    "claude": {
+     "mean": 0.1511,
+     "sd": 0.0033,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.1502,
+     "sd": 0.0036,
      "n": 5
     }
    }
@@ -211,6 +311,16 @@
      "mean": 0.0834,
      "sd": 0.0265,
      "n": 5
+    },
+    "claude": {
+     "mean": 0.0874,
+     "sd": 0.0247,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.072,
+     "sd": 0.0208,
+     "n": 5
     }
    }
   },
@@ -228,6 +338,16 @@
     "gold": {
      "mean": 1.8148,
      "sd": 0.0076,
+     "n": 5
+    },
+    "claude": {
+     "mean": 2.0659,
+     "sd": 0.0024,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 2.0662,
+     "sd": 0.0034,
      "n": 5
     }
    }
@@ -247,6 +367,16 @@
      "mean": 0.4996,
      "sd": 0.0087,
      "n": 5
+    },
+    "claude": {
+     "mean": 0.6497,
+     "sd": 0.0077,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.6506,
+     "sd": 0.0106,
+     "n": 5
     }
    }
   },
@@ -264,6 +394,16 @@
     "gold": {
      "mean": 0.4962,
      "sd": 0.004,
+     "n": 5
+    },
+    "claude": {
+     "mean": 0.5643,
+     "sd": 0.0075,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.565,
+     "sd": 0.009,
      "n": 5
     }
    }
@@ -283,6 +423,16 @@
      "mean": 0.1474,
      "sd": 0.0082,
      "n": 5
+    },
+    "claude": {
+     "mean": 0.181,
+     "sd": 0.0055,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.1814,
+     "sd": 0.0073,
+     "n": 5
     }
    }
   },
@@ -300,6 +450,16 @@
     "gold": {
      "mean": 0.2554,
      "sd": 0.0093,
+     "n": 5
+    },
+    "claude": {
+     "mean": 0.2865,
+     "sd": 0.0066,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.2828,
+     "sd": 0.0026,
      "n": 5
     }
    }
@@ -319,6 +479,16 @@
      "mean": 0.3378,
      "sd": 0.0036,
      "n": 5
+    },
+    "claude": {
+     "mean": 0.3372,
+     "sd": 0.0031,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.3366,
+     "sd": 0.0034,
+     "n": 5
     }
    }
   },
@@ -336,6 +506,16 @@
     "gold": {
      "mean": 0.3226,
      "sd": 0.0068,
+     "n": 5
+    },
+    "claude": {
+     "mean": 0.3255,
+     "sd": 0.0051,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.3246,
+     "sd": 0.0069,
      "n": 5
     }
    }
@@ -355,6 +535,16 @@
      "mean": 4.4472,
      "sd": 0.0181,
      "n": 5
+    },
+    "claude": {
+     "mean": 4.4503,
+     "sd": 0.0178,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 4.4418,
+     "sd": 0.0091,
+     "n": 5
     }
    }
   },
@@ -372,6 +562,16 @@
     "gold": {
      "mean": 4.5092,
      "sd": 0.0263,
+     "n": 5
+    },
+    "claude": {
+     "mean": 4.5376,
+     "sd": 0.0304,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 4.5526,
+     "sd": 0.0374,
      "n": 5
     }
    }
@@ -391,6 +591,16 @@
      "mean": 0.6444,
      "sd": 0.0043,
      "n": 5
+    },
+    "claude": {
+     "mean": 0.6775,
+     "sd": 0.0703,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.6754,
+     "sd": 0.0729,
+     "n": 5
     }
    }
   },
@@ -408,6 +618,16 @@
     "gold": {
      "mean": 0.6196,
      "sd": 0.0076,
+     "n": 5
+    },
+    "claude": {
+     "mean": 0.6209,
+     "sd": 0.0053,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.6192,
+     "sd": 0.0066,
      "n": 5
     }
    }
@@ -427,6 +647,16 @@
      "mean": 8.7174,
      "sd": 0.0342,
      "n": 5
+    },
+    "claude": {
+     "mean": 8.715,
+     "sd": 0.0315,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 8.7216,
+     "sd": 0.0439,
+     "n": 5
     }
    }
   },
@@ -444,6 +674,16 @@
     "gold": {
      "mean": 8.9576,
      "sd": 0.0503,
+     "n": 5
+    },
+    "claude": {
+     "mean": 8.9764,
+     "sd": 0.0767,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 8.9662,
+     "sd": 0.1066,
      "n": 5
     }
    }
@@ -471,6 +711,14 @@
   "gold": {
    "tests": "PASS",
    "slug": "gold"
+  },
+  "claude": {
+   "tests": "PASS",
+   "slug": "claude"
+  },
+  "claude + PR's solution": {
+   "tests": "PASS",
+   "slug": "claude___PR_s_solution"
   }
  },
  "improved": true,
@@ -487,6 +735,16 @@
      "mean": 0.5242,
      "sd": 0.0016,
      "n": 5
+    },
+    "claude": {
+     "mean": 0.5302,
+     "sd": 0.0037,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.5318,
+     "sd": 0.0045,
+     "n": 5
     }
    },
    "mixed_partial_b128_v32768": {
@@ -499,6 +757,16 @@
     "gold": {
      "mean": 0.1654,
      "sd": 0.0075,
+     "n": 5
+    },
+    "claude": {
+     "mean": 0.1778,
+     "sd": 0.0192,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.1818,
+     "sd": 0.0275,
      "n": 5
     }
    },
@@ -513,6 +781,16 @@
      "mean": 5.9894,
      "sd": 0.0157,
      "n": 5
+    },
+    "claude": {
+     "mean": 6.5868,
+     "sd": 0.0073,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 6.5866,
+     "sd": 0.0049,
+     "n": 5
     }
    },
    "mixed_partial_b2048_v32768": {
@@ -525,6 +803,16 @@
     "gold": {
      "mean": 1.597,
      "sd": 0.0116,
+     "n": 5
+    },
+    "claude": {
+     "mean": 1.9378,
+     "sd": 0.0039,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 1.9352,
+     "sd": 0.0011,
      "n": 5
     }
    },
@@ -539,6 +827,16 @@
      "mean": 0.1352,
      "sd": 0.0031,
      "n": 5
+    },
+    "claude": {
+     "mean": 0.1511,
+     "sd": 0.0033,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.1502,
+     "sd": 0.0036,
+     "n": 5
     }
    },
    "topk_partial_b128_v32768": {
@@ -551,6 +849,16 @@
     "gold": {
      "mean": 0.0834,
      "sd": 0.0265,
+     "n": 5
+    },
+    "claude": {
+     "mean": 0.0874,
+     "sd": 0.0247,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.072,
+     "sd": 0.0208,
      "n": 5
     }
    },
@@ -565,6 +873,16 @@
      "mean": 1.8148,
      "sd": 0.0076,
      "n": 5
+    },
+    "claude": {
+     "mean": 2.0659,
+     "sd": 0.0024,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 2.0662,
+     "sd": 0.0034,
+     "n": 5
     }
    },
    "topk_partial_b2048_v32768": {
@@ -577,6 +895,16 @@
     "gold": {
      "mean": 0.4996,
      "sd": 0.0087,
+     "n": 5
+    },
+    "claude": {
+     "mean": 0.6497,
+     "sd": 0.0077,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.6506,
+     "sd": 0.0106,
      "n": 5
     }
    },
@@ -591,6 +919,16 @@
      "mean": 0.4962,
      "sd": 0.004,
      "n": 5
+    },
+    "claude": {
+     "mean": 0.5643,
+     "sd": 0.0075,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.565,
+     "sd": 0.009,
+     "n": 5
     }
    },
    "topk_topp_whole_b128_v32768": {
@@ -603,6 +941,16 @@
     "gold": {
      "mean": 0.1474,
      "sd": 0.0082,
+     "n": 5
+    },
+    "claude": {
+     "mean": 0.181,
+     "sd": 0.0055,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.1814,
+     "sd": 0.0073,
      "n": 5
     }
    },
@@ -617,6 +965,16 @@
      "mean": 5.1634,
      "sd": 0.0231,
      "n": 5
+    },
+    "claude": {
+     "mean": 6.3765,
+     "sd": 0.0054,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 6.3788,
+     "sd": 0.0065,
+     "n": 5
     }
    },
    "topk_topp_whole_b2048_v32768": {
@@ -629,6 +987,16 @@
     "gold": {
      "mean": 1.5902,
      "sd": 0.011,
+     "n": 5
+    },
+    "claude": {
+     "mean": 2.1091,
+     "sd": 0.0064,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 2.1128,
+     "sd": 0.0073,
      "n": 5
     }
    },
@@ -643,6 +1011,16 @@
      "mean": 0.2554,
      "sd": 0.0093,
      "n": 5
+    },
+    "claude": {
+     "mean": 0.2865,
+     "sd": 0.0066,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.2828,
+     "sd": 0.0026,
+     "n": 5
     }
    },
    "topk_whole_b128_v32768": {
@@ -655,6 +1033,16 @@
     "gold": {
      "mean": 0.1066,
      "sd": 0.0171,
+     "n": 5
+    },
+    "claude": {
+     "mean": 0.1065,
+     "sd": 0.007,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.1046,
+     "sd": 0.009,
      "n": 5
     }
    },
@@ -669,6 +1057,16 @@
      "mean": 3.552,
      "sd": 0.0169,
      "n": 5
+    },
+    "claude": {
+     "mean": 4.0635,
+     "sd": 0.1893,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 4.1222,
+     "sd": 0.2682,
+     "n": 5
     }
    },
    "topk_whole_b2048_v32768": {
@@ -681,6 +1079,16 @@
     "gold": {
      "mean": 0.9584,
      "sd": 0.0027,
+     "n": 5
+    },
+    "claude": {
+     "mean": 1.2671,
+     "sd": 0.0174,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 1.2704,
+     "sd": 0.0204,
      "n": 5
     }
    },
@@ -695,6 +1103,16 @@
      "mean": 0.3378,
      "sd": 0.0036,
      "n": 5
+    },
+    "claude": {
+     "mean": 0.3372,
+     "sd": 0.0031,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.3366,
+     "sd": 0.0034,
+     "n": 5
     }
    },
    "topp_partial_b128_v32768": {
@@ -707,6 +1125,16 @@
     "gold": {
      "mean": 0.3226,
      "sd": 0.0068,
+     "n": 5
+    },
+    "claude": {
+     "mean": 0.3255,
+     "sd": 0.0051,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.3246,
+     "sd": 0.0069,
      "n": 5
     }
    },
@@ -721,6 +1149,16 @@
      "mean": 4.4472,
      "sd": 0.0181,
      "n": 5
+    },
+    "claude": {
+     "mean": 4.4503,
+     "sd": 0.0178,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 4.4418,
+     "sd": 0.0091,
+     "n": 5
     }
    },
    "topp_partial_b2048_v32768": {
@@ -733,6 +1171,16 @@
     "gold": {
      "mean": 4.5092,
      "sd": 0.0263,
+     "n": 5
+    },
+    "claude": {
+     "mean": 4.5376,
+     "sd": 0.0304,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 4.5526,
+     "sd": 0.0374,
      "n": 5
     }
    },
@@ -747,6 +1195,16 @@
      "mean": 0.6444,
      "sd": 0.0043,
      "n": 5
+    },
+    "claude": {
+     "mean": 0.6775,
+     "sd": 0.0703,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.6754,
+     "sd": 0.0729,
+     "n": 5
     }
    },
    "topp_whole_b128_v32768": {
@@ -759,6 +1217,16 @@
     "gold": {
      "mean": 0.6196,
      "sd": 0.0076,
+     "n": 5
+    },
+    "claude": {
+     "mean": 0.6209,
+     "sd": 0.0053,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 0.6192,
+     "sd": 0.0066,
      "n": 5
     }
    },
@@ -773,6 +1241,16 @@
      "mean": 8.7174,
      "sd": 0.0342,
      "n": 5
+    },
+    "claude": {
+     "mean": 8.715,
+     "sd": 0.0315,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 8.7216,
+     "sd": 0.0439,
+     "n": 5
     }
    },
    "topp_whole_b2048_v32768": {
@@ -785,6 +1263,16 @@
     "gold": {
      "mean": 8.9576,
      "sd": 0.0503,
+     "n": 5
+    },
+    "claude": {
+     "mean": 8.9764,
+     "sd": 0.0767,
+     "n": 10
+    },
+    "claude + PR's solution": {
+     "mean": 8.9662,
+     "sd": 0.1066,
      "n": 5
     }
    }
@@ -926,7 +1414,31 @@
     "tail": "/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n.s...................................................................... [ 80%]\n..................                                                       [100%]\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n../usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:362: 14 warnings\n  /usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:362: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n89 passed, 1 skipped, 15 warnings in 58.48s\n"
    },
    "workload_runs": 5
+  },
+  "claude": {
+   "tests": {
+    "bytes": 1539,
+    "tail": "/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n.s...................................................................... [ 80%]\n..................                                                       [100%]\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n../usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:362: 14 warnings\n  /usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:362: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n89 passed, 1 skipped, 15 warnings in 56.41s\n"
+   },
+   "solve": {
+    "bytes": 129,
+    "tail": "Nothing else independent to request now. The v3 check/bench job (ID b8ocykflj) is running; I'll act when its notification lands.\n"
+   },
+   "workload_runs": 10,
+   "patch_bytes": 0
+  },
+  "claude + PR's solution": {
+   "tests": {
+    "bytes": 1539,
+    "tail": "/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n.s...................................................................... [ 80%]\n..................                                                       [100%]\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n../usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:362: 14 warnings\n  /usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:362: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n89 passed, 1 skipped, 15 warnings in 55.84s\n"
+   },
+   "solve": {
+    "bytes": 0,
+    "tail": ""
+   },
+   "workload_runs": 5,
+   "patch_bytes": 98
   }
  },
- "ts": "2026-11-05T11:13:41Z"
+ "ts": "2026-11-05T12:20:50Z"
 }
