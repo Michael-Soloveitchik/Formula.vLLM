@@ -1,21 +1,26 @@
 #!/usr/bin/env python3
-"""Fold per-arm workload logs into one latency dict (ms per scenario, mean ± sd).
+"""Fold per-arm workload logs into one latency dict (per scenario, mean ± sd).
 
 Usage:
     parse_workload.py <work_dir> <arm1> [arm2 ...]
 
-Reads <work_dir>/wl_<arm>_<i>.log for every repeat i, parses the SUMMARY TABLE
-printed by benchmarks/benchmark_topk_topp.py (one row per scenario:
-`<scenario> <batch> <vocab> <ops>% <triton_ms> <pytorch_ms> <speedup>x ...`),
-and prints JSON:
+Reads <work_dir>/wl_<arm>_<i>.log for every repeat i and extracts every metric
+line it recognises (one "scenario" per metric):
 
-    {"unit": "ms",
-     "scenarios": {"topk_whole_b2048_v32768": {"<arm>": {"mean":..,"sd":..,"n":..}, ...}},
-     "pytorch_ref": {"topk_whole_b2048_v32768": {"mean":..,"sd":..,"n":..}}}
+  * benchmark_topk_topp.py SUMMARY TABLE rows
+        <scenario> <batch> <vocab> <ops>% <triton_ms> <pytorch_ms> <speedup>x ...
+    -> "<scenario>_b<batch>_v<vocab>" (ms, Triton column); the PyTorch column of
+       the gold arm is kept as `pytorch_ref` (= pre-PR number when the base tree
+       cannot run the script at all, e.g. 33538 introduces it)
+  * "AllPool.forward median: 39.65 us"            -> allpool_forward_median (us)
+  * benchmark_throughput.py
+        "Throughput: 123.4 requests/s, 5678.9 total tokens/s, 910.1 output tokens/s"
+    -> throughput_req_s (req/s), throughput_total_tok_s, throughput_output_tok_s (tok/s)
 
-`pytorch_ref` is the script's own sort-based PyTorch column (same process, same
-logits) taken from the gold arm's runs; it is the pre-PR number for PRs whose
-base tree cannot run the script at all (e.g. 33538 introduces the kernel).
+Prints JSON:
+    {"scenarios": {"<name>": {"unit": "ms", "<arm>": {"mean":..,"sd":..,"n":..}, ...}},
+     "pytorch_ref": {"<name>": {"mean":..,"sd":..,"n":..}}}
+Units ending in "/s" are higher-is-better (web/index.html handles direction).
 """
 import glob
 import json
@@ -24,8 +29,12 @@ import os
 import re
 import sys
 
-ROW = re.compile(
+TOPK_ROW = re.compile(
     r"^(\w+?)\s+(\d+)\s+(\d+)\s+(\d+)%\s+([\d.]+|inf)\s+([\d.]+|inf)\s+([\d.]+|inf)x"
+)
+ALLPOOL = re.compile(r"AllPool\.forward median:\s*([\d.]+)\s*us")
+THROUGHPUT = re.compile(
+    r"Throughput:\s*([\d.]+)\s*requests/s,\s*([\d.]+)\s*total tokens/s,\s*([\d.]+)\s*output tokens/s"
 )
 
 
@@ -39,35 +48,46 @@ def stats(xs):
 
 
 def parse_log(path):
-    tri, pyt = {}, {}
+    """-> ({scenario: (value, unit)}, {scenario: pytorch_ms})"""
+    vals, pyt = {}, {}
     for ln in open(path, errors="replace"):
-        m = ROW.match(ln.strip())
-        if not m:
+        s = ln.strip()
+        m = TOPK_ROW.match(s)
+        if m:
+            name = f"{m.group(1)}_b{m.group(2)}_v{m.group(3)}"
+            vals[name] = (float(m.group(5)), "ms")
+            pyt[name] = float(m.group(6))
             continue
-        name = f"{m.group(1)}_b{m.group(2)}_v{m.group(3)}"
-        tri[name] = float(m.group(5))
-        pyt[name] = float(m.group(6))
-    return tri, pyt
+        m = ALLPOOL.search(s)
+        if m:
+            vals["allpool_forward_median"] = (float(m.group(1)), "us")
+            continue
+        m = THROUGHPUT.search(s)
+        if m:
+            vals["throughput_req_s"] = (float(m.group(1)), "req/s")
+            vals["throughput_total_tok_s"] = (float(m.group(2)), "tok/s")
+            vals["throughput_output_tok_s"] = (float(m.group(3)), "tok/s")
+    return vals, pyt
 
 
 def main():
     work, arms = sys.argv[1], sys.argv[2:]
-    per_arm = {}      # arm -> scenario -> [ms]
+    per_arm = {}      # arm -> scenario -> [values]
+    units = {}        # scenario -> unit
     pyt_ref = {}      # scenario -> [ms] (gold runs only)
     for arm in arms:
-        logs = sorted(glob.glob(os.path.join(work, f"wl_{arm}_*.log")))
         per_arm[arm] = {}
-        for lg in logs:
-            tri, pyt = parse_log(lg)
-            for k, v in tri.items():
+        for lg in sorted(glob.glob(os.path.join(work, f"wl_{arm}_*.log"))):
+            vals, pyt = parse_log(lg)
+            for k, (v, u) in vals.items():
                 per_arm[arm].setdefault(k, []).append(v)
+                units[k] = u
             if arm == "gold":
                 for k, v in pyt.items():
                     pyt_ref.setdefault(k, []).append(v)
-    scen = sorted({k for a in per_arm.values() for k in a})
-    out = {"unit": "ms", "scenarios": {}, "pytorch_ref": {}}
-    for k in scen:
-        out["scenarios"][k] = {}
+    out = {"scenarios": {}, "pytorch_ref": {}}
+    for k in sorted(units):
+        out["scenarios"][k] = {"unit": units[k]}
         for arm in arms:
             s = stats(per_arm[arm].get(k, []))
             if s:

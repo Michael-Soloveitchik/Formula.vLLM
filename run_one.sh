@@ -151,10 +151,24 @@ for d in tests benchmarks pyproject.toml conftest.py; do [ -e "$d" ] && cp -a "$
 cd /t
 '
 
+# Common mounts: /arm = the arm's tree, /gold = merge tree (tests/benchmarks),
+# /task = tasks/pr_<n> (vendored bench.py etc.), HF cache shared across PRs at
+# .weights/hf (model weights download once, never committed). --shm-size for
+# vLLM engine workloads.
+mkdir -p "$HERE/.weights/hf"
+run_in_img() { # run_in_img <tree> <script>
+  $ENGINE run --rm $GPU --shm-size=2g \
+    -v "$1":/arm:ro -v "$WORK/gold_full":/gold:ro -v "$TASK":/task:ro \
+    -v "$HERE/.weights/hf":/root/.cache/huggingface \
+    -e HF_HUB_DISABLE_PROGRESS_BARS=1 \
+    "$IMG" -lc "$2"
+}
+
 # 3+4. isolate an arm's .py tree in the same image, run the oracle -> PASS/FAIL
 run_arm() {
   local arm="$1" tree="$2"
-  $ENGINE run --rm $GPU -v "$tree":/arm:ro -v "$WORK/gold_full":/gold:ro "$IMG" -lc "$PRELUDE"'
+  [ -n "$TESTS" ] || { echo SKIP; return 0; }
+  run_in_img "$tree" "$PRELUDE"'
     python3 -m pytest -q -p no:cacheprovider '"$TESTS"' >/tmp/t.log 2>&1 && echo PASS || echo FAIL
     cat /tmp/t.log >&2
   ' 2>"$WORK/test_${arm}.log"
@@ -166,8 +180,8 @@ run_workload() {
   [ -n "$WL_CMD" ] || return 0
   for i in $(seq 1 "$REPEATS"); do
     say "workload $arm run $i/$REPEATS"
-    $ENGINE run --rm $GPU -v "$tree":/arm:ro -v "$WORK/gold_full":/gold:ro "$IMG" -lc "$PRELUDE $WL_CMD" \
-      >"$WORK/wl_${arm}_${i}.log" 2>&1 || { say "workload $arm run $i failed (see $WORK/wl_${arm}_${i}.log)"; break; }
+    run_in_img "$tree" "$PRELUDE $WL_CMD" >"$WORK/wl_${arm}_${i}.log" 2>&1 \
+      || { say "workload $arm run $i failed (see $WORK/wl_${arm}_${i}.log)"; break; }
   done
 }
 
@@ -225,7 +239,7 @@ experiments=None
 if latency and "scenarios" in latency:   # re-key arm slugs -> dashboard arm names
     slug2name={v["slug"]:k for k,v in arms.items()}
     for s,d in latency["scenarios"].items():
-        latency["scenarios"][s]={slug2name.get(k,k):v for k,v in d.items()}
+        latency["scenarios"][s]={slug2name.get(k,k):v for k,v in d.items()}   # keeps the "unit" key
     # experiments_v2 for web/index.html: one table per scenario. Scenarios the
     # task metadata names come first (with the author's reported numbers);
     # every other measured scenario follows with reported=null.
@@ -238,10 +252,11 @@ if latency and "scenarios" in latency:   # re-key arm slugs -> dashboard arm nam
     experiments=[]
     for n in names:
         a=dict(latency["scenarios"].get(n,{}))
+        unit=a.pop("unit",None) or (meta.get("workload") or {}).get("unit") or "ms"
         note=None
         if "base" not in a and n in pyref:   # base tree can't run the script (PR introduces it)
             a["base"]=pyref[n]; note=(meta.get("workload") or {}).get("base_note") or "base = script's PyTorch column"
-        e={"name":n,"unit":latency.get("unit","ms"),"workload":wl,"reported":rep_by.get(n),"arms":a}
+        e={"name":n,"unit":unit,"workload":wl,"reported":rep_by.get(n),"arms":a}
         if note: e["note"]=note
         experiments.append(e)
 out={
