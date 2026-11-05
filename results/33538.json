@@ -1,0 +1,1604 @@
+{
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "topk_whole_b16_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": {
+    "base": 0.28,
+    "patch": 0.067
+   },
+   "arms": {
+    "gold": {
+     "mean": 0.1202,
+     "sd": 0.0477,
+     "n": 5
+    },
+    "base": {
+     "mean": 1.2936,
+     "sd": 0.1189,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topp_whole_b16_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": {
+    "base": 0.361,
+    "patch": 0.184
+   },
+   "arms": {
+    "gold": {
+     "mean": 0.3236,
+     "sd": 0.0413,
+     "n": 5
+    },
+    "base": {
+     "mean": 1.2468,
+     "sd": 0.0609,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_topp_whole_b16_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": {
+    "base": 0.242,
+    "patch": 0.093
+   },
+   "arms": {
+    "gold": {
+     "mean": 0.1156,
+     "sd": 0.0377,
+     "n": 5
+    },
+    "base": {
+     "mean": 1.3732,
+     "sd": 0.0681,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "mixed_partial_b16_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": {
+    "base": 0.266,
+    "patch": 0.205
+   },
+   "arms": {
+    "gold": {
+     "mean": 0.0916,
+     "sd": 0.018,
+     "n": 5
+    },
+    "base": {
+     "mean": 1.3516,
+     "sd": 0.0142,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_whole_b1_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": {
+    "base": 0.101,
+    "patch": 0.065
+   },
+   "arms": {
+    "gold": {
+     "mean": 0.0984,
+     "sd": 0.0212,
+     "n": 5
+    },
+    "base": {
+     "mean": 0.2596,
+     "sd": 0.0941,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_whole_b128_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.3816,
+     "sd": 0.129,
+     "n": 5
+    },
+    "base": {
+     "mean": 1.302,
+     "sd": 0.3511,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_topp_whole_b2048_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 6.3332,
+     "sd": 0.0033,
+     "n": 5
+    },
+    "base": {
+     "mean": 94.0016,
+     "sd": 0.0569,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "mixed_partial_b128_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.5258,
+     "sd": 0.0022,
+     "n": 5
+    },
+    "base": {
+     "mean": 5.8938,
+     "sd": 0.0206,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "mixed_partial_b128_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.1596,
+     "sd": 0.0089,
+     "n": 5
+    },
+    "base": {
+     "mean": 2.098,
+     "sd": 0.0191,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "mixed_partial_b16_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.2194,
+     "sd": 0.0058,
+     "n": 5
+    },
+    "base": {
+     "mean": 0.7694,
+     "sd": 0.0124,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "mixed_partial_b1_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.1778,
+     "sd": 0.0103,
+     "n": 5
+    },
+    "base": {
+     "mean": 0.461,
+     "sd": 0.1573,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "mixed_partial_b1_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.1102,
+     "sd": 0.0303,
+     "n": 5
+    },
+    "base": {
+     "mean": 0.3984,
+     "sd": 0.1569,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "mixed_partial_b2048_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 6.5826,
+     "sd": 0.025,
+     "n": 5
+    },
+    "base": {
+     "mean": 94.044,
+     "sd": 0.0348,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "mixed_partial_b2048_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 1.9294,
+     "sd": 0.0023,
+     "n": 5
+    },
+    "base": {
+     "mean": 23.2188,
+     "sd": 0.0091,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_partial_b128_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.1542,
+     "sd": 0.0049,
+     "n": 5
+    },
+    "base": {
+     "mean": 5.0994,
+     "sd": 0.0137,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_partial_b128_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.0712,
+     "sd": 0.0045,
+     "n": 5
+    },
+    "base": {
+     "mean": 1.149,
+     "sd": 0.0072,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_partial_b16_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.1416,
+     "sd": 0.0125,
+     "n": 5
+    },
+    "base": {
+     "mean": 0.565,
+     "sd": 0.0042,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_partial_b16_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.0992,
+     "sd": 0.0654,
+     "n": 5
+    },
+    "base": {
+     "mean": 1.236,
+     "sd": 0.0111,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_partial_b1_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.0688,
+     "sd": 0.0352,
+     "n": 5
+    },
+    "base": {
+     "mean": 0.3256,
+     "sd": 0.1021,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_partial_b1_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.072,
+     "sd": 0.0262,
+     "n": 5
+    },
+    "base": {
+     "mean": 0.2766,
+     "sd": 0.0943,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_partial_b2048_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 2.1,
+     "sd": 0.0069,
+     "n": 5
+    },
+    "base": {
+     "mean": 81.5542,
+     "sd": 0.0573,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_partial_b2048_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.6456,
+     "sd": 0.0013,
+     "n": 5
+    },
+    "base": {
+     "mean": 20.4182,
+     "sd": 0.0228,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_topp_whole_b128_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.4244,
+     "sd": 0.006,
+     "n": 5
+    },
+    "base": {
+     "mean": 5.8762,
+     "sd": 0.0062,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_topp_whole_b128_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.1638,
+     "sd": 0.0135,
+     "n": 5
+    },
+    "base": {
+     "mean": 2.1132,
+     "sd": 0.0081,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_topp_whole_b16_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.233,
+     "sd": 0.0678,
+     "n": 5
+    },
+    "base": {
+     "mean": 6.45,
+     "sd": 0.9625,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_topp_whole_b1_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.1834,
+     "sd": 0.0181,
+     "n": 5
+    },
+    "base": {
+     "mean": 0.3906,
+     "sd": 0.0487,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_topp_whole_b1_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.1162,
+     "sd": 0.0216,
+     "n": 5
+    },
+    "base": {
+     "mean": 0.3992,
+     "sd": 0.1681,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_topp_whole_b2048_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 2.112,
+     "sd": 0.0166,
+     "n": 5
+    },
+    "base": {
+     "mean": 23.2142,
+     "sd": 0.0122,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_whole_b128_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.299,
+     "sd": 0.0275,
+     "n": 5
+    },
+    "base": {
+     "mean": 5.0932,
+     "sd": 0.0145,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_whole_b16_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.1538,
+     "sd": 0.0341,
+     "n": 5
+    },
+    "base": {
+     "mean": 4.5176,
+     "sd": 1.4069,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_whole_b1_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.138,
+     "sd": 0.0149,
+     "n": 5
+    },
+    "base": {
+     "mean": 0.2988,
+     "sd": 0.0718,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_whole_b2048_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 4.0822,
+     "sd": 0.0038,
+     "n": 5
+    },
+    "base": {
+     "mean": 81.5568,
+     "sd": 0.0346,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topk_whole_b2048_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 1.2574,
+     "sd": 0.0026,
+     "n": 5
+    },
+    "base": {
+     "mean": 20.4318,
+     "sd": 0.0197,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topp_partial_b128_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.3428,
+     "sd": 0.0116,
+     "n": 5
+    },
+    "base": {
+     "mean": 5.5888,
+     "sd": 0.071,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topp_partial_b128_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.3288,
+     "sd": 0.0085,
+     "n": 5
+    },
+    "base": {
+     "mean": 1.2272,
+     "sd": 0.0066,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topp_partial_b16_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.2886,
+     "sd": 0.0098,
+     "n": 5
+    },
+    "base": {
+     "mean": 0.8796,
+     "sd": 0.012,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topp_partial_b16_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.3062,
+     "sd": 0.013,
+     "n": 5
+    },
+    "base": {
+     "mean": 1.2758,
+     "sd": 0.0163,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topp_partial_b1_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.0724,
+     "sd": 0.0236,
+     "n": 5
+    },
+    "base": {
+     "mean": 0.263,
+     "sd": 0.0164,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topp_partial_b1_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.0892,
+     "sd": 0.0265,
+     "n": 5
+    },
+    "base": {
+     "mean": 0.2706,
+     "sd": 0.0951,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topp_partial_b2048_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 4.3734,
+     "sd": 0.0083,
+     "n": 5
+    },
+    "base": {
+     "mean": 89.228,
+     "sd": 0.0161,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topp_partial_b2048_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 4.489,
+     "sd": 0.0221,
+     "n": 5
+    },
+    "base": {
+     "mean": 21.9902,
+     "sd": 0.024,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topp_whole_b128_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.6386,
+     "sd": 0.0038,
+     "n": 5
+    },
+    "base": {
+     "mean": 5.57,
+     "sd": 0.0295,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topp_whole_b128_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.6186,
+     "sd": 0.005,
+     "n": 5
+    },
+    "base": {
+     "mean": 1.24,
+     "sd": 0.0136,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topp_whole_b16_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.2844,
+     "sd": 0.0049,
+     "n": 5
+    },
+    "base": {
+     "mean": 0.9338,
+     "sd": 0.0699,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topp_whole_b1_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.2722,
+     "sd": 0.0156,
+     "n": 5
+    },
+    "base": {
+     "mean": 0.3322,
+     "sd": 0.1049,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topp_whole_b1_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 0.2924,
+     "sd": 0.0043,
+     "n": 5
+    },
+    "base": {
+     "mean": 0.3418,
+     "sd": 0.1086,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topp_whole_b2048_v131072",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 8.5438,
+     "sd": 0.0308,
+     "n": 5
+    },
+    "base": {
+     "mean": 89.2988,
+     "sd": 0.0619,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  },
+  {
+   "name": "topp_whole_b2048_v32768",
+   "unit": "ms",
+   "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "reported": null,
+   "arms": {
+    "gold": {
+     "mean": 8.9244,
+     "sd": 0.0529,
+     "n": 5
+    },
+    "base": {
+     "mean": 22.017,
+     "sd": 0.0406,
+     "n": 5
+    }
+   },
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+  }
+ ],
+ "pr": 33538,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/33538",
+ "title": "[Kernel] Triton-based Top-k and Top-p sampler kernels (#33538)",
+ "field": "scheduling",
+ "reported_gain": "up to 9.94x vs PyTorch topk sampler (batch 4, vocab 32768)",
+ "gain_kind": "unit",
+ "base_sha": "dc5fa77a4eb6680339cb77abe713fb22d7795560",
+ "merge_sha": "c656ba3b4d2cda82ca753eefde4b10cbf04c0a3f",
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.16.0",
+  "workload_cmd": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "FAIL",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "PASS",
+   "slug": "gold"
+  }
+ },
+ "improved": true,
+ "latency": {
+  "scenarios": {
+   "mixed_partial_b128_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.5258,
+     "sd": 0.0022,
+     "n": 5
+    }
+   },
+   "mixed_partial_b128_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.1596,
+     "sd": 0.0089,
+     "n": 5
+    }
+   },
+   "mixed_partial_b16_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.2194,
+     "sd": 0.0058,
+     "n": 5
+    }
+   },
+   "mixed_partial_b16_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.0916,
+     "sd": 0.018,
+     "n": 5
+    }
+   },
+   "mixed_partial_b1_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.1778,
+     "sd": 0.0103,
+     "n": 5
+    }
+   },
+   "mixed_partial_b1_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.1102,
+     "sd": 0.0303,
+     "n": 5
+    }
+   },
+   "mixed_partial_b2048_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 6.5826,
+     "sd": 0.025,
+     "n": 5
+    }
+   },
+   "mixed_partial_b2048_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 1.9294,
+     "sd": 0.0023,
+     "n": 5
+    }
+   },
+   "topk_partial_b128_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.1542,
+     "sd": 0.0049,
+     "n": 5
+    }
+   },
+   "topk_partial_b128_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.0712,
+     "sd": 0.0045,
+     "n": 5
+    }
+   },
+   "topk_partial_b16_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.1416,
+     "sd": 0.0125,
+     "n": 5
+    }
+   },
+   "topk_partial_b16_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.0992,
+     "sd": 0.0654,
+     "n": 5
+    }
+   },
+   "topk_partial_b1_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.0688,
+     "sd": 0.0352,
+     "n": 5
+    }
+   },
+   "topk_partial_b1_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.072,
+     "sd": 0.0262,
+     "n": 5
+    }
+   },
+   "topk_partial_b2048_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 2.1,
+     "sd": 0.0069,
+     "n": 5
+    }
+   },
+   "topk_partial_b2048_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.6456,
+     "sd": 0.0013,
+     "n": 5
+    }
+   },
+   "topk_topp_whole_b128_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.4244,
+     "sd": 0.006,
+     "n": 5
+    }
+   },
+   "topk_topp_whole_b128_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.1638,
+     "sd": 0.0135,
+     "n": 5
+    }
+   },
+   "topk_topp_whole_b16_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.233,
+     "sd": 0.0678,
+     "n": 5
+    }
+   },
+   "topk_topp_whole_b16_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.1156,
+     "sd": 0.0377,
+     "n": 5
+    }
+   },
+   "topk_topp_whole_b1_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.1834,
+     "sd": 0.0181,
+     "n": 5
+    }
+   },
+   "topk_topp_whole_b1_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.1162,
+     "sd": 0.0216,
+     "n": 5
+    }
+   },
+   "topk_topp_whole_b2048_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 6.3332,
+     "sd": 0.0033,
+     "n": 5
+    }
+   },
+   "topk_topp_whole_b2048_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 2.112,
+     "sd": 0.0166,
+     "n": 5
+    }
+   },
+   "topk_whole_b128_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.299,
+     "sd": 0.0275,
+     "n": 5
+    }
+   },
+   "topk_whole_b128_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.3816,
+     "sd": 0.129,
+     "n": 5
+    }
+   },
+   "topk_whole_b16_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.1538,
+     "sd": 0.0341,
+     "n": 5
+    }
+   },
+   "topk_whole_b16_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.1202,
+     "sd": 0.0477,
+     "n": 5
+    }
+   },
+   "topk_whole_b1_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.138,
+     "sd": 0.0149,
+     "n": 5
+    }
+   },
+   "topk_whole_b1_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.0984,
+     "sd": 0.0212,
+     "n": 5
+    }
+   },
+   "topk_whole_b2048_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 4.0822,
+     "sd": 0.0038,
+     "n": 5
+    }
+   },
+   "topk_whole_b2048_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 1.2574,
+     "sd": 0.0026,
+     "n": 5
+    }
+   },
+   "topp_partial_b128_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.3428,
+     "sd": 0.0116,
+     "n": 5
+    }
+   },
+   "topp_partial_b128_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.3288,
+     "sd": 0.0085,
+     "n": 5
+    }
+   },
+   "topp_partial_b16_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.2886,
+     "sd": 0.0098,
+     "n": 5
+    }
+   },
+   "topp_partial_b16_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.3062,
+     "sd": 0.013,
+     "n": 5
+    }
+   },
+   "topp_partial_b1_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.0724,
+     "sd": 0.0236,
+     "n": 5
+    }
+   },
+   "topp_partial_b1_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.0892,
+     "sd": 0.0265,
+     "n": 5
+    }
+   },
+   "topp_partial_b2048_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 4.3734,
+     "sd": 0.0083,
+     "n": 5
+    }
+   },
+   "topp_partial_b2048_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 4.489,
+     "sd": 0.0221,
+     "n": 5
+    }
+   },
+   "topp_whole_b128_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.6386,
+     "sd": 0.0038,
+     "n": 5
+    }
+   },
+   "topp_whole_b128_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.6186,
+     "sd": 0.005,
+     "n": 5
+    }
+   },
+   "topp_whole_b16_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.2844,
+     "sd": 0.0049,
+     "n": 5
+    }
+   },
+   "topp_whole_b16_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.3236,
+     "sd": 0.0413,
+     "n": 5
+    }
+   },
+   "topp_whole_b1_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.2722,
+     "sd": 0.0156,
+     "n": 5
+    }
+   },
+   "topp_whole_b1_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 0.2924,
+     "sd": 0.0043,
+     "n": 5
+    }
+   },
+   "topp_whole_b2048_v131072": {
+    "unit": "ms",
+    "gold": {
+     "mean": 8.5438,
+     "sd": 0.0308,
+     "n": 5
+    }
+   },
+   "topp_whole_b2048_v32768": {
+    "unit": "ms",
+    "gold": {
+     "mean": 8.9244,
+     "sd": 0.0529,
+     "n": 5
+    }
+   }
+  },
+  "pytorch_ref": {
+   "topk_whole_b1_v32768": {
+    "mean": 0.2596,
+    "sd": 0.0941,
+    "n": 5
+   },
+   "topk_partial_b1_v32768": {
+    "mean": 0.2766,
+    "sd": 0.0943,
+    "n": 5
+   },
+   "topp_whole_b1_v32768": {
+    "mean": 0.3418,
+    "sd": 0.1086,
+    "n": 5
+   },
+   "topp_partial_b1_v32768": {
+    "mean": 0.2706,
+    "sd": 0.0951,
+    "n": 5
+   },
+   "topk_topp_whole_b1_v32768": {
+    "mean": 0.3992,
+    "sd": 0.1681,
+    "n": 5
+   },
+   "mixed_partial_b1_v32768": {
+    "mean": 0.3984,
+    "sd": 0.1569,
+    "n": 5
+   },
+   "topk_whole_b16_v32768": {
+    "mean": 1.2936,
+    "sd": 0.1189,
+    "n": 5
+   },
+   "topk_partial_b16_v32768": {
+    "mean": 1.236,
+    "sd": 0.0111,
+    "n": 5
+   },
+   "topp_whole_b16_v32768": {
+    "mean": 1.2468,
+    "sd": 0.0609,
+    "n": 5
+   },
+   "topp_partial_b16_v32768": {
+    "mean": 1.2758,
+    "sd": 0.0163,
+    "n": 5
+   },
+   "topk_topp_whole_b16_v32768": {
+    "mean": 1.3732,
+    "sd": 0.0681,
+    "n": 5
+   },
+   "mixed_partial_b16_v32768": {
+    "mean": 1.3516,
+    "sd": 0.0142,
+    "n": 5
+   },
+   "topk_whole_b128_v32768": {
+    "mean": 1.302,
+    "sd": 0.3511,
+    "n": 5
+   },
+   "topk_partial_b128_v32768": {
+    "mean": 1.149,
+    "sd": 0.0072,
+    "n": 5
+   },
+   "topp_whole_b128_v32768": {
+    "mean": 1.24,
+    "sd": 0.0136,
+    "n": 5
+   },
+   "topp_partial_b128_v32768": {
+    "mean": 1.2272,
+    "sd": 0.0066,
+    "n": 5
+   },
+   "topk_topp_whole_b128_v32768": {
+    "mean": 2.1132,
+    "sd": 0.0081,
+    "n": 5
+   },
+   "mixed_partial_b128_v32768": {
+    "mean": 2.098,
+    "sd": 0.0191,
+    "n": 5
+   },
+   "topk_whole_b2048_v32768": {
+    "mean": 20.4318,
+    "sd": 0.0197,
+    "n": 5
+   },
+   "topk_partial_b2048_v32768": {
+    "mean": 20.4182,
+    "sd": 0.0228,
+    "n": 5
+   },
+   "topp_whole_b2048_v32768": {
+    "mean": 22.017,
+    "sd": 0.0406,
+    "n": 5
+   },
+   "topp_partial_b2048_v32768": {
+    "mean": 21.9902,
+    "sd": 0.024,
+    "n": 5
+   },
+   "topk_topp_whole_b2048_v32768": {
+    "mean": 23.2142,
+    "sd": 0.0122,
+    "n": 5
+   },
+   "mixed_partial_b2048_v32768": {
+    "mean": 23.2188,
+    "sd": 0.0091,
+    "n": 5
+   },
+   "topk_whole_b1_v131072": {
+    "mean": 0.2988,
+    "sd": 0.0718,
+    "n": 5
+   },
+   "topk_partial_b1_v131072": {
+    "mean": 0.3256,
+    "sd": 0.1021,
+    "n": 5
+   },
+   "topp_whole_b1_v131072": {
+    "mean": 0.3322,
+    "sd": 0.1049,
+    "n": 5
+   },
+   "topp_partial_b1_v131072": {
+    "mean": 0.263,
+    "sd": 0.0164,
+    "n": 5
+   },
+   "topk_topp_whole_b1_v131072": {
+    "mean": 0.3906,
+    "sd": 0.0487,
+    "n": 5
+   },
+   "mixed_partial_b1_v131072": {
+    "mean": 0.461,
+    "sd": 0.1573,
+    "n": 5
+   },
+   "topk_whole_b16_v131072": {
+    "mean": 4.5176,
+    "sd": 1.4069,
+    "n": 5
+   },
+   "topk_partial_b16_v131072": {
+    "mean": 0.565,
+    "sd": 0.0042,
+    "n": 5
+   },
+   "topp_whole_b16_v131072": {
+    "mean": 0.9338,
+    "sd": 0.0699,
+    "n": 5
+   },
+   "topp_partial_b16_v131072": {
+    "mean": 0.8796,
+    "sd": 0.012,
+    "n": 5
+   },
+   "topk_topp_whole_b16_v131072": {
+    "mean": 6.45,
+    "sd": 0.9625,
+    "n": 5
+   },
+   "mixed_partial_b16_v131072": {
+    "mean": 0.7694,
+    "sd": 0.0124,
+    "n": 5
+   },
+   "topk_whole_b128_v131072": {
+    "mean": 5.0932,
+    "sd": 0.0145,
+    "n": 5
+   },
+   "topk_partial_b128_v131072": {
+    "mean": 5.0994,
+    "sd": 0.0137,
+    "n": 5
+   },
+   "topp_whole_b128_v131072": {
+    "mean": 5.57,
+    "sd": 0.0295,
+    "n": 5
+   },
+   "topp_partial_b128_v131072": {
+    "mean": 5.5888,
+    "sd": 0.071,
+    "n": 5
+   },
+   "topk_topp_whole_b128_v131072": {
+    "mean": 5.8762,
+    "sd": 0.0062,
+    "n": 5
+   },
+   "mixed_partial_b128_v131072": {
+    "mean": 5.8938,
+    "sd": 0.0206,
+    "n": 5
+   },
+   "topk_whole_b2048_v131072": {
+    "mean": 81.5568,
+    "sd": 0.0346,
+    "n": 5
+   },
+   "topk_partial_b2048_v131072": {
+    "mean": 81.5542,
+    "sd": 0.0573,
+    "n": 5
+   },
+   "topp_whole_b2048_v131072": {
+    "mean": 89.2988,
+    "sd": 0.0619,
+    "n": 5
+   },
+   "topp_partial_b2048_v131072": {
+    "mean": 89.228,
+    "sd": 0.0161,
+    "n": 5
+   },
+   "topk_topp_whole_b2048_v131072": {
+    "mean": 94.0016,
+    "sd": 0.0569,
+    "n": 5
+   },
+   "mixed_partial_b2048_v131072": {
+    "mean": 94.044,
+    "sd": 0.0348,
+    "n": 5
+   }
+  }
+ },
+ "logs": {
+  "base": {
+   "tests": {
+    "bytes": 2076,
+    "tail": "precationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n\n==================================== ERRORS ====================================\n__________ ERROR collecting tests/v1/sample/test_topk_topp_sampler.py __________\nImportError while importing test module '/t/tests/v1/sample/test_topk_topp_sampler.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/usr/lib/python3.10/importlib/__init__.py:126: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntests/v1/sample/test_topk_topp_sampler.py:8: in <module>\n    from vllm.v1.sample.ops.topk_topp_sampler import apply_top_k_top_p_pytorch\nE   ImportError: cannot import name 'apply_top_k_top_p_pytorch' from 'vllm.v1.sample.ops.topk_topp_sampler' (/usr/local/lib/python3.10/dist-packages/vllm/v1/sample/ops/topk_topp_sampler.py)\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nERROR tests/v1/sample/test_topk_topp_sampler.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 warning, 1 error in 0.78s\n"
+   },
+   "workload_runs": 1
+  },
+  "gold": {
+   "tests": {
+    "bytes": 1256,
+    "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n.s...................................................................... [ 80%]\n..................                                                       [100%]\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n89 passed, 1 skipped, 1 warning in 50.94s\n"
+   },
+   "workload_runs": 5
+  }
+ },
+ "ts": "2026-11-05T11:29:15Z"
+}
