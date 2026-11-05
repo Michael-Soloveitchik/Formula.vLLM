@@ -3639,6 +3639,92 @@
   "ts": "2026-11-05T00:00:00Z"
  },
  {
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "allpool_forward_median",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": 59.89,
+     "patch": 39.65
+    },
+    "arms": {
+     "base": {
+      "mean": 120.196,
+      "sd": 19.679,
+      "n": 5
+     },
+     "gold": {
+      "mean": 84.442,
+      "sd": 17.2932,
+      "n": 5
+     }
+    }
+   }
+  ],
+  "pr": 41163,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/41163",
+  "title": "[Perf] Optimize `AllPool.forward` by slicing first, 51% faster in the method level benchmark (#41163)",
+  "field": "gpu_kernels",
+  "reported_gain": "51%",
+  "gain_kind": "pct",
+  "base_sha": "b92ef9ec5a041b538f44d9584bef0e34bfbeecd1",
+  "merge_sha": "39a7f4f4e2635012ead0ad127970d7b6778890af",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.20.1",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "arms": {
+   "base": {
+    "tests": "PASS",
+    "slug": "base"
+   },
+   "gold": {
+    "tests": "PASS",
+    "slug": "gold"
+   }
+  },
+  "improved": true,
+  "latency": {
+   "scenarios": {
+    "allpool_forward_median": {
+     "unit": "us",
+     "base": {
+      "mean": 120.196,
+      "sd": 19.679,
+      "n": 5
+     },
+     "gold": {
+      "mean": 84.442,
+      "sd": 17.2932,
+      "n": 5
+     }
+    }
+   },
+   "pytorch_ref": {}
+  },
+  "logs": {
+   "base": {
+    "tests": {
+     "bytes": 2567,
+     "tail": "/models/language/pooling/test_token_classification.py:72\n  /t/tests/models/language/pooling/test_token_classification.py:72: PytestUnknownMarkWarning: Unknown pytest.mark.flaky - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.flaky(reruns=3)\n\ntests/models/language/pooling/test_token_classification.py: 14 warnings\n  /usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.\n    warnings.warn(\n\ntests/models/language/pooling/test_token_classification.py::test_modernbert_models[float-disham993/electrical-ner-ModernBERT-base]\n  /usr/local/lib/python3.10/dist-packages/torch/_inductor/compile_fx.py:322: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.\n    warnings.warn(\n\ntests/models/language/pooling/test_token_classification.py::test_auto_conversion[float-bd2lcco/Qwen3-0.6B-finetuned]\n  /usr/local/lib/python3.10/dist-packages/huggingface_hub/file_download.py:1727: DeprecationWarning: hf_xet.download_files() is deprecated. Use XetSession().new_file_download_group().start_download_file() instead.\n    xet_get(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n4 passed, 18 warnings in 149.94s (0:02:29)\n"
+    },
+    "workload_runs": 5
+   },
+   "gold": {
+    "tests": {
+     "bytes": 2221,
+     "tail": "=================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\ntests/models/language/pooling/test_token_classification.py:72\n  /t/tests/models/language/pooling/test_token_classification.py:72: PytestUnknownMarkWarning: Unknown pytest.mark.flaky - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.flaky(reruns=3)\n\ntests/models/language/pooling/test_token_classification.py: 14 warnings\n  /usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.\n    warnings.warn(\n\ntests/models/language/pooling/test_token_classification.py::test_modernbert_models[float-disham993/electrical-ner-ModernBERT-base]\n  /usr/local/lib/python3.10/dist-packages/torch/_inductor/compile_fx.py:322: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n4 passed, 17 warnings in 96.91s (0:01:36)\n"
+    },
+    "workload_runs": 5
+   }
+  },
+  "ts": "2026-11-05T11:35:51Z"
+ },
+ {
   "pr": 4118,
   "pr_url": "https://github.com/vllm-project/vllm/pull/4118",
   "title": "[Kernel][FP8] Initial support with dynamic per-tensor scaling (#4118)",
