@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>vLLM perf-benchmark · 202</title>
 <style>
- :root{--bg:#edf3ff;--panel:#fff;--panel2:#f2f6ff;--border:#dde6f5;--border2:#c9d6ec;
+ :root{--bg:#f4f8ff;--panel:#fff;--panel2:#f5f8ff;--border:#dde6f5;--border2:#c9d6ec;
   --fg:#172a5c;--mut:#5a6786;--faint:#98a2b8;--acc:#0b8ce8;--acc2:#1aa7ff;--cyan:#1aa7ff;--navy:#172a5c;
   --org:#ff9a1f;--yel:#ffc426;--grn:#1a9c5b;--red:#e5533f;--sel:#e8f3ff;
   --grad:linear-gradient(120deg,#1aa7ff,#0b8ce8 45%,#2457d8);
@@ -18,9 +18,9 @@
  *{box-sizing:border-box}
  html,body{height:100%}
  body{margin:0;font:13.5px/1.5 var(--ui);color:var(--fg);
-  background:radial-gradient(900px 520px at -5% -10%,#cfe5ff 0,transparent 60%),radial-gradient(900px 520px at 105% -10%,#d6ecff 0,transparent 55%),radial-gradient(800px 500px at 50% 110%,#dbe8ff 0,transparent 55%),var(--bg);
+  background:radial-gradient(900px 520px at -5% -10%,#e0efff 0,transparent 60%),radial-gradient(900px 520px at 105% -10%,#e4f3ff 0,transparent 55%),radial-gradient(800px 500px at 50% 110%,#e8f0ff 0,transparent 55%),var(--bg);
   background-attachment:fixed}
- header{background:linear-gradient(180deg,#f3f7ff,#e9f1ff);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);
+ header{background:linear-gradient(180deg,#f9fbff,#f1f6ff);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);
   color:var(--fg);padding:10px 26px 10px 16px;border-bottom:1px solid rgba(11,140,232,.14);box-shadow:0 6px 24px rgba(11,140,232,.08);
   display:flex;flex-direction:column;align-items:center;gap:4px;position:sticky;top:0;z-index:20}
  header::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--grad)}
@@ -41,7 +41,7 @@
  #app>*{min-width:0}
  /* ---- LEFT TREE PANE ---- */
  #left{border-right:1px solid var(--border);height:calc(100vh - var(--hh,180px));overflow:auto;position:sticky;top:var(--hh,180px);
-  background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(236,243,255,.7))}
+  background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(244,248,255,.75))}
  #left .lh{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);padding:12px 14px 4px}
  #left .lsearch{padding:0 12px 10px;border-bottom:1px solid var(--border)}
  #left .lsearch input{width:100%;background:var(--panel);border:1px solid var(--border2);border-radius:9px;padding:7px 10px;font:13px var(--ui);color:var(--fg)}
