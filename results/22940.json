@@ -1,0 +1,77 @@
+{
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "throughput_output_tok_s",
+   "unit": "tok/s",
+   "workload": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 2000 --dtype float16",
+   "reported": {
+    "pct": 2.07,
+    "comparable": false,
+    "scale_short": "author: 30000 prompts on H100-class GPU; ours: 2000 prompts on RTX 5070 Ti",
+    "scale_note": "Author reported +2.07% end-to-end throughput at 30000 prompts; we run 2000 prompts per repeat on an RTX 5070 Ti. Ratio is the comparable quantity, not absolute tok/s."
+   },
+   "arms": {}
+  },
+  {
+   "name": "throughput_total_tok_s",
+   "unit": "tok/s",
+   "workload": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 2000 --dtype float16",
+   "reported": null,
+   "arms": {}
+  },
+  {
+   "name": "throughput_req_s",
+   "unit": "tok/s",
+   "workload": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 2000 --dtype float16",
+   "reported": null,
+   "arms": {}
+  }
+ ],
+ "pr": 22940,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/22940",
+ "title": "[Core] direct indexing on self.block_table_np in compute_slot_mapping (#22940)",
+ "field": "kv_cache",
+ "reported_gain": "2.07%",
+ "gain_kind": "pct",
+ "base_sha": "df5afa82e5c41be7d87ddd1968e13891d22003a7",
+ "merge_sha": "6e670778cdd87c282c42002a2304cb0a4a165904",
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.10.1",
+  "workload_cmd": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 2000 --dtype float16",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "FAIL",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "FAIL",
+   "slug": "gold"
+  }
+ },
+ "improved": false,
+ "latency": {
+  "scenarios": {},
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {
+   "tests": {
+    "bytes": 1463,
+    "tail": "ImportError while loading conftest '/t/tests/conftest.py'.\ntests/conftest.py:20: in <module>\n    from tests.models.utils import (TokensTextLogprobs,\ntests/models/utils.py:12: in <module>\n    from vllm.config import ModelConfig, ModelDType, RunnerOption\n/usr/local/lib/python3.10/dist-packages/vllm/config/__init__.py:36: in <module>\n    from vllm.config.parallel import DistributedExecutorBackend, ParallelConfig\n/usr/local/lib/python3.10/dist-packages/vllm/config/parallel.py:17: in <module>\n    from vllm.platforms import current_platform\n/usr/local/lib/python3.10/dist-packages/vllm/platforms/__init__.py:12: in <module>\n    from .interface import _Backend  # noqa: F401\n/usr/local/lib/python3.10/dist-packages/vllm/platforms/interface.py:16: in <module>\n    from vllm.inputs import ProcessorInputs, PromptType\n/usr/local/lib/python3.10/dist-packages/vllm/inputs/__init__.py:10: in <module>\n    from .registry import (DummyData, InputContext, InputProcessingContext,\n/usr/local/lib/python3.10/dist-packages/vllm/inputs/registry.py:8: in <module>\n    from transformers import BatchFeature, PretrainedConfig, ProcessorMixin\n/usr/local/lib/python3.10/dist-packages/transformers/utils/import_utils.py:2688: in __getattr__\n    raise ModuleNotFoundError(import_error_message) from e\nE   ModuleNotFoundError: Could not import module 'ProcessorMixin'. Are this object's requirements defined correctly? Set the logging verbosity to DEBUG for the original import error.\n"
+   },
+   "workload_runs": 1
+  },
+  "gold": {
+   "tests": {
+    "bytes": 1463,
+    "tail": "ImportError while loading conftest '/t/tests/conftest.py'.\ntests/conftest.py:20: in <module>\n    from tests.models.utils import (TokensTextLogprobs,\ntests/models/utils.py:12: in <module>\n    from vllm.config import ModelConfig, ModelDType, RunnerOption\n/usr/local/lib/python3.10/dist-packages/vllm/config/__init__.py:36: in <module>\n    from vllm.config.parallel import DistributedExecutorBackend, ParallelConfig\n/usr/local/lib/python3.10/dist-packages/vllm/config/parallel.py:17: in <module>\n    from vllm.platforms import current_platform\n/usr/local/lib/python3.10/dist-packages/vllm/platforms/__init__.py:12: in <module>\n    from .interface import _Backend  # noqa: F401\n/usr/local/lib/python3.10/dist-packages/vllm/platforms/interface.py:16: in <module>\n    from vllm.inputs import ProcessorInputs, PromptType\n/usr/local/lib/python3.10/dist-packages/vllm/inputs/__init__.py:10: in <module>\n    from .registry import (DummyData, InputContext, InputProcessingContext,\n/usr/local/lib/python3.10/dist-packages/vllm/inputs/registry.py:8: in <module>\n    from transformers import BatchFeature, PretrainedConfig, ProcessorMixin\n/usr/local/lib/python3.10/dist-packages/transformers/utils/import_utils.py:2688: in __getattr__\n    raise ModuleNotFoundError(import_error_message) from e\nE   ModuleNotFoundError: Could not import module 'ProcessorMixin'. Are this object's requirements defined correctly? Set the logging verbosity to DEBUG for the original import error.\n"
+   },
+   "workload_runs": 1
+  }
+ },
+ "ts": "2026-11-05T11:36:10Z"
+}
