@@ -100,7 +100,13 @@
  .md strong{font-weight:700}
  .dsec{margin-top:12px;padding-top:10px;border-top:1px solid var(--border)}
  .dsec:first-of-type{border-top:none;padding-top:0;margin-top:10px}
- .dsecH{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:0 0 7px}
+ .dsecH{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:0 0 7px;cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}
+ .dsecH:hover{color:var(--acc)}
+ .fcaret{display:inline-block;transition:transform .18s;color:var(--acc);font-size:12px}
+ .dsec.folded .fcaret{transform:rotate(-90deg)}
+ .dsec.folded .dbody{display:none}
+ .dsec.folded .dsecH{margin-bottom:0}
+ .fhint{margin-left:auto;font-weight:500;text-transform:none;letter-spacing:0;color:var(--faint);font-size:10.5px}
  .detail .restab{margin-bottom:12px}
  .expH{font-size:14px;font-weight:700;margin:8px 0 4px;display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
  .expH .eu{font-family:var(--mono);font-size:10px;color:var(--acc);font-weight:600}
@@ -511,6 +517,11 @@ function harnessTable(res){
 }
 
 // ---------- PR DETAIL PANEL (challenge results TOP · PR info BOTTOM) ----------
+// fold state of the two detail sections, remembered per browser
+let FOLD={results:false,info:false};
+try{FOLD=Object.assign(FOLD,JSON.parse(localStorage.getItem('fvllm.fold')||'{}'));}catch(e){}
+function toggleSec(h){const sec=h.parentElement; sec.classList.toggle('folded');
+ FOLD[sec.dataset.k]=sec.classList.contains('folded'); try{localStorage.setItem('fvllm.fold',JSON.stringify(FOLD));}catch(e){}}
 async function showPR(pr){
  SEL=pr; render(); window.scrollTo({top:0,behavior:'smooth'});
  const r=IDX.find(x=>x.pr===pr)||{pr}, res=RES[pr];
@@ -527,15 +538,15 @@ async function showPR(pr){
    · <a href="${url}" target="_blank">GitHub PR #${pr}</a>
    · reported: ${esc(r.reported_gain||'—')}</div>
   <!-- TOP: challenge results with harnesses -->
-  <div class="dsec">
-   <div class="dsecH">challenge results · baseline (measured) = 1.00× reference · <span style="color:#2563eb">measured=our run</span> · <span style="color:#d97706">reported=PR author</span></div>
-   ${harnessTable(res)}
-   ${arms?`<div class="meta" style="margin-top:4px">tests: ${arms}</div>`:''}
+  <div class="dsec${FOLD.results?' folded':''}" data-k="results">
+   <div class="dsecH" onclick="toggleSec(this)"><span class="fcaret">▾</span>challenge results · baseline (measured) = 1.00× reference · <span style="color:#0b8ce8">measured=our run</span> · <span style="color:#b97a00">reported=PR author</span></div>
+   <div class="dbody">${harnessTable(res)}
+   ${arms?`<div class="meta" style="margin-top:4px">tests: ${arms}</div>`:''}</div>
   </div>
   <!-- BOTTOM: PR info -->
-  <div class="dsec">
-   <div class="dsecH">PR info · base ${esc((r.base_sha||'').slice(0,10))} → merge ${esc((r.merge_sha||'').slice(0,10))}</div>
-   <div class="md" id="mdbody"><span class="muted">loading detail…</span></div>
+  <div class="dsec${FOLD.info?' folded':''}" data-k="info">
+   <div class="dsecH" onclick="toggleSec(this)"><span class="fcaret">▾</span>PR info · base ${esc((r.base_sha||'').slice(0,10))} → merge ${esc((r.merge_sha||'').slice(0,10))} <span class="fhint">click to fold / unfold</span></div>
+   <div class="dbody"><div class="md" id="mdbody"><span class="muted">loading detail…</span></div></div>
   </div>
  </div>`;
  const p=mdPath(pr);
