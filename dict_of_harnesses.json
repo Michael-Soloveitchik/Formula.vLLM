@@ -1,10 +1,10 @@
 {
- "_doc": "Single source of truth for solver harnesses. run_one.sh reads this via conf.py (conf.py falls back to config.yaml:solvers only if this file is absent). Each entry: key = the arm name shown in the dashboard (MUST match web/index.html HARNESSES). guided=false -> objective has the '## Expert solution' section STRIPPED (blind FormulaCode: discover the optimization). guided=true -> full problem.md incl. the expert's merged patch, asked to beat it. The runner invokes:  <cmd> \"<objective>\"  inside a copy of the base_sha tree; the command edits ./vllm and exits.",
+ "_doc": "Single source of truth for solver harnesses. run_one.sh reads this via conf.py (conf.py falls back to config.yaml:solvers only if this file is absent). Each entry: key = the arm name shown in the dashboard (MUST match web/index.html HARNESSES). guided=false -> objective has the '## Expert solution' section STRIPPED (blind FormulaCode: discover the optimization). guided=true -> full problem.md incl. the expert's merged patch, asked to beat it. The runner invokes:  <cmd> \"<objective>\"  inside a copy of the base_sha tree; the command edits ./vllm and exits. NOTE: claude's --allowedTools is variadic, so `-p` must be the LAST token of cmd: the runner appends \"<objective>\" and it becomes -p's argument.",
  "harnesses": [
   {
    "key": "claude",
    "model": "claude-fable-5-1",
-   "cmd": "claude -p --model claude-fable-5-1 --permission-mode acceptEdits --allowedTools \"Read,Edit,Write,Glob,Grep,Bash(python3:*),Bash(python:*)\"",
+   "cmd": "claude --model claude-fable-5-1 --permission-mode acceptEdits --allowedTools \"Read,Edit,Write,Glob,Grep,Bash(python3:*),Bash(python:*)\" -p",
    "guided": false,
    "enabled": true,
    "env": []
@@ -12,7 +12,7 @@
   {
    "key": "claude + PR's solution",
    "model": "claude-fable-5-1",
-   "cmd": "claude -p --model claude-fable-5-1 --permission-mode acceptEdits --allowedTools \"Read,Edit,Write,Glob,Grep,Bash(python3:*),Bash(python:*)\"",
+   "cmd": "claude --model claude-fable-5-1 --permission-mode acceptEdits --allowedTools \"Read,Edit,Write,Glob,Grep,Bash(python3:*),Bash(python:*)\" -p",
    "guided": true,
    "enabled": true,
    "env": []

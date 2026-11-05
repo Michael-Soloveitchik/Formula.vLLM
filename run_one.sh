@@ -208,7 +208,7 @@ while IFS=$'\t' read -r HN MODEL CMD GUIDED; do
   cp -a "$WORK/base_full/." "$SDIR/"
   if [ "${GUIDED:-0}" = "1" ]; then THIS_OBJ="$OBJ"; mode=guided; else THIS_OBJ="$OBJ_BLIND"; mode=blind; fi
   say "solver $HN ($MODEL $mode): $CMD"
-  ( cd "$SDIR" && eval "$CMD \"\$THIS_OBJ\"" ) >"$WORK/solve_$SLUG.log" 2>&1 \
+  ( cd "$SDIR" && eval "$CMD \"\$THIS_OBJ\"" </dev/null ) >"$WORK/solve_$SLUG.log" 2>&1 \
     || say "solver $HN exited nonzero (see $WORK/solve_$SLUG.log)"
   ( cd "$SDIR" && diff -ru "$WORK/base_full/vllm" vllm >"$WORK/solve_$SLUG.patch" ) || true
   R=$(run_arm "$SLUG" "$SDIR" || echo FAIL)
