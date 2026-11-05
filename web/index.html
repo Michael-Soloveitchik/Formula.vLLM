@@ -313,6 +313,20 @@ async function boot(){
  $('#cSolved').textContent=IDX.filter(r=>isSolved(r.pr)).length;
  buildTree();
  render();
+ setInterval(refreshResults,60000);   // live: pick up new results/all.json without a reload
+}
+let LAST_ALL='';
+async function refreshResults(){
+ try{
+  const txt=await fetch('../results/all.json',{cache:'no-store'}).then(r=>r.ok?r.text():'');
+  if(!txt||txt===LAST_ALL) return;
+  LAST_ALL=txt; const all=JSON.parse(txt);
+  RES={}; all.forEach(r=>RES[r.pr]=r);
+  $('#cRun').textContent=IDX.filter(r=>isRun(r.pr)).length;
+  $('#cSolved').textContent=IDX.filter(r=>isSolved(r.pr)).length;
+  buildTree(); render();
+  if(SEL!=null&&$('#detailWrap').innerHTML) showPR(SEL);
+ }catch(e){}
 }
 function fmt(x,d=3){return (x==null||isNaN(x))?'—':(+x).toFixed(d)}
 function statusOf(pr){const r=RES[pr]; if(!r)return 'pending'; return r.improved?'improved':'not'}
