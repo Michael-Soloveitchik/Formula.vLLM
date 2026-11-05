@@ -22,6 +22,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *a, **kw):
         super().__init__(*a, directory=HERE, **kw)
 
+    def log_message(self, fmt, *args):   # include User-Agent so link-preview crawlers are visible
+        ua = self.headers.get("User-Agent", "-") if hasattr(self, "headers") else "-"
+        sys.stderr.write("%s - [%s] %s  UA=%s\n" % (self.address_string(), self.log_date_time_string(), fmt % args, ua[:80]))
+
     def end_headers(self):
         self.send_header("Cache-Control", "no-store")
         super().end_headers()
