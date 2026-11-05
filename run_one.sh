@@ -33,6 +33,9 @@ GPU="${GPU_FLAG:---gpus all}"
 WORK="$HERE/.work/pr_${PR}"
 TASK="$HERE/tasks/pr_${PR}"
 REPEATS="${REPEATS:-$(python3 conf.py get measure.repeats)}"; REPEATS="${REPEATS:-5}"
+SOLVER_TIMEOUT="${SOLVER_TIMEOUT:-15m}"   # hard cap per solver arm (claude -p / codex exec)
+KEEP_WORK="${KEEP_WORK:-0}"             # 1 = reuse existing .work/pr_<n> refs (base/gold logs), run solvers only
+# RUN_SOLVERS=0 -> measure base/gold only (fast numbers first); run solvers later with KEEP_WORK=1
 
 say(){ echo "[$PR] $*"; }
 die(){ echo "[$PR] ERROR: $*" >&2; exit 1; }
@@ -110,6 +113,9 @@ fi
 preflight
 say "mode=$MODE base=$BASE merge=$MERGE wheel=${WHEEL:--} engine=$ENGINE repeats=$REPEATS"
 
+if [ "$KEEP_WORK" = 1 ] && [ -f "$WORK/arms.json" ]; then
+  say "KEEP_WORK=1: reusing refs in $WORK (skipping checkout/build/base+gold measurement)"
+else
 rm -rf "$WORK"; mkdir -p "$WORK/base_full" "$WORK/gold_full"
 if [ "$MODE" = wheel ]; then
   # 2. build (one image per task: wheel + both PR trees cloned inside). The
@@ -135,6 +141,7 @@ else
     --build-arg SRC_DIR=".work/pr_${PR}/base_full" \
     --build-arg PRETEND_VERSION="$VER" .
 fi
+fi  # KEEP_WORK (checkout/build)
 
 # ---- in-container prelude: swap the arm's .py tree over the installed vllm --
 # Wipes the wheel's own .py files first so a file the arm tree lacks (e.g. a
@@ -185,12 +192,22 @@ run_workload() {
   done
 }
 
+if [ "$KEEP_WORK" = 1 ] && [ -f "$WORK/arms.json" ]; then
+  say "KEEP_WORK=1: refs already measured ($(ls "$WORK" | grep -c "^wl_") workload logs)"
+else
 say "tests: ${TESTS:-<none-known>}"
 BASE_RES=$(run_arm base "$WORK/base_full" || echo FAIL)
 GOLD_RES=$(run_arm gold "$WORK/gold_full" || echo FAIL)
 say "base=$BASE_RES gold=$GOLD_RES"
 run_workload base "$WORK/base_full"
 run_workload gold "$WORK/gold_full"
+# arms.json is the running ledger record.py folds into results/<pr>.json
+python3 - "$WORK/arms.json" "$BASE_RES" "$GOLD_RES" <<'PY'
+import json,sys
+json.dump({"base":{"tests":sys.argv[2],"slug":"base"},"gold":{"tests":sys.argv[3],"slug":"gold"}},open(sys.argv[1],"w"),indent=1)
+PY
+python3 record.py "$PR"          # measured base/gold numbers are live on the dashboard from here on
+fi  # KEEP_WORK (refs)
 
 # blind objective = problem.md with the "## Expert solution" section removed
 OBJ_BLIND="$(printf '%s\n' "$OBJ" | awk '
@@ -200,6 +217,7 @@ OBJ_BLIND="$(printf '%s\n' "$OBJ" | awk '
 
 # 5. solvers: each starts from the base tree, edits ./vllm via `cmd + objective`.
 SOLVERS=""; ARMS="base gold"
+if [ "${RUN_SOLVERS:-1}" = 1 ]; then
 while IFS=$'\t' read -r HN MODEL CMD GUIDED; do
   [ -n "${HN:-}" ] || continue
   SLUG=$(printf '%s' "$HN" | tr -c 'A-Za-z0-9._-' '_')
@@ -208,71 +226,20 @@ while IFS=$'\t' read -r HN MODEL CMD GUIDED; do
   cp -a "$WORK/base_full/." "$SDIR/"
   if [ "${GUIDED:-0}" = "1" ]; then THIS_OBJ="$OBJ"; mode=guided; else THIS_OBJ="$OBJ_BLIND"; mode=blind; fi
   say "solver $HN ($MODEL $mode): $CMD"
-  ( cd "$SDIR" && eval "$CMD \"\$THIS_OBJ\"" </dev/null ) >"$WORK/solve_$SLUG.log" 2>&1 \
-    || say "solver $HN exited nonzero (see $WORK/solve_$SLUG.log)"
+  rm -f "$WORK"/wl_"$SLUG"_*.log "$WORK/test_$SLUG.log"
+  ( cd "$SDIR" && eval "timeout -k 30s $SOLVER_TIMEOUT $CMD \"\$THIS_OBJ\"" </dev/null ) >"$WORK/solve_$SLUG.log" 2>&1 \
+    || say "solver $HN exited nonzero/timeout $SOLVER_TIMEOUT (see $WORK/solve_$SLUG.log)"
   ( cd "$SDIR" && diff -ru "$WORK/base_full/vllm" vllm >"$WORK/solve_$SLUG.patch" ) || true
   R=$(run_arm "$SLUG" "$SDIR" || echo FAIL)
-  say "solver $HN tests=$R"
+  say "solver $HN tests=$R patch=$(wc -c <"$WORK/solve_$SLUG.patch")B"
   run_workload "$SLUG" "$SDIR"
-  SOLVERS="$SOLVERS$HN:$R:$SLUG"$'\t'; ARMS="$ARMS $SLUG"
-done < <(python3 conf.py solvers)
-
-# 6. record + fold measured latency
-LAT_JSON=""
-if [ -n "$WL_CMD" ]; then
-  LAT_JSON=$(python3 parse_workload.py "$WORK" $ARMS)
-elif [ -f "$TASK/results_measured.json" ]; then
-  LAT_JSON=$(cat "$TASK/results_measured.json")
-fi
-LAT_JSON="$LAT_JSON" python3 - "$PR" "$BASE" "$MERGE" "$BASE_RES" "$GOLD_RES" "$SOLVERS" "$TASK" "$MODE" "$WHEEL" "$WL_CMD" <<'PY'
-import json,sys,os,time
-pr,base,merge,bres,gres,solvers,task,mode,wheel,wl=sys.argv[1:11]
-idx={x['pr']:x for x in json.load(open('index.json'))}[int(pr)]
-arms={"base":{"tests":bres,"slug":"base"},"gold":{"tests":gres,"slug":"gold"}}
-for tok in solvers.split('\t'):
-    tok=tok.strip()
-    if tok.count(':')>=2:
-        n,r,slug=tok.rsplit(':',2); arms[n]={"tests":r,"slug":slug}
-lat=os.environ.get("LAT_JSON") or ""
-latency=json.loads(lat) if lat.strip() else None
-experiments=None
-if latency and "scenarios" in latency:   # re-key arm slugs -> dashboard arm names
-    slug2name={v["slug"]:k for k,v in arms.items()}
-    for s,d in latency["scenarios"].items():
-        latency["scenarios"][s]={slug2name.get(k,k):v for k,v in d.items()}   # keeps the "unit" key
-    # experiments_v2 for web/index.html: one table per scenario. Scenarios the
-    # task metadata names come first (with the author's reported numbers);
-    # every other measured scenario follows with reported=null.
-    try: meta=json.load(open(os.path.join(task,"metadata.json")))
-    except Exception: meta={}
-    listed=meta.get("experiments") or []
-    names=[e["name"] for e in listed]+[s for s in latency["scenarios"] if s not in {e["name"] for e in listed}]
-    rep_by={e["name"]:e.get("reported") for e in listed}
-    pyref=latency.get("pytorch_ref") or {}
-    experiments=[]
-    for n in names:
-        a=dict(latency["scenarios"].get(n,{}))
-        unit=a.pop("unit",None) or (meta.get("workload") or {}).get("unit") or "ms"
-        note=None
-        if "base" not in a and n in pyref:   # base tree can't run the script (PR introduces it)
-            a["base"]=pyref[n]; note=(meta.get("workload") or {}).get("base_note") or "base = script's PyTorch column"
-        e={"name":n,"unit":unit,"workload":wl,"reported":rep_by.get(n),"arms":a}
-        if note: e["note"]=note
-        experiments.append(e)
-out={
-  "schema":"experiments_v2" if experiments is not None else None,
-  "experiments":experiments,
-  "pr":int(pr),
-  "pr_url":f"https://github.com/vllm-project/vllm/pull/{pr}",
-  "title":idx.get("title"),"field":idx.get("field"),
-  "reported_gain":idx.get("reported_gain"),"gain_kind":idx.get("gain_kind"),
-  "base_sha":base,"merge_sha":merge,
-  "image":{"mode":mode,"wheel":wheel or None,"workload_cmd":wl or None,"repeats":int(os.environ.get("REPEATS","5"))},
-  "arms":arms,
-  "improved": gres=="PASS" and bres=="FAIL",
-  "latency":latency,
-  "ts":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),
-}
-json.dump(out,open(f"results/{pr}.json","w"),indent=1)
-print("wrote results/%s.json improved=%s"%(pr,out["improved"]))
+  python3 - "$WORK/arms.json" "$HN" "$R" "$SLUG" <<'PY'
+import json,sys
+d=json.load(open(sys.argv[1])); d[sys.argv[2]]={"tests":sys.argv[3],"slug":sys.argv[4]}; json.dump(d,open(sys.argv[1],"w"),indent=1)
 PY
+  python3 record.py "$PR"        # dashboard gets this arm right away
+done < <(python3 conf.py solvers)
+else say "RUN_SOLVERS=0: refs only"; fi
+
+# 6. results: record.py already wrote results/<pr>.json after refs and after each solver arm
+say "done -> results/$PR.json"

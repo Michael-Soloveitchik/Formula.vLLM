@@ -36,10 +36,5 @@ for PR in $PRS; do
   bash "$HERE/run_one.sh" "$PR" || echo "PR $PR failed, continuing"
 done
 
-python3 -c "
-import json,glob
-agg=[json.load(open(f)) for f in sorted(glob.glob('results/*.json')) if 'all.json' not in f]
-json.dump(agg,open('results/all.json','w'),indent=1)
-print('wrote results/all.json:',len(agg),'prs')
-"
+python3 aggregate.py
 echo 'run ./serve.sh then open http://localhost:8000/web/ (live reads results/all.json)'
