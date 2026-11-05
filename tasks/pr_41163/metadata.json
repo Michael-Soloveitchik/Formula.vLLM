@@ -12,7 +12,9 @@
  "source_files": [
   "vllm/model_executor/layers/pooler/tokwise/methods.py"
  ],
- "test_files": [],
+ "test_files": [
+  "tests/models/language/pooling/test_token_classification.py"
+ ],
  "wheel": "0.20.1",
  "wheel_note": "first PyPI release after merge (2026-05-04 > 2026-04-29); torch 2.11 cu128 wheel runs on sm_120.",
  "workload": {
@@ -39,5 +41,6 @@
    }
   }
  ],
- "experiments_note": "reported = PR body (us, median of the author's benchmark on their GPU)"
+ "experiments_note": "reported = PR body (us, median of the author's benchmark on their GPU)",
+ "test_note": "PR says 'covered in current CI'; test_token_classification.py exercises the token-wise pooler (AllPool) end-to-end on a small HF model (downloads into the shared HF cache). Perf-only PR: base and gold both expected PASS."
 }

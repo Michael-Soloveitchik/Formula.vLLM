@@ -12,7 +12,9 @@
  "source_files": [
   "vllm/v1/worker/block_table.py"
  ],
- "test_files": [],
+ "test_files": [
+  "tests/v1/worker/test_gpu_input_batch.py"
+ ],
  "wheel": "0.10.1",
  "wheel_note": "first PyPI release after merge (2025-08-19 > 2025-08-15); torch 2.7.1 cu128 wheel runs on sm_120.",
  "workload": {
@@ -50,5 +52,6 @@
    "reported": null
   }
  ],
- "experiments_note": "reported pct = author's end-to-end throughput gain; dashboard applies it to our measured baseline"
+ "experiments_note": "reported pct = author's end-to-end throughput gain; dashboard applies it to our measured baseline",
+ "test_note": "PR changed only block_table.py; test_gpu_input_batch.py builds BlockTable/InputBatch and checks slot mappings. Perf-only PR: base and gold both expected PASS."
 }
