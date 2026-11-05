@@ -1,13 +1,13 @@
 <p align="center"><img src="web/shots/logo_banner.png" alt="Formula.vLLM" width="820"></p>
 <p align="center">
-<a href="https://station-wsl-michael.taila4786c.ts.net:10000/formula/web/"><img src="https://img.shields.io/badge/dashboard-live-0b8ce8?style=for-the-badge&labelColor=172a5c" alt="live dashboard"></a>
+<a href="https://station-wsl-michael.taila4786c.ts.net/formula/web/"><img src="https://img.shields.io/badge/dashboard-live-0b8ce8?style=for-the-badge&labelColor=172a5c" alt="live dashboard"></a>
 <img src="https://img.shields.io/badge/PRs-202-ffc426?style=for-the-badge&labelColor=172a5c" alt="202 PRs">
 <img src="https://img.shields.io/badge/isolation-FormulaCode--style-1aa7ff?style=for-the-badge&labelColor=172a5c" alt="FormulaCode-style">
 <img src="https://img.shields.io/badge/GPU-RTX%205070%20Ti%20sm__120-0b8ce8?style=for-the-badge&labelColor=172a5c" alt="GPU">
 </p>
 
 <h3 align="center">202 real vLLM perf PRs, each a benchmark task. Did the PR's speedup reproduce?</h3>
-<p align="center">Live dashboard: <a href="https://station-wsl-michael.taila4786c.ts.net:10000/formula/web/">station-wsl-michael.taila4786c.ts.net:10000/formula/web/</a></p>
+<p align="center">Live dashboard: <a href="https://station-wsl-michael.taila4786c.ts.net/formula/web/">station-wsl-michael.taila4786c.ts.net:10000/formula/web/</a></p>
 
 ![dashboard](web/shots/dashboard_wide.png)
 
@@ -83,6 +83,6 @@ legacy source mode.
 ### <img src="web/shots/h/dashboard.svg" height="40" alt="Public dashboard (this GPU box)">
 
 `formula-dashboard.service` runs `serve.py` on :8000; Tailscale Funnel mounts it at
-`https://station-wsl-michael.taila4786c.ts.net:10000/formula/web/`
+`https://station-wsl-michael.taila4786c.ts.net/formula/web/`
 (`tailscale funnel --bg --https=10000 --set-path /formula http://127.0.0.1:8000`).
 `data/area.json` (`gen_area.py`) keeps the first paint small over the slow Funnel link.
