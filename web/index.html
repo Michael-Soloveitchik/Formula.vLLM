@@ -261,7 +261,7 @@
    <select id="status"><option value="">all</option><option value="improved">improved</option><option value="not">not improved</option><option value="pending">pending</option></select>
   </div>
   <div class="grid" id="grid"></div>
-  <footer>live: reads <code>index.json</code> + <code>results/all.json</code> · reload to refresh</footer>
+  <footer>live: reads <code>index.json</code> + <code>results/&lt;pr&gt;.json</code> per PR (manifest) · auto-refresh every 60 s</footer>
  </div>
 </div>
 <script>
@@ -283,8 +283,7 @@ async function boot(){
  const setHH=()=>document.documentElement.style.setProperty('--hh',document.querySelector('header').offsetHeight+'px');
  setHH(); window.addEventListener('resize',setHH); document.querySelector('header img').addEventListener('load',setHH);
  IDX=await fetch('../index.json',no).then(r=>r.json()).catch(()=>[]);
- const all=await fetch('../results/all.json',no).then(r=>r.json()).catch(()=>[]);
- RES={}; all.forEach(r=>RES[r.pr]=r);
+ RES=await loadResults();
  // pr -> {field, area} map (needed to construct md paths). data/area.json is the
  // compact 202-PR subset (~20 KB, built by gen_area.py); the full crawl jsonl
  // (~10 MB) is only a fallback and is fetched AFTER first render so a slow link
@@ -315,13 +314,32 @@ async function boot(){
  render();
  setInterval(refreshResults,60000);   // live: pick up new results/all.json without a reload
 }
-let LAST_ALL='';
+// Results are read PER PR: results/manifest.json lists the PR ids that have a
+// results/<pr>.json (written by aggregate.py); each file is fetched directly, in
+// parallel. results/all.json is only the fallback when the manifest is missing.
+async function loadResults(){
+ const no={cache:'no-store'};
+ const man=await fetch('../results/manifest.json',no).then(r=>r.ok?r.json():null).catch(()=>null);
+ const out={};
+ if(man&&Array.isArray(man.prs)){
+  const rows=await Promise.all(man.prs.map(pr=>fetch(`../results/${pr}.json`,no).then(r=>r.ok?r.json():null).catch(()=>null)));
+  rows.forEach(r=>{if(r&&r.pr!=null) out[r.pr]=r;});
+  return out;
+ }
+ const all=await fetch('../results/all.json',no).then(r=>r.ok?r.json():[]).catch(()=>[]);
+ all.forEach(r=>out[r.pr]=r); return out;
+}
+async function loadOne(pr){   // fresh read of one PR's own results file
+ try{const r=await fetch(`../results/${pr}.json`,{cache:'no-store'}); if(r.ok){const j=await r.json(); if(j&&j.pr!=null) RES[j.pr]=j; return j;}}catch(e){}
+ return RES[pr];
+}
+let LAST_SIG='';
 async function refreshResults(){
  try{
-  const txt=await fetch('../results/all.json',{cache:'no-store'}).then(r=>r.ok?r.text():'');
-  if(!txt||txt===LAST_ALL) return;
-  LAST_ALL=txt; const all=JSON.parse(txt);
-  RES={}; all.forEach(r=>RES[r.pr]=r);
+  const fresh=await loadResults();
+  const sig=JSON.stringify(Object.keys(fresh).sort().map(k=>[k,fresh[k].ts||'',Object.keys(fresh[k].arms||{}).length]));
+  if(sig===LAST_SIG) return;
+  LAST_SIG=sig; RES=fresh;
   $('#cRun').textContent=IDX.filter(r=>isRun(r.pr)).length;
   $('#cSolved').textContent=IDX.filter(r=>isSolved(r.pr)).length;
   buildTree(); render();
@@ -555,7 +573,7 @@ try{FOLD=Object.assign(FOLD,JSON.parse(localStorage.getItem('fvllm.fold')||'{}')
 function toggleSec(h){const sec=h.parentElement; sec.classList.toggle('folded');
  FOLD[sec.dataset.k]=sec.classList.contains('folded'); try{localStorage.setItem('fvllm.fold',JSON.stringify(FOLD));}catch(e){}}
 async function showPR(pr){
- SEL=pr; render(); window.scrollTo({top:0,behavior:'smooth'});
+ SEL=pr; await loadOne(pr); render(); window.scrollTo({top:0,behavior:'smooth'});
  const r=IDX.find(x=>x.pr===pr)||{pr}, res=RES[pr];
  const D=$('#detailWrap');
  const url='https://github.com/vllm-project/vllm/pull/'+pr;

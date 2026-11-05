@@ -42,13 +42,16 @@ def atomic_write_json(path, obj):
 def rebuild_locked():
     agg = []
     for f in sorted(glob.glob(os.path.join(RES, "*.json"))):
-        if os.path.basename(f) == "all.json" or os.path.basename(f).startswith(".tmp-"):
+        if os.path.basename(f) in ("all.json", "manifest.json") or os.path.basename(f).startswith(".tmp-"):
             continue
         try:
             agg.append(json.load(open(f)))
         except ValueError:
             print(f"skip unreadable {f}", file=sys.stderr)
     atomic_write_json(os.path.join(RES, "all.json"), agg)
+    # tiny index for the web: it fetches results/<pr>.json per PR from this list
+    atomic_write_json(os.path.join(RES, "manifest.json"),
+                      {"prs": sorted(int(x["pr"]) for x in agg if "pr" in x)})
     return len(agg)
 
 
