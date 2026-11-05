@@ -1,0 +1,39 @@
+{
+ "pr": 3985,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/3985",
+ "title": "[Core][Model] torch.compile for layernorm in commandr",
+ "field": "scheduling",
+ "reported_gain": "5%",
+ "base_sha": "67b4221a61ace91a79aff507df0a95a01978300e",
+ "merge_sha": "caada5e50aa16cd5f59bd7889128a83588ca1f99",
+ "arms": {
+  "base": {
+   "tests": "PASS"
+  },
+  "gold": {
+   "tests": "PASS"
+  }
+ },
+ "improved": true,
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "commandr_layernorm_latency",
+   "unit": "s",
+   "workload": "CohereForAI/c4ai-command-r-v01, tp=4, benchmark_latency.py default batch-size=8 on GPU; avg decode latency per run.",
+   "needs": "gpu",
+   "note": "Diff extracts commandr LayerNorm math into a standalone @torch.compile layer_norm_func so torch compiles it once instead of recompiling whenever self changes. Number source: PR body batch-size=8 avg latency 2.9004 s -> 2.7343 s (~5% latency improvement; throughput 3290.22 -> 3463.78 tok/s consistent).",
+   "reported": {
+    "base": 2.9004,
+    "patch": 2.7343,
+    "comparable": false,
+    "scope": "full command-r forward-pass avg latency at tp=4 batch=8, not the isolated layernorm op the diff compiles",
+    "scale_short": "Author's latency is the whole command-r decode step; the diff only compiles the layernorm function. TO MAKE 1:1: microbench the isolated layer_norm_func on a command-r-shaped hidden-state tensor, base eager vs compiled.",
+    "scale_note": "SAME unit (s) but 2.9004 -> 2.7343 s is the whole-model avg decode latency (tp=4, batch=8), dominated by attention and MLP; the ~5% reflects the layernorm compile win diluted across the full step. Direction genuine; absolute seconds are whole-step, not the isolated layernorm op."
+   },
+   "arms": {}
+  }
+ ],
+ "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
+ "ts": "2026-11-05T00:00:00Z"
+}

@@ -1,0 +1,23 @@
+{
+ "pr": 4118,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/4118",
+ "title": "[Kernel][FP8] Initial support with dynamic per-tensor scaling (#4118)",
+ "field": "quantization",
+ "reported_gain": "N/A (enabling PR; author's own numbers show FP8 SLOWER than BF16: 1.47s->1.66s E2E, TTFT 28.8->38.8ms. No speedup achieved yet; this PR adds the FP8 path to unblock follow-up optimizations.)",
+ "base_sha": "682789d4026429a04cc32acb88064265441080dd",
+ "merge_sha": "a22cdea371bb26b4bdba112d4602736b48ca4a3a",
+ "arms": {
+  "base": {
+   "tests": "PASS"
+  },
+  "gold": {
+   "tests": "PASS"
+  }
+ },
+ "improved": false,
+ "schema": "experiments_v2",
+ "note": "Initial FP8 (dynamic per-tensor scaling) enablement: loads FP16/BF16 checkpoints, quantizes weights to FP8 post-load, computes activation scales each forward pass. Enabled via --quantization fp8. The author's own measurements show FP8 is currently SLOWER than BF16 (Mistral-7B 1xH100: BF16 1.47s vs FP8 1.66s; comaniac's run: FP16 TTFT 28.8ms / ITL 8.5ms vs FP8 38.8ms / 10.2ms) because activation quantization adds large overhead. The author explicitly states 'we haven't achieved a decent performance with this FP8 support' and merges it to unblock follow-up optimizations. There is therefore no speedup gain to record; the eventual 2x-class FP8 wins land in later kernel PRs, not here. No timing experiment.",
+ "experiments": [],
+ "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
+ "ts": "2026-11-05T00:00:00Z"
+}

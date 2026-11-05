@@ -1,0 +1,39 @@
+{
+ "pr": 6865,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/6865",
+ "title": "[core][misc] improve free_finished_seq_groups",
+ "field": "scheduling",
+ "reported_gain": "40%",
+ "base_sha": "d7a299edaa5d23f3d7d5c98b53872a8ced9aad80",
+ "merge_sha": "6ca8031e7130f810ce7248286754a60044f65c73",
+ "arms": {
+  "base": {
+   "tests": "PASS"
+  },
+  "gold": {
+   "tests": "PASS"
+  }
+ },
+ "improved": true,
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "free_finished_seq_groups_throughput",
+   "unit": "req/s",
+   "workload": "facebook/opt-125m offline batch, benchmark_throughput.py input-len 16 output-len 16 num-prompts 100000; scheduler's free_finished_seq_groups is on the critical path every model step.",
+   "needs": "cpu",
+   "note": "Diff rewrites free_finished_seq_groups (scheduler.py) to scan only the running deque instead of iterating running+swapped+waiting every step, so finished-request detection no longer walks the full 100k-prompt backlog. Number source: PR body opt-125m 100k-prompt throughput 211.18 -> 522.91 req/s (slowdown vs 10k cut to ~40%).",
+   "reported": {
+    "base": 211.18,
+    "patch": 522.91,
+    "comparable": false,
+    "scope": "full offline-batch serving throughput with 100k pending prompts on a tiny model where scheduler overhead dominates, not the isolated free_finished_seq_groups call",
+    "scale_short": "Author's req/s is whole-engine offline-batch throughput with a 100k-prompt backlog; the diff speeds up one scheduler scan. TO MAKE 1:1: microbench free_finished_seq_groups alone with a large running+waiting queue, old full-queue scan vs running-only scan.",
+    "scale_note": "SAME unit (req/s) but 211.18 -> 522.91 is end-to-end benchmark_throughput on opt-125m with 100k prompts, where the scheduler's per-step full-queue scan dominated; on small backlogs the gain vanishes. The headline '40%' is the reduced slowdown going 10k->100k prompts, not a flat per-call ratio. Direction genuine; magnitude is backlog-size dependent."
+   },
+   "arms": {}
+  }
+ ],
+ "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
+ "ts": "2026-11-05T00:00:00Z"
+}

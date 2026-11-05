@@ -1,0 +1,39 @@
+{
+ "pr": 11870,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/11870",
+ "title": "[perf]fix current stream (#11870)",
+ "field": "parallelism",
+ "reported_gain": "3% (2.9457s->2.8516s avg latency)",
+ "base_sha": "a732900efc4eb0d4393e3885d5df8ef3516d4834",
+ "merge_sha": "310aca88c984983189a57f1b72e3b1dde89fb92f",
+ "arms": {
+  "base": {
+   "tests": "PASS"
+  },
+  "gold": {
+   "tests": "PASS"
+  }
+ },
+ "improved": true,
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "current_stream_lookup",
+   "unit": "s",
+   "workload": "benchmark_latency.py on Meta-Llama-3-70B, --load-format dummy --enforce-eager -tp 4; avg end-to-end decode latency over the run.",
+   "needs": "gpu",
+   "note": "diff replaces torch.cuda.current_stream() with vllm.utils.current_stream() in pynccl.py (all_reduce/all_gather/reduce_scatter/send/recv warmup paths), caching the stream to avoid the per-call CUDA stream query overhead. Numbers from PR body: main 2.945735s vs this PR 2.851607s avg latency.",
+   "reported": {
+    "base": 2.945735,
+    "patch": 2.851607,
+    "comparable": false,
+    "scope": "full E2E avg decode latency of a 70B tp=4 serving run; the fixed op is a per-call CUDA stream lookup inside every NCCL collective, a tiny fraction of that latency.",
+    "scale_short": "Author's number is whole-run E2E latency (~3%); our isolated op is just the stream lookup. TO MAKE 1:1: microbench the current_stream() call path (cached vs torch.cuda.current_stream()) in isolation, or reproduce the full 70B tp=4 benchmark_latency run on 4 GPUs.",
+    "scale_note": "Requires 4 GPUs and NCCL; the 3% is diluted across the entire decode loop, so an isolated stream-lookup microbench will show a far larger ratio on the op itself but a negligible absolute delta. Direction (lower latency) is genuine."
+   },
+   "arms": {}
+  }
+ ],
+ "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
+ "ts": "2026-11-05T00:00:00Z"
+}

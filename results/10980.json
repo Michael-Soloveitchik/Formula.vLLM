@@ -1,0 +1,23 @@
+{
+ "pr": 10980,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/10980",
+ "title": "[V1] V1 engine implements parallel sampling (AsyncLLM and LLMEngine)",
+ "field": "decoding_tpot",
+ "reported_gain": "N/A (feature PR adding n>1 support; no speedup benchmark published)",
+ "base_sha": "444b0f0f62989246abe115f0b24d2ba289612b23",
+ "merge_sha": "befc402d34c2563477ff33bfdd9548ae20a42acd",
+ "arms": {
+  "base": {
+   "tests": "PASS"
+  },
+  "gold": {
+   "tests": "PASS"
+  }
+ },
+ "improved": true,
+ "schema": "experiments_v2",
+ "note": "Feature PR: adds parallel sampling (n>1) to the V1 AsyncLLM and LLMEngine by branching a parent request into n child n=1 requests and aggregating their outputs (new vllm/v1/engine/parallel_sampling.py plus async_llm/llm_engine wrappers). It enables a capability, not an optimization, and the body/comments publish no before/after timings. The only ratio in the thread is a '3x throughput regression' attributed to the OLD V0 PR #9302, which this PR is meant to avoid (V1 relies on default prefix caching to dedup the shared prompt); that is a qualitative claim about a different PR, not a measured speedup here. No speedup experiment applies, so experiments is empty.",
+ "experiments": [],
+ "environment": "reported-only: no author speedup numbers (feature PR); no measured arm applicable",
+ "ts": "2026-11-05T00:00:00Z"
+}

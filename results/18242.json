@@ -1,0 +1,39 @@
+{
+ "pr": 18242,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/18242",
+ "title": "[V1][P/D] An native implementation of xPyD based on P2P NCCL (#18242)",
+ "field": "parallelism",
+ "reported_gain": "82% ITL P99 (127ms->23.1ms, 1P1D vs vLLM)",
+ "base_sha": "5f52a846850a3aed258e3a95bbea8fcaeb39d725",
+ "merge_sha": "eccdc8318c50ad3e2adfaaf99d714a8dccc6ab16",
+ "arms": {
+  "base": {
+   "tests": "PASS"
+  },
+  "gold": {
+   "tests": "PASS"
+  }
+ },
+ "improved": true,
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "intertoken_latency_p99",
+   "unit": "ms",
+   "workload": "Scenario 2 (1K input, 200 output tokens, E2E P99 latency ~4s): 1P1D on 2xA800 vs single-instance vLLM on 1xA800, Qwen model, random-input-len 1024 / random-output-len 1024 serving benchmark measuring ITL (P99).",
+   "needs": "gpu",
+   "note": "diff adds the P2P NCCL xPyD KV-transfer connector (p2p_nccl_connector.py, p2p_nccl_engine.py, tensor_memory_pool.py) that disaggregates prefill/decode so decode is not stalled by prefill. The headline 127ms->23.1ms is ITL (P99), the inter-token latency, from the PR body's Scenario 2 test data (not TTFT; TTFT actually rises 160->227ms as the disagg tradeoff).",
+   "reported": {
+    "base": 127,
+    "patch": 23.1,
+    "comparable": false,
+    "scope": "P99 inter-token latency of a disaggregated 1P1D (2xA800) serving run vs a single aggregated vLLM instance (1xA800); the gain comes from removing prefill-decode interference across two GPUs, not from an isolated op.",
+    "scale_short": "Author compares a 2-GPU disaggregated topology against a 1-GPU aggregated one. TO MAKE 1:1: stand up the full 1P1D xPyD proxy + two A800 instances and a matched single-instance baseline, then run the serving benchmark measuring ITL P99.",
+    "scale_note": "Multi-GPU disaggregated serving topology (proxy/router + P instance + D instance over NCCL); not reproducible on a single CPU/arm box. The 82% ITL drop is paid for by higher TTFT (160->227ms) and extra hardware (2x A800). Direction (lower ITL) is genuine for the disagg setup."
+   },
+   "arms": {}
+  }
+ ],
+ "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
+ "ts": "2026-11-05T00:00:00Z"
+}

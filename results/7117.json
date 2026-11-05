@@ -1,0 +1,39 @@
+{
+ "pr": 7117,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/7117",
+ "title": "[core][misc] simply output processing with shortcut code path",
+ "field": "scheduling",
+ "reported_gain": "1.5%",
+ "base_sha": "9fadc7b7a03f798036d0e8710587870e13bae759",
+ "merge_sha": "83c644fe7ecee05d3ebe5057acb6e008d7e81eb8",
+ "arms": {
+  "base": {
+   "tests": "PASS"
+  },
+  "gold": {
+   "tests": "PASS"
+  }
+ },
+ "improved": true,
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "output_processing_shortcut_throughput",
+   "unit": "req/s",
+   "workload": "meta-llama/Meta-Llama-3-8B on H100, benchmark_throughput.py input-len 256 output-len 256; mean of 3 trials.",
+   "needs": "cpu",
+   "note": "Diff adds an n==1 and not use_beam_search shortcut in _process_sequence_group_outputs (single_step.py) that appends the single token, detokenizes, stop-checks and frees inline, skipping the general child-sequence/beam machinery. Number source: comment trials main mean ~24.24 -> PR mean ~24.62 req/s (~1.5%).",
+   "reported": {
+    "base": 24.24,
+    "patch": 24.62,
+    "comparable": false,
+    "scope": "end-to-end Llama-3-8B serving throughput (GPU-bound), where the CPU output-processing shortcut the diff adds is a tiny fraction of per-step time",
+    "scale_short": "Author's req/s is whole-model Llama-3-8B serving; the diff only shortcuts the CPU output-processing path. TO MAKE 1:1: microbench _process_sequence_group_outputs alone for the n==1 non-beam case, general path vs shortcut, on CPU.",
+    "scale_note": "SAME unit (req/s) but 24.24 -> 24.62 is GPU-bound E2E Llama-3-8B throughput; the output-processing shortcut is a CPU-path win nearly hidden by model compute, hence only ~1.5%. Isolated on CPU the relative savings of skipping the child-seq/beam machinery is larger. Direction genuine; magnitude diluted by GPU work."
+   },
+   "arms": {}
+  }
+ ],
+ "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
+ "ts": "2026-11-05T00:00:00Z"
+}

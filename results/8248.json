@@ -1,0 +1,39 @@
+{
+ "pr": 8248,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/8248",
+ "title": "[Kernel] [Triton] Memory optimization for awq_gemm and awq_dequantize, 2x throughput",
+ "field": "gpu_kernels",
+ "reported_gain": "2x (13351 -> 27783 tok/s)",
+ "base_sha": "1447c97e753919709b613590d7267c93d07d9382",
+ "merge_sha": "9db52eab3dc0b7b2cf30fa4399d569131e90c2d4",
+ "arms": {
+  "base": {
+   "tests": "PASS"
+  },
+  "gold": {
+   "tests": "PASS"
+  }
+ },
+ "improved": true,
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "awq_triton_dequantize_gemm",
+   "unit": "tok/s",
+   "workload": "Author ran benchmarks/benchmark_throughput.py --input-len 2048 --output-len 128 --quantization awq --model Qwen/Qwen2-7B-Instruct-AWQ, measuring end-to-end serving throughput of the AWQ Triton path before vs after the kernel memory optimization.",
+   "needs": "gpu",
+   "note": "Diff rewrites awq_dequantize_kernel and awq_gemm_kernel to load each packed 4-bit weight/zero element ONCE then expand via tl.interleave/tl.broadcast_to, instead of re-loading with //8 index arithmetic (BLOCK_SIZE_X*8 offsets). This cuts redundant memory loads. Number source: PR body throughput table - AWQ Triton no-opt 13351.06 tok/s, with-opt 27783.36 tok/s (also 6.14 -> 12.77 req/s); ~2x, beating the AWQ CUDA path (25049 tok/s).",
+   "reported": {
+    "base": 13351.06,
+    "patch": 27783.36,
+    "comparable": false,
+    "scope": "end-to-end benchmark_throughput.py serving run (Qwen2-7B-Instruct-AWQ, in 2048 / out 128) on GPU, so the number includes attention, sampling and scheduling, not only the two AWQ kernels",
+    "scale_short": "Author's 13351->27783 tok/s is whole-pipeline serving throughput on GPU; our microbench isolates only awq_dequantize/awq_gemm and cannot run Triton CUDA kernels on CPU. TO MAKE 1:1: on a CUDA box, time just awq_dequantize_kernel + awq_gemm_kernel on a fixed weight tile and report kernel tok/s or us/call, isolating them from the rest of the serving loop.",
+    "scale_note": "The ~2x is real for the AWQ Triton path and even overtakes the hand-written AWQ CUDA kernel, but it is reported as E2E serving throughput, so the isolated-kernel ratio will differ. The kernels are Triton/CUDA-only and not reproducible on our arm CPU microbench; direction and rough magnitude are genuine."
+   },
+   "arms": {}
+  }
+ ],
+ "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
+ "ts": "2026-11-05T00:00:00Z"
+}

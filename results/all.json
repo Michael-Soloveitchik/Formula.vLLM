@@ -1,1 +1,1682 @@
-{"6779":{"pr":6779,"pr_url":"https://github.com/vllm-project/vllm/pull/6779","title":"[Core] Use array to speedup padding (#6779)","field":"decoding_tpot","reported_gain":"18%","base_sha":"084a01fd3544557990f8af8af6fd3c1185bae848","merge_sha":"89a84b0bb7b30706a02836234a94493ea8f780bf","arms":{"base":{"tests":"FAIL"},"gold":{"tests":"PASS"}},"improved":true,"schema":"experiments_v2","experiments":[{"name":"make_tensor_with_pad","unit":"ms","workload":"SamplingTensors padding-input prep + 2x make_tensor_with_pad (prompt+output), input_len=1024, batch_size=2048, pad=vocab_size(32000), dtype=int64, device=cpu; 1 warmup, 5 timed repeats","note":"FINDING: PR #6779 does NOT touch make_tensor_with_pad; that fn is BYTE-IDENTICAL at base and gold (already the np.full/make_ndarray_with_pad array path). The real change is the INPUT fed to it inside SamplingTensors.from_sampling_metadata/from_lists: base builds List[List[int]] via list(seq_data.prompt_token_ids) (tuple->list copies); gold passes seq_data.prompt_token_ids_array (array('l')) directly, SequenceData now storing tokens as array. Benchmark loads the REAL unmodified make_tensor_with_pad from each mounted tree by source (vllm import chain needs the absent _custom_ops C ext) and replicates the exact per-arm prep path. speedup_x = mean of per-run base/gold ratios.","reported":{"base":79,"patch":22,"scope":"PR microbench of the FULL from_sampling_metadata / SamplingTensors.from_lists build (NVTX-profiled), input_len=1024 batch=2048 -> 79->22ms (~3.6x)","comparable":false,"scale_short":"We isolate only the token-store+pad sub-op; author timed the whole metadata build. TO MAKE 1:1: widen our bench to the full from_sampling_metadata build.","scale_note":"SAME unit (ms) but NOT 1:1. The PR does NOT optimize make_tensor_with_pad (byte-identical across arms); the real change is SequenceData storing tokens as array.array('l') so from_sampling_metadata appends arrays directly instead of list(...) copies. Author's 79->22ms (3.6x) is the WHOLE sampler-metadata build stage; our 54.7->2.7ms (20x) isolates just the token-store+pad sub-op the array change accelerates. TO MAKE SAME ENCLOSING SCOPE: time the full from_sampling_metadata build (not just the pad sub-op) so our ratio converges toward the author's 3.6x. E2E (separate arm) is the headline the author/reviewer agreed on: ~18.9%."},"arms":{"base":{"mean":54.6725,"sd":3.4126,"runs":[61.469011,53.007991,52.754865,53.525083,52.605456]},"gold":{"mean":2.725,"sd":0.2186,"runs":[3.160982,2.601602,2.626848,2.639047,2.596544],"speedup_x":20.089,"speedup_sd":0.335,"counts":true}}},{"name":"e2e_qwen05b","unit":"it/s","workload":"end-to-end decode throughput, Qwen2-0.5B","note":"needs GPU model, reported-only","reported":{"base":24.76,"patch":29.44,"scope":"E2E Qwen-1.5-0.5B offline throughput (GPU)","comparable":false,"scale_note":"E2E it/s on GPU (24.76->29.44). NOT run here (CPU arm Mac). Row left as reported-only."},"arms":{}}],"environment":"docker vllm-cpu-bench:21222 (CPU torch 2.15.0+cpu, numpy 2.5.4), colima arm64 Mac; identical image for both arms, only vllm/ source tree differs; real make_tensor_with_pad loaded by source from each mounted tree","ts":"2026-11-04T00:00:00Z"},"13365":{"pr":13365,"pr_url":"https://github.com/vllm-project/vllm/pull/13365","title":"[V1][Spec Decode] Optimize N-gram matching with Numba (#13365)","field":"decoding_tpot","reported_gain":"30x, 2.5%","base_sha":"c8d70e2437feecdb3762ce17298df33439ae1bd1","merge_sha":"4c822298981a8f7521492075ff72659985fc4c3f","arms":{"base":{"tests":"FAIL"},"gold":{"tests":"PASS"}},"improved":true,"schema":"experiments_v2","experiments":[{"name":"ngram_match_overhead","unit":"s","workload":"5000 synthetic context sequences (len 200-800, vocab 32000), n-gram n=3, k=10; ~50% seeded with a plantable match. Cumulative NgramProposer.propose() time over the full 5000-seq pass; 5 repeats (gold warmed up once untimed to exclude JIT compile).","note":"PREFERRED approach: imported the standalone vllm/v1/spec_decode/ngram_proposer.py module directly from each mounted source tree (self-contained, only numpy/numba/typing deps) and timed .propose(). base=pure-python KMP loop; gold=numba @jit(nopython=True) kernels. runs = per-repeat cumulative seconds; speedup_x = mean of per-repeat base/gold ratios. numba not baked in image -> installed at runtime via pip (numba 0.68.1, arm64 wheel); worked.","reported":{"base":54.3,"patch":1.9,"scope":"cumulative over a full ShareGPT 5K-request E2E serving run (propose() called once per decode step per request = hundreds of thousands of calls)","comparable":false,"scale_note":"SAME unit (s) but NOT scale-comparable to our microbench. Our 'base' 0.257s is cumulative over 5000 single-sequence propose() calls; the PR's 54.3s is cumulative over a full ShareGPT 5K-REQUEST serving run (~200x more cumulative work; exact call count not derivable since per-call cost differs between synthetic and real token streams). Direction + ratio (ours 71x vs reported ~29x) are genuine; absolute seconds are not 1:1."},"arms":{"base":{"mean":0.256929,"sd":0.028241,"runs":[0.229843,0.224256,0.293397,0.251467,0.285683]},"gold":{"mean":0.003596,"sd":0.000005,"runs":[0.003587,0.003603,0.003593,0.003598,0.003598],"speedup_x":71.454,"speedup_sd":7.867,"counts":true}}}],"environment":"docker vllm-cpu-bench:21222 (python:3.12-slim + CPU torch arm64 wheel, numpy 2.5.4), colima arm64 Mac; identical image for both arms, only vllm/ source tree differs. numba NOT baked into image -> installed at runtime with `pip install numba` (numba 0.68.1, arm64 wheel) for the gold arm; base arm is pure-python and needs no numba. gold arm warmed up once (untimed) to exclude numba JIT compile from the steady-state timing.","ts":"2026-11-04T00:00:00Z"},"21222":{"pr":21222,"pr_url":"https://github.com/vllm-project/vllm/pull/21222","title":"[Core] Introduce popleft_n and append_n in FreeKVCacheBlockQueue to further optimize block_pool (#21222)","field":"kv_cache","reported_gain":"95% (0.15ms→0.008ms)","base_sha":"10904e6d755051260a7c3ce98659d8907c74caa9","merge_sha":"ed25054577f7abca2aee32a5290200c4a1aed561","arms":{"base":{"tests":"FAIL"},"gold":{"tests":"PASS"}},"improved":true,"schema":"experiments_v2","experiments":[{"name":"get_new_blocks","unit":"ms/op","workload":"block_pool sweep 10/50/100/500/1000 blocks, 1000 iters","note":"runs = per allocate-block size; speedup = mean of per-size base/gold ratios","reported":{"base":0.15,"patch":0.008,"scope":"per-op TRACE in a serving run","comparable":false,"scale_note":"PR gave TWO measurements from DIFFERENT harnesses: (1) engine 'benchmark scripts' on a GPU box, single aggregate per-op, 0.15ms->0.008ms (~19x, screenshots only); (2) benchmark_block_pool.py, which the author described only as 'cut in half' (~2x, no typed numbers). OUR bench IS benchmark_block_pool.py, so the ~2x claim is the right comparator (measured 1.83x = match). The 19x headline is the engine-script scope where fixed per-call python overhead dominates a GPU-fast path -- NOT reproducible on, nor scale-comparable to, a CPU linked-list microbench. Author never claimed benchmark_block_pool gives 19x."},"arms":{"base":{"mean":0.150956,"sd":0.172406,"runs":[0.004424,0.022943,0.043132,0.228052,0.456227]},"gold":{"mean":0.087743,"sd":0.097173,"runs":[0.00268,0.010689,0.020929,0.16115,0.243266],"speedup_x":1.83,"speedup_sd":0.268,"counts":true}}},{"name":"free_blocks","unit":"ms/op","workload":"block_pool sweep 10/50/100/500/1000 blocks, 1000 iters","note":"runs = per allocate-block size; speedup = mean of per-size base/gold ratios","reported":{"base":0.033,"patch":0.009,"scope":"per-op TRACE in a serving run","comparable":false,"scale_note":"Same as get_new_blocks: 33us->9us is the engine-script TRACE aggregate (GPU box), benchmark_block_pool is 'cut in half' ~2x (measured 1.71x = match). Our base free=0.101ms is NOT 3x the author's 33us 'baseline' -- it is the 500-block-size row average; the 33us is a single engine-aggregate per-call figure from a different harness. Harness mismatch, not a scale error. Pure-python linked-list pointer reduction (popleft_n/append_n), no GPU involved in the list logic."},"arms":{"base":{"mean":0.100668,"sd":0.115137,"runs":[0.002991,0.015285,0.028646,0.151623,0.304795]},"gold":{"mean":0.059619,"sd":0.066554,"runs":[0.00204,0.007899,0.015462,0.101475,0.171221],"speedup_x":1.706,"speedup_sd":0.191,"counts":true}}}],"environment":"docker python:3.12-slim, CPU torch (arm64 cpu wheel), colima arm64 Mac; identical image for both arms, only vllm/ source differs","ts":"2026-11-04T00:00:00Z"},"21281":{"pr":21281,"pr_url":"https://github.com/vllm-project/vllm/pull/21281","title":"[Core] Minimize number of dict lookup in _maybe_evict_cached_block (#21281)","field":"scheduling","base_sha":"e7b204268132cb775c139574c1ff4ad7e15c8f66","merge_sha":"af376ca19d4588b1d5ace72ffc0b4bbd778c15f2","reported_gain":"77% (0.13ms→0.03ms)","arms":{"base":{"tests":"FAIL"},"gold":{"tests":"PASS"}},"improved":true,"schema":"experiments_v2","experiments":[{"name":"allocate_new_block","unit":"ms/op","workload":"block_pool sweep 10/50/100/500/1000 blocks, 1000 iters (evict path)","note":"runs = per allocate-block size, median of 3 reps; speedup = mean of per-size base/gold ratios","reported":{"base":0.13,"patch":0.03,"scope":"per-call TRACE of allocate_new_block, measured on top of PR #21222","comparable":false,"workload_invalid":true,"scale_note":"WORKLOAD INVALID (measured 1.007x is meaningless, do not trust). The PR cuts 4->2 dict lookups of the same key in _maybe_evict_cached_block, but that body ONLY runs when block_hash is not None AND block_hash in cached_block_hash_to_block (a cached block being evicted). Our benchmark_block_pool sweep pulls free blocks with block_hash=None, so BOTH arms hit the membership-fail early-out and the 4->2 reduction never executes. FIX NEEDED: enable_caching=True; assign each test block a non-None block_hash; pre-populate cached_block_hash_to_block[block_hash]={block_id:block} so the membership HITS; loop _maybe_evict_cached_block on those cached blocks (re-insert each iter). Only then does base pay 4 same-key hashes vs gold's 2 -> expect ~2x isolated (author's 4.3x is a profiler trace delta on top of #21222, an upper bound incl. surrounding overhead). Author number 0.13->0.03ms published as prose, no input sizes."},"arms":{"base":{"mean":0.174353,"sd":0.216158,"runs":[0.003969,0.019962,0.048273,0.221984,0.577576]},"gold":{"mean":0.161171,"sd":0.184676,"runs":[0.003931,0.02218,0.046476,0.246428,0.48684],"speedup_x":1.007,"speedup_sd":0.106,"counts":true}}}],"environment":"docker python:3.12-slim cpu colima arm64 — identical image both arms, only vllm/ differs","ts":"2026-11-04T00:00:00Z"},"27793":{"pr":27793,"pr_url":"https://github.com/vllm-project/vllm/pull/27793","title":"[Core][Observability] Add KV cache residency metrics (#27793)","field":"scheduling","reported_gain":"N/A (observability feature; author claims <0.1% overhead/request at 1% sampling, not a speedup)","base_sha":"ec7035c9d40cda43fa9c3d2d1c148b1382aa04a4","merge_sha":"cabc77cc86586206134a19e3e70aa401ec30b71f","arms":{"base":{"tests":"FAIL"},"gold":{"tests":"PASS"}},"improved":true,"schema":"experiments_v2","experiments":[],"note":"OBSERVABILITY FEATURE, not a perf optimization. Title: '[Core][Observability] Add KV cache residency metrics'. Adds 3 Prometheus histograms (kv_block_lifetime/idle_before_evict/reuse_gap) behind --kv-cache-metrics flags (default 1% sampling) via new KVCacheMetricsCollector in block_pool hot paths (on_block_allocated/accessed/evicted), each guarded by `if self.metrics_collector:` so disabled=zero cost. The '0.1%' is the author's OVERHEAD ceiling (~365ns/block @1% sampling), NOT a gain. No base-vs-gold speedup exists; correctness-only is correct. If benchmarked, it would measure feature OVERHEAD (lower-is-better, inverted), not improvement.","environment":"n/a (correctness-only)","ts":"2026-11-04T00:00:00Z"},"29499":{"pr":29499,"pr_url":"https://github.com/vllm-project/vllm/pull/29499","title":"[EPLB] Optimize EPLB with numpy (#29499)","field":"parallelism","reported_gain":"27% (rearrange 1370->1077ms end-to-end); 20-25% per primitive","base_sha":"0ada960a20766fa1de9063576979f9d807583785","merge_sha":"6170d47d2220bc464fb561b93caf799a7560e304","arms":{"base":{"tests":"FAIL"},"gold":{"tests":"PASS"}},"improved":true,"schema":"experiments_v2","experiments":[{"name":"move_from_buffer","unit":"ms/op","workload":"per-rank mapping over 16 local experts (2048-slot cluster); 5 repeats x best-of-100","note":"inline-from-diff: exact duplicate-resolution mapping body copied verbatim from base_sha / merge_sha (tensor .copy_ excluded as arm-identical). per-rank body over num_local_experts=16 rows; numpy overhead dominates at this size so gold is slower. unit ms/op. speedup = mean of per-repeat base/gold ratios","reported":{"base":null,"patch":null,"pct":0.225,"comparable":false,"scale_note":"NOT CPU-REPRODUCIBLE. Headline is end-to-end rearrange 1370->1077ms (~27%); this primitive is in the separate '20-25% per primitive' claim (pct~0.225), no absolute ms pair. PRECISE mechanism: the numpy rewrite moved only the INDEX/MASK bookkeeping (np.isin/unique/lexsort/searchsorted) off GPU tensors; the tensor .copy_(non_blocking=True) transfers themselves are UNCHANGED across arms. Author's #1 bullet 'removes multiple gpu-cpu transfers in move_from_buffer' + preserve_intragpu_slots avoids memcopies -- a GPU-sync/transfer saving invisible on CPU. On CPU-only our microbench pays the numpy bookkeeping overhead with NO GPU-sync elision to offset it -> gold SLOWER (0.245x). Sub-1x contradicts no published number (author ran no CPU microbench); real gain is on the GPU path."},"arms":{"base":{"mean":0.00181,"sd":0.00005,"runs":[0.00185,0.001792,0.001866,0.001816,0.001724]},"gold":{"mean":0.008454,"sd":0.003279,"runs":[0.005669,0.005882,0.012448,0.012491,0.005782],"speedup_x":0.245,"speedup_sd":0.08,"counts":true}}},{"name":"get_ep_ranks_with_expert","unit":"ms/op","workload":"128 ranks x 16 local = 2048 physical slots, 256 logical experts; 5 repeats x best-of-100","note":"isolated import of real function from each tree. base loops get_ep_ranks_with_expert over all unique experts; gold makes one get_ep_ranks_with_experts_batch call. unit ms/op (whole-layer rank-map computation). speedup = mean of per-repeat base/gold ratios","reported":{"base":null,"patch":null,"pct":0.225,"comparable":false,"scale_note":"PR gives '20-25% on average for each primitive' (pct~0.225), no absolute pair. This is the ONE primitive that is pure-CPU and genuinely batchable: base loops get_ep_ranks_with_expert per-expert, gold does one batched call -> our 8.3x is a real CPU-reproducible win whose DIRECTION agrees with the PR, but the magnitude is not 1:1 with the PR's 20-25% because the PR's percent is diluted across the whole EPLB step (including GPU-transfer primitives). Absolute ms not comparable (no reported pair)."},"arms":{"base":{"mean":24.043582,"sd":0.559845,"runs":[24.96972,24.388491,23.435503,23.733472,23.690724]},"gold":{"mean":2.900953,"sd":0.032188,"runs":[2.862138,2.861013,2.929905,2.92577,2.92594],"speedup_x":8.291,"speedup_sd":0.282,"counts":true}}},{"name":"move_to_buffer","unit":"ms/op","workload":"per-rank mapping over 16 local experts (2048-slot cluster); 5 repeats x best-of-100","note":"inline-from-diff: exact index-mapping body copied verbatim from base_sha / merge_sha (P2P + .copy_ excluded as arm-identical). per-rank body over num_local_experts=16 rows; numpy overhead dominates at this size so gold is slower. unit ms/op. speedup = mean of per-repeat base/gold ratios","reported":{"base":null,"patch":null,"pct":0.225,"comparable":false,"scale_note":"GPU-TRANSFER-BOUND, NOT CPU-REPRODUCIBLE. Same as move_from_buffer: PR's '20-25% per primitive' (pct~0.225) is dominated by eliding GPU P2P + tensor .copy_ round-trips (arm-identical, excluded). The residual numpy index-mapping body over 16 local experts is too small for numpy to win -> gold SLOWER (0.659x) on CPU. Sub-1x is an isolation artifact, not a regression; the PR's real gain lives on the GPU-transfer path we cannot run here."},"arms":{"base":{"mean":0.026854,"sd":0.000414,"runs":[0.027419,0.02668,0.027144,0.026824,0.026203]},"gold":{"mean":0.040745,"sd":0.000316,"runs":[0.040228,0.041051,0.040838,0.041051,0.040555],"speedup_x":0.659,"speedup_sd":0.013,"counts":true}}}],"environment":"docker vllm-cpu-bench:21222 (python 3.12.16, numpy 2.5.4, torch 2.15.0+cpu), colima arm64 Mac; identical image for both arms, only vllm/ source tree differs (PYTHONPATH). get_ep_ranks_with_expert via isolated import of real function; move_to_buffer/move_from_buffer via inline-from-diff of the exact mapping body the PR changed (multi-rank process group + GPU P2P cannot run in a single CPU container; P2P/.copy_ are arm-identical and excluded)","ts":"2026-11-04T00:00:00Z"},"32975":{"pr":32975,"pr_url":"https://github.com/vllm-project/vllm/pull/32975","title":"[Perf] Optimize detokenizer python logic (#32975)","field":"scheduling","reported_gain":"1.628x, 38.57%","base_sha":"97fa8f65909d4d8f2eb0edc2137fb22f576a5b25","merge_sha":"e1060a71a1bb96103ce9ca98345184dcdc982467","arms":{"base":{"tests":"FAIL"},"gold":{"tests":"PASS"}},"improved":true,"schema":"experiments_v2","experiments":[{"name":"detokenize","unit":"us/tok","workload":"200 seqs x 2000 tokens; isolated SlowIncrementalDetokenizer per-token output-count check (slice vs tracked), 7 repeats","note":"approach=fallback (self-contained, both arms in ONE process on the same CPU, no cross-container noise). Reproduces the exact changed inner logic: base recomputes len(self.token_ids[self.prompt_len:]) per token (slice alloc), gold uses num_output_tokens()==len(token_ids)-prompt_len. speedup_x = mean of per-repeat base/gold ratios. NOTE: the real full detokenizer path was ALSO driven (PYTHONPATH=/src, real gpt2 tokenizer via transformers, real SlowIncrementalDetokenizer.update() loop, batched updates, long prompt); there the native tokenizer decode (~5us/tok) dominates and the slice removal is below run-to-run noise (real base ~5.36 us/tok vs gold ~6.39 us/tok, i.e. no measurable end-to-end gain). The isolated fallback below matches the PR's own reported methodology of timing the detokenizer PYTHON logic in isolation.","reported":{"base":0.03936,"patch":0.02418,"scope":"benchmark_detokenizer_min_tokens.py: 39.36 ns/token -> 24.18 ns/token (1.628x, -38.57%) -- but this benchmarks the min_tokens offset-accumulation loop that was REVERTED, not the merged change","comparable":false,"scale_note":"UNIT-BUG FIXED + SCOPE CAVEAT. Earlier this field held base=1.628/patch=1.0, pasting the SPEEDUP RATIO as an absolute us/tok value; real PR numbers are 39.36->24.18 ns/token = 0.03936->0.02418 us/tok. BUT the 1.628x is unrepresentative TWICE OVER: (1) the PR's benchmark_detokenizer_min_tokens.py times a synthetic pure-Python int/str accumulation loop (new_chars_len += len(piece) vs stop_check_offset += len(piece)) with NO tokenizer / NO update() / NO slice -- it measures the min_tokens stop_check_offset change, which was REVERTED (njhill 2026-02-06; only num_output_tokens was merged). (2) njhill noted the common case is 1 token/update where the change is MORE work, so the benchmark doesn't reflect production. Our microbench isolates the actually-merged num_output_tokens() slice-vs-count primitive (base ~1.33 us/tok, 11x). Direction agrees; the PR's 1.628x and our 11x measure different code and are not comparable."},"arms":{"base":{"mean":1.330579,"sd":0.012124,"runs":[1.322138,1.333397,1.322168,1.322721,1.320539,1.336379,1.356709]},"gold":{"mean":0.117099,"sd":0.000396,"runs":[0.117234,0.11725,0.116556,0.117155,0.116553,0.117773,0.117172],"speedup_x":11.362829,"speedup_sd":0.093282,"counts":true}}}],"environment":"docker vllm-cpu-bench:32975 (python:3.12-slim + CPU torch + transformers + gguf), PYTHONPATH=/src with per-arm vllm source tree mounted ro; colima arm64 Mac (aarch64), py 3.12.16; identical image for both arms, only vllm/ source differs","ts":"2026-11-04T00:00:00Z"},"33593":{"pr":33593,"pr_url":"https://github.com/vllm-project/vllm/pull/33593","title":"[Perf] Optimize Python Slice for Structured Output using `islice` instead of [:] (#33593)","field":"decoding_tpot","reported_gain":"0.5%","base_sha":"c38b8d5a317da356353a0a9ae1ab87f612267fb3","merge_sha":"9ce8fad2a9fe010ede46b085f6cb4099c8ec402d","arms":{"base":{"tests":"FAIL"},"gold":{"tests":"PASS"}},"improved":true,"schema":"experiments_v2","experiments":[{"name":"membership_present","unit":"s/call","workload":"SIZE=100_000, end-token at 10%% in; `tok not in input_ids[:-1]` vs `tok not in islice(input_ids,0,len-1)`; INNER=200 calls/block, 18 paired samples, best-of + mean±sd","note":"Real PR hot path (reasoning parser extract_content_ids). Marker present early -> islice short-circuits + copies nothing; list[:-1] copies all N first. Gold wins.","reported":{"base":0.0034,"patch":0.000001,"scope":"PR microbench 'create slice' on a 2,000,000-element list, N=1,000,000: list[:N] 0.003368s vs islice 0.000001s (materialization cost, NOT a membership test)","comparable":false,"scale_note":"DIFFERENT EXPERIMENT: the PR's 0.0034->1e-6 is pure list[:N] MATERIALIZATION (allocating the copy). Our membership_present measures the REAL hot-path idiom `tok not in islice(...)` which short-circuits -- a different operation. 3400x (the PR's alloc elision) is not the same quantity as our 2.31x (short-circuit membership). Honest: we measure the actual call site, the PR measured the underlying primitive in isolation."},"arms":{"base":{"mean":0.000358804,"sd":0.000046743,"runs":[0.000330733,0.000377697,0.000326645,0.000345245,0.000507789,0.000329285,0.000316241,0.000341058,0.000351174,0.000400607,0.000339538,0.000377984,0.000366388,0.000344082,0.000430289,0.00033626,0.000326537,0.000310923]},"gold":{"mean":0.000155275,"sd":0.000010947,"runs":[0.000159376,0.000169886,0.000143453,0.000149218,0.000163265,0.000155865,0.00016565,0.000155066,0.000146417,0.000169359,0.000145489,0.000183984,0.000145105,0.000150742,0.00015026,0.000152459,0.000144649,0.000144703],"speedup_x":2.3142,"speedup_sd":0.2775,"counts":true}}},{"name":"membership_absent","unit":"s/call","workload":"SIZE=100_000, end-token absent; same two idioms; INNER=200, 18 paired samples","note":"HONEST TRADEOFF: when the token is absent both scan all N, but list[:-1] is a C-level memcpy + C-level `in`, while islice yields through the Python iterator protocol per element. Gold is SLOWER here. Net PR win depends on how often reasoning has already ended (present case dominates in practice).","reported":{"base":0.0056,"patch":0.0047,"comparable":false,"scale_note":"CONSUMER DIFFERS. The PR's absent-case number comes from summing/materializing the whole slice (list[:-1] then consume all N); our membership_absent scans for a token that never occurs. Both are O(N) but list[:-1] is a C-level memcpy + C `in`, while islice yields per-element through the Python iterator protocol -> gold is SLOWER here (our 0.78x vs the PR's ~1.18x). Sign flips because the operation after the slice is not the same primitive. This is the honest tradeoff case: islice only wins when the marker is present (short-circuit), which dominates in practice."},"arms":{"base":{"mean":0.001291289,"sd":0.000529284,"runs":[0.001199808,0.001103488,0.001139905,0.001095942,0.001149443,0.001095101,0.001143228,0.001148784,0.00345858,0.001183188,0.001342441,0.001288587,0.001156719,0.00118306,0.001126867,0.00116652,0.001102764,0.001158777]},"gold":{"mean":0.001658282,"sd":0.000147542,"runs":[0.001612199,0.001790975,0.001551818,0.001517835,0.001523724,0.001485493,0.001909483,0.001542935,0.00170378,0.002030049,0.00167952,0.001712967,0.00149505,0.00150705,0.001802099,0.001664878,0.001622824,0.001696395],"speedup_x":0.7813,"speedup_sd":0.3093,"counts":true}}}],"environment":"docker python:3.12-slim cpu, colima arm64","ts":"2026-11-04T00:00:00Z"},"39328":{"pr":39328,"pr_url":"https://github.com/vllm-project/vllm/pull/39328","title":"[Core] Cache InductorPass.hash_source with functools.cache (#39328)","field":"gpu_kernels","reported_gain":"1.15x, 2.88x","base_sha":"304d5ba1a04b6cbfa2b5bd377c2a89d350a10921","merge_sha":"87805fa11ea6d9f9aa7a7fc92ac957c613bc2163","arms":{"base":{"tests":"FAIL"},"gold":{"tests":"PASS"}},"improved":true,"schema":"experiments_v2","experiments":[{"name":"cache_lookup","unit":"ms","workload":"InductorPass.hash_source repeated over 5 source objects, 10000 lookups/repeat, 5 repeats; per-call ms","note":"base = recompute inspect.getsource+sha256 each call; gold = functools.cache wrapped (cold miss then hits); speedup = mean of per-repeat base/gold ratios","reported":{"base":32.5,"patch":11.3,"scope":"ms per 'cache lookup' (PR body does not define granularity; likely per-uuid() computation -- inferred, not quoted)","comparable":false,"scale_note":"SAME unit (ms) but NOT scale-comparable. Reported 32.5->11.3ms is the PR's 'cache lookup time' whose scope the PR body does NOT specify (inferred to be per full uuid() computation over the pass classes). Our bench = ms per SINGLE hash_source() call (total_ms/n_lookups over 5 objects), so ~92x smaller. Ratio also differs (measured 354x vs reported 2.88x): our gold is a pure functools.cache HIT (trivial) vs base paying getsource+sha256 every call; the PR's 2.88x is diluted because uuid() does other non-cached work. Direction genuine; absolute ms and ratio not 1:1."},"arms":{"base":{"mean":0.354834,"sd":0.030611,"runs":[0.351354,0.366423,0.406632,0.319355,0.330404]},"gold":{"mean":0.001002,"sd":0.000985,"runs":[0.00048,0.0005,0.000491,0.00297,0.000567],"speedup_x":596.651,"speedup_sd":256.867,"counts":true}}},{"name":"cold_compile","unit":"s","workload":"full torch.compile cold compile (E2E)","note":"not reproducible on CPU arm Mac","reported":{"base":34.1,"patch":29.7},"arms":{}}],"environment":"docker python:3.12-slim cpu colima arm64","ts":"2026-11-04T00:00:00Z"}}
+[
+ {
+  "pr": 10980,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/10980",
+  "title": "[V1] V1 engine implements parallel sampling (AsyncLLM and LLMEngine)",
+  "field": "decoding_tpot",
+  "reported_gain": "N/A (feature PR adding n>1 support; no speedup benchmark published)",
+  "base_sha": "444b0f0f62989246abe115f0b24d2ba289612b23",
+  "merge_sha": "befc402d34c2563477ff33bfdd9548ae20a42acd",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "note": "Feature PR: adds parallel sampling (n>1) to the V1 AsyncLLM and LLMEngine by branching a parent request into n child n=1 requests and aggregating their outputs (new vllm/v1/engine/parallel_sampling.py plus async_llm/llm_engine wrappers). It enables a capability, not an optimization, and the body/comments publish no before/after timings. The only ratio in the thread is a '3x throughput regression' attributed to the OLD V0 PR #9302, which this PR is meant to avoid (V1 relies on default prefix caching to dedup the shared prompt); that is a qualitative claim about a different PR, not a measured speedup here. No speedup experiment applies, so experiments is empty.",
+  "experiments": [],
+  "environment": "reported-only: no author speedup numbers (feature PR); no measured arm applicable",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 11870,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/11870",
+  "title": "[perf]fix current stream (#11870)",
+  "field": "parallelism",
+  "reported_gain": "3% (2.9457s->2.8516s avg latency)",
+  "base_sha": "a732900efc4eb0d4393e3885d5df8ef3516d4834",
+  "merge_sha": "310aca88c984983189a57f1b72e3b1dde89fb92f",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "current_stream_lookup",
+    "unit": "s",
+    "workload": "benchmark_latency.py on Meta-Llama-3-70B, --load-format dummy --enforce-eager -tp 4; avg end-to-end decode latency over the run.",
+    "needs": "gpu",
+    "note": "diff replaces torch.cuda.current_stream() with vllm.utils.current_stream() in pynccl.py (all_reduce/all_gather/reduce_scatter/send/recv warmup paths), caching the stream to avoid the per-call CUDA stream query overhead. Numbers from PR body: main 2.945735s vs this PR 2.851607s avg latency.",
+    "reported": {
+     "base": 2.945735,
+     "patch": 2.851607,
+     "comparable": false,
+     "scope": "full E2E avg decode latency of a 70B tp=4 serving run; the fixed op is a per-call CUDA stream lookup inside every NCCL collective, a tiny fraction of that latency.",
+     "scale_short": "Author's number is whole-run E2E latency (~3%); our isolated op is just the stream lookup. TO MAKE 1:1: microbench the current_stream() call path (cached vs torch.cuda.current_stream()) in isolation, or reproduce the full 70B tp=4 benchmark_latency run on 4 GPUs.",
+     "scale_note": "Requires 4 GPUs and NCCL; the 3% is diluted across the entire decode loop, so an isolated stream-lookup microbench will show a far larger ratio on the op itself but a negligible absolute delta. Direction (lower latency) is genuine."
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 12368,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/12368",
+  "title": "[Core] add and implement `VLLM_LOGITS_PROCESSOR_THREADS` (#12368)",
+  "field": "decoding_tpot",
+  "reported_gain": "~10% tok/s & req/s",
+  "base_sha": "75e94309e8d8919e0daea041f6cd81a4b8c09060",
+  "merge_sha": "b3a0d01e4551118c735ee905c4ddc800ec603f24",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "logits_processor_threadpool",
+    "unit": "tok/s",
+    "workload": "Author's internal custom logits processor on GPU serving, request concurrency ~50, VLLM_LOGITS_PROCESSOR_THREADS=50; end-to-end tok/s and req/s with vs without the threadpool.",
+    "needs": "gpu",
+    "note": "Diff adds env var VLLM_LOGITS_PROCESSOR_THREADS (envs.py) and a ThreadPoolExecutor in logits_processor.py that fans the per-sequence logits-processor calls across threads. Number is the author's qualitative '~10% improvement in tok/s and req/s'; author explicitly could not share raw numbers or traces.",
+    "reported": {
+     "pct": 0.1,
+     "comparable": false,
+     "scope": "end-to-end GPU serving tok/s & req/s with a proprietary custom logits processor at concurrency ~50 and threadpool size 50 (author's internal workload, no in-tree LP shown to benefit)",
+     "scale_short": "Author's 10% is whole-run E2E with a private logits processor we cannot run; the feature is also off by default and no in-tree LP (e.g. xgrammar) was shown to benefit. TO MAKE 1:1: stand up GPU serving with a CUDA-launching or GIL-releasing custom LP at concurrency 50, set VLLM_LOGITS_PROCESSOR_THREADS=50, and compare steady-state tok/s on vs off.",
+     "scale_note": "The gain requires a logits processor that either launches extra CUDA kernels or does CPU-bound work while releasing the GIL; the author even added a CUDA sync so threaded LPs don't block each other on the cudaMemcpy lock. With no benefiting in-tree processor and only a published percentage, there is no isolated micro-op to time and no absolute baseline to anchor."
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 12563,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/12563",
+  "title": "[Feature] Fix guided decoding blocking bitmask memcpy (#12563)",
+  "field": "decoding_tpot",
+  "reported_gain": "87.5->92 tok/s (~5%)",
+  "base_sha": "eb5741ad422f04d0bac60c9b6c07183e0431ce8c",
+  "merge_sha": "fc542144c4477ffec1d3de6fa43e54f8fb5351e8",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "guided_decode_bitmask_async_copy",
+    "unit": "tok/s",
+    "workload": "Single-request generation with xgrammar guided decoding, Llama 3.1 8B on one H100; decode-phase tok/s with the token-bitmask H2D copy blocking vs async.",
+    "needs": "gpu",
+    "note": "Diff is a one-liner in xgrammar_decoding.py: self.token_bitmask.to(scores.device) -> .to(scores.device, non_blocking=True), letting the CPU pre-launch sampler kernels instead of blocking on cudaStreamSynchronize. Numbers are the author's single-request H100 benchmark posted in a comment (87.5 tok/s unoptimized, 92 tok/s optimized).",
+    "reported": {
+     "base": 87.5,
+     "patch": 92.0,
+     "comparable": false,
+     "scope": "end-to-end single-request decode throughput (tok/s) for Llama 3.1 8B on H100 with xgrammar guided decoding",
+     "scale_short": "Author's number is full E2E single-request decode tok/s on an H100; the win is a GPU async-copy / kernel-pre-launch effect not reproducible on CPU. TO MAKE 1:1: run Llama 3.1 8B with xgrammar guided decoding single-request on a CUDA device and measure decode tok/s with the bitmask copy blocking vs non_blocking=True.",
+     "scale_note": "The speedup comes from hiding a blocking H2D bitmask transfer behind sampler-kernel launches (nsys traces in the PR body). It only manifests under real CUDA stream overlap; an isolated CPU timing of the .to() call cannot exercise the stream-synchronize that the fix elides, so the ~5% E2E figure is not 1:1 with any CPU microbench."
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 12755,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/12755",
+  "title": "[Model][Speculative Decoding] DeepSeek MTP spec decode (#12755)",
+  "field": "decoding_tpot",
+  "reported_gain": "1.69x,1.32x,1.22x TPOT (draft TP=8, QPS 1/2/4)",
+  "base_sha": "983a40a8bb2ef2a0ed9c5134d49358c38d6b03ae",
+  "merge_sha": "f525c0be8b4c9ede079f866721526eba4c679ee3",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "deepseek_mtp_spec_decode_tpot",
+    "unit": "ms",
+    "workload": "DeepSeek-R1 on 8x H200, tensor-parallel-size 8, MTP k=1 speculative decoding (draft TP=8); mean TPOT (time per output token) at QPS=1, baseline vs spec-decode. Acceptance rate ~81-82%.",
+    "needs": "gpu",
+    "note": "Diff adds the DeepSeek MTP (multi-token-prediction) spec-decode path (new deepseek_mtp model + multi_step_worker/spec_decode wiring). Headline number is the draft-TP=8 QPS=1 row of the author's benchmark table in the PR body: baseline TPOT 55.47 ms -> k=1 TPOT 32.64 ms (1.69x). Draft TP=1 QPS=1 is 55.47->33.99 (1.63x). Speedup decays with QPS and goes <1.0x at QPS>=6.",
+    "reported": {
+     "base": 55.47,
+     "patch": 32.64,
+     "comparable": false,
+     "scope": "end-to-end online-serving TPOT for DeepSeek-R1 across a full 8x H200 TP=8 deployment at QPS=1 (draft TP=8), not an isolated op",
+     "scale_short": "Author's number is whole-model E2E serving TPOT on 8x H200 with DeepSeek-R1; it is a system-level spec-decode win driven by token-acceptance, not a reproducible micro-op. Only QPS<=4 gains; QPS>=6 regresses. TO MAKE 1:1: serve DeepSeek-R1 TP=8 on 8x H200 with --num-speculative-tokens 1, drive QPS=1, and measure mean TPOT baseline vs MTP.",
+     "scale_note": "TPOT improvement comes from ~81-82% MTP draft acceptance shrinking decode steps; it depends on QPS, concurrency, and draft TP and cannot be isolated on a single CPU/GPU op. The table also shows the effect inverting (<1.0x) at QPS 6-8 as batching saturates, so the headline 1.69x is a low-load best case, not a uniform speedup."
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 13365,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/13365",
+  "title": "[V1][Spec Decode] Optimize N-gram matching with Numba (#13365)",
+  "field": "decoding_tpot",
+  "reported_gain": "30x, 2.5%",
+  "base_sha": "c8d70e2437feecdb3762ce17298df33439ae1bd1",
+  "merge_sha": "4c822298981a8f7521492075ff72659985fc4c3f",
+  "arms": {
+   "base": {
+    "tests": "FAIL"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "ngram_match_overhead",
+    "unit": "s",
+    "workload": "5000 synthetic context sequences (len 200-800, vocab 32000), n-gram n=3, k=10; ~50% seeded with a plantable match. Cumulative NgramProposer.propose() time over the full 5000-seq pass; 5 repeats (gold warmed up once untimed to exclude JIT compile).",
+    "note": "PREFERRED approach: imported the standalone vllm/v1/spec_decode/ngram_proposer.py module directly from each mounted source tree (self-contained, only numpy/numba/typing deps) and timed .propose(). base=pure-python KMP loop; gold=numba @jit(nopython=True) kernels. runs = per-repeat cumulative seconds; speedup_x = mean of per-repeat base/gold ratios. numba not baked in image -> installed at runtime via pip (numba 0.68.1, arm64 wheel); worked.",
+    "reported": {
+     "base": 54.3,
+     "patch": 1.9,
+     "scope": "cumulative over a full ShareGPT 5K-request E2E serving run (propose() called once per decode step per request = hundreds of thousands of calls)",
+     "comparable": false,
+     "scale_note": "SAME unit (s) but NOT scale-comparable to our microbench. Our 'base' 0.257s is cumulative over 5000 single-sequence propose() calls; the PR's 54.3s is cumulative over a full ShareGPT 5K-REQUEST serving run (~200x more cumulative work; exact call count not derivable since per-call cost differs between synthetic and real token streams). Direction + ratio (ours 71x vs reported ~29x) are genuine; absolute seconds are not 1:1."
+    },
+    "arms": {
+     "base": {
+      "mean": 0.256929,
+      "sd": 0.028241,
+      "runs": [
+       0.229843,
+       0.224256,
+       0.293397,
+       0.251467,
+       0.285683
+      ]
+     },
+     "gold": {
+      "mean": 0.003596,
+      "sd": 5e-06,
+      "runs": [
+       0.003587,
+       0.003603,
+       0.003593,
+       0.003598,
+       0.003598
+      ],
+      "speedup_x": 71.454,
+      "speedup_sd": 7.867,
+      "counts": true
+     }
+    }
+   }
+  ],
+  "environment": "docker vllm-cpu-bench:21222 (python:3.12-slim + CPU torch arm64 wheel, numpy 2.5.4), colima arm64 Mac; identical image for both arms, only vllm/ source tree differs. numba NOT baked into image -> installed at runtime with `pip install numba` (numba 0.68.1, arm64 wheel) for the gold arm; base arm is pure-python and needs no numba. gold arm warmed up once (untimed) to exclude numba JIT compile from the steady-state timing.",
+  "ts": "2026-11-04T00:00:00Z"
+ },
+ {
+  "pr": 14540,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/14540",
+  "title": "[Perf] Improve MLA on V1",
+  "field": "attention",
+  "reported_gain": "64% (527.55->865.80 output tok/s)",
+  "base_sha": "92b0ce2ac75e251fe683f5b720f07001782054ff",
+  "merge_sha": "fb0acb6c72874e98617cabee4ff4851569374fc9",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "mla_v1_decode_throughput",
+    "unit": "tok/s",
+    "workload": "DeepSeek-R1 on 8xH200, VLLM_USE_V1=1 benchmark_throughput.py, input-len 6000 output-len 1000, 50 prompts, tensor-parallel-size 8; metric is output tokens/s. Compared against the pre-change V1 MLA path.",
+    "needs": "gpu",
+    "note": "Diff touches only vllm/v1/attention/backends/mla/common.py: makes the rotary_emb input contiguous so the cuda kernel is correct, and reorders ops in build() to avoid GPU->CPU syncs (CPU->GPU kept). Numbers are from the PR body Performance Test (R1): the 6k-input row (865.80 vs 527.55 output tok/s, the 64% headline). Author also showed a 3k-input row that is still slightly below V0, and a DeepSeek-V2-Lite small-model ~15% case.",
+    "reported": {
+     "base": 527.55,
+     "patch": 865.8,
+     "comparable": false,
+     "scope": "full end-to-end V1 serving throughput (benchmark_throughput, DeepSeek-R1, 6k in / 1k out, TP=8 on 8xH200), not an isolated MLA-op timing",
+     "scale_short": "Author's 64% is whole-run output tok/s on 8xH200; our microbench would isolate the MLA build()/rotary path. TO MAKE 1:1: on a GPU box run the same benchmark_throughput command (DeepSeek-R1, 6k/1k, TP=8) before vs after merge_sha and read output tok/s, rather than timing the op alone.",
+     "scale_note": "SAME unit (tok/s) but E2E vs isolated op: the reordering removes GPU->CPU syncs in MLA build, whose benefit is amplified across the full decode loop and tail latency (author noted up to 1ms p99 saved). The 64% figure is specific to the long-context (6k) regime; short-context (3k) was roughly flat / slightly worse, so the isolated-op win will not reproduce the 64% headline at every length."
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "reported-only: author's published GPU numbers (8xH200); measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 14778,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/14778",
+  "title": "[Model] Mamba2 Prefill Performance Tweaks: Fixing Flurry of Unnecessary Memory Copies",
+  "field": "attention",
+  "reported_gain": "40% (5ms->3ms prefill mamba layer); 8% E2E total tok/s",
+  "base_sha": "270a5da495d24e947a71e2fa0c56635f4fad2dc3",
+  "merge_sha": "fe66b34728e5d383e3d19aefc544eeee808c99fb",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "mamba2_prefill_layer_latency",
+    "unit": "ms",
+    "workload": "Bamba-9B on H100-80GB, offline mode, batch size 64, short prompt; per-Mamba-prefill-layer latency as seen in the Nsight Systems trace. Compared against the pre-change mamba_mixer2 forward.",
+    "needs": "gpu",
+    "note": "Diff touches only vllm/model_executor/layers/mamba/mamba_mixer2.py: eliminates/fuses two phases of unnecessary per-layer memory copies identified in an nsys trace. Headline number is the author body claim: the fix reduces the prefill mamba layer latency from 5ms to 3ms for the batch=64 short-prompt case. (Author also reports an E2E benchmark_serving run: total token throughput 1460.17 -> 1589.37 tok/s, ~8%.)",
+    "reported": {
+     "base": 5.0,
+     "patch": 3.0,
+     "comparable": false,
+     "scope": "per-Mamba-prefill-layer wall latency from an nsys trace (Bamba-9B, batch=64, short prompt), a GPU-kernel-level measurement",
+     "scale_short": "Author's 5->3ms is a single Mamba prefill layer read off an nsys GPU trace, not a CPU-isolatable op. TO MAKE 1:1: on a GPU box profile one mamba_mixer2 prefill forward (Bamba-9B, batch=64) before vs after merge_sha with nsys and compare per-layer latency.",
+     "scale_note": "The win is removal of GPU memory copies, so it only manifests on-GPU and cannot be reproduced on a CPU microbench. The 5ms->3ms is one layer in one trace; the companion E2E serving run (ShareGPT, 1000 reqs, H100) showed ~8% total tok/s (1460.17->1589.37), diluted by the rest of the model. Author notes another similar sequential loop remains unfixed because the test case did not hit that control path."
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "reported-only: author's published GPU numbers (H100-80GB); measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 18242,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/18242",
+  "title": "[V1][P/D] An native implementation of xPyD based on P2P NCCL (#18242)",
+  "field": "parallelism",
+  "reported_gain": "82% ITL P99 (127ms->23.1ms, 1P1D vs vLLM)",
+  "base_sha": "5f52a846850a3aed258e3a95bbea8fcaeb39d725",
+  "merge_sha": "eccdc8318c50ad3e2adfaaf99d714a8dccc6ab16",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "intertoken_latency_p99",
+    "unit": "ms",
+    "workload": "Scenario 2 (1K input, 200 output tokens, E2E P99 latency ~4s): 1P1D on 2xA800 vs single-instance vLLM on 1xA800, Qwen model, random-input-len 1024 / random-output-len 1024 serving benchmark measuring ITL (P99).",
+    "needs": "gpu",
+    "note": "diff adds the P2P NCCL xPyD KV-transfer connector (p2p_nccl_connector.py, p2p_nccl_engine.py, tensor_memory_pool.py) that disaggregates prefill/decode so decode is not stalled by prefill. The headline 127ms->23.1ms is ITL (P99), the inter-token latency, from the PR body's Scenario 2 test data (not TTFT; TTFT actually rises 160->227ms as the disagg tradeoff).",
+    "reported": {
+     "base": 127,
+     "patch": 23.1,
+     "comparable": false,
+     "scope": "P99 inter-token latency of a disaggregated 1P1D (2xA800) serving run vs a single aggregated vLLM instance (1xA800); the gain comes from removing prefill-decode interference across two GPUs, not from an isolated op.",
+     "scale_short": "Author compares a 2-GPU disaggregated topology against a 1-GPU aggregated one. TO MAKE 1:1: stand up the full 1P1D xPyD proxy + two A800 instances and a matched single-instance baseline, then run the serving benchmark measuring ITL P99.",
+     "scale_note": "Multi-GPU disaggregated serving topology (proxy/router + P instance + D instance over NCCL); not reproducible on a single CPU/arm box. The 82% ITL drop is paid for by higher TTFT (160->227ms) and extra hardware (2x A800). Direction (lower ITL) is genuine for the disagg setup."
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 21222,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/21222",
+  "title": "[Core] Introduce popleft_n and append_n in FreeKVCacheBlockQueue to further optimize block_pool (#21222)",
+  "field": "kv_cache",
+  "reported_gain": "95% (0.15ms\u21920.008ms)",
+  "base_sha": "10904e6d755051260a7c3ce98659d8907c74caa9",
+  "merge_sha": "ed25054577f7abca2aee32a5290200c4a1aed561",
+  "arms": {
+   "base": {
+    "tests": "FAIL"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "get_new_blocks",
+    "unit": "ms/op",
+    "workload": "block_pool sweep 10/50/100/500/1000 blocks, 1000 iters",
+    "note": "runs = per allocate-block size; speedup = mean of per-size base/gold ratios",
+    "reported": {
+     "base": 0.15,
+     "patch": 0.008,
+     "scope": "per-op TRACE in a serving run",
+     "comparable": false,
+     "scale_note": "PR gave TWO measurements from DIFFERENT harnesses: (1) engine 'benchmark scripts' on a GPU box, single aggregate per-op, 0.15ms->0.008ms (~19x, screenshots only); (2) benchmark_block_pool.py, which the author described only as 'cut in half' (~2x, no typed numbers). OUR bench IS benchmark_block_pool.py, so the ~2x claim is the right comparator (measured 1.83x = match). The 19x headline is the engine-script scope where fixed per-call python overhead dominates a GPU-fast path -- NOT reproducible on, nor scale-comparable to, a CPU linked-list microbench. Author never claimed benchmark_block_pool gives 19x."
+    },
+    "arms": {
+     "base": {
+      "mean": 0.150956,
+      "sd": 0.172406,
+      "runs": [
+       0.004424,
+       0.022943,
+       0.043132,
+       0.228052,
+       0.456227
+      ]
+     },
+     "gold": {
+      "mean": 0.087743,
+      "sd": 0.097173,
+      "runs": [
+       0.00268,
+       0.010689,
+       0.020929,
+       0.16115,
+       0.243266
+      ],
+      "speedup_x": 1.83,
+      "speedup_sd": 0.268,
+      "counts": true
+     }
+    }
+   },
+   {
+    "name": "free_blocks",
+    "unit": "ms/op",
+    "workload": "block_pool sweep 10/50/100/500/1000 blocks, 1000 iters",
+    "note": "runs = per allocate-block size; speedup = mean of per-size base/gold ratios",
+    "reported": {
+     "base": 0.033,
+     "patch": 0.009,
+     "scope": "per-op TRACE in a serving run",
+     "comparable": false,
+     "scale_note": "Same as get_new_blocks: 33us->9us is the engine-script TRACE aggregate (GPU box), benchmark_block_pool is 'cut in half' ~2x (measured 1.71x = match). Our base free=0.101ms is NOT 3x the author's 33us 'baseline' -- it is the 500-block-size row average; the 33us is a single engine-aggregate per-call figure from a different harness. Harness mismatch, not a scale error. Pure-python linked-list pointer reduction (popleft_n/append_n), no GPU involved in the list logic."
+    },
+    "arms": {
+     "base": {
+      "mean": 0.100668,
+      "sd": 0.115137,
+      "runs": [
+       0.002991,
+       0.015285,
+       0.028646,
+       0.151623,
+       0.304795
+      ]
+     },
+     "gold": {
+      "mean": 0.059619,
+      "sd": 0.066554,
+      "runs": [
+       0.00204,
+       0.007899,
+       0.015462,
+       0.101475,
+       0.171221
+      ],
+      "speedup_x": 1.706,
+      "speedup_sd": 0.191,
+      "counts": true
+     }
+    }
+   }
+  ],
+  "environment": "docker python:3.12-slim, CPU torch (arm64 cpu wheel), colima arm64 Mac; identical image for both arms, only vllm/ source differs",
+  "ts": "2026-11-04T00:00:00Z"
+ },
+ {
+  "pr": 21281,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/21281",
+  "title": "[Core] Minimize number of dict lookup in _maybe_evict_cached_block (#21281)",
+  "field": "scheduling",
+  "base_sha": "e7b204268132cb775c139574c1ff4ad7e15c8f66",
+  "merge_sha": "af376ca19d4588b1d5ace72ffc0b4bbd778c15f2",
+  "reported_gain": "77% (0.13ms\u21920.03ms)",
+  "arms": {
+   "base": {
+    "tests": "FAIL"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "allocate_new_block",
+    "unit": "ms/op",
+    "workload": "block_pool sweep 10/50/100/500/1000 blocks, 1000 iters (evict path)",
+    "note": "runs = per allocate-block size, median of 3 reps; speedup = mean of per-size base/gold ratios",
+    "reported": {
+     "base": 0.13,
+     "patch": 0.03,
+     "scope": "per-call TRACE of allocate_new_block, measured on top of PR #21222",
+     "comparable": false,
+     "workload_invalid": true,
+     "scale_note": "WORKLOAD INVALID (measured 1.007x is meaningless, do not trust). The PR cuts 4->2 dict lookups of the same key in _maybe_evict_cached_block, but that body ONLY runs when block_hash is not None AND block_hash in cached_block_hash_to_block (a cached block being evicted). Our benchmark_block_pool sweep pulls free blocks with block_hash=None, so BOTH arms hit the membership-fail early-out and the 4->2 reduction never executes. FIX NEEDED: enable_caching=True; assign each test block a non-None block_hash; pre-populate cached_block_hash_to_block[block_hash]={block_id:block} so the membership HITS; loop _maybe_evict_cached_block on those cached blocks (re-insert each iter). Only then does base pay 4 same-key hashes vs gold's 2 -> expect ~2x isolated (author's 4.3x is a profiler trace delta on top of #21222, an upper bound incl. surrounding overhead). Author number 0.13->0.03ms published as prose, no input sizes."
+    },
+    "arms": {
+     "base": {
+      "mean": 0.174353,
+      "sd": 0.216158,
+      "runs": [
+       0.003969,
+       0.019962,
+       0.048273,
+       0.221984,
+       0.577576
+      ]
+     },
+     "gold": {
+      "mean": 0.161171,
+      "sd": 0.184676,
+      "runs": [
+       0.003931,
+       0.02218,
+       0.046476,
+       0.246428,
+       0.48684
+      ],
+      "speedup_x": 1.007,
+      "speedup_sd": 0.106,
+      "counts": true
+     }
+    }
+   }
+  ],
+  "environment": "docker python:3.12-slim cpu colima arm64 \u2014 identical image both arms, only vllm/ differs",
+  "ts": "2026-11-04T00:00:00Z"
+ },
+ {
+  "pr": 23928,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/23928",
+  "title": "[Model loader] support multi-thread model weight loading",
+  "field": "memory",
+  "reported_gain": "1.43x (Load Time 20 -> 14s)",
+  "base_sha": "7be141b2c52366f0cc4e731c36819aed178d2258",
+  "merge_sha": "43d9ad03ba8584547537da71aee3e1810a0abbfd",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "multi_thread_weight_loading",
+    "unit": "s",
+    "workload": "Author loaded QwQ-32B (62 GB) from a single NVMe SSD (page cache dropped before each run, reads hit disk) via the OpenAI api_server with --model-loader-extra-config '{\"enable_multithread_load\": true, \"num_threads\": 8}', comparing total weight Load Time with and without multi-thread loading.",
+    "needs": "cpu",
+    "note": "Diff adds multi_thread_safetensors_weights_iterator and multi_thread_pt_weights_iterator (concurrent.futures.ThreadPoolExecutor over shard files) in weight_utils.py, and DefaultModelLoader selects them when enable_multithread_load is set (num_threads default 8); also validates extra-config keys. Number source: PR body Test Result table - disable 20 s / 3.1 GB/s vs enable 14 s / 4.42 GB/s, 'Load Weight speed up 1.43x'.",
+    "reported": {
+     "base": 20,
+     "patch": 14,
+     "comparable": false,
+     "scope": "wall-clock weight Load Time for a 62 GB QwQ-32B model read from a single NVMe SSD with page cache dropped; the win is disk-bandwidth-bound (3.1 -> 4.42 GB/s) not compute",
+     "scale_short": "Author's 20->14s is for a 62 GB model streamed from a specific NVMe SSD with cold page cache; the gain depends entirely on the storage device's parallel-read bandwidth. TO MAKE 1:1: load a multi-shard safetensors model from the SAME class of NVMe with the page cache dropped, timing _get_weights_iterator with num_threads=1 vs 8; a tiny model or warm page cache collapses the gap (author saw only ~0.2s from cache).",
+     "scale_note": "This is CPU/IO-measurable later but NOT GPU-dependent. The speedup is purely from parallelizing shard reads to saturate NVMe bandwidth; the author confirmed in comments that with a warm page cache the improvement shrinks to ~0.2s, so magnitude is highly storage- and model-size-dependent. Direction is genuine for cold large-model loads from fast disks."
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 27793,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/27793",
+  "title": "[Core][Observability] Add KV cache residency metrics (#27793)",
+  "field": "scheduling",
+  "reported_gain": "N/A (observability feature; author claims <0.1% overhead/request at 1% sampling, not a speedup)",
+  "base_sha": "ec7035c9d40cda43fa9c3d2d1c148b1382aa04a4",
+  "merge_sha": "cabc77cc86586206134a19e3e70aa401ec30b71f",
+  "arms": {
+   "base": {
+    "tests": "FAIL"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [],
+  "note": "OBSERVABILITY FEATURE, not a perf optimization. Title: '[Core][Observability] Add KV cache residency metrics'. Adds 3 Prometheus histograms (kv_block_lifetime/idle_before_evict/reuse_gap) behind --kv-cache-metrics flags (default 1% sampling) via new KVCacheMetricsCollector in block_pool hot paths (on_block_allocated/accessed/evicted), each guarded by `if self.metrics_collector:` so disabled=zero cost. The '0.1%' is the author's OVERHEAD ceiling (~365ns/block @1% sampling), NOT a gain. No base-vs-gold speedup exists; correctness-only is correct. If benchmarked, it would measure feature OVERHEAD (lower-is-better, inverted), not improvement.",
+  "environment": "n/a (correctness-only)",
+  "ts": "2026-11-04T00:00:00Z"
+ },
+ {
+  "pr": 29499,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/29499",
+  "title": "[EPLB] Optimize EPLB with numpy (#29499)",
+  "field": "parallelism",
+  "reported_gain": "27% (rearrange 1370->1077ms end-to-end); 20-25% per primitive",
+  "base_sha": "0ada960a20766fa1de9063576979f9d807583785",
+  "merge_sha": "6170d47d2220bc464fb561b93caf799a7560e304",
+  "arms": {
+   "base": {
+    "tests": "FAIL"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "move_from_buffer",
+    "unit": "ms/op",
+    "workload": "per-rank mapping over 16 local experts (2048-slot cluster); 5 repeats x best-of-100",
+    "note": "inline-from-diff: exact duplicate-resolution mapping body copied verbatim from base_sha / merge_sha (tensor .copy_ excluded as arm-identical). per-rank body over num_local_experts=16 rows; numpy overhead dominates at this size so gold is slower. unit ms/op. speedup = mean of per-repeat base/gold ratios",
+    "reported": {
+     "base": null,
+     "patch": null,
+     "pct": 0.225,
+     "comparable": false,
+     "scale_note": "NOT CPU-REPRODUCIBLE. Headline is end-to-end rearrange 1370->1077ms (~27%); this primitive is in the separate '20-25% per primitive' claim (pct~0.225), no absolute ms pair. PRECISE mechanism: the numpy rewrite moved only the INDEX/MASK bookkeeping (np.isin/unique/lexsort/searchsorted) off GPU tensors; the tensor .copy_(non_blocking=True) transfers themselves are UNCHANGED across arms. Author's #1 bullet 'removes multiple gpu-cpu transfers in move_from_buffer' + preserve_intragpu_slots avoids memcopies -- a GPU-sync/transfer saving invisible on CPU. On CPU-only our microbench pays the numpy bookkeeping overhead with NO GPU-sync elision to offset it -> gold SLOWER (0.245x). Sub-1x contradicts no published number (author ran no CPU microbench); real gain is on the GPU path."
+    },
+    "arms": {
+     "base": {
+      "mean": 0.00181,
+      "sd": 5e-05,
+      "runs": [
+       0.00185,
+       0.001792,
+       0.001866,
+       0.001816,
+       0.001724
+      ]
+     },
+     "gold": {
+      "mean": 0.008454,
+      "sd": 0.003279,
+      "runs": [
+       0.005669,
+       0.005882,
+       0.012448,
+       0.012491,
+       0.005782
+      ],
+      "speedup_x": 0.245,
+      "speedup_sd": 0.08,
+      "counts": true
+     }
+    }
+   },
+   {
+    "name": "get_ep_ranks_with_expert",
+    "unit": "ms/op",
+    "workload": "128 ranks x 16 local = 2048 physical slots, 256 logical experts; 5 repeats x best-of-100",
+    "note": "isolated import of real function from each tree. base loops get_ep_ranks_with_expert over all unique experts; gold makes one get_ep_ranks_with_experts_batch call. unit ms/op (whole-layer rank-map computation). speedup = mean of per-repeat base/gold ratios",
+    "reported": {
+     "base": null,
+     "patch": null,
+     "pct": 0.225,
+     "comparable": false,
+     "scale_note": "PR gives '20-25% on average for each primitive' (pct~0.225), no absolute pair. This is the ONE primitive that is pure-CPU and genuinely batchable: base loops get_ep_ranks_with_expert per-expert, gold does one batched call -> our 8.3x is a real CPU-reproducible win whose DIRECTION agrees with the PR, but the magnitude is not 1:1 with the PR's 20-25% because the PR's percent is diluted across the whole EPLB step (including GPU-transfer primitives). Absolute ms not comparable (no reported pair)."
+    },
+    "arms": {
+     "base": {
+      "mean": 24.043582,
+      "sd": 0.559845,
+      "runs": [
+       24.96972,
+       24.388491,
+       23.435503,
+       23.733472,
+       23.690724
+      ]
+     },
+     "gold": {
+      "mean": 2.900953,
+      "sd": 0.032188,
+      "runs": [
+       2.862138,
+       2.861013,
+       2.929905,
+       2.92577,
+       2.92594
+      ],
+      "speedup_x": 8.291,
+      "speedup_sd": 0.282,
+      "counts": true
+     }
+    }
+   },
+   {
+    "name": "move_to_buffer",
+    "unit": "ms/op",
+    "workload": "per-rank mapping over 16 local experts (2048-slot cluster); 5 repeats x best-of-100",
+    "note": "inline-from-diff: exact index-mapping body copied verbatim from base_sha / merge_sha (P2P + .copy_ excluded as arm-identical). per-rank body over num_local_experts=16 rows; numpy overhead dominates at this size so gold is slower. unit ms/op. speedup = mean of per-repeat base/gold ratios",
+    "reported": {
+     "base": null,
+     "patch": null,
+     "pct": 0.225,
+     "comparable": false,
+     "scale_note": "GPU-TRANSFER-BOUND, NOT CPU-REPRODUCIBLE. Same as move_from_buffer: PR's '20-25% per primitive' (pct~0.225) is dominated by eliding GPU P2P + tensor .copy_ round-trips (arm-identical, excluded). The residual numpy index-mapping body over 16 local experts is too small for numpy to win -> gold SLOWER (0.659x) on CPU. Sub-1x is an isolation artifact, not a regression; the PR's real gain lives on the GPU-transfer path we cannot run here."
+    },
+    "arms": {
+     "base": {
+      "mean": 0.026854,
+      "sd": 0.000414,
+      "runs": [
+       0.027419,
+       0.02668,
+       0.027144,
+       0.026824,
+       0.026203
+      ]
+     },
+     "gold": {
+      "mean": 0.040745,
+      "sd": 0.000316,
+      "runs": [
+       0.040228,
+       0.041051,
+       0.040838,
+       0.041051,
+       0.040555
+      ],
+      "speedup_x": 0.659,
+      "speedup_sd": 0.013,
+      "counts": true
+     }
+    }
+   }
+  ],
+  "environment": "docker vllm-cpu-bench:21222 (python 3.12.16, numpy 2.5.4, torch 2.15.0+cpu), colima arm64 Mac; identical image for both arms, only vllm/ source tree differs (PYTHONPATH). get_ep_ranks_with_expert via isolated import of real function; move_to_buffer/move_from_buffer via inline-from-diff of the exact mapping body the PR changed (multi-rank process group + GPU P2P cannot run in a single CPU container; P2P/.copy_ are arm-identical and excluded)",
+  "ts": "2026-11-04T00:00:00Z"
+ },
+ {
+  "pr": 31034,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/31034",
+  "title": "[P/D] rework mooncake connector and introduce its bootstrap server (#31034)",
+  "field": "prefill_ttft",
+  "reported_gain": "7% TTFT (83.41ms->77.53ms, input-len 128)",
+  "base_sha": "18e7cbbb158a86bdc76585e64ada795bf1c0d435",
+  "merge_sha": "0d6ccf68fa2c439e17d02f26c4044ed5df7f7099",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "ttft_random_input_128",
+    "unit": "ms",
+    "workload": "Random dataset, max-concurrency=1, Qwen2.5-7B-Instruct on two A10 machines (P/D disaggregated); random-input-len 128; TTFT measured with the reworked mooncake connector running prefill on P and decode on D simultaneously.",
+    "needs": "gpu",
+    "note": "diff reworks the mooncake KV connector into vllm/distributed/kv_transfer/kv_connector/v1/mooncake/ and adds a central MooncakeBootstrapServer on P plus a proxy. Headline 83.41ms->77.53ms TTFT (input-len 128) from the PR body; author notes ~6ms TTFT win from running P and D simultaneously.",
+    "reported": {
+     "base": 83.41,
+     "patch": 77.53,
+     "comparable": false,
+     "scope": "end-to-end TTFT of a two-machine A10 P/D disaggregated serving run at max-concurrency=1; the ~6ms win comes from P/D concurrency, not an isolated CPU op.",
+     "scale_short": "Author's number is full two-A10 P/D-disaggregated serving TTFT. TO MAKE 1:1: deploy the reworked mooncake connector + bootstrap server across two A10 machines running Qwen2.5-7B-Instruct and run the random-dataset benchmark at max-concurrency=1.",
+     "scale_note": "Multi-machine disaggregated setup (bootstrap server + proxy + P and D instances with mooncake transport); not reproducible on a single box. The ~6ms (7%) TTFT win at input-len 128 shrinks proportionally at input-len 1024 (252.35->246.25ms). Direction (lower TTFT) is genuine."
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 32975,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/32975",
+  "title": "[Perf] Optimize detokenizer python logic (#32975)",
+  "field": "scheduling",
+  "reported_gain": "1.628x, 38.57%",
+  "base_sha": "97fa8f65909d4d8f2eb0edc2137fb22f576a5b25",
+  "merge_sha": "e1060a71a1bb96103ce9ca98345184dcdc982467",
+  "arms": {
+   "base": {
+    "tests": "FAIL"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "detokenize",
+    "unit": "us/tok",
+    "workload": "200 seqs x 2000 tokens; isolated SlowIncrementalDetokenizer per-token output-count check (slice vs tracked), 7 repeats",
+    "note": "approach=fallback (self-contained, both arms in ONE process on the same CPU, no cross-container noise). Reproduces the exact changed inner logic: base recomputes len(self.token_ids[self.prompt_len:]) per token (slice alloc), gold uses num_output_tokens()==len(token_ids)-prompt_len. speedup_x = mean of per-repeat base/gold ratios. NOTE: the real full detokenizer path was ALSO driven (PYTHONPATH=/src, real gpt2 tokenizer via transformers, real SlowIncrementalDetokenizer.update() loop, batched updates, long prompt); there the native tokenizer decode (~5us/tok) dominates and the slice removal is below run-to-run noise (real base ~5.36 us/tok vs gold ~6.39 us/tok, i.e. no measurable end-to-end gain). The isolated fallback below matches the PR's own reported methodology of timing the detokenizer PYTHON logic in isolation.",
+    "reported": {
+     "base": 0.03936,
+     "patch": 0.02418,
+     "scope": "benchmark_detokenizer_min_tokens.py: 39.36 ns/token -> 24.18 ns/token (1.628x, -38.57%) -- but this benchmarks the min_tokens offset-accumulation loop that was REVERTED, not the merged change",
+     "comparable": false,
+     "scale_note": "UNIT-BUG FIXED + SCOPE CAVEAT. Earlier this field held base=1.628/patch=1.0, pasting the SPEEDUP RATIO as an absolute us/tok value; real PR numbers are 39.36->24.18 ns/token = 0.03936->0.02418 us/tok. BUT the 1.628x is unrepresentative TWICE OVER: (1) the PR's benchmark_detokenizer_min_tokens.py times a synthetic pure-Python int/str accumulation loop (new_chars_len += len(piece) vs stop_check_offset += len(piece)) with NO tokenizer / NO update() / NO slice -- it measures the min_tokens stop_check_offset change, which was REVERTED (njhill 2026-02-06; only num_output_tokens was merged). (2) njhill noted the common case is 1 token/update where the change is MORE work, so the benchmark doesn't reflect production. Our microbench isolates the actually-merged num_output_tokens() slice-vs-count primitive (base ~1.33 us/tok, 11x). Direction agrees; the PR's 1.628x and our 11x measure different code and are not comparable."
+    },
+    "arms": {
+     "base": {
+      "mean": 1.330579,
+      "sd": 0.012124,
+      "runs": [
+       1.322138,
+       1.333397,
+       1.322168,
+       1.322721,
+       1.320539,
+       1.336379,
+       1.356709
+      ]
+     },
+     "gold": {
+      "mean": 0.117099,
+      "sd": 0.000396,
+      "runs": [
+       0.117234,
+       0.11725,
+       0.116556,
+       0.117155,
+       0.116553,
+       0.117773,
+       0.117172
+      ],
+      "speedup_x": 11.362829,
+      "speedup_sd": 0.093282,
+      "counts": true
+     }
+    }
+   }
+  ],
+  "environment": "docker vllm-cpu-bench:32975 (python:3.12-slim + CPU torch + transformers + gguf), PYTHONPATH=/src with per-arm vllm source tree mounted ro; colima arm64 Mac (aarch64), py 3.12.16; identical image for both arms, only vllm/ source differs",
+  "ts": "2026-11-04T00:00:00Z"
+ },
+ {
+  "pr": 33593,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/33593",
+  "title": "[Perf] Optimize Python Slice for Structured Output using `islice` instead of [:] (#33593)",
+  "field": "decoding_tpot",
+  "reported_gain": "0.5%",
+  "base_sha": "c38b8d5a317da356353a0a9ae1ab87f612267fb3",
+  "merge_sha": "9ce8fad2a9fe010ede46b085f6cb4099c8ec402d",
+  "arms": {
+   "base": {
+    "tests": "FAIL"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "membership_present",
+    "unit": "s/call",
+    "workload": "SIZE=100_000, end-token at 10%% in; `tok not in input_ids[:-1]` vs `tok not in islice(input_ids,0,len-1)`; INNER=200 calls/block, 18 paired samples, best-of + mean\u00b1sd",
+    "note": "Real PR hot path (reasoning parser extract_content_ids). Marker present early -> islice short-circuits + copies nothing; list[:-1] copies all N first. Gold wins.",
+    "reported": {
+     "base": 0.0034,
+     "patch": 1e-06,
+     "scope": "PR microbench 'create slice' on a 2,000,000-element list, N=1,000,000: list[:N] 0.003368s vs islice 0.000001s (materialization cost, NOT a membership test)",
+     "comparable": false,
+     "scale_note": "DIFFERENT EXPERIMENT: the PR's 0.0034->1e-6 is pure list[:N] MATERIALIZATION (allocating the copy). Our membership_present measures the REAL hot-path idiom `tok not in islice(...)` which short-circuits -- a different operation. 3400x (the PR's alloc elision) is not the same quantity as our 2.31x (short-circuit membership). Honest: we measure the actual call site, the PR measured the underlying primitive in isolation."
+    },
+    "arms": {
+     "base": {
+      "mean": 0.000358804,
+      "sd": 4.6743e-05,
+      "runs": [
+       0.000330733,
+       0.000377697,
+       0.000326645,
+       0.000345245,
+       0.000507789,
+       0.000329285,
+       0.000316241,
+       0.000341058,
+       0.000351174,
+       0.000400607,
+       0.000339538,
+       0.000377984,
+       0.000366388,
+       0.000344082,
+       0.000430289,
+       0.00033626,
+       0.000326537,
+       0.000310923
+      ]
+     },
+     "gold": {
+      "mean": 0.000155275,
+      "sd": 1.0947e-05,
+      "runs": [
+       0.000159376,
+       0.000169886,
+       0.000143453,
+       0.000149218,
+       0.000163265,
+       0.000155865,
+       0.00016565,
+       0.000155066,
+       0.000146417,
+       0.000169359,
+       0.000145489,
+       0.000183984,
+       0.000145105,
+       0.000150742,
+       0.00015026,
+       0.000152459,
+       0.000144649,
+       0.000144703
+      ],
+      "speedup_x": 2.3142,
+      "speedup_sd": 0.2775,
+      "counts": true
+     }
+    }
+   },
+   {
+    "name": "membership_absent",
+    "unit": "s/call",
+    "workload": "SIZE=100_000, end-token absent; same two idioms; INNER=200, 18 paired samples",
+    "note": "HONEST TRADEOFF: when the token is absent both scan all N, but list[:-1] is a C-level memcpy + C-level `in`, while islice yields through the Python iterator protocol per element. Gold is SLOWER here. Net PR win depends on how often reasoning has already ended (present case dominates in practice).",
+    "reported": {
+     "base": 0.0056,
+     "patch": 0.0047,
+     "comparable": false,
+     "scale_note": "CONSUMER DIFFERS. The PR's absent-case number comes from summing/materializing the whole slice (list[:-1] then consume all N); our membership_absent scans for a token that never occurs. Both are O(N) but list[:-1] is a C-level memcpy + C `in`, while islice yields per-element through the Python iterator protocol -> gold is SLOWER here (our 0.78x vs the PR's ~1.18x). Sign flips because the operation after the slice is not the same primitive. This is the honest tradeoff case: islice only wins when the marker is present (short-circuit), which dominates in practice."
+    },
+    "arms": {
+     "base": {
+      "mean": 0.001291289,
+      "sd": 0.000529284,
+      "runs": [
+       0.001199808,
+       0.001103488,
+       0.001139905,
+       0.001095942,
+       0.001149443,
+       0.001095101,
+       0.001143228,
+       0.001148784,
+       0.00345858,
+       0.001183188,
+       0.001342441,
+       0.001288587,
+       0.001156719,
+       0.00118306,
+       0.001126867,
+       0.00116652,
+       0.001102764,
+       0.001158777
+      ]
+     },
+     "gold": {
+      "mean": 0.001658282,
+      "sd": 0.000147542,
+      "runs": [
+       0.001612199,
+       0.001790975,
+       0.001551818,
+       0.001517835,
+       0.001523724,
+       0.001485493,
+       0.001909483,
+       0.001542935,
+       0.00170378,
+       0.002030049,
+       0.00167952,
+       0.001712967,
+       0.00149505,
+       0.00150705,
+       0.001802099,
+       0.001664878,
+       0.001622824,
+       0.001696395
+      ],
+      "speedup_x": 0.7813,
+      "speedup_sd": 0.3093,
+      "counts": true
+     }
+    }
+   }
+  ],
+  "environment": "docker python:3.12-slim cpu, colima arm64",
+  "ts": "2026-11-04T00:00:00Z"
+ },
+ {
+  "pr": 39328,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/39328",
+  "title": "[Core] Cache InductorPass.hash_source with functools.cache (#39328)",
+  "field": "gpu_kernels",
+  "reported_gain": "1.15x, 2.88x",
+  "base_sha": "304d5ba1a04b6cbfa2b5bd377c2a89d350a10921",
+  "merge_sha": "87805fa11ea6d9f9aa7a7fc92ac957c613bc2163",
+  "arms": {
+   "base": {
+    "tests": "FAIL"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "cache_lookup",
+    "unit": "ms",
+    "workload": "InductorPass.hash_source repeated over 5 source objects, 10000 lookups/repeat, 5 repeats; per-call ms",
+    "note": "base = recompute inspect.getsource+sha256 each call; gold = functools.cache wrapped (cold miss then hits); speedup = mean of per-repeat base/gold ratios",
+    "reported": {
+     "base": 32.5,
+     "patch": 11.3,
+     "scope": "ms per 'cache lookup' (PR body does not define granularity; likely per-uuid() computation -- inferred, not quoted)",
+     "comparable": false,
+     "scale_note": "SAME unit (ms) but NOT scale-comparable. Reported 32.5->11.3ms is the PR's 'cache lookup time' whose scope the PR body does NOT specify (inferred to be per full uuid() computation over the pass classes). Our bench = ms per SINGLE hash_source() call (total_ms/n_lookups over 5 objects), so ~92x smaller. Ratio also differs (measured 354x vs reported 2.88x): our gold is a pure functools.cache HIT (trivial) vs base paying getsource+sha256 every call; the PR's 2.88x is diluted because uuid() does other non-cached work. Direction genuine; absolute ms and ratio not 1:1."
+    },
+    "arms": {
+     "base": {
+      "mean": 0.354834,
+      "sd": 0.030611,
+      "runs": [
+       0.351354,
+       0.366423,
+       0.406632,
+       0.319355,
+       0.330404
+      ]
+     },
+     "gold": {
+      "mean": 0.001002,
+      "sd": 0.000985,
+      "runs": [
+       0.00048,
+       0.0005,
+       0.000491,
+       0.00297,
+       0.000567
+      ],
+      "speedup_x": 596.651,
+      "speedup_sd": 256.867,
+      "counts": true
+     }
+    }
+   },
+   {
+    "name": "cold_compile",
+    "unit": "s",
+    "workload": "full torch.compile cold compile (E2E)",
+    "note": "not reproducible on CPU arm Mac",
+    "reported": {
+     "base": 34.1,
+     "patch": 29.7
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "docker python:3.12-slim cpu colima arm64",
+  "ts": "2026-11-04T00:00:00Z"
+ },
+ {
+  "pr": 3985,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/3985",
+  "title": "[Core][Model] torch.compile for layernorm in commandr",
+  "field": "scheduling",
+  "reported_gain": "5%",
+  "base_sha": "67b4221a61ace91a79aff507df0a95a01978300e",
+  "merge_sha": "caada5e50aa16cd5f59bd7889128a83588ca1f99",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "commandr_layernorm_latency",
+    "unit": "s",
+    "workload": "CohereForAI/c4ai-command-r-v01, tp=4, benchmark_latency.py default batch-size=8 on GPU; avg decode latency per run.",
+    "needs": "gpu",
+    "note": "Diff extracts commandr LayerNorm math into a standalone @torch.compile layer_norm_func so torch compiles it once instead of recompiling whenever self changes. Number source: PR body batch-size=8 avg latency 2.9004 s -> 2.7343 s (~5% latency improvement; throughput 3290.22 -> 3463.78 tok/s consistent).",
+    "reported": {
+     "base": 2.9004,
+     "patch": 2.7343,
+     "comparable": false,
+     "scope": "full command-r forward-pass avg latency at tp=4 batch=8, not the isolated layernorm op the diff compiles",
+     "scale_short": "Author's latency is the whole command-r decode step; the diff only compiles the layernorm function. TO MAKE 1:1: microbench the isolated layer_norm_func on a command-r-shaped hidden-state tensor, base eager vs compiled.",
+     "scale_note": "SAME unit (s) but 2.9004 -> 2.7343 s is the whole-model avg decode latency (tp=4, batch=8), dominated by attention and MLP; the ~5% reflects the layernorm compile win diluted across the full step. Direction genuine; absolute seconds are whole-step, not the isolated layernorm op."
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 4118,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/4118",
+  "title": "[Kernel][FP8] Initial support with dynamic per-tensor scaling (#4118)",
+  "field": "quantization",
+  "reported_gain": "N/A (enabling PR; author's own numbers show FP8 SLOWER than BF16: 1.47s->1.66s E2E, TTFT 28.8->38.8ms. No speedup achieved yet; this PR adds the FP8 path to unblock follow-up optimizations.)",
+  "base_sha": "682789d4026429a04cc32acb88064265441080dd",
+  "merge_sha": "a22cdea371bb26b4bdba112d4602736b48ca4a3a",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": false,
+  "schema": "experiments_v2",
+  "note": "Initial FP8 (dynamic per-tensor scaling) enablement: loads FP16/BF16 checkpoints, quantizes weights to FP8 post-load, computes activation scales each forward pass. Enabled via --quantization fp8. The author's own measurements show FP8 is currently SLOWER than BF16 (Mistral-7B 1xH100: BF16 1.47s vs FP8 1.66s; comaniac's run: FP16 TTFT 28.8ms / ITL 8.5ms vs FP8 38.8ms / 10.2ms) because activation quantization adds large overhead. The author explicitly states 'we haven't achieved a decent performance with this FP8 support' and merges it to unblock follow-up optimizations. There is therefore no speedup gain to record; the eventual 2x-class FP8 wins land in later kernel PRs, not here. No timing experiment.",
+  "experiments": [],
+  "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 4222,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/4222",
+  "title": "Updating lm-format-enforcer version and adding links to decoding libraries in docs (#4222)",
+  "field": "quantization",
+  "reported_gain": "N/A (dependency bump + docs: lm-format-enforcer 0.9.3->0.9.8. The '2x' is the upstream library's own claim that JSONSchemaParser is 2x faster 'in many cases'; vLLM itself publishes no benchmark and no absolute numbers for this PR.)",
+  "base_sha": "91528575ec0e6fd251bac08973a3abf23d4c318c",
+  "merge_sha": "cc74b2b232070f74d8765a5eefa49ae93ee45490",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": false,
+  "schema": "experiments_v2",
+  "note": "diff bumps requirements-common.txt lm-format-enforcer 0.9.3->0.9.8 and expands the guided-decoding-backend CLI help with doc links (arg_utils.py). No vLLM source-logic change on a hot path. The claimed '2x in many cases' is the upstream library's self-reported JSONSchemaParser speedup, not a number vLLM measured; the versions have no API changes and mostly fix bugs. There is no author benchmark, no absolute pair, and no isolated vLLM op to time. No timing experiment.",
+  "experiments": [],
+  "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 4298,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/4298",
+  "title": "[Model] Adds Phi-3 support",
+  "field": "attention",
+  "reported_gain": "N/A (model-enablement PR; no benchmark for the merged code)",
+  "base_sha": "a395a638c2f18d549e7d01655cf7a6dbee566f91",
+  "merge_sha": "96e90fdeb3c4ebacfe24513556afccb918722b7c",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "note": "Model-enablement PR: adds Phi-3-mini (4k / 128k) support via a pure-PyTorch Phi3SuScaledRotaryEmbedding layer plus more robust llama layer-name mapping. The author explicitly says 'This is a pure Pytorch implementation. Optimizations may come in the future.' The '2-5x' the author mentions in a comment is a hypothetical for a FUTURE torch.compile of the rotary layer ('someone with more compile experience can add this feature later'); this PR does NOT add torch.compile and publishes no before/after benchmark for the merged code. No speedup experiment applies, so experiments is empty.",
+  "experiments": [],
+  "environment": "reported-only: no author speedup numbers (feature PR); no measured arm applicable",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 4690,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/4690",
+  "title": "[Core] Implement sharded state loader",
+  "field": "scheduling",
+  "reported_gain": "10x",
+  "base_sha": "52f8107cf2e5b3cc1a6a4a96c22b24505f02df01",
+  "merge_sha": "30e754390c2a8a7198f472386d35ee1ec9443e4a",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "sharded_state_model_load",
+    "unit": "s",
+    "workload": "Arctic model loaded from NVMe at 8x tensor parallelism; new sharded_state loader lets each worker read only its own shard instead of the full checkpoint.",
+    "needs": "gpu",
+    "note": "Diff adds ShardedStateLoader + save_sharded_state example/test so a pre-sharded checkpoint is read per worker, skipping the default whole-checkpoint load path. Number source: PR body states a 10x model-loading speedup from NVMe with 8x TP on Arctic; only the ratio is published, no absolute load seconds.",
+    "reported": {
+     "pct": 9.0,
+     "comparable": false,
+     "scope": "end-to-end model load time of the full Arctic checkpoint from NVMe at 8x tensor parallelism; only a 10x ratio, no absolute seconds, and no small-model number",
+     "scale_short": "Author gave a 10x load-time ratio for Arctic at 8x TP from NVMe, no absolute seconds. TO MAKE 1:1: time ShardedStateLoader vs default loader on the same large multi-shard checkpoint at matching TP on an NVMe box, recording absolute load seconds.",
+     "scale_note": "Author published only a ratio (~10x faster NVMe load with 8x TP on Arctic, a very large MoE model), reconstructed here as pct=9.0 against our baseline. The win scales with checkpoint size and TP degree; a small single-worker load will show far less because the whole-checkpoint read it eliminates is small. Direction genuine; magnitude is model/TP/storage dependent."
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 5183,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/5183",
+  "title": "[Kernel] Switch fp8 layers to use the CUTLASS kernels (#5183)",
+  "field": "gpu_kernels",
+  "reported_gain": "5-15% e2e",
+  "base_sha": "388596c91437a51d428a447594e9faec340c29b2",
+  "merge_sha": "8d75fe48ca5f46b7af0f5201d8500b9604eed769",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "fp8_cutlass_scaled_mm",
+    "unit": "pct",
+    "workload": "neuralmagic/Meta-Llama-3-8B-Instruct-FP8 end-to-end serving on GPU; fp8 linear layers routed through vLLM's CUTLASS cutlass_scaled_mm_dq kernel instead of torch._scaled_mm. Author reports 5-15% e2e improvement.",
+    "needs": "gpu",
+    "note": "Diff adds cutlass_fp8_supported() and switches fp8 apply() to ops.cutlass_scaled_mm_dq when bias is None and CUTLASS is supported, else falls back to torch._scaled_mm. Author gives only a ratio/percent range (5-15% e2e on Llama-3-8B-FP8) plus a spreadsheet of GEMM-size comparisons; no absolute before/after tok/s published in the PR text.",
+    "reported": {
+     "pct": 0.15,
+     "comparable": false,
+     "scope": "end-to-end serving speedup on Llama-3-8B-Instruct-FP8; author quotes a 5-15% range (0.15 = the top of the range as headline)",
+     "scale_short": "Author published only a 5-15% E2E range (no absolute numbers) on FP8 Llama-3-8B; the kernel is CUTLASS fp8 GEMM which needs an fp8-capable GPU and cannot run on CPU. TO MAKE 1:1: run the FP8 model e2e on an fp8-capable GPU (e.g. H100) and compare tok/s with torch._scaled_mm vs cutlass_scaled_mm_dq.",
+     "scale_note": "The win is a GPU fp8 GEMM kernel swap; magnitude varies with GEMM shape (per the linked spreadsheet and PR #5144 size sweep), so the 5-15% is an e2e range rather than a single isolated-op ratio. Recorded at the top of the author's range; there is no absolute baseline to anchor and no CPU path to time."
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 5908,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/5908",
+  "title": "[Model] Add Gemma 2 (#5908)",
+  "field": "gpu_kernels",
+  "reported_gain": "N/A (new-model enablement, no perf claim)",
+  "base_sha": "736ed388492c5c10deb7522637a94c041f163f48",
+  "merge_sha": "79c92c7c8aa6a881421e2007ab216a819f61bc9b",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": false,
+  "schema": "experiments_v2",
+  "experiments": [],
+  "note": "This is a MODEL-ENABLEMENT PR adding the Gemma 2 architecture, not a performance optimization. It introduces the Gemma2 model class and config; it does NOT optimize any existing op. The PR even temporarily DROPS features for correctness/compat (removes attention logit soft-capping as a workaround, truncates max length to 4K for sliding-window layers). The author publishes NO speedup numbers. The '2x' token in the task hint traces to an unrelated Reddit link in a comment about finetuning, not to any vLLM benchmark in this PR. There is no timing experiment to run; reported_gain is N/A.",
+  "environment": "reported-only: no author perf numbers; new-model enablement PR, no measurable op",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 6210,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/6210",
+  "title": "[Kernel] reloading fused_moe config on the last chunk",
+  "field": "gpu_kernels",
+  "reported_gain": "~5%",
+  "base_sha": "717f4bcea036a049e86802b3a05dd6f7cd17efc8",
+  "merge_sha": "f7a8fa39d828136d0b8bbdd20c262602e5543ffd",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "fused_experts_last_chunk_config_reload",
+    "unit": "pct",
+    "workload": "Author ran fused_moe chunked execution (follow-up to the #6029 chunking mechanism) and observed that reloading the Triton kernel config sized for the smaller last chunk yields a ~5% average speedup across their experiments (reported as a performance plot, no tabulated numbers).",
+    "needs": "gpu",
+    "note": "Diff refactors the config lookup in fused_experts into a try_get_optimal_moe_config helper wrapped in functools.partial, then calls get_config_func(tokens_in_chunk) to RELOAD the config for the final (smaller) chunk instead of reusing the full CHUNK_SIZE config. Number source: PR body 'this can yield a ~5% speedup on average'; only a plot is attached, no absolute before/after values.",
+    "reported": {
+     "pct": 0.05,
+     "comparable": false,
+     "scope": "end-to-end fused_moe layer throughput averaged across the author's unspecified MoE model/batch experiments, shown only as a performance plot",
+     "scale_short": "Author gives a ~5% average from a plot over whole-layer fused_moe runs on GPU; our isolated microbench cannot reproduce the Triton-kernel autotune path on CPU. TO MAKE 1:1: run fused_experts on a CUDA box with a real MoE weight set and a batch whose final chunk is smaller than VLLM_FUSED_MOE_CHUNK_SIZE, comparing per-call latency with and without the last-chunk config reload.",
+     "scale_note": "The win is a GPU Triton autotune effect: the last chunk is smaller than CHUNK_SIZE, so reusing the full-chunk kernel config is suboptimal; reloading a config tuned for the smaller chunk recovers ~5%. No absolute baseline published (plot only), and the path only exercises on GPU, so direction is genuine but magnitude is not CPU-reproducible."
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 6455,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/6455",
+  "title": "[Distributed][PP] only create embedding & lm head when necessary",
+  "field": "parallelism",
+  "reported_gain": "up to 25% per-rank memory savings",
+  "base_sha": "ce37be7ba05f21f2a8f3b792034195305ebe1b27",
+  "merge_sha": "1d094fd7c0d72e7eaf3a2b65fff9f7de8d812a49",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "pp_rank_embedding_lm_head_elision",
+    "unit": "pct",
+    "workload": "Author ran Llama-3-70B with --pipeline-parallel-size 8 and measured per-rank memory, observing up to 25% per-rank memory savings by not allocating the embedding / lm head / norm on ranks that do not use them (no absolute GB numbers published).",
+    "needs": "gpu",
+    "note": "Diff edits vllm/model_executor/models/llama.py to create VocabParallelEmbedding only on the first (or tie_word_embeddings last) rank, RMSNorm + ParallelLMHead + LogitsProcessor + Sampler only on the last rank, substituting PPMissingLayer elsewhere. Number source: PR body 'Testing with --pipeline-parallel-size 8 showed up to 25% per-rank memory savings for the Llama-3-70B model'; a maintainer (youkaichao) notes the min across ranks drops by roughly one embedding / lm-head layer. No absolute memory figures given.",
+    "reported": {
+     "pct": 0.25,
+     "comparable": false,
+     "scope": "per-rank GPU memory footprint reduction (not latency/throughput) for Llama-3-70B under 8-way pipeline parallelism; the saving is roughly one word-embedding or lm-head layer per rank",
+     "scale_short": "Author's ~25% is a per-rank MEMORY saving under 8-way PP, measured as a fraction with no absolute GB; it is a distributed multi-GPU effect, not CPU-reproducible and not a speed gain. TO MAKE 1:1: on an 8-GPU box run Llama-3-70B with --pipeline-parallel-size 8 and compare per-rank allocated memory before/after, confirming the drop equals the embedding/lm-head tensor size.",
+     "scale_note": "This is a memory-footprint optimization that only indirectly helps throughput (freed memory can hold more KV cache). The 25% is a reported fraction, not an absolute, and only manifests across real PP ranks on multiple GPUs, so it cannot be reproduced on our single-host CPU microbench. Because vLLM takes the min number of blocks across ranks, the effective win is bounded by the per-rank saving the maintainer described."
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 6695,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/6695",
+  "title": "PP comm optimization: replace send with partial send + allgather",
+  "field": "parallelism",
+  "reported_gain": "~5% throughput",
+  "base_sha": "630dd9e0aea166085a4c897e21a98ec752954265",
+  "merge_sha": "0437492ea97f0650a8b2ca39121be8864625fd70",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "pp_send_partial_allgather",
+    "unit": "pct",
+    "workload": "Author ran Llama 3.1 405B under pipeline parallelism and observed ~5% throughput improvement from replacing the full inter-stage tensor send with a sliced (partial) send followed by a TP all-gather (reported via a before/after plot in a comment, no tabulated numbers).",
+    "needs": "gpu",
+    "note": "Diff adds an all_gather_group arg to GroupCoordinator.send_tensor_dict / recv_tensor_dict in parallel_state.py: when set, each PP send transmits only a 1/world_size slice (tensor.reshape(all_gather_size,-1)[rank]) and the receiver reconstructs the full tensor via all_gather over the TP group. worker_base.py passes get_tp_group() as all_gather_group. Number source: PR body '5% improvement in throughput for llama 3.1 405b' plus a before/after screenshot in a comment; no absolute tok/s values.",
+    "reported": {
+     "pct": 0.05,
+     "comparable": false,
+     "scope": "end-to-end serving throughput for Llama 3.1 405B across pipeline + tensor parallel ranks; the win is reduced inter-stage PP communication volume on a multi-GPU/multi-node interconnect",
+     "scale_short": "Author's ~5% is whole-run serving throughput for a 405B model over PP+TP on real interconnect, shown only as a plot with no absolute numbers; it is a distributed-comm effect, not CPU-reproducible. TO MAKE 1:1: on a multi-GPU box with PP>1 and TP>1, benchmark serving tok/s with and without all_gather_group on send/recv_tensor_dict, isolating the partial-send + all-gather path.",
+     "scale_note": "The optimization shrinks each PP send to a 1/TP slice and rebuilds the tensor with a TP all-gather, trading send bandwidth for an all-gather; the benefit depends on PP/TP sizes and interconnect, and the author noted they tested few scenarios and saw no regressions. No absolute throughput published (plot only), and the path only exercises across real parallel ranks, so magnitude is not reproducible on our single-host CPU bench."
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 6779,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/6779",
+  "title": "[Core] Use array to speedup padding (#6779)",
+  "field": "decoding_tpot",
+  "reported_gain": "18%",
+  "base_sha": "084a01fd3544557990f8af8af6fd3c1185bae848",
+  "merge_sha": "89a84b0bb7b30706a02836234a94493ea8f780bf",
+  "arms": {
+   "base": {
+    "tests": "FAIL"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "make_tensor_with_pad",
+    "unit": "ms",
+    "workload": "SamplingTensors padding-input prep + 2x make_tensor_with_pad (prompt+output), input_len=1024, batch_size=2048, pad=vocab_size(32000), dtype=int64, device=cpu; 1 warmup, 5 timed repeats",
+    "note": "FINDING: PR #6779 does NOT touch make_tensor_with_pad; that fn is BYTE-IDENTICAL at base and gold (already the np.full/make_ndarray_with_pad array path). The real change is the INPUT fed to it inside SamplingTensors.from_sampling_metadata/from_lists: base builds List[List[int]] via list(seq_data.prompt_token_ids) (tuple->list copies); gold passes seq_data.prompt_token_ids_array (array('l')) directly, SequenceData now storing tokens as array. Benchmark loads the REAL unmodified make_tensor_with_pad from each mounted tree by source (vllm import chain needs the absent _custom_ops C ext) and replicates the exact per-arm prep path. speedup_x = mean of per-run base/gold ratios.",
+    "reported": {
+     "base": 79.0,
+     "patch": 22.0,
+     "scope": "PR microbench of the FULL from_sampling_metadata / SamplingTensors.from_lists build (NVTX-profiled), input_len=1024 batch=2048 -> 79->22ms (~3.6x)",
+     "comparable": false,
+     "scale_short": "We isolate only the token-store+pad sub-op; author timed the whole metadata build. TO MAKE 1:1: widen our bench to the full from_sampling_metadata build.",
+     "scale_note": "SAME unit (ms) but NOT 1:1. The PR does NOT optimize make_tensor_with_pad (byte-identical across arms); the real change is SequenceData storing tokens as array.array('l') so from_sampling_metadata appends arrays directly instead of list(...) copies. Author's 79->22ms (3.6x) is the WHOLE sampler-metadata build stage; our 54.7->2.7ms (20x) isolates just the token-store+pad sub-op the array change accelerates. TO MAKE SAME ENCLOSING SCOPE: time the full from_sampling_metadata build (not just the pad sub-op) so our ratio converges toward the author's 3.6x. E2E (separate arm) is the headline the author/reviewer agreed on: ~18.9%."
+    },
+    "arms": {
+     "base": {
+      "mean": 54.6725,
+      "sd": 3.4126,
+      "runs": [
+       61.469011,
+       53.007991,
+       52.754865,
+       53.525083,
+       52.605456
+      ]
+     },
+     "gold": {
+      "mean": 2.725,
+      "sd": 0.2186,
+      "runs": [
+       3.160982,
+       2.601602,
+       2.626848,
+       2.639047,
+       2.596544
+      ],
+      "speedup_x": 20.089,
+      "speedup_sd": 0.335,
+      "counts": true
+     }
+    }
+   },
+   {
+    "name": "e2e_qwen05b",
+    "unit": "it/s",
+    "workload": "end-to-end decode throughput, Qwen2-0.5B",
+    "note": "needs GPU model, reported-only",
+    "reported": {
+     "base": 24.76,
+     "patch": 29.44,
+     "scope": "E2E Qwen-1.5-0.5B offline throughput (GPU)",
+     "comparable": false,
+     "scale_note": "E2E it/s on GPU (24.76->29.44). NOT run here (CPU arm Mac). Row left as reported-only."
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "docker vllm-cpu-bench:21222 (CPU torch 2.15.0+cpu, numpy 2.5.4), colima arm64 Mac; identical image for both arms, only vllm/ source tree differs; real make_tensor_with_pad loaded by source from each mounted tree",
+  "ts": "2026-11-04T00:00:00Z"
+ },
+ {
+  "pr": 6865,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/6865",
+  "title": "[core][misc] improve free_finished_seq_groups",
+  "field": "scheduling",
+  "reported_gain": "40%",
+  "base_sha": "d7a299edaa5d23f3d7d5c98b53872a8ced9aad80",
+  "merge_sha": "6ca8031e7130f810ce7248286754a60044f65c73",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "free_finished_seq_groups_throughput",
+    "unit": "req/s",
+    "workload": "facebook/opt-125m offline batch, benchmark_throughput.py input-len 16 output-len 16 num-prompts 100000; scheduler's free_finished_seq_groups is on the critical path every model step.",
+    "needs": "cpu",
+    "note": "Diff rewrites free_finished_seq_groups (scheduler.py) to scan only the running deque instead of iterating running+swapped+waiting every step, so finished-request detection no longer walks the full 100k-prompt backlog. Number source: PR body opt-125m 100k-prompt throughput 211.18 -> 522.91 req/s (slowdown vs 10k cut to ~40%).",
+    "reported": {
+     "base": 211.18,
+     "patch": 522.91,
+     "comparable": false,
+     "scope": "full offline-batch serving throughput with 100k pending prompts on a tiny model where scheduler overhead dominates, not the isolated free_finished_seq_groups call",
+     "scale_short": "Author's req/s is whole-engine offline-batch throughput with a 100k-prompt backlog; the diff speeds up one scheduler scan. TO MAKE 1:1: microbench free_finished_seq_groups alone with a large running+waiting queue, old full-queue scan vs running-only scan.",
+     "scale_note": "SAME unit (req/s) but 211.18 -> 522.91 is end-to-end benchmark_throughput on opt-125m with 100k prompts, where the scheduler's per-step full-queue scan dominated; on small backlogs the gain vanishes. The headline '40%' is the reduced slowdown going 10k->100k prompts, not a flat per-call ratio. Direction genuine; magnitude is backlog-size dependent."
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 7117,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/7117",
+  "title": "[core][misc] simply output processing with shortcut code path",
+  "field": "scheduling",
+  "reported_gain": "1.5%",
+  "base_sha": "9fadc7b7a03f798036d0e8710587870e13bae759",
+  "merge_sha": "83c644fe7ecee05d3ebe5057acb6e008d7e81eb8",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "output_processing_shortcut_throughput",
+    "unit": "req/s",
+    "workload": "meta-llama/Meta-Llama-3-8B on H100, benchmark_throughput.py input-len 256 output-len 256; mean of 3 trials.",
+    "needs": "cpu",
+    "note": "Diff adds an n==1 and not use_beam_search shortcut in _process_sequence_group_outputs (single_step.py) that appends the single token, detokenizes, stop-checks and frees inline, skipping the general child-sequence/beam machinery. Number source: comment trials main mean ~24.24 -> PR mean ~24.62 req/s (~1.5%).",
+    "reported": {
+     "base": 24.24,
+     "patch": 24.62,
+     "comparable": false,
+     "scope": "end-to-end Llama-3-8B serving throughput (GPU-bound), where the CPU output-processing shortcut the diff adds is a tiny fraction of per-step time",
+     "scale_short": "Author's req/s is whole-model Llama-3-8B serving; the diff only shortcuts the CPU output-processing path. TO MAKE 1:1: microbench _process_sequence_group_outputs alone for the n==1 non-beam case, general path vs shortcut, on CPU.",
+     "scale_note": "SAME unit (req/s) but 24.24 -> 24.62 is GPU-bound E2E Llama-3-8B throughput; the output-processing shortcut is a CPU-path win nearly hidden by model compute, hence only ~1.5%. Isolated on CPU the relative savings of skipping the child-seq/beam machinery is larger. Direction genuine; magnitude diluted by GPU work."
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 7377,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/7377",
+  "title": "[Misc] Add numpy implementation of `compute_slot_mapping`",
+  "field": "attention",
+  "reported_gain": "up to 3x (large lists)",
+  "base_sha": "5c6c54d67a4d7d08f1db8bcc80612d44595d1b4f",
+  "merge_sha": "999ef0b917aa00166e10bc4252de0463604265b3",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "compute_slot_mapping",
+    "unit": "x",
+    "workload": "Prefill slot-mapping build in vllm/attention/backends/utils.py: fill the per-token slot_mapping list from a block_table over a large token range (numel >= 256, the author's large-list regime).",
+    "needs": "gpu",
+    "note": "Diff adds _compute_slot_mapping_numpy (vectorized np.arange / block_table[idx]) alongside the original per-token python loop, dispatching to numpy only when numel >= _COMPUTE_SLOT_MAPPING_NUMPY_NUMEL (256) to avoid numpy-array setup overhead on small lists. Number is the author's body claim 'up to 3x speedup with large lists'; no absolute timings published.",
+    "reported": {
+     "pct": 2.0,
+     "comparable": false,
+     "scope": "author's 'up to 3x' is a speedup ceiling for the large-list regime only, with no absolute baseline and no fixed list length given",
+     "scale_short": "Author gave only a ratio (up to 3x) for unspecified 'large' lists, no absolute us/ms and no list size. TO MAKE 1:1: microbench _compute_slot_mapping_numpy vs _compute_slot_mapping_python at a fixed numel (e.g. 4096) and report the measured ratio in the same regime.",
+     "scale_note": "This is a pure CPU list-building helper, so it is reproducible off-GPU, but the author published only a qualitative '3x' upper bound. pct is stored as 2.0 (3x = +200%) per the ratio shape; the author baseline renders as none and the solution is reconstructed from our measured baseline. Gain shrinks toward 1x as numel approaches the 256 switch threshold and the python path is slower only above it."
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 8248,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/8248",
+  "title": "[Kernel] [Triton] Memory optimization for awq_gemm and awq_dequantize, 2x throughput",
+  "field": "gpu_kernels",
+  "reported_gain": "2x (13351 -> 27783 tok/s)",
+  "base_sha": "1447c97e753919709b613590d7267c93d07d9382",
+  "merge_sha": "9db52eab3dc0b7b2cf30fa4399d569131e90c2d4",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "awq_triton_dequantize_gemm",
+    "unit": "tok/s",
+    "workload": "Author ran benchmarks/benchmark_throughput.py --input-len 2048 --output-len 128 --quantization awq --model Qwen/Qwen2-7B-Instruct-AWQ, measuring end-to-end serving throughput of the AWQ Triton path before vs after the kernel memory optimization.",
+    "needs": "gpu",
+    "note": "Diff rewrites awq_dequantize_kernel and awq_gemm_kernel to load each packed 4-bit weight/zero element ONCE then expand via tl.interleave/tl.broadcast_to, instead of re-loading with //8 index arithmetic (BLOCK_SIZE_X*8 offsets). This cuts redundant memory loads. Number source: PR body throughput table - AWQ Triton no-opt 13351.06 tok/s, with-opt 27783.36 tok/s (also 6.14 -> 12.77 req/s); ~2x, beating the AWQ CUDA path (25049 tok/s).",
+    "reported": {
+     "base": 13351.06,
+     "patch": 27783.36,
+     "comparable": false,
+     "scope": "end-to-end benchmark_throughput.py serving run (Qwen2-7B-Instruct-AWQ, in 2048 / out 128) on GPU, so the number includes attention, sampling and scheduling, not only the two AWQ kernels",
+     "scale_short": "Author's 13351->27783 tok/s is whole-pipeline serving throughput on GPU; our microbench isolates only awq_dequantize/awq_gemm and cannot run Triton CUDA kernels on CPU. TO MAKE 1:1: on a CUDA box, time just awq_dequantize_kernel + awq_gemm_kernel on a fixed weight tile and report kernel tok/s or us/call, isolating them from the rest of the serving loop.",
+     "scale_note": "The ~2x is real for the AWQ Triton path and even overtakes the hand-written AWQ CUDA kernel, but it is reported as E2E serving throughput, so the isolated-kernel ratio will differ. The kernels are Triton/CUDA-only and not reproducible on our arm CPU microbench; direction and rough magnitude are genuine."
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 8651,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/8651",
+  "title": "[Core] Default to using per_token quantization for fp8 when cutlass is supported.",
+  "field": "quantization",
+  "reported_gain": "4.68%",
+  "base_sha": "cd9d06fb8d1f89fc1bcc9305bc20d57c6d8b73d8",
+  "merge_sha": "fa0050db08660535368ec5ea41d313bdeb69909d",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "fp8_per_token_apply",
+    "unit": "tok/s",
+    "workload": "Llama2-7B on H100, full serving throughput benchmark; fp8 dynamic quant with cutlass supported so dequant+amax fuse into the cutlass gemm.",
+    "needs": "gpu",
+    "note": "Diff flips use_per_token_if_dynamic from False to self.cutlass_fp8_supported in Fp8LinearMethod.apply (fp8.py), enabling fused amax+quantization. Number source: PR body H100 Llama2-7B throughput 10681.75 -> 11181.40 tok/s (~4.68%).",
+    "reported": {
+     "base": 10681.75,
+     "patch": 11181.4,
+     "comparable": false,
+     "scope": "end-to-end H100 Llama2-7B serving throughput over the whole model, not the isolated apply() call the diff touches",
+     "scale_short": "Author's number is full-model E2E serving throughput; the diff only changes one quant flag in the fp8 linear apply path. TO MAKE 1:1: run an isolated fp8 cutlass gemm+quant microbench on the changed apply() call, not whole-model serving.",
+     "scale_note": "SAME unit (tok/s) but the 10681.75 -> 11181.40 figure is whole-model H100 Llama2-7B serving throughput, diluted by attention, KV cache and all non-fp8 work; the diff only fuses amax+quantization inside the cutlass fp8 gemm path. Direction genuine; absolute magnitude not 1:1 with an isolated-op bench."
+    },
+    "arms": {}
+   }
+  ],
+  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ },
+ {
+  "pr": 9948,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/9948",
+  "title": "[Bugfix] Fix Phi-3 BNB quantization with tensor parallel",
+  "field": "quantization",
+  "reported_gain": "N/A (correctness bugfix: makes Phi-3 BNB quantization work with tensor parallel; the quoted ~28.7 tok/s is the fixed model simply running, not a speedup over any working baseline)",
+  "base_sha": "a111d0151ffed94582bec65635979e04e5b63676",
+  "merge_sha": "b6374e09b0af4f8fa4c0b911b3cd1bd45342ead6",
+  "arms": {
+   "base": {
+    "tests": "PASS"
+   },
+   "gold": {
+    "tests": "PASS"
+   }
+  },
+  "improved": true,
+  "schema": "experiments_v2",
+  "experiments": [],
+  "note": "Diff generalizes adjust_bitsandbytes_4bit_shard (renames qkv_offsets->shard_offsets) and adds fused-on-disk BNB weight sharding in linear.py + loader.py so QKV/MergedColumn fused BNB weights shard correctly under tensor parallel. This is a CORRECTNESS bugfix (FIX #9937) enabling Phi-3.5-mini BNB with TP=2, not a performance optimization. The index's '0.8%, 0.0%' derives from the author's TP=2 demo log (Avg generation throughput ~28.7 tok/s) which merely shows the previously-broken configuration now running; there is no before/after speedup baseline, so no timing experiment applies.",
+  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
+  "ts": "2026-11-05T00:00:00Z"
+ }
+]

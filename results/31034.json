@@ -1,0 +1,39 @@
+{
+ "pr": 31034,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/31034",
+ "title": "[P/D] rework mooncake connector and introduce its bootstrap server (#31034)",
+ "field": "prefill_ttft",
+ "reported_gain": "7% TTFT (83.41ms->77.53ms, input-len 128)",
+ "base_sha": "18e7cbbb158a86bdc76585e64ada795bf1c0d435",
+ "merge_sha": "0d6ccf68fa2c439e17d02f26c4044ed5df7f7099",
+ "arms": {
+  "base": {
+   "tests": "PASS"
+  },
+  "gold": {
+   "tests": "PASS"
+  }
+ },
+ "improved": true,
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "ttft_random_input_128",
+   "unit": "ms",
+   "workload": "Random dataset, max-concurrency=1, Qwen2.5-7B-Instruct on two A10 machines (P/D disaggregated); random-input-len 128; TTFT measured with the reworked mooncake connector running prefill on P and decode on D simultaneously.",
+   "needs": "gpu",
+   "note": "diff reworks the mooncake KV connector into vllm/distributed/kv_transfer/kv_connector/v1/mooncake/ and adds a central MooncakeBootstrapServer on P plus a proxy. Headline 83.41ms->77.53ms TTFT (input-len 128) from the PR body; author notes ~6ms TTFT win from running P and D simultaneously.",
+   "reported": {
+    "base": 83.41,
+    "patch": 77.53,
+    "comparable": false,
+    "scope": "end-to-end TTFT of a two-machine A10 P/D disaggregated serving run at max-concurrency=1; the ~6ms win comes from P/D concurrency, not an isolated CPU op.",
+    "scale_short": "Author's number is full two-A10 P/D-disaggregated serving TTFT. TO MAKE 1:1: deploy the reworked mooncake connector + bootstrap server across two A10 machines running Qwen2.5-7B-Instruct and run the random-dataset benchmark at max-concurrency=1.",
+    "scale_note": "Multi-machine disaggregated setup (bootstrap server + proxy + P and D instances with mooncake transport); not reproducible on a single box. The ~6ms (7%) TTFT win at input-len 128 shrinks proportionally at input-len 1024 (252.35->246.25ms). Direction (lower TTFT) is genuine."
+   },
+   "arms": {}
+  }
+ ],
+ "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
+ "ts": "2026-11-05T00:00:00Z"
+}

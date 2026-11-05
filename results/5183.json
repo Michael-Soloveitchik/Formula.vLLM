@@ -1,0 +1,38 @@
+{
+ "pr": 5183,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/5183",
+ "title": "[Kernel] Switch fp8 layers to use the CUTLASS kernels (#5183)",
+ "field": "gpu_kernels",
+ "reported_gain": "5-15% e2e",
+ "base_sha": "388596c91437a51d428a447594e9faec340c29b2",
+ "merge_sha": "8d75fe48ca5f46b7af0f5201d8500b9604eed769",
+ "arms": {
+  "base": {
+   "tests": "PASS"
+  },
+  "gold": {
+   "tests": "PASS"
+  }
+ },
+ "improved": true,
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "fp8_cutlass_scaled_mm",
+   "unit": "pct",
+   "workload": "neuralmagic/Meta-Llama-3-8B-Instruct-FP8 end-to-end serving on GPU; fp8 linear layers routed through vLLM's CUTLASS cutlass_scaled_mm_dq kernel instead of torch._scaled_mm. Author reports 5-15% e2e improvement.",
+   "needs": "gpu",
+   "note": "Diff adds cutlass_fp8_supported() and switches fp8 apply() to ops.cutlass_scaled_mm_dq when bias is None and CUTLASS is supported, else falls back to torch._scaled_mm. Author gives only a ratio/percent range (5-15% e2e on Llama-3-8B-FP8) plus a spreadsheet of GEMM-size comparisons; no absolute before/after tok/s published in the PR text.",
+   "reported": {
+    "pct": 0.15,
+    "comparable": false,
+    "scope": "end-to-end serving speedup on Llama-3-8B-Instruct-FP8; author quotes a 5-15% range (0.15 = the top of the range as headline)",
+    "scale_short": "Author published only a 5-15% E2E range (no absolute numbers) on FP8 Llama-3-8B; the kernel is CUTLASS fp8 GEMM which needs an fp8-capable GPU and cannot run on CPU. TO MAKE 1:1: run the FP8 model e2e on an fp8-capable GPU (e.g. H100) and compare tok/s with torch._scaled_mm vs cutlass_scaled_mm_dq.",
+    "scale_note": "The win is a GPU fp8 GEMM kernel swap; magnitude varies with GEMM shape (per the linked spreadsheet and PR #5144 size sweep), so the 5-15% is an e2e range rather than a single isolated-op ratio. Recorded at the top of the author's range; there is no absolute baseline to anchor and no CPU path to time."
+   },
+   "arms": {}
+  }
+ ],
+ "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
+ "ts": "2026-11-05T00:00:00Z"
+}

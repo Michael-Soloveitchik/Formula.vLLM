@@ -1,0 +1,39 @@
+{
+ "pr": 14540,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/14540",
+ "title": "[Perf] Improve MLA on V1",
+ "field": "attention",
+ "reported_gain": "64% (527.55->865.80 output tok/s)",
+ "base_sha": "92b0ce2ac75e251fe683f5b720f07001782054ff",
+ "merge_sha": "fb0acb6c72874e98617cabee4ff4851569374fc9",
+ "arms": {
+  "base": {
+   "tests": "PASS"
+  },
+  "gold": {
+   "tests": "PASS"
+  }
+ },
+ "improved": true,
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "mla_v1_decode_throughput",
+   "unit": "tok/s",
+   "workload": "DeepSeek-R1 on 8xH200, VLLM_USE_V1=1 benchmark_throughput.py, input-len 6000 output-len 1000, 50 prompts, tensor-parallel-size 8; metric is output tokens/s. Compared against the pre-change V1 MLA path.",
+   "needs": "gpu",
+   "note": "Diff touches only vllm/v1/attention/backends/mla/common.py: makes the rotary_emb input contiguous so the cuda kernel is correct, and reorders ops in build() to avoid GPU->CPU syncs (CPU->GPU kept). Numbers are from the PR body Performance Test (R1): the 6k-input row (865.80 vs 527.55 output tok/s, the 64% headline). Author also showed a 3k-input row that is still slightly below V0, and a DeepSeek-V2-Lite small-model ~15% case.",
+   "reported": {
+    "base": 527.55,
+    "patch": 865.80,
+    "comparable": false,
+    "scope": "full end-to-end V1 serving throughput (benchmark_throughput, DeepSeek-R1, 6k in / 1k out, TP=8 on 8xH200), not an isolated MLA-op timing",
+    "scale_short": "Author's 64% is whole-run output tok/s on 8xH200; our microbench would isolate the MLA build()/rotary path. TO MAKE 1:1: on a GPU box run the same benchmark_throughput command (DeepSeek-R1, 6k/1k, TP=8) before vs after merge_sha and read output tok/s, rather than timing the op alone.",
+    "scale_note": "SAME unit (tok/s) but E2E vs isolated op: the reordering removes GPU->CPU syncs in MLA build, whose benefit is amplified across the full decode loop and tail latency (author noted up to 1ms p99 saved). The 64% figure is specific to the long-context (6k) regime; short-context (3k) was roughly flat / slightly worse, so the isolated-op win will not reproduce the 64% headline at every length."
+   },
+   "arms": {}
+  }
+ ],
+ "environment": "reported-only: author's published GPU numbers (8xH200); measured arms pending on GPU box",
+ "ts": "2026-11-05T00:00:00Z"
+}
