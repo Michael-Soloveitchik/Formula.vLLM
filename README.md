@@ -1,32 +1,35 @@
 <p align="center"><img src="web/shots/logo_banner.png" alt="Formula.vLLM" width="820"></p>
+<p align="center">
+<a href="https://station-wsl-michael.taila4786c.ts.net:10000/formula/web/"><img src="https://img.shields.io/badge/dashboard-live-0b8ce8?style=for-the-badge&labelColor=172a5c" alt="live dashboard"></a>
+<img src="https://img.shields.io/badge/PRs-202-ffc426?style=for-the-badge&labelColor=172a5c" alt="202 PRs">
+<img src="https://img.shields.io/badge/isolation-FormulaCode--style-1aa7ff?style=for-the-badge&labelColor=172a5c" alt="FormulaCode-style">
+<img src="https://img.shields.io/badge/GPU-RTX%205070%20Ti%20sm__120-0b8ce8?style=for-the-badge&labelColor=172a5c" alt="GPU">
+</p>
 
-# Formula.vLLM
-
-202 real vLLM perf PRs, each a benchmark task. Did the PR's speedup reproduce?
-
-Live dashboard: https://station-wsl-michael.taila4786c.ts.net:10000/formula/web/
+<h3 align="center">202 real vLLM perf PRs, each a benchmark task. Did the PR's speedup reproduce?</h3>
+<p align="center">Live dashboard: <a href="https://station-wsl-michael.taila4786c.ts.net:10000/formula/web/">station-wsl-michael.taila4786c.ts.net:10000/formula/web/</a></p>
 
 ![dashboard](web/shots/dashboard_wide.png)
 
-## Goal
+## <img src="web/shots/h/goal.svg" height="40" alt="Goal">
 
 Turn merged vLLM perf PRs into reproducible tasks. Pre-merge code = baseline.
 Merged code = author's solution. Measure both, side by side, in the PR's own unit.
 Check the claimed gain is real.
 
-## Example
+## <img src="web/shots/h/example.svg" height="40" alt="Example">
 
 PR #21222 (block-pool queue ops): author claimed 19×. Our isolated microbench shows
 ~2× — because the 19× was a whole-engine aggregate, not the one op. Both numbers are
 genuine; different scope. The dashboard shows both and names the gap.
 
-## Inspiration
+## <img src="web/shots/h/inspiration.svg" height="40" alt="Inspiration">
 
 FormulaCode. One isolated image per task; baseline vs solution timed back-to-back in
 the SAME container (paired A-B-B-A); repeat for a noise distribution; count only gains
 that clear a MAD gate.
 
-## Partial results
+## <img src="web/shots/h/results.svg" height="40" alt="Partial results">
 
 ![table](web/shots/table_measured.png)
 
@@ -40,14 +43,14 @@ that clear a MAD gate.
   isolated op. Every mismatch carries a `NOT 1:1` banner + the exact fix to make it 1:1.
   7 PRs are feature/correctness-only with no real speedup — marked N/A, not faked.
 
-## Methodology
+## <img src="web/shots/h/methodology.svg" height="40" alt="Methodology">
 
 Two axes per number: **who** (measured by us / reported by author) × **which code**
 (baseline / solution). Four rows per experiment, two colored metric pairs (vs reported,
 vs measured), diagonal fill. Full spec: `prompts/numeric_solution.md` (numbers) +
 `prompts/benchmark.md` (harness).
 
-## Run
+## <img src="web/shots/h/run.svg" height="40" alt="Run">
 
 ```bash
 ./run.sh                 # CPU PRs, this box
@@ -60,7 +63,7 @@ vs measured), diagonal fill. Full spec: `prompts/numeric_solution.md` (numbers) 
 GPU tasks self-skip without CUDA. Weights download on-demand, clustered by model, never
 committed. Mixtral (~90 GB) is gated + last.
 
-### GPU box: wheel mode (no source build, no host clone)
+### <img src="web/shots/h/wheel.svg" height="40" alt="GPU box: wheel mode (no source build, no host clone)">
 
 `Dockerfile.gpu` builds vLLM from source with CUDA 12.1 (sm_86). On newer GPUs that
 cannot run (RTX 5070 Ti is sm_120), so pure-python / Triton PRs run in **wheel mode**:
@@ -77,7 +80,7 @@ site-packages (compiled `.so` stay), runs the oracle from a vllm-free copy of
 The host needs only docker + the NVIDIA container toolkit. `VLLM_GIT` is only for
 legacy source mode.
 
-### Public dashboard (this GPU box)
+### <img src="web/shots/h/dashboard.svg" height="40" alt="Public dashboard (this GPU box)">
 
 `formula-dashboard.service` runs `serve.py` on :8000; Tailscale Funnel mounts it at
 `https://station-wsl-michael.taila4786c.ts.net:10000/formula/web/`
