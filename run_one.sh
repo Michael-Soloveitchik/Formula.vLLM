@@ -246,9 +246,14 @@ while IFS=$'\t' read -r HN MODEL CMD GUIDED; do
   ( cd "$SDIR" && eval "timeout -k 30s $SOLVER_TIMEOUT $CMD \"\$THIS_OBJ\"" </dev/null ) >"$WORK/solve_$SLUG.log" 2>&1 \
     || say "solver $HN exited nonzero/timeout $SOLVER_TIMEOUT (see $WORK/solve_$SLUG.log)"
   ( cd "$SDIR" && diff -ru "$WORK/base_full/vllm" vllm >"$WORK/solve_$SLUG.patch" ) || true
+  if grep -qiE "spend limit|usage limit|rate limit|quota" "$WORK/solve_$SLUG.log" && [ ! -s "$WORK/solve_$SLUG.patch" ]; then
+    say "solver $HN hit an API limit — arm recorded as LIMIT (no measurement)"
+    R=LIMIT
+  else
   R=$(run_arm "$SLUG" "$SDIR" || echo FAIL)
+  fi
   say "solver $HN tests=$R patch=$(wc -c <"$WORK/solve_$SLUG.patch")B"
-  run_workload "$SLUG" "$SDIR"
+  [ "$R" = LIMIT ] || run_workload "$SLUG" "$SDIR"
   python3 - "$WORK/arms.json" "$HN" "$R" "$SLUG" <<'PY'
 import json,sys
 d=json.load(open(sys.argv[1])); d[sys.argv[2]]={"tests":sys.argv[3],"slug":sys.argv[4]}; json.dump(d,open(sys.argv[1],"w"),indent=1)
