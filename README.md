@@ -2,7 +2,7 @@
 
 202 real vLLM perf PRs, each a benchmark task. Did the PR's speedup reproduce?
 
-![dashboard](web/shots/hero.png)
+![dashboard](web/shots/dashboard_wide.png)
 
 ## Goal
 
