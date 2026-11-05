@@ -1,0 +1,186 @@
+# discovery — apply known agendas to NEW places in the vLLM source
+
+Last stage of `all_in.prompt`. Everything before it *describes* what vLLM already
+did (clustered PRs → agendas → research). This stage turns that knowledge forward:
+take the agenda **patterns** that cross clusters/areas and go hunting in the live
+vLLM source on disk for **new sites, bugs, or cases** where one of those patterns
+could be applied to produce a real — ideally significant — efficiency advance.
+
+**Hard constraints**
+- Do NOT use the web. Read the local repo + the Knowledge data only.
+- Do NOT propose anything that already exists as a merged PR. Cross-check every
+  candidate against `data/index.jsonl` (titles) and `data/prs/**` before writing
+  it. If vLLM already did it, drop it.
+- Do NOT modify vLLM source. This stage only *reads* source and *writes proposals*.
+- Be efficient: strongest candidates first, concrete over exhaustive.
+
+**Inputs**
+- `agendas_research.md` — pick the cross-cluster / cross-area agenda categories
+  with the clearest reusable `WHEN → DO → GAIN` pattern (see §2, §2b, §3, §5).
+- `agendas.md` — the per-agenda `pattern` lines are the recipe to re-apply.
+- `data/index.jsonl` + `data/prs/**` — the "already done" set, to avoid dupes.
+- vLLM source on disk: `/Users/michaelsoloveitchik/Repositories/Projects/vLLM/vllm`
+  — the search target. Read actual files/functions/lines.
+
+**Target output** — under
+`/Users/michaelsoloveitchik/Repositories/Projects/vLLM/Knowledge/experiments/`:
+```
+experiments/
+  report.md                          # final roll-up: filter counts + examples
+  <agenda-category-slug>/            # 5-6 of these (agenda or agenda-category;
+    README.md                        #   categories allowed if agendas too close)
+    <NN-proposal-slug>/              # up to 10 per category (ceiling, not target;
+      localization.md                #   5-8 strong ones beats 10 weak)
+      solution.md
+```
+
+- **5-6 agenda categories.** Each MUST be a cross-cluster or cross-area pattern
+  copied from `agendas_research.md`, with its `WHEN→DO→GAIN` recipe stated in the
+  category `README.md`, plus which clusters/areas it spans and why it generalizes.
+- **Up to 10 proposals per category.** Each proposal = a distinct, concrete site in
+  the vLLM source where the pattern applies and is NOT already done.
+**Split rule:** `localization.md` is WHERE only — paths, functions, line ranges,
+quoted current code, the factual dedupe check. **All discussion** (issue analysis,
+proposed change, mechanism, prior-PR precedent, gain estimate, risk) lives ONLY in
+`solution.md`. Do not analyze in localization; do not localize in solution.
+
+- **`localization.md`** per proposal — WHERE, at file + function + line level:
+  - exact path(s) under `vllm/`, the function/class, and line ranges (cite real
+    code that exists on disk today — quote the 2-5 key lines).
+  - what the current code does and why it is a candidate (the inefficiency / the
+    missing fast path / the un-fused ops / the recompute / the fp16 that could be
+    fp8 / the CUDA-only path missing on ROCm, etc.).
+  - the dedupe check: "searched index.jsonl for `<terms>`, nearest existing PR is
+    #NNNN which does X — this is different because Y" (or "no match").
+- **`solution.md`** per proposal — WHAT to change and WHY it wins. Use these
+  **exact `##` subtitles**, in order, so every solution reads the same:
+
+  - `## Agenda scope` — which agenda/category this belongs to, its
+    `WHEN→DO→GAIN` recipe, and which clusters/areas it crosses.
+  - `## Issue` — spell out the problem fully, not one line: what the current code
+    does step by step, where exactly the waste/bottleneck is (extra memory
+    round-trip, redundant recompute, serialized stall, fp16 bytes moved, launch
+    overhead, CUDA-only gap…), under what workload/model it bites, why it matters
+    at scale. A reader who has never seen the file must grasp it from here alone.
+  - `## Solution` — the proposed change in terms of the agenda's lever (fuse /
+    reduce-precision / reuse / overlap / specialize / shard / offload / skip-work /
+    reorder). Walk the new control/data flow, functions/signatures touched, and a
+    pseudocode sketch — enough to DIY. No actual source edits.
+  - `## Mechanism` — why it yields a gain, tied to the `GAIN` metric (throughput /
+    TPOT / TTFT / memory). Name the physical reason (bandwidth, launches,
+    occupancy, idle time, bytes).
+  - `## Similar PRs` — cite 1-3 real merged PRs from this agenda (#numbers + gains
+    from `agendas.md` / the gain views) that applied the SAME lever to a DIFFERENT
+    site; state the analogy: "PR #NNNN fused A+B in <place> for +X%; this fuses the
+    analogous C+D in <new place>." Evidence the pattern transfers.
+  - `## Potential gain` — estimate by **scaling from the measured gains of those
+    prior PRs**, not from thin air: state the prior PR's number, argue up/down for
+    this site (same lever, smaller/larger tensor, hotter/colder path, fraction of
+    total time affected). Range + confidence + every assumption. Do NOT invent a
+    benchmark you did not run; the number must trace to a cited prior PR's gain ×
+    an explained factor.
+  - `## Critique` — argue against your own proposal: why it might be weak, wrong, or
+    low-impact (small fraction of runtime, hidden dependency, backend already does
+    this implicitly, correctness landmine, maintenance cost). Then either (a)
+    revise the gain estimate down to the honest number, or (b) justify why it
+    survives the critique. This section decides keep-vs-filter (see Method step 4).
+  - `## Risk & validation` — correctness/blast radius; which test / model / metric
+    confirms it; what to measure.
+
+**File templates — copy these headers VERBATIM into every proposal.** Missing or
+renamed subtitles = reject.
+
+`localization.md`:
+```markdown
+# <proposal title>
+
+## File
+vllm/<path>  (+ any secondary paths)
+
+## Function
+<Class.method / function name>
+
+## Lines
+L<start>-L<end>  — quote the 2-5 key current lines here
+
+## Dedupe check
+searched index.jsonl for `<terms>`; nearest existing PR #NNNN does X — differs by Y
+(or: no match found)
+```
+
+`solution.md` (every `##` below is mandatory, in this order):
+```markdown
+# <proposal title>
+
+## Agenda scope
+agenda/category · WHEN→DO→GAIN recipe · clusters/areas it crosses
+
+## Issue
+<elaborated problem — step by step, where the waste is, when it bites, why at scale>
+
+## Solution
+<lever + new control/data flow + functions touched + pseudocode sketch>
+
+## Mechanism
+<physical reason for the gain, tied to throughput/TPOT/TTFT/memory>
+
+## Similar PRs
+<1-3 real merged PRs from this agenda, #numbers + their gains, + the analogy>
+
+## Potential gain
+<estimate SCALED from the cited prior PRs' gains × explained factor; range + confidence + assumptions>
+
+## Critique
+<argue against it; then revise gain down OR justify survival>
+
+## Risk & validation
+<correctness/blast radius · which test/model/metric confirms it · what to measure>
+```
+
+**Method (use multi-agents — fan out, one per category)**
+1. From `agendas_research.md`, pick the 5-6 categories with the sharpest patterns
+   and widest reach (candidates: `reduce-precision` spread; `fuse`/fusion-pass;
+   `reuse`/prefix-caching; `overlap`/compute-comm; shared-abstraction refactor;
+   port-the-proven-win to ROCm/TPU/CPU). Close categories may be merged.
+2. Launch one agent per category **in parallel** (independent search spaces). Give
+   each the pattern recipe, the source root, and the dedupe rule. Each agent:
+   greps the source for the pattern's signature, reads the candidate functions,
+   confirms it is not an existing PR, writes `localization.md` + `solution.md`.
+3. Draft every candidate with the full `solution.md` including its `## Critique`.
+4. **Critique + filter pass.** Re-read each proposal's `## Critique` and cut the
+   weak ones: too small a fraction of runtime, already done implicitly by the
+   backend, correctness landmine, speculative gain with no precedent. Filtering a
+   whole category is allowed if none of its proposals survive. Keep the strongest
+   (5-8 typical, 10 max per surviving category). Record what you cut and why — it
+   feeds `experiments/report.md`.
+5. Write each surviving category `README.md` (pattern + why it crosses + index of
+   kept proposals).
+6. Write `experiments/report.md` (see below).
+
+**Final roll-up — `experiments/report.md`** (write LAST, after the critique+filter
+pass). Must contain:
+- **Filter counts.** Candidates drafted vs kept vs filtered, overall and per
+  category: e.g. "drafted 48 across 6 categories → kept 31, filtered 17; 1 whole
+  category dropped." A small table (category | drafted | kept | filtered) + totals.
+- **Worked filter examples — show the judgment, not just numbers:**
+  - 2-3 **proposals you FILTERED OUT**, each with a one-paragraph reason (what the
+    `## Critique` found: too small, already implicit, risky, no precedent).
+  - 2-3 **agendas/categories you FILTERED OUT** (if any), with the reason none of
+    their proposals survived.
+  - 2-3 **proposals you KEPT as-is**, spread across 2-3 different agendas, each with
+    one line on why it survived (strong precedent, large runtime fraction, clean
+    localization).
+- Keep it skimmable — this is the executive summary of the discovery run.
+
+**Quality bar / edge cases**
+- Every cited file/function/line MUST exist in the on-disk source (verify, don't
+  guess). A localization that points at a stale or imagined path is a reject.
+- "New" is strict: incremental configs of an existing kernel are not novel; a
+  genuinely un-fused op pair, an fp16 tensor with no fp8 path, a CUDA kernel with
+  no ROCm/TPU twin, a recompute with no cache — those are novel.
+- Prefer proposals where the agenda's own evidence shows the pattern already paid
+  off elsewhere (reuse the proven lever on an unproven site) — those carry the
+  best expected-gain argument.
+- State uncertainty honestly; a well-localized "medium-confidence" proposal beats a
+  confident hand-wave.
+```

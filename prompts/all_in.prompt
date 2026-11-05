@@ -1,0 +1,250 @@
+# all_in — master orchestrator
+
+Runs the whole vLLM-efficiency knowledge build **from scratch**: search the repo →
+aggregate → cluster → filter → download conversations → scan gains → extract
+agendas → research. This file does NOT contain the rules — it **dispatches** the
+three specialist prompts and the pipeline scripts in the right order, tells you
+**when to stop each stage**, **when to move on**, and **what runs sequentially vs
+in parallel**.
+
+The three specialist prompts it orchestrates (do not merge them — edit each in
+place):
+- `prompts/prompt_clustering.md` — field assignment rules (the `json` block drives
+  `extract.py`).
+- `prompts/prompt_subclustering.md` — area (code-dir) assignment rules (same
+  `extract.py`).
+- `prompts/prompt_agendas.md` — the agenda-layer build (schema, agents, gain
+  attribution, research doc).
+- `prompts/discovery_prompt` — the forward-looking stage: re-apply agenda patterns
+  to NEW sites in the live vLLM source → `experiments/` proposals.
+
+**Hard constraint: do NOT use the web.** The source is the local
+`/Users/michaelsoloveitchik/Repositories/Projects/vLLM/vllm` git repo + GitHub via
+`gh` (for PR conversations only). All analysis is local.
+
+All paths below are relative to
+`/Users/michaelsoloveitchik/Repositories/Projects/vLLM/Knowledge`.
+
+---
+
+## The pipeline at a glance (DAG)
+
+```
+            prompt_clustering.md ─┐
+            prompt_subclustering.md ─┤
+                                   ▼
+  (local git log) ── extract.py ──► data/index.jsonl + data/stats.md     [STAGE 1 search+aggregate+cluster+filter]
+                                   │
+                      ┌────────────┤  (gate: distribution stable?)
+                      ▼            │
+            download.py ──► data/prs/<field>/<area>/<pr>.md               [STAGE 2 aggregate conversations]
+            (parallel per field)   │
+                      │            ├── migrate.py   (ONLY after a recluster)
+                      ▼            ▼
+                  report.py   data/digests/<cluster>.md                   [STAGE 3 progress + per-field digests]
+                      │
+          ┌───────────┼───────────┐
+          ▼           ▼           ▼
+   perf_scan.py  quant_scan.py  agenda.py                                 [STAGE 4 gain scans + perf/enabling split]
+   (strict)      (broad)        (perf vs enabling)        ← run in parallel
+          └───────────┼───────────┘
+                      ▼
+        9 parallel extraction agents ──► /tmp/agendas_new_<cluster>.md     [STAGE 5 agenda extraction — PARALLEL x9]
+                      ▼
+            assemble_agendas.py ──► agendas.md                            [STAGE 6 assemble — SEQUENTIAL]
+                      ▼
+            attribute_gains.py  (rewrites gains lines)                    [STAGE 6 attribute — SEQUENTIAL, after assemble]
+                      ▼
+            hand-author agendas_research.md                               [STAGE 7 research — SEQUENTIAL]
+                      ▼
+        5-6 discovery agents ──► experiments/<agenda>/<proposal>/          [STAGE 8 discovery — PARALLEL x5-6, LAST]
+                                   {localization.md, solution.md}
+```
+
+---
+
+## STAGE 1 — search + aggregate + cluster + filter   `[sequential, iterate]`
+
+**What:** `python3 pipeline/extract.py`. Reads the local vLLM `git log` (merged PR
+titles + changed file paths), applies `prompt_clustering.md` (field) and
+`prompt_subclustering.md` (area), writes `data/index.jsonl` (one row per PR) +
+`data/stats.md`.
+
+- **search / aggregate** = extract.py walking git history since `"since"`
+  (2024-04-01).
+- **cluster** = field assignment from keyword/tag/priority rules.
+- **filter** = a PR with zero efficiency signal → `field: null` (excluded). Also
+  `exclude_tags`, `exclude_areas`, `exclude_path_prefixes`, `exclude_prs`
+  (body-read drop list).
+
+**This is the ONLY stage that uses the two cluster prompts. Iterate here:**
+1. Run extract, open `data/stats.md`.
+2. **STOP condition:** no field is a junk bucket. Specifically `gpu_kernels` must
+   NOT swallow specific work (it is lowest priority on purpose; a FP8 CUDA kernel
+   is `quantization`, not `gpu_kernels`). Specific fields (quant/attention/kv_cache)
+   must be populated. If `gpu_kernels` is >~35% of contributing PRs → the generic
+   keywords are too greedy → fix priority/keywords in `prompt_clustering.md`, rerun.
+3. Add body-audited false matches to `exclude_prs` (a PR that keyword-matched but
+   whose conversation says "enablement, perf later" / pure refactor / version bump).
+4. **MOVE ON** only when the distribution is stable across two consecutive runs.
+
+Do not proceed to downloads while the index is still churning — re-clustering
+after download forces a `migrate.py` reshuffle.
+
+---
+
+## STAGE 2 — download PR conversations   `[parallel per field]`
+
+**What:** `python3 pipeline/download.py --fields all` (or a comma list). Fetches
+each contributing PR's conversation via `gh pr view` → `data/prs/<field>/<area>/
+<pr>.md`. Resumable (skips existing); self-throttles on rate limits.
+
+- **Parallelize** by launching one background process per field
+  (`--fields gpu_kernels`, `--fields quantization`, …) — independent trees, no
+  write contention. Mind the shared `gh` rate limit; the script sleeps 120s and
+  retries on 403/secondary-limit.
+- **STOP condition:** every contributing field has ≥ "enough" bodies for the gain
+  scans and agenda agents to be representative (the big clusters need the most;
+  `report.py` shows per-field coverage). 100% is not required to start Stage 4,
+  but the agenda for a cluster is only as good as that cluster's downloaded set.
+- **After a recluster** (Stage 1 rerun that moved PRs between fields/areas): run
+  `python3 pipeline/migrate.py` instead of re-downloading — it relocates existing
+  bodies to match the new index and parks now-excluded PRs under
+  `data/prs/_excluded/<reason>/`. Idempotent, no re-fetch.
+
+---
+
+## STAGE 3 — progress + per-field digests   `[sequential, cheap]`
+
+- `python3 pipeline/report.py` → `report.md` (download coverage per field/area).
+  Run anytime to decide whether Stage 2 has enough coverage to proceed.
+- Ensure `data/digests/<cluster>.md` exist (one per field: title+date per PR).
+  These are the ONLY input the Stage-5 agents read — they keep each agent's
+  context small. Regenerate from `index.jsonl` whenever the index changes.
+
+---
+
+## STAGE 4 — gain scans + perf/enabling split   `[3-way parallel]`
+
+Three independent body scans; launch together:
+1. `python3 pipeline/perf_scan.py` → `data/views/perf_gains.{jsonl,md}` — **strict**
+   (~376 PRs). Trustworthy PR-number→gain map; seeds evidence-PR gains in Stage 6.
+2. `python3 pipeline/quant_scan.py` → `data/views/quant_gains.jsonl` — **broad**
+   (~443 PRs). Maximizes coverage for the agenda gain roll-up.
+3. `python3 pipeline/agenda.py` → `data/views/agenda.{jsonl,md}` — splits
+   contributing PRs into **performance** (has a measured number) vs **enabling**
+   (no number: correctness / "it works" / doesn't-OOM / refactor / metrics).
+
+Edge cases for 1&2 are specified in `prompt_agendas.md` §4 Step 2 (hardware-token
+masking, parity/≥50x noise drop, tok/s excluded). **STOP condition:** `quant_gains`
+≈443 (a much larger count means the noise filters regressed — do not ship it).
+
+---
+
+## STAGE 5 — agenda extraction   `[PARALLEL × 9 agents]`
+
+Hand off to `prompt_agendas.md` §3. Launch **9 agents in one message** (one per
+cluster: gpu_kernels, quantization, parallelism, attention, scheduling,
+decoding_tpot, memory, kv_cache, prefill_ttft). Each reads only its own
+`data/digests/<cluster>.md`, writes `/tmp/agendas_new_<cluster>.md` on the
+**shared comparable schema** (`prompt_agendas.md` §3), ending with a
+`===TABLEROWS===` block.
+
+- This is the one stage that genuinely fans out — the clusters are independent, so
+  9-way parallel is correct and ~9× faster than serial.
+- **Reject + re-run a cluster** if: titles are jargon-only; any schema field
+  missing; closed vocab violated; `memory` agendas have blank `plain`/`example`
+  (its digest lacks seeds — the agent must author them from real PRs).
+- **STOP condition:** all 9 temp files present, each parses on the schema.
+
+---
+
+## STAGE 6 — assemble then attribute   `[STRICTLY SEQUENTIAL]`
+
+Order is load-bearing — attribute reads the file assemble writes.
+1. `cp agendas.md /tmp/agendas_pre_gains.md` (restore point).
+2. `python3 pipeline/assemble_agendas.py` → `agendas.md` (header + closed-vocab
+   legend + Cross-cluster comparison matrix + seed gains from `perf_gains`).
+3. `python3 pipeline/attribute_gains.py` → rewrites every `- **gains:**` line by
+   attributing all ~443 `quant_gains` PRs to one agenda each (~375 attributed, ~68
+   left unattributed — do not force them). Evidence PRs force-assigned;
+   `platform→gpu_kernels` alias.
+4. `grep -c "^### Agenda:" agendas.md` → expect ~87.
+
+Never run attribute before assemble. Never run them in parallel.
+
+---
+
+## STAGE 7 — research doc   `[sequential, last, hand-authored]`
+
+Hand-author `agendas_research.md` from `agendas.md` + both gain views, per
+`prompt_agendas.md` §6: §1 lifecycle (active/waning/dormant), §2 cross-CLUSTER
+meta-agendas, §2b cross-AREA within one cluster, §3 recurring patterns with
+per-category counts (lever + trigger tables each summing to 87), §4 where gains
+concentrate, §5 worked examples. The two "close agendas, not shared PRs" claims and
+the two 87-sum tables are mandatory (see `prompt_agendas.md` §6 checklist).
+
+---
+
+## STAGE 8 — discovery (apply agendas forward)   `[PARALLEL × 5-6 agents, LAST]`
+
+Hand off to `prompts/discovery_prompt`. Take the cross-cluster / cross-area agenda
+patterns from `agendas_research.md` and hunt the **live vLLM source on disk** for
+NEW sites/bugs/cases where a pattern could be applied for a real advance. Launch
+one agent per agenda category in parallel; each writes
+`experiments/<agenda>/<proposal>/{localization.md,solution.md}` (file+function+line
+localization + proposed solution). Strict rules: no web, do NOT propose existing
+merged PRs (dedupe against `data/index.jsonl` + `data/prs/**`), do NOT edit source.
+5-6 categories, up to 10 proposals each. **STOP condition:** every proposal cites
+real on-disk code and passes the dedupe check.
+
+---
+
+## Sequential vs parallel — quick reference
+
+| stage | mode | why |
+|---|---|---|
+| 1 extract/cluster | sequential, **iterate to stable** | deterministic; distribution must settle before downloading |
+| 2 download | **parallel per field** (bg procs) | independent trees; bounded by shared `gh` rate limit |
+| 3 report/digests | sequential, cheap | reads the index |
+| 4 perf_scan / quant_scan / agenda | **3-way parallel** | independent body scans |
+| 5 agenda extraction | **parallel × 9 agents** | clusters are independent |
+| 6 assemble → attribute | **strictly sequential** | attribute edits assemble's output |
+| 7 research | sequential | synthesizes everything above |
+| 8 discovery | **parallel × 5-6 agents, last** | independent per-category source hunts |
+
+## When to move between stages (gates)
+
+- **1 → 2:** `stats.md` stable, no junk bucket, exclude lists settled.
+- **2 → 4:** `report.py` shows representative per-field coverage (not necessarily
+  100%).
+- **recluster at any time → 2:** run `migrate.py`, not a re-download.
+- **4 → 5:** `quant_gains` ≈443 and `perf_gains` ≈376 exist; digests current.
+- **5 → 6:** all 9 `/tmp/agendas_new_*.md` present and schema-valid.
+- **6 → 7:** `agendas.md` has ~87 agendas and rewritten gains lines.
+- **7 → 8:** `agendas_research.md` done; cross-cluster/cross-area patterns picked.
+
+## From-scratch one-shot
+
+```bash
+cd /Users/michaelsoloveitchik/Repositories/Projects/vLLM/Knowledge
+# STAGE 1 (iterate: edit prompt_clustering/subclustering, rerun, read stats.md)
+python3 pipeline/extract.py
+# STAGE 2 (parallel per field; or --fields all). After a recluster use migrate.py.
+for f in gpu_kernels quantization parallelism attention scheduling decoding_tpot memory kv_cache prefill_ttft; do
+  python3 pipeline/download.py --fields "$f" &        # background, respects gh rate limit
+done; wait
+# STAGE 3
+python3 pipeline/report.py
+# STAGE 4 (parallel)
+python3 pipeline/perf_scan.py & python3 pipeline/quant_scan.py & python3 pipeline/agenda.py & wait
+# STAGE 5 — launch 9 parallel extraction agents per prompt_agendas.md §3 → /tmp/agendas_new_<cluster>.md
+# STAGE 6 (sequential)
+cp agendas.md /tmp/agendas_pre_gains.md
+python3 pipeline/assemble_agendas.py
+python3 pipeline/attribute_gains.py
+grep -c "^### Agenda:" agendas.md            # ~87
+# STAGE 7 — hand-author agendas_research.md per prompt_agendas.md §6
+# STAGE 8 — launch 5-6 parallel discovery agents per prompts/discovery_prompt
+#           → experiments/<agenda>/<proposal>/{localization.md,solution.md}
+```
