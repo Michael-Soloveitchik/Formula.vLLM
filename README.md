@@ -43,6 +43,23 @@ that clear a MAD gate.
   isolated op. Every mismatch carries a `NOT 1:1` banner + the exact fix to make it 1:1.
   7 PRs are feature/correctness-only with no real speedup — marked N/A, not faked.
 
+### GPU box (RTX 5070 Ti, sm_120, wheel mode) — 2026-11-05
+
+Measured in Docker, 5 repeats per arm (mean ± sd), author's own benchmark command.
+`claude` = blind (objective without the expert solution), `claude + PR's solution` = guided.
+
+| PR | metric | base | gold (merged PR) | ours | author | claude | claude + PR's solution |
+|---|---|---|---|---|---|---|---|
+| [#37225](https://github.com/vllm-project/vllm/pull/37225) top-k search | topk_whole b2048 v32k, ms | 1.259 ± 0.003 | 0.958 ± 0.003 | **1.31×** | 1.38× | = base (timed out) | = base (timed out) |
+| [#33538](https://github.com/vllm-project/vllm/pull/33538) Triton top-k/top-p | topk_whole b16 v32k, ms | 1.294 (PyTorch sort) | 0.120 ± 0.048 | **10.8×** | 4.2× | FAIL (timed out) | 0.065 ms, PASS |
+| [#41163](https://github.com/vllm-project/vllm/pull/41163) AllPool.forward | median, µs | 120.2 ± 19.7 | 84.4 ± 17.3 | **1.42×** | 1.51× | **12.1 µs, PASS** | 12.1 µs, PASS |
+| [#22940](https://github.com/vllm-project/vllm/pull/22940) slot mapping | opt-125m, output tok/s | 2270 ± 12 | 2280 ± 16 | +0.4 % | +2.07 % | 2280, PASS | 2282, PASS |
+
+- #41163: both claude arms beat the author's patch ~7× by also caching the first-token
+  indices on the CPU (no device sync at all); hidden pooling test passes.
+- #22940: GPU-bound workload on this box; the slot-mapping CPU gain is inside the noise.
+- #33538 base = the script's PyTorch sort path (the PR introduces both kernel and script).
+
 ## <img src="web/shots/h/methodology.svg" height="40" alt="Methodology">
 
 Two axes per number: **who** (measured by us / reported by author) × **which code**
