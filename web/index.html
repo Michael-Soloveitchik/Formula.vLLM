@@ -208,14 +208,21 @@ async function boot(){
  IDX=await fetch('../index.json',no).then(r=>r.json()).catch(()=>[]);
  const all=await fetch('../results/all.json',no).then(r=>r.json()).catch(()=>[]);
  RES={}; all.forEach(r=>RES[r.pr]=r);
- // build pr -> {field, area} map from the full crawl jsonl (needed to construct md paths).
- // only keep rows that belong to our 202-PR benchmark set.
+ // pr -> {field, area} map (needed to construct md paths). data/area.json is the
+ // compact 202-PR subset (~20 KB, built by gen_area.py); the full crawl jsonl
+ // (~10 MB) is only a fallback and is fetched AFTER first render so a slow link
+ // (Tailscale Funnel) never blocks the dashboard.
  const want=new Set(IDX.map(r=>r.pr));
- const jl=await fetch('../data/index.jsonl',no).then(r=>r.text()).catch(()=>'');
- jl.split('\n').forEach(line=>{
-  if(!line) return;
-  try{const r=JSON.parse(line); if(want.has(r.pr)) AREA[r.pr]={field:r.field,area:r.area};}catch(e){}
- });
+ const area=await fetch('../data/area.json',no).then(r=>r.ok?r.json():null).catch(()=>null);
+ if(area){Object.keys(area).forEach(k=>{AREA[+k]=area[k];});}
+ else{
+  fetch('../data/index.jsonl',no).then(r=>r.text()).catch(()=>'').then(jl=>{
+   jl.split('\n').forEach(line=>{
+    if(!line) return;
+    try{const r=JSON.parse(line); if(want.has(r.pr)) AREA[r.pr]={field:r.field,area:r.area};}catch(e){}
+   });
+  });
+ }
  const fields=[...new Set(IDX.map(r=>r.field).filter(Boolean))].sort();
  fields.forEach(f=>$('#field').add(new Option(f,f)));
  ['q','field','status'].forEach(id=>$('#'+id).addEventListener('input',render));

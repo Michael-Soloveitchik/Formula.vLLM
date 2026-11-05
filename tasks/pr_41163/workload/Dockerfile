@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends python3 python3
  && rm -rf /var/lib/apt/lists/*
 # vLLM wheel: first PyPI release AFTER merge_sha (compiled ops match the gold tree).
 # Empty VLLM_VERSION = latest (pick one and record it in tasks/pr_41163/metadata.json:wheel).
-ARG VLLM_VERSION=
+ARG VLLM_VERSION=0.20.1
 RUN pip install --upgrade pip && pip install "vllm${VLLM_VERSION:+==$VLLM_VERSION}" pytest pytest-asyncio
 # Runtime extras in their own layer (keeps the wheel layer cached):
 #   gcc/libc6-dev : Triton JIT compiles its CUDA driver shim with a host C compiler

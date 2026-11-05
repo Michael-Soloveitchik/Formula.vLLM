@@ -1,0 +1,54 @@
+{
+ "pr": 22940,
+ "title": "[Core] direct indexing on self.block_table_np in compute_slot_mapping (#22940)",
+ "field": "kv_cache",
+ "date": "2025-08-15",
+ "hardware": [
+  "agnostic"
+ ],
+ "url": "https://github.com/vllm-project/vllm/pull/22940",
+ "base_sha": "df5afa82e5c41be7d87ddd1968e13891d22003a7",
+ "merge_sha": "6e670778cdd87c282c42002a2304cb0a4a165904",
+ "source_files": [
+  "vllm/v1/worker/block_table.py"
+ ],
+ "test_files": [],
+ "wheel": "0.10.1",
+ "wheel_note": "first PyPI release after merge (2025-08-19 > 2025-08-15); torch 2.7.1 cu128 wheel runs on sm_120.",
+ "workload": {
+  "kind": "serving",
+  "script": "benchmarks/benchmark_throughput.py",
+  "cmd": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 2000 --dtype float16",
+  "unit": "tok/s",
+  "needs": "gpu",
+  "model": "facebook/opt-125m",
+  "headline": "throughput_output_tok_s",
+  "note": "Author ran --num-prompts 30000 (opt-125m, in 800 / out 75). We run 2000 prompts per repeat so 5 repeats x 4 arms fit in a session; same per-step hot path (compute_slot_mapping runs every step), throughput ratio comparable, absolute tok/s not 1:1 (different GPU, shorter run). Weights come from the HF cache mounted at /root/.cache/huggingface (.weights/hf on the host)."
+ },
+ "perf_gain": {
+  "top_gain": "2.07%",
+  "gain_kind": "pct",
+  "gain_evidence": "benchmark_throughput opt-125m: +2.07% throughput; compute_slot_mapping 400+us -> 15-30us per call"
+ },
+ "needs": "gpu",
+ "experiments": [
+  {
+   "name": "throughput_output_tok_s",
+   "reported": {
+    "pct": 2.07,
+    "comparable": false,
+    "scale_short": "author: 30000 prompts on H100-class GPU; ours: 2000 prompts on RTX 5070 Ti",
+    "scale_note": "Author reported +2.07% end-to-end throughput at 30000 prompts; we run 2000 prompts per repeat on an RTX 5070 Ti. Ratio is the comparable quantity, not absolute tok/s."
+   }
+  },
+  {
+   "name": "throughput_total_tok_s",
+   "reported": null
+  },
+  {
+   "name": "throughput_req_s",
+   "reported": null
+  }
+ ],
+ "experiments_note": "reported pct = author's end-to-end throughput gain; dashboard applies it to our measured baseline"
+}
