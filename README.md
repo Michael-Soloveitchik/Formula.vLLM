@@ -1,6 +1,10 @@
+<p align="center"><img src="web/shots/logo_banner.png" alt="Formula.vLLM" width="820"></p>
+
 # Formula.vLLM
 
 202 real vLLM perf PRs, each a benchmark task. Did the PR's speedup reproduce?
+
+Live dashboard: https://station-wsl-michael.taila4786c.ts.net:10000/formula/web/
 
 ![dashboard](web/shots/dashboard_wide.png)
 
