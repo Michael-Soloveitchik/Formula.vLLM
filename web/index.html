@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
- :root{--bg:#f8fbff;--panel:#fff;--panel2:#f7f9ff;--border:#dde6f5;--border2:#c9d6ec;
+ :root{--bg:#fcfdff;--panel:#fff;--panel2:#f8faff;--border:#dde6f5;--border2:#c9d6ec;
   --fg:#172a5c;--mut:#5a6786;--faint:#98a2b8;--acc:#0b8ce8;--acc2:#1aa7ff;--cyan:#1aa7ff;--navy:#172a5c;
   --org:#ff9a1f;--yel:#ffc426;--grn:#1a9c5b;--red:#e5533f;--sel:#e8f3ff;
   --grad:linear-gradient(120deg,#1aa7ff,#0b8ce8 45%,#2457d8);
@@ -20,9 +20,9 @@
  *{box-sizing:border-box}
  html,body{height:100%}
  body{margin:0;font:14px/1.5 var(--ui);-webkit-font-smoothing:antialiased;color:var(--fg);
-  background:radial-gradient(900px 520px at -5% -10%,#ebf4ff 0,transparent 60%),radial-gradient(900px 520px at 105% -10%,#edf7ff 0,transparent 55%),radial-gradient(800px 500px at 50% 110%,#eff4ff 0,transparent 55%),var(--bg);
+  background:radial-gradient(900px 520px at -5% -10%,#f1f7ff 0,transparent 60%),radial-gradient(900px 520px at 105% -10%,#f2f9ff 0,transparent 55%),var(--bg);
   background-attachment:fixed}
- header{background:linear-gradient(180deg,#fcfdff,#f6f9ff);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);
+ header{background:linear-gradient(180deg,#fff,#f9fbff);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);
   color:var(--fg);padding:10px 26px 10px 16px;border-bottom:1px solid rgba(11,140,232,.14);box-shadow:0 6px 24px rgba(11,140,232,.08);
   display:flex;flex-direction:column;align-items:center;gap:4px;position:sticky;top:0;z-index:20}
  header::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--grad)}
@@ -138,7 +138,7 @@
  .ctl input{flex:1;min-width:180px}
  .restab{width:100%;border-collapse:separate;border-spacing:0;background:var(--panel);border:1px solid var(--border);
   border-radius:12px;overflow:hidden;margin-bottom:14px;box-shadow:var(--glow)}
- .restab th,.restab td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);font-size:14px;line-height:1.4}
+ .restab th,.restab td{padding:7px 8px;text-align:left;border-bottom:1px solid var(--border);font-size:14px;line-height:1.4}
  .restab tbody tr{transition:background .12s}
  .restab tbody tr:hover td{background:#f6f9ff}
  .restab th{background:#f8fafc;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);border-bottom:2px solid var(--border2)}
@@ -152,14 +152,14 @@
  .restab td .tag-m{color:#0b8ce8;font-weight:600}
  .restab td .tag-r{color:#b97a00;font-weight:600}
  .restab.exp{table-layout:fixed}
- .restab.exp .c-row{width:330px}
- .restab.exp .c-val{width:150px}
- .restab.exp .c-d{width:96px}
- .restab.exp .c-r{width:64px}
+ .restab.exp .c-row{width:300px}
+ .restab.exp .c-val{width:140px}
+ .restab.exp .c-d{width:88px}
+ .restab.exp .c-r{width:58px}
  .restab.exp th.r-rep{color:#a66e00;background:#fff4d6}
  .restab.exp th.r-meas{color:#0b6fc0;background:#edf6ff}
- .restab.exp td.num .mv{display:inline-block;width:64px;text-align:right}
- .restab.exp td.num .var{color:var(--faint);display:inline-block;width:66px;text-align:left;margin-left:4px;font-size:11.5px}
+ .restab.exp td.num .mv{display:inline-block;width:60px;text-align:right}
+ .restab.exp td.num .var{color:var(--faint);display:inline-block;width:62px;text-align:left;margin-left:3px;font-size:11.5px}
  .scalebox{margin:-8px 0 16px;padding:8px 12px;border-radius:0 0 12px 12px;background:#fff9ef;
   border:1px solid #ffe2b3;border-top:none;font-size:12.5px;line-height:1.5}
  .scalebox.inv{background:#fef2f2;border-color:#fecaca}
@@ -171,7 +171,7 @@
  .scalebox .sb-l b{color:var(--mut);font-weight:700;cursor:default}
  .scalebox .sb-full{color:var(--mut)}
  .restab.exp .c-src{width:auto}
- .restab.exp th.num,.restab.exp td.num{text-align:right;padding-right:10px;padding-left:4px}
+ .restab.exp th.num,.restab.exp td.num{text-align:right;padding-right:8px;padding-left:2px}
  .restab.exp td.src{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--mut)}
  .expH .eb{font-family:var(--mono);font-size:10px;color:var(--mut);font-weight:600;margin-left:2px}
  .restab tr:last-child td{border-bottom:none}
