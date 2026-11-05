@@ -77,7 +77,11 @@ def main():
     pyt_ref = {}      # scenario -> [ms] (gold runs only)
     for arm in arms:
         per_arm[arm] = {}
-        for lg in sorted(glob.glob(os.path.join(work, f"wl_{arm}_*.log"))):
+        # exact arm match: wl_<arm>_<n>.log (a bare glob would also match
+        # another arm whose slug starts with this one, e.g. claude vs claude___PR_s_solution)
+        pat = re.compile(rf"^wl_{re.escape(arm)}_(\d+)\.log$")
+        logs = sorted(os.path.join(work, f) for f in os.listdir(work) if pat.match(f))
+        for lg in logs:
             vals, pyt = parse_log(lg)
             for k, (v, u) in vals.items():
                 per_arm[arm].setdefault(k, []).append(v)
