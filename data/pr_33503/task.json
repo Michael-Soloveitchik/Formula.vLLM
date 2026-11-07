@@ -1,0 +1,18 @@
+{
+ "pr": 33503,
+ "title": "feat(spec_decode): fuse EAGLE step slot mapping and metadata updates (#33503)",
+ "url": "https://github.com/vllm-project/vllm/pull/33503",
+ "date": "2026-03-10",
+ "field": "decoding_tpot",
+ "area": "v1/spec_decode",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "4bf533623b6957ed27ba3a026df86ee9e2b9685e",
+ "merge_sha": "4aaaf8c8ce517dd97a1cb2610e57fc161755a3a3",
+ "source_path": "vllm/v1/spec_decode/eagle.py",
+ "reported_gain": "1.9%",
+ "gain_kind": "pct",
+ "gain_evidence": "I measure a 1.9% speedup for Llama 3.1 8B on 1xB200 with K=3 spec tokens, 1K ISL, BS=1.",
+ "hardware_overrides": {}
+}

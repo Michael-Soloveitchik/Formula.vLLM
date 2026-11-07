@@ -1,0 +1,18 @@
+{
+ "pr": 28047,
+ "title": "[Hybrid] Mamba2 prefix cache blocks freeing for running requests (#28047)",
+ "url": "https://github.com/vllm-project/vllm/pull/28047",
+ "date": "2025-12-25",
+ "field": "attention",
+ "area": "v1/core",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "2d6001f491bc29223dd3f8150688daeaded275ee",
+ "merge_sha": "f1531d9f2a60c347ea1b410bfb04850c92922de0",
+ "source_path": null,
+ "reported_gain": "96%",
+ "gain_kind": "pct",
+ "gain_evidence": "--output-len 10 --batch-size 8 --enable-prefix-caching --num-iters 10 --num-iters-warmup 2 ``` - case 2: prompt 100000 - memory tight situation => **latency red",
+ "hardware_overrides": {}
+}

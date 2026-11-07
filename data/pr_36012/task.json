@@ -1,0 +1,18 @@
+{
+ "pr": 36012,
+ "title": "[Performance] Add prefetch for checkpoints to OS page cache (#36012)",
+ "url": "https://github.com/vllm-project/vllm/pull/36012",
+ "date": "2026-03-16",
+ "field": "quantization",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "9b005edc48d105e9a9ced0ac44b5292a647c2b05",
+ "merge_sha": "f5e59ee7a6c3a07aad8f814b261bc0a1db2dcaf1",
+ "source_path": "vllm/model_executor/model_loader/weight_utils.py",
+ "reported_gain": null,
+ "gain_kind": "audit",
+ "gain_evidence": "prefetch checkpoints -> faster model loading",
+ "hardware_overrides": {}
+}

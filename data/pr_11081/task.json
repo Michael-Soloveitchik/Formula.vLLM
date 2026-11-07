@@ -1,0 +1,18 @@
+{
+ "pr": 11081,
+ "title": "[torch.compile] allow tracking forward time (#11081)",
+ "url": "https://github.com/vllm-project/vllm/pull/11081",
+ "date": "2024-12-14",
+ "field": "gpu_kernels",
+ "area": "vllm/forward_context.py",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "15859f2357059ef488405e5336d2c6e5d246687b",
+ "merge_sha": "a1c02058baf47be1a91ee743378a340ee1b10416",
+ "source_path": "vllm/forward_context.py",
+ "reported_gain": "8.8%",
+ "gain_kind": "pct",
+ "gain_evidence": "then it is clear that the forward time improves from 6.5ms to 5.93ms, 8.8% improvement.",
+ "hardware_overrides": {}
+}

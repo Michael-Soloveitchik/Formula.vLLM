@@ -1,0 +1,18 @@
+{
+ "pr": 7162,
+ "title": "[Performance] Optimize e2e overheads: Reduce python allocations (#7162)",
+ "url": "https://github.com/vllm-project/vllm/pull/7162",
+ "date": "2024-08-09",
+ "field": "scheduling",
+ "area": "attention/backends",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "73388c07a42233a1010595edaab73a9e7ab8d9a4",
+ "merge_sha": "e02ac5561748306186aaeaad6dad4c89484a2b45",
+ "source_path": "vllm/worker/model_runner.py",
+ "reported_gain": "24%",
+ "gain_kind": "pct",
+ "gain_evidence": "End-to-end throughput of Llama3 8B on 1xH100 is 24% faster with this PR.",
+ "hardware_overrides": {}
+}

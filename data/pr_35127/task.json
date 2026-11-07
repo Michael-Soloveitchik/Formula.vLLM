@@ -1,0 +1,18 @@
+{
+ "pr": 35127,
+ "title": "[Perf] Optimize pooling model redundant copy, 1.8% throughput improvement (#35127)",
+ "url": "https://github.com/vllm-project/vllm/pull/35127",
+ "date": "2026-02-24",
+ "field": "scheduling",
+ "area": "v1/worker",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "c77f3e1207d32d4101a202e92f5d684d1c6968e1",
+ "merge_sha": "14561fabfd39030168a3365327d921ae5c49bb0c",
+ "source_path": "vllm/v1/worker/gpu_model_runner.py",
+ "reported_gain": "1.8%",
+ "gain_kind": "pct",
+ "gain_evidence": "# PR #35127: [Perf] Optimize pooling model redundant copy, 1.8% throughput improvement",
+ "hardware_overrides": {}
+}

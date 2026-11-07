@@ -1,0 +1,18 @@
+{
+ "pr": 41428,
+ "title": "[DSv4] Improved fused Indexer Q quant kernel (#41428)",
+ "url": "https://github.com/vllm-project/vllm/pull/41428",
+ "date": "2026-05-09",
+ "field": "gpu_kernels",
+ "area": "v1/attention",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "34ab4f2565572a1525865a06d2ba19cc5fcb4f00",
+ "merge_sha": "530d37130278d38b07b089f936850537aa1ea5e6",
+ "source_path": "vllm/v1/attention/ops/deepseek_v4_ops/fused_indexer_q.py",
+ "reported_gain": "3% (TTFT (P50): 1.39s→1.35s)",
+ "gain_kind": "unit",
+ "gain_evidence": "TTFT (P50): before 1.39s / after 1.35s",
+ "hardware_overrides": {}
+}

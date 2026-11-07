@@ -1,0 +1,18 @@
+{
+ "pr": 24539,
+ "title": "[Spec Decode] Efficient padded speculation (#24539)",
+ "url": "https://github.com/vllm-project/vllm/pull/24539",
+ "date": "2025-09-18",
+ "field": "decoding_tpot",
+ "area": "v1/worker",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "5c65a72bb17b34bc6eb0d7ca43b10938c88dc7e3",
+ "merge_sha": "b7433ca1a47732394b1bdea4099d98389515954b",
+ "source_path": "vllm/v1/worker/gpu_model_runner.py",
+ "reported_gain": "2%",
+ "gain_kind": "pct",
+ "gain_evidence": "When tested on Llama 3.1 8B-Instruct with EAGLE3 on 1xB200, this PR introduces a small 2% speedup on both TTFT and TPOT.",
+ "hardware_overrides": {}
+}

@@ -1,0 +1,18 @@
+{
+ "pr": 40534,
+ "title": "[Model] Gemma4: add bidirectional vision attention for sliding layers with window guard (#40534)",
+ "url": "https://github.com/vllm-project/vllm/pull/40534",
+ "date": "2026-04-24",
+ "field": "gpu_kernels",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "4c34b2f6fc63435c791c9054c579ca3f8c902bb6",
+ "merge_sha": "512f52219240b0aa1be687955ab52fcdd0c5a40e",
+ "source_path": "vllm/v1/worker/gpu_model_runner.py",
+ "reported_gain": "1.10%",
+ "gain_kind": "pct",
+ "gain_evidence": "Bidi improves MMMU-Pro by +0.81–1.10% when images fit within the sliding window.",
+ "hardware_overrides": {}
+}

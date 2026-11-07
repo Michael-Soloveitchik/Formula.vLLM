@@ -1,0 +1,18 @@
+{
+ "pr": 24597,
+ "title": "Kimi K2 Fused MoE kernels Optimization configs (#24597)",
+ "url": "https://github.com/vllm-project/vllm/pull/24597",
+ "date": "2025-09-10",
+ "field": "gpu_kernels",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "8a894084d21a1ae3bd22743e285c79bda735f910",
+ "merge_sha": "3d1393f6fc730f34e6f57a8bed40c455164f5ac4",
+ "source_path": null,
+ "reported_gain": "17.8%",
+ "gain_kind": "pct",
+ "gain_evidence": "``` We see 17.8% in `Output token throughput (tok/s)`.",
+ "hardware_overrides": {}
+}

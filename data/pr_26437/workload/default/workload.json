@@ -1,0 +1,247 @@
+{
+ "schema": "workload_v2",
+ "pr": 26437,
+ "title": "[PERF] Qwen3-next MTP speedup (change bool mask indexing to index_select / index_copy to reduce d2h) (#26437)",
+ "url": "https://github.com/vllm-project/vllm/pull/26437",
+ "field": "decoding_tpot",
+ "area": "model_executor/layers",
+ "date": "2025-10-16",
+ "hw": "default",
+ "hw_override": null,
+ "base_sha": "f6cdc9a02fcb15eee6c7511eef657bc118c2db90",
+ "merge_sha": "785d8b6410c3f1dc138947ea861a194b061f0293",
+ "source_files": [
+  "vllm/model_executor/layers/fla/ops/utils.py",
+  "vllm/model_executor/models/qwen3_next.py",
+  "vllm/v1/attention/backends/gdn_attn.py"
+ ],
+ "test_files": [],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:26437",
+  "dockerfile": "data/pr_26437/workload/default/Dockerfile",
+  "template": "templates/Dockerfile.gpu-wheel",
+  "wheel": "0.11.1",
+  "wheel_note": "first PyPI release after merge (2025-11-19 > 2025-10-16); picked by gen_tasks.py from PyPI upload dates.",
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:26437 data/pr_26437/workload/default"
+ },
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_26437/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "needs": "gpu",
+  "cluster": "none_gpu",
+  "all_clusters": [
+   "none_gpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "data/pr_26437 (bench.py, tests/)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "fla @tensor_cache 4 -> 8 entries (part 2 of the PR): prepare_chunk_indices cycled over 6 distinct cu_seqlens (2 calls x 3 groups per GDN layer) - baseline LRU thrashes and recomputes (incl. .tolist() sync), PR's solution hits. Wall-clock us per call. Parts 1 (bool-mask -> index_select in qwen3_next.py) and 3 are model-level and not measured. Author e2e (Qwen3-Next-80B MTP, B200) reported-only.",
+  "base_note": null
+ },
+ "policy": {
+  "source": "pipeline/run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "task.json:repeats (or hardware_overrides[<hw>].repeats)",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in data/pr_<n>/work/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> data/pr_<n>/work/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY task.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "chunk_indices_6way_cycle",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": true,
+   "parse": "chunk_indices_6way_cycle",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "serving_mean_tpot",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "Mean TPOT (not measured: Qwen3-Next-80B MTP, 512 conc, B200)",
+   "reported": {
+    "baseline": 22.89,
+    "pr_solution": 21.12
+   },
+   "note": null
+  },
+  {
+   "name": "serving_output_throughput",
+   "unit": "tok/s",
+   "higher_is_better": true,
+   "headline": false,
+   "parse": "Output token throughput (not measured)",
+   "reported": {
+    "baseline": 15947.5,
+    "pr_solution": 17872.27
+   },
+   "note": null
+  }
+ ],
+ "headline": "chunk_indices_6way_cycle",
+ "reported": {
+  "gain": "12%",
+  "gain_kind": "pct",
+  "gain_evidence": "Speedup of Output token throughput is **12%**",
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
+  "author_hardware_args": [
+   {
+    "line": 12,
+    "text": "Qwen3-next MTP suffered from d<->h memory transfers on prefill phase. That makes MTP slower than STM (at least for some inputs)."
+   },
+   {
+    "line": 21,
+    "text": "B200. Test MTP with 512 concurrency."
+   },
+   {
+    "line": 23,
+    "text": "VLLM_ATTENTION_BACKEND=FLASH_ATTN vllm serve Qwen/Qwen3-Next-80B-A3B-Instruct -tp 4 --no-enable-prefix-caching --speculative-config '{\"method\": \"qwen3_next_mtp\", \"num_speculative_tokens\": 2}' --cuda-graph-sizes=2048"
+   },
+   {
+    "line": 26,
+    "text": "vllm bench serve --backend vllm --model Qwen/Qwen3-Next-80B-A3B-Instruct --endpoint /v1/completions --dataset-name random --random-input 1024 --random-output 1024 --max-concurrency 512 --num-prompt 512 --ignore-eos"
+   },
+   {
+    "line": 38,
+    "text": "Output token throughput (tok/s):         15947.50"
+   },
+   {
+    "line": 39,
+    "text": "Peak output token throughput (tok/s):    9216.00"
+   },
+   {
+    "line": 46,
+    "text": "-----Time per Output Token (excl. 1st token)------"
+   },
+   {
+    "line": 66,
+    "text": "Output token throughput (tok/s):         17872.27"
+   },
+   {
+    "line": 67,
+    "text": "Peak output token throughput (tok/s):    9727.00"
+   },
+   {
+    "line": 74,
+    "text": "-----Time per Output Token (excl. 1st token)------"
+   },
+   {
+    "line": 85,
+    "text": "Speedup of Output token throughput is **12%**"
+   },
+   {
+    "line": 90,
+    "text": "VLLM_ATTENTION_BACKEND=FLASH_ATTN vllm serve Qwen/Qwen3-Next-80B-A3B-Instruct -tp 4 --no-enable-prefix-caching --cuda-graph-sizes=2048"
+   },
+   {
+    "line": 93,
+    "text": "vllm bench serve --backend vllm --model Qwen/Qwen3-Next-80B-A3B-Instruct --endpoint /v1/completions --dataset-name random --random-input 1024 --random-output 1024 --max-concurrency 512 --num-prompt 512 --ignore-eos"
+   },
+   {
+    "line": 104,
+    "text": "Output token throughput (tok/s):         13976.35"
+   },
+   {
+    "line": 105,
+    "text": "Peak output token throughput (tok/s):    17920.00"
+   },
+   {
+    "line": 112,
+    "text": "-----Time per Output Token (excl. 1st token)------"
+   }
+  ],
+  "source": "data/pr_26437/pr.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.11.1",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ },
+ "reproduced": null,
+ "gap": {
+  "verdict": "not analysed",
+  "note": null,
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:26437 data/pr_26437/workload/default",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_26437:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:26437 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_26437:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:26437 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": "perf-only; no test in the diff; only the tensor_cache part is measured (model parts need Qwen3-Next)."
+}

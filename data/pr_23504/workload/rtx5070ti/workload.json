@@ -1,0 +1,211 @@
+{
+ "schema": "workload_v2",
+ "pr": 23504,
+ "title": "[Perf] Add Triton config for DeepSeek V3 FP8 EP32 H200 (#23504)",
+ "url": "https://github.com/vllm-project/vllm/pull/23504",
+ "field": "quantization",
+ "area": "model_executor/layers",
+ "date": "2025-08-24",
+ "hw": "rtx5070ti",
+ "hw_override": null,
+ "base_sha": "47455c424f62a20b75a7cfd872e17c5ba11c9f3a",
+ "merge_sha": "504d91431499e302bbd5a3d8a1432cd427ec8d5d",
+ "source_files": null,
+ "test_files": null,
+ "image": {
+  "mode": "wheel (UNPINNED: no task.json:wheel)",
+  "tag": "vllm-task:23504",
+  "dockerfile": "data/pr_23504/workload/rtx5070ti/Dockerfile",
+  "template": "templates/Dockerfile.gpu-wheel",
+  "wheel": null,
+  "wheel_note": null,
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:23504 data/pr_23504/workload/rtx5070ti"
+ },
+ "workload": {
+  "kind": "repo_benchmark",
+  "script": "benchmarks/kernels/benchmark_w8a8_block_fp8.py",
+  "cmd": "python3 benchmarks/kernels/benchmark_w8a8_block_fp8.py --tp-size 8 --input-type fp8 --out-dtype float16 --block-n 128 --block-k 128",
+  "needs": "gpu",
+  "cluster": "none_gpu",
+  "all_clusters": [
+   "none_gpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "data/pr_23504 (bench.py, tests/)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "W8A8 block FP8 Triton kernel tuning; GPU-only (H200 config).",
+  "base_note": null
+ },
+ "policy": {
+  "source": "pipeline/run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "task.json:repeats (or hardware_overrides[<hw>].repeats)",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in data/pr_<n>/work/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> data/pr_<n>/work/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY task.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "serving_throughput",
+   "unit": "tok/s",
+   "higher_is_better": true,
+   "headline": false,
+   "parse": "total tok/s",
+   "reported": {
+    "baseline": 16776.0,
+    "pr_solution": 16872.0
+   },
+   "note": null
+  },
+  {
+   "name": "w8a8_kernel",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "kernel us",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  }
+ ],
+ "headline": null,
+ "reported": {
+  "gain": "1.6x",
+  "gain_kind": "pct",
+  "gain_evidence": "The initial throughput number looked too good (1.6x speedup with tuning).",
+  "experiments_note": null,
+  "author_hardware_args": [
+   {
+    "line": 17,
+    "text": "(VllmWorker TP2 pid=1298912) WARNING 08-23 18:31:51 [fp8_utils.py:581] Using default W8A8 Block FP8 kernel config. Performance might be sub-optimal! Config file not found at /data/users/yming/gitrepos/vllm/vllm/model_executor/layers/quantiz"
+   },
+   {
+    "line": 18,
+    "text": "(VllmWorker TP1 pid=1298911) WARNING 08-23 18:32:45 [fused_moe.py:727] Using default MoE config. Performance might be sub-optimal! Config file not found at ['/data/users/yming/gitrepos/vllm/vllm/model_executor/layers/fused_moe/configs/E=8,N"
+   },
+   {
+    "line": 28,
+    "text": "python benchmarks/benchmark_serving.py  --model deepseek-ai/DeepSeek-V3-0324 --port 8000  --dataset-name random  --ignore-eos  --num-prompts 4096  --request-rate inf  --random-input-len 2048  --random-output-len 1024 --max-concurrency 2048"
+   },
+   {
+    "line": 42,
+    "text": "Output token throughput (tok/s):         5630.83"
+   },
+   {
+    "line": 48,
+    "text": "-----Time per Output Token (excl. 1st token)------"
+   },
+   {
+    "line": 66,
+    "text": "Output token throughput (tok/s):         5598.65"
+   },
+   {
+    "line": 72,
+    "text": "-----Time per Output Token (excl. 1st token)------"
+   },
+   {
+    "line": 93,
+    "text": "Output token throughput (tok/s):         7164.09"
+   },
+   {
+    "line": 99,
+    "text": "-----Time per Output Token (excl. 1st token)------"
+   },
+   {
+    "line": 117,
+    "text": "Output token throughput (tok/s):         11483.21"
+   },
+   {
+    "line": 123,
+    "text": "-----Time per Output Token (excl. 1st token)------"
+   }
+  ],
+  "source": "data/pr_23504/pr.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 24,
+   "compute_cap_min": 8.9,
+   "compute_cap_max": null,
+   "gpu_hint": "H200 (--tp-size 8 only shapes the problem; one GPU runs it)",
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": null,
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "needs-wheel-task"
+  }
+ },
+ "reproduced": null,
+ "gap": {
+  "verdict": "not analysed",
+  "note": null,
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:23504 data/pr_23504/workload/rtx5070ti",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_23504:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:23504 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 benchmarks/kernels/benchmark_w8a8_block_fp8.py --tp-size 8 --input-type fp8 --out-dtype float16 --block-n 128 --block-k 128'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_23504:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:23504 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 benchmarks/kernels/benchmark_w8a8_block_fp8.py --tp-size 8 --input-type fp8 --out-dtype float16 --block-n 128 --block-k 128'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/). NOT PINNED: task.json has no `wheel` yet, so the Dockerfile installs the latest PyPI vLLM (compiled ops may not match either tree) and run_one.sh refuses to run it. `python3 gen/gen_tasks.py <pr>` picks the first PyPI release after merge_sha."
+ },
+ "test_note": null
+}

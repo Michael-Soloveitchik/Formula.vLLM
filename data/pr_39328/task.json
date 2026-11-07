@@ -1,0 +1,81 @@
+{
+ "pr": 39328,
+ "title": "[Core] Cache InductorPass.hash_source with functools.cache (#39328)",
+ "url": "https://github.com/vllm-project/vllm/pull/39328",
+ "date": "2026-04-20",
+ "field": "gpu_kernels",
+ "area": "compilation/passes",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "304d5ba1a04b6cbfa2b5bd377c2a89d350a10921",
+ "merge_sha": "87805fa11ea6d9f9aa7a7fc92ac957c613bc2163",
+ "source_path": "vllm/compilation/passes/inductor_pass.py",
+ "reported_gain": "1.15x, 2.88x",
+ "gain_kind": "pct",
+ "gain_evidence": "## Test Result - 4/4 tests passed in test_pass_manager.py - E2E test passed (cold compile 29.5s, correct output) - Cold compile time: 29.70s ± 0.50s (baseline 3",
+ "source_files": [
+  "vllm/compilation/passes/inductor_pass.py"
+ ],
+ "test_files": [],
+ "wheel": "0.20.0",
+ "wheel_note": "first PyPI release after merge (2026-04-27 > 2026-04-20); picked by gen_tasks.py from PyPI upload dates.",
+ "test_note": "perf-only functools.cache over inspect.getsource; no test in the diff. cold_compile needs a real torch.compile of a 70B model - reported-only.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_39328/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "ms",
+  "needs": "gpu",
+  "headline": "cache_lookup",
+  "note": "Real InductorPass.hash_source, 10000 lookups cycling 5 source objects after one untimed call each; total ms per 10000 lookups (author's scale), median of 5. cold_compile (Llama-3-70B TP4 torch.compile) is reported-only."
+ },
+ "experiments": [
+  {
+   "name": "cache_lookup",
+   "unit": "ms",
+   "reported": {
+    "base": 32.5,
+    "patch": 11.3
+   },
+   "parse": "lookup ms"
+  },
+  {
+   "name": "cold_compile",
+   "unit": "s",
+   "reported": {
+    "base": 34.1,
+    "patch": 29.7
+   },
+   "parse": "compile s"
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "hardware_overrides": {},
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.20.0",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ }
+}

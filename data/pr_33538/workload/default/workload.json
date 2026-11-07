@@ -1,0 +1,1577 @@
+{
+ "schema": "workload_v2",
+ "pr": 33538,
+ "title": "[Kernel] Triton-based Top-k and Top-p sampler kernels (#33538)",
+ "url": "https://github.com/vllm-project/vllm/pull/33538",
+ "field": "scheduling",
+ "area": "v1/worker",
+ "date": "2026-02-17",
+ "hw": "default",
+ "hw_override": null,
+ "base_sha": "dc5fa77a4eb6680339cb77abe713fb22d7795560",
+ "merge_sha": "c656ba3b4d2cda82ca753eefde4b10cbf04c0a3f",
+ "source_files": [
+  "vllm/v1/sample/ops/topk_topp_sampler.py",
+  "vllm/v1/sample/ops/topk_topp_triton.py",
+  "vllm/utils/math_utils.py"
+ ],
+ "test_files": [
+  "tests/v1/sample/test_topk_topp_sampler.py"
+ ],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:33538",
+  "dockerfile": "data/pr_33538/workload/default/Dockerfile",
+  "template": "templates/Dockerfile.gpu-wheel",
+  "wheel": "0.16.0",
+  "wheel_note": "first PyPI release after merge (v0.16.0rc1 tag at merge); compiled ops match PR's solution tree; arms are .py swaps inside this image. Needed because the cu121 source build cannot target sm_120 (RTX 5070 Ti).",
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:33538 data/pr_33538/workload/default"
+ },
+ "workload": {
+  "kind": "repo_benchmark",
+  "script": "benchmarks/benchmark_topk_topp.py",
+  "cmd": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+  "needs": "gpu",
+  "cluster": "none_gpu",
+  "all_clusters": [
+   "none_gpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "data/pr_33538 (bench.py, tests/)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "Adds Triton sampler + bench script. Triton vs PyTorch sort-based. CUDA-only.",
+  "base_note": "The benchmark script and the Triton kernel are both introduced by this PR. The baseline tree has no Triton implementation, so the baseline arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the baseline number."
+ },
+ "policy": {
+  "source": "pipeline/run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "task.json:repeats (or hardware_overrides[<hw>].repeats)",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in data/pr_<n>/work/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> data/pr_<n>/work/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY task.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "topk_whole_b16_v32768",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": true,
+   "parse": "benchmark_topk_topp.py SUMMARY TABLE row '<scenario> <batch> <vocab> ...' (Triton ms column; PyTorch column kept as pytorch_ref)",
+   "reported": {
+    "baseline": 0.28,
+    "pr_solution": 0.067
+   },
+   "note": null
+  },
+  {
+   "name": "topp_whole_b16_v32768",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "benchmark_topk_topp.py SUMMARY TABLE row '<scenario> <batch> <vocab> ...' (Triton ms column; PyTorch column kept as pytorch_ref)",
+   "reported": {
+    "baseline": 0.361,
+    "pr_solution": 0.184
+   },
+   "note": null
+  },
+  {
+   "name": "topk_topp_whole_b16_v32768",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "benchmark_topk_topp.py SUMMARY TABLE row '<scenario> <batch> <vocab> ...' (Triton ms column; PyTorch column kept as pytorch_ref)",
+   "reported": {
+    "baseline": 0.242,
+    "pr_solution": 0.093
+   },
+   "note": null
+  },
+  {
+   "name": "mixed_partial_b16_v32768",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "benchmark_topk_topp.py SUMMARY TABLE row '<scenario> <batch> <vocab> ...' (Triton ms column; PyTorch column kept as pytorch_ref)",
+   "reported": {
+    "baseline": 0.266,
+    "pr_solution": 0.205
+   },
+   "note": null
+  },
+  {
+   "name": "topk_whole_b1_v32768",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "benchmark_topk_topp.py SUMMARY TABLE row '<scenario> <batch> <vocab> ...' (Triton ms column; PyTorch column kept as pytorch_ref)",
+   "reported": {
+    "baseline": 0.101,
+    "pr_solution": 0.065
+   },
+   "note": null
+  },
+  {
+   "name": "topk_whole_b128_v32768",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "benchmark_topk_topp.py SUMMARY TABLE row '<scenario> <batch> <vocab> ...' (Triton ms column; PyTorch column kept as pytorch_ref)",
+   "reported": null,
+   "note": null
+  },
+  {
+   "name": "topk_topp_whole_b2048_v131072",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "benchmark_topk_topp.py SUMMARY TABLE row '<scenario> <batch> <vocab> ...' (Triton ms column; PyTorch column kept as pytorch_ref)",
+   "reported": null,
+   "note": null
+  }
+ ],
+ "headline": "topk_whole_b16_v32768",
+ "reported": {
+  "gain": "up to 9.94x vs PyTorch topk sampler (batch 4, vocab 32768)",
+  "gain_kind": "unit",
+  "gain_evidence": "faster triton topk/topp sampler kernels",
+  "experiments_note": "reported = PR author's table (ms), same scenario key as benchmark_topk_topp.py SUMMARY TABLE: <scenario>_b<batch>_v<vocab>",
+  "author_hardware_args": [
+   {
+    "line": 13,
+    "text": "Passes all correctness tests, faster overall compared to #32558 except for Top-p only cases.  Compared to #32558, this algorithm includes a truncation step, which gathers a small \"outlier\" subset of the logits to reduce the search space usi"
+   },
+   {
+    "line": 19,
+    "text": "Scenario        Batch   Vocab  Ops%  Triton (ms)  PR32558 (ms)  PyTorch (ms)  Speedup  Speedup vs PR32558    Tri Mem  32558 Mem    Pyt Mem"
+   },
+   {
+    "line": 21,
+    "text": "topk_whole          1   32768  100%        0.065         0.162         0.101    1.55x               2.49x  722.00 KB  592.00 KB    1.47 MB"
+   },
+   {
+    "line": 22,
+    "text": "topk_partial        1   32768    0%        0.039         0.025         0.099    2.54x               0.64x  722.00 KB  592.00 KB    1.47 MB"
+   },
+   {
+    "line": 23,
+    "text": "topp_whole          1   32768  100%        0.172          0.21         0.112    0.65x               1.22x  722.00 KB  592.00 KB    1.47 MB"
+   },
+   {
+    "line": 24,
+    "text": "topp_partial        1   32768    0%        0.039         0.024         0.112    2.87x               0.62x  722.00 KB  592.00 KB    1.47 MB"
+   },
+   {
+    "line": 25,
+    "text": "topk_topp_whole     1   32768  200%        0.089          0.35         0.134    1.51x               3.93x  722.00 KB  592.00 KB    1.47 MB"
+   },
+   {
+    "line": 26,
+    "text": "mixed_partial       1   32768  200%        0.087          0.35         0.137    1.57x               4.02x  722.00 KB  592.00 KB    1.47 MB"
+   },
+   {
+    "line": 27,
+    "text": "topk_whole          4   32768  100%        0.067         0.162         0.666    9.94x               2.42x    2.21 MB    1.70 MB    6.74 MB"
+   },
+   {
+    "line": 28,
+    "text": "topk_partial        4   32768   50%         0.07         0.162          0.24    3.43x               2.31x    2.21 MB    1.70 MB    6.74 MB"
+   },
+   {
+    "line": 29,
+    "text": "topp_whole          4   32768  100%        0.181          0.21         0.201    1.11x               1.16x    2.21 MB    1.70 MB    6.74 MB"
+   },
+   {
+    "line": 30,
+    "text": "topp_partial        4   32768   50%        0.181         0.209         0.482    2.66x               1.15x    2.21 MB    1.70 MB    6.74 MB"
+   },
+   {
+    "line": 31,
+    "text": "topk_topp_whole     4   32768  200%        0.098         0.351         0.311    3.17x               3.58x    2.21 MB    1.70 MB    6.74 MB"
+   },
+   {
+    "line": 32,
+    "text": "mixed_partial       4   32768  150%        0.191          0.35         0.752    3.94x               1.83x    2.21 MB    1.70 MB    6.74 MB"
+   },
+   {
+    "line": 33,
+    "text": "topk_whole         16   32768  100%        0.067         0.163          0.28    4.18x               2.43x    8.21 MB    6.20 MB   26.31 MB"
+   },
+   {
+    "line": 34,
+    "text": "topk_partial       16   32768   50%        0.064         0.163         0.169    2.64x               2.55x    8.21 MB    6.20 MB   26.31 MB"
+   },
+   {
+    "line": 35,
+    "text": "topp_whole         16   32768  100%        0.184          0.21         0.361    1.96x               1.14x    8.21 MB    6.20 MB   26.31 MB"
+   },
+   {
+    "line": 36,
+    "text": "topp_partial       16   32768   50%        0.178          0.21         0.305    1.71x               1.18x    8.21 MB    6.20 MB   26.31 MB"
+   },
+   {
+    "line": 37,
+    "text": "topk_topp_whole    16   32768  200%        0.093         0.351         0.242    2.60x               3.77x    8.21 MB    6.20 MB   26.31 MB"
+   },
+   {
+    "line": 38,
+    "text": "mixed_partial      16   32768  138%        0.205         0.351         0.266    1.30x               1.71x    8.21 MB    6.20 MB   26.31 MB"
+   }
+  ],
+  "source": "data/pr_33538/pr.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.5,
+   "compute_cap_max": null,
+   "gpu_hint": "Triton kernel",
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.16.0",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ },
+ "reproduced": {
+  "rtx5070ti": {
+   "source": "data/pr_33538/results.rtx5070ti.json",
+   "hw_slug": "rtx5070ti",
+   "ts": "2026-11-07T10:51:56Z",
+   "image": {
+    "mode": "wheel",
+    "wheel": "0.16.0",
+    "workload_cmd": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+    "repeats": 5
+   },
+   "tests": {
+    "base": "FAIL",
+    "gold": "PASS"
+   },
+   "verdict": "reproduced",
+   "reproduced_ratio_median": 9.0553,
+   "reported_ratio_median": 1.962,
+   "machine": null,
+   "experiments": [
+    {
+     "name": "topk_whole_b16_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": 0.28,
+      "pr_solution": 0.067,
+      "how": "absolute",
+      "marker": "",
+      "raw": "0.28 -> 0.067 ms",
+      "note": "author gave absolute numbers",
+      "ratio": 4.179104,
+      "pct": 317.91
+     },
+     "baseline": 1.214,
+     "baseline_sd": 0.0195,
+     "pr_solution": 0.1094,
+     "pr_solution_sd": 0.0447,
+     "n": 5,
+     "ratio": 11.096892,
+     "ratio_of_ratios": 2.655,
+     "verdict": "reproduced",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topp_whole_b16_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": 0.361,
+      "pr_solution": 0.184,
+      "how": "absolute",
+      "marker": "",
+      "raw": "0.361 -> 0.184 ms",
+      "note": "author gave absolute numbers",
+      "ratio": 1.961957,
+      "pct": 96.2
+     },
+     "baseline": 1.2634,
+     "baseline_sd": 0.0123,
+     "pr_solution": 0.3024,
+     "pr_solution_sd": 0.0102,
+     "n": 5,
+     "ratio": 4.17791,
+     "ratio_of_ratios": 2.129,
+     "verdict": "reproduced",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_topp_whole_b16_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": 0.242,
+      "pr_solution": 0.093,
+      "how": "absolute",
+      "marker": "",
+      "raw": "0.242 -> 0.093 ms",
+      "note": "author gave absolute numbers",
+      "ratio": 2.602151,
+      "pct": 160.22
+     },
+     "baseline": 1.3186,
+     "baseline_sd": 0.019,
+     "pr_solution": 0.1298,
+     "pr_solution_sd": 0.0277,
+     "n": 5,
+     "ratio": 10.158706,
+     "ratio_of_ratios": 3.904,
+     "verdict": "reproduced",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "mixed_partial_b16_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": 0.266,
+      "pr_solution": 0.205,
+      "how": "absolute",
+      "marker": "",
+      "raw": "0.266 -> 0.205 ms",
+      "note": "author gave absolute numbers",
+      "ratio": 1.297561,
+      "pct": 29.76
+     },
+     "baseline": 1.424,
+     "baseline_sd": 0.2419,
+     "pr_solution": 0.1246,
+     "pr_solution_sd": 0.0264,
+     "n": 5,
+     "ratio": 11.428571,
+     "ratio_of_ratios": 8.808,
+     "verdict": "reproduced",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_whole_b1_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": 0.101,
+      "pr_solution": 0.065,
+      "how": "absolute",
+      "marker": "",
+      "raw": "0.101 -> 0.065 ms",
+      "note": "author gave absolute numbers",
+      "ratio": 1.553846,
+      "pct": 55.38
+     },
+     "baseline": 0.2806,
+     "baseline_sd": 0.1026,
+     "pr_solution": 0.0964,
+     "pr_solution_sd": 0.0245,
+     "n": 5,
+     "ratio": 2.910788,
+     "ratio_of_ratios": 1.873,
+     "verdict": "reproduced",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_whole_b128_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 1.4242,
+     "baseline_sd": 0.5914,
+     "pr_solution": 0.3522,
+     "pr_solution_sd": 0.0372,
+     "n": 5,
+     "ratio": 4.043725,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_topp_whole_b2048_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 94.0044,
+     "baseline_sd": 0.0329,
+     "pr_solution": 6.343,
+     "pr_solution_sd": 0.0094,
+     "n": 5,
+     "ratio": 14.82018,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "mixed_partial_b128_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 5.8774,
+     "baseline_sd": 0.0196,
+     "pr_solution": 0.5264,
+     "pr_solution_sd": 0.0047,
+     "n": 5,
+     "ratio": 11.165274,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "mixed_partial_b128_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 2.108,
+     "baseline_sd": 0.0102,
+     "pr_solution": 0.1694,
+     "pr_solution_sd": 0.0044,
+     "n": 5,
+     "ratio": 12.44392,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "mixed_partial_b16_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 0.7746,
+     "baseline_sd": 0.0216,
+     "pr_solution": 0.2208,
+     "pr_solution_sd": 0.0074,
+     "n": 5,
+     "ratio": 3.508152,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "mixed_partial_b1_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 0.453,
+     "baseline_sd": 0.2083,
+     "pr_solution": 0.1762,
+     "pr_solution_sd": 0.0085,
+     "n": 5,
+     "ratio": 2.570942,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "mixed_partial_b1_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 0.3742,
+     "baseline_sd": 0.1151,
+     "pr_solution": 0.0996,
+     "pr_solution_sd": 0.0259,
+     "n": 5,
+     "ratio": 3.757028,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "mixed_partial_b2048_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 94.0534,
+     "baseline_sd": 0.0417,
+     "pr_solution": 6.576,
+     "pr_solution_sd": 0.0137,
+     "n": 5,
+     "ratio": 14.302524,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "mixed_partial_b2048_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 23.1896,
+     "baseline_sd": 0.0136,
+     "pr_solution": 1.9278,
+     "pr_solution_sd": 0.003,
+     "n": 5,
+     "ratio": 12.029049,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_partial_b128_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 5.0958,
+     "baseline_sd": 0.022,
+     "pr_solution": 0.155,
+     "pr_solution_sd": 0.0031,
+     "n": 5,
+     "ratio": 32.876129,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_partial_b128_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 1.1536,
+     "baseline_sd": 0.0097,
+     "pr_solution": 0.1032,
+     "pr_solution_sd": 0.0268,
+     "n": 5,
+     "ratio": 11.178295,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_partial_b16_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 0.6004,
+     "baseline_sd": 0.0758,
+     "pr_solution": 0.1324,
+     "pr_solution_sd": 0.0055,
+     "n": 5,
+     "ratio": 4.534743,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_partial_b16_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 1.2356,
+     "baseline_sd": 0.0234,
+     "pr_solution": 0.1322,
+     "pr_solution_sd": 0.0386,
+     "n": 5,
+     "ratio": 9.346445,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_partial_b1_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 0.3254,
+     "baseline_sd": 0.1036,
+     "pr_solution": 0.076,
+     "pr_solution_sd": 0.0357,
+     "n": 5,
+     "ratio": 4.281579,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_partial_b1_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 0.2328,
+     "baseline_sd": 0.0847,
+     "pr_solution": 0.0728,
+     "pr_solution_sd": 0.0169,
+     "n": 5,
+     "ratio": 3.197802,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_partial_b2048_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 81.5878,
+     "baseline_sd": 0.0288,
+     "pr_solution": 2.0992,
+     "pr_solution_sd": 0.0108,
+     "n": 5,
+     "ratio": 38.866139,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_partial_b2048_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 20.4294,
+     "baseline_sd": 0.0259,
+     "pr_solution": 0.6478,
+     "pr_solution_sd": 0.0018,
+     "n": 5,
+     "ratio": 31.536585,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_topp_whole_b128_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 5.8824,
+     "baseline_sd": 0.0207,
+     "pr_solution": 0.4168,
+     "pr_solution_sd": 0.004,
+     "n": 5,
+     "ratio": 14.113244,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_topp_whole_b128_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 2.1246,
+     "baseline_sd": 0.0217,
+     "pr_solution": 0.1724,
+     "pr_solution_sd": 0.0104,
+     "n": 5,
+     "ratio": 12.323666,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_topp_whole_b16_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 6.8312,
+     "baseline_sd": 0.6445,
+     "pr_solution": 0.2044,
+     "pr_solution_sd": 0.0269,
+     "n": 5,
+     "ratio": 33.420744,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_topp_whole_b1_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 0.4092,
+     "baseline_sd": 0.1075,
+     "pr_solution": 0.186,
+     "pr_solution_sd": 0.019,
+     "n": 5,
+     "ratio": 2.2,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_topp_whole_b1_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 0.3886,
+     "baseline_sd": 0.1301,
+     "pr_solution": 0.0916,
+     "pr_solution_sd": 0.0205,
+     "n": 5,
+     "ratio": 4.242358,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_topp_whole_b2048_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 23.2102,
+     "baseline_sd": 0.0109,
+     "pr_solution": 2.1006,
+     "pr_solution_sd": 0.0032,
+     "n": 5,
+     "ratio": 11.049319,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_whole_b128_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 5.0866,
+     "baseline_sd": 0.0168,
+     "pr_solution": 0.288,
+     "pr_solution_sd": 0.0036,
+     "n": 5,
+     "ratio": 17.661806,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_whole_b16_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 5.6788,
+     "baseline_sd": 1.8976,
+     "pr_solution": 0.1458,
+     "pr_solution_sd": 0.0089,
+     "n": 5,
+     "ratio": 38.949246,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_whole_b1_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 0.2858,
+     "baseline_sd": 0.04,
+     "pr_solution": 0.1326,
+     "pr_solution_sd": 0.005,
+     "n": 5,
+     "ratio": 2.155354,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_whole_b2048_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 81.5694,
+     "baseline_sd": 0.0471,
+     "pr_solution": 4.0892,
+     "pr_solution_sd": 0.0347,
+     "n": 5,
+     "ratio": 19.94752,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topk_whole_b2048_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 20.4296,
+     "baseline_sd": 0.0182,
+     "pr_solution": 1.2596,
+     "pr_solution_sd": 0.0021,
+     "n": 5,
+     "ratio": 16.219117,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topp_partial_b128_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 5.558,
+     "baseline_sd": 0.015,
+     "pr_solution": 0.3376,
+     "pr_solution_sd": 0.0022,
+     "n": 5,
+     "ratio": 16.46327,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topp_partial_b128_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 1.2398,
+     "baseline_sd": 0.0218,
+     "pr_solution": 0.333,
+     "pr_solution_sd": 0.0179,
+     "n": 5,
+     "ratio": 3.723123,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topp_partial_b16_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 0.8884,
+     "baseline_sd": 0.0208,
+     "pr_solution": 0.2944,
+     "pr_solution_sd": 0.0086,
+     "n": 5,
+     "ratio": 3.017663,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topp_partial_b16_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 1.2712,
+     "baseline_sd": 0.0229,
+     "pr_solution": 0.323,
+     "pr_solution_sd": 0.0267,
+     "n": 5,
+     "ratio": 3.935604,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topp_partial_b1_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 0.3266,
+     "baseline_sd": 0.1006,
+     "pr_solution": 0.097,
+     "pr_solution_sd": 0.0324,
+     "n": 5,
+     "ratio": 3.36701,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topp_partial_b1_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 0.274,
+     "baseline_sd": 0.0865,
+     "pr_solution": 0.0656,
+     "pr_solution_sd": 0.017,
+     "n": 5,
+     "ratio": 4.176829,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topp_partial_b2048_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 89.256,
+     "baseline_sd": 0.0318,
+     "pr_solution": 4.3616,
+     "pr_solution_sd": 0.0098,
+     "n": 5,
+     "ratio": 20.46405,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topp_partial_b2048_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 22.0048,
+     "baseline_sd": 0.0143,
+     "pr_solution": 4.5072,
+     "pr_solution_sd": 0.0227,
+     "n": 5,
+     "ratio": 4.882144,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topp_whole_b128_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 5.56,
+     "baseline_sd": 0.0146,
+     "pr_solution": 0.6344,
+     "pr_solution_sd": 0.0059,
+     "n": 5,
+     "ratio": 8.764187,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topp_whole_b128_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 1.2364,
+     "baseline_sd": 0.0105,
+     "pr_solution": 0.6216,
+     "pr_solution_sd": 0.0027,
+     "n": 5,
+     "ratio": 1.98906,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topp_whole_b16_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 0.892,
+     "baseline_sd": 0.0072,
+     "pr_solution": 0.2906,
+     "pr_solution_sd": 0.0131,
+     "n": 5,
+     "ratio": 3.069511,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topp_whole_b1_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 0.367,
+     "baseline_sd": 0.1129,
+     "pr_solution": 0.2716,
+     "pr_solution_sd": 0.0106,
+     "n": 5,
+     "ratio": 1.351252,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topp_whole_b1_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 0.323,
+     "baseline_sd": 0.1002,
+     "pr_solution": 0.2934,
+     "pr_solution_sd": 0.0038,
+     "n": 5,
+     "ratio": 1.100886,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topp_whole_b2048_v131072",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 89.2514,
+     "baseline_sd": 0.0549,
+     "pr_solution": 8.5346,
+     "pr_solution_sd": 0.0689,
+     "n": 5,
+     "ratio": 10.457596,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "topp_whole_b2048_v32768",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 22.0094,
+     "baseline_sd": 0.0118,
+     "pr_solution": 8.8606,
+     "pr_solution_sd": 0.1151,
+     "n": 5,
+     "ratio": 2.483963,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   ]
+  }
+ },
+ "gap": {
+  "verdict": "not analysed",
+  "note": null,
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:33538 data/pr_33538/workload/default",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_33538:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:33538 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_33538:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:33538 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": null
+}

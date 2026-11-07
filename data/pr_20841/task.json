@@ -1,0 +1,18 @@
+{
+ "pr": 20841,
+ "title": "[Perf] Use Triton instead of Torch for DeepGEMM Per Token Group Quant (#20841)",
+ "url": "https://github.com/vllm-project/vllm/pull/20841",
+ "date": "2025-07-12",
+ "field": "gpu_kernels",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "f45a33288624f30e3ab3d1f5c3c4499e86c5bb7d",
+ "merge_sha": "42d440c22bc85a95dc457d4a0970507f8e66f0da",
+ "source_path": "vllm/utils/deep_gemm.py",
+ "reported_gain": "15%",
+ "gain_kind": "pct",
+ "gain_evidence": "R1: Don't have enough cards to test currently, but guessing it could improve like 15%+",
+ "hardware_overrides": {}
+}

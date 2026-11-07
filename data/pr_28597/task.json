@@ -1,0 +1,18 @@
+{
+ "pr": 28597,
+ "title": "[Perf] Optimize EAGLE prepare_inputs_padded with triton kernels (#28597)",
+ "url": "https://github.com/vllm-project/vllm/pull/28597",
+ "date": "2025-11-28",
+ "field": "gpu_kernels",
+ "area": "v1/spec_decode",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "3461e7efd8d1af0dd069900383fd5e33c7956c1f",
+ "merge_sha": "1986de137502d0d767cb4c1d3cad23dedbd22397",
+ "source_path": "vllm/v1/spec_decode/eagle.py",
+ "reported_gain": "10x",
+ "gain_kind": "pct",
+ "gain_evidence": "The fused kernels are simple and cheap to run, reducing the overhead in these sections by over 10x.",
+ "hardware_overrides": {}
+}

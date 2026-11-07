@@ -1,0 +1,18 @@
+{
+ "pr": 23777,
+ "title": "[LoRA] Much faster startup when LoRA is enabled (#23777)",
+ "url": "https://github.com/vllm-project/vllm/pull/23777",
+ "date": "2025-08-30",
+ "field": "scheduling",
+ "area": "v1/worker",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "68a349114f2a90f17645a8172496b0803d677f29",
+ "merge_sha": "038e9be4eb7a63189c8980845d80cb96957b9919",
+ "source_path": "vllm/v1/worker/lora_model_runner_mixin.py",
+ "reported_gain": "20x",
+ "gain_kind": "pct",
+ "gain_evidence": "Cuda graph capture is >20x faster with my test command.",
+ "hardware_overrides": {}
+}

@@ -1,0 +1,18 @@
+{
+ "pr": 35777,
+ "title": "[Kernel] Add fused_sigmoid_gating_delta_rule_update kernel for Qwen3 Next (#35777)",
+ "url": "https://github.com/vllm-project/vllm/pull/35777",
+ "date": "2026-03-08",
+ "field": "gpu_kernels",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "1bc9c77f6d324bf7b9253b0c78626fbc50286bfb",
+ "merge_sha": "dc6b57846686206d6d77fe788f71ab7fe8e568ab",
+ "source_path": "vllm/model_executor/models/qwen3_next.py",
+ "reported_gain": "13.2%",
+ "gain_kind": "pct",
+ "gain_evidence": "**TPOT improvement: 13.2% (8.58 -> 7.45 ms)**",
+ "hardware_overrides": {}
+}

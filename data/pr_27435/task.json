@@ -1,0 +1,18 @@
+{
+ "pr": 27435,
+ "title": "Load tuned fused_moe_lora shrink and expand kernel configs separately (#27435)",
+ "url": "https://github.com/vllm-project/vllm/pull/27435",
+ "date": "2025-11-04",
+ "field": "gpu_kernels",
+ "area": "lora/ops",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "4022a9d279d09efe1b8a36ff3531bf1d4c8f08ca",
+ "merge_sha": "2ec401bc39daf0c8daa7f7c6bffe4f5e15cb7c79",
+ "source_path": "vllm/lora/ops/triton_ops/fused_moe_lora_op.py",
+ "reported_gain": "80%, 90%",
+ "gain_kind": "pct",
+ "gain_evidence": "Together with #26319 we can improve the OTPS 80% - 90% in GPT-OSS-120B when concurrency is 1 or 2.",
+ "hardware_overrides": {}
+}

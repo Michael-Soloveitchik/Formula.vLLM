@@ -1,0 +1,18 @@
+{
+ "pr": 27869,
+ "title": "[Perf] Support stream interval for reducing host overhead (#27869)",
+ "url": "https://github.com/vllm-project/vllm/pull/27869",
+ "date": "2025-11-14",
+ "field": "scheduling",
+ "area": "v1/engine",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "f9f3b596f374c4a01acef275ee1f35398bb05164",
+ "merge_sha": "5d6ce2b9601f3251487e44eb9e00c098101c4af6",
+ "source_path": "tests/v1/engine/test_output_processor.py",
+ "reported_gain": "10x",
+ "gain_kind": "pct",
+ "gain_evidence": "However, if stream_interval=10, the number of responses will be reduced by 10x, and the output processing speed may be significantly improved.",
+ "hardware_overrides": {}
+}

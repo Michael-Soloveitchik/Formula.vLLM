@@ -1,0 +1,18 @@
+{
+ "pr": 27306,
+ "title": "[Feature]: Add corrupted request metric to V1 metrics system. (#27306)",
+ "url": "https://github.com/vllm-project/vllm/pull/27306",
+ "date": "2025-11-06",
+ "field": "scheduling",
+ "area": "v1/metrics",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "65ac8d8dc474839eafaea2adddb76fd2341cb78d",
+ "merge_sha": "e15601789be803c8e27a7806b1b6ec8924f20b03",
+ "source_path": "vllm/v1/metrics/loggers.py",
+ "reported_gain": "2%",
+ "gain_kind": "pct",
+ "gain_evidence": "From my sight, I observed that enabling the flag adds an overhead of: - About 1-2% in latency - Though surprisingly, there was not a very big impact on throughp",
+ "hardware_overrides": {}
+}

@@ -1,0 +1,86 @@
+{
+ "pr": 6779,
+ "title": "[Core] Use array to speedup padding (#6779)",
+ "url": "https://github.com/vllm-project/vllm/pull/6779",
+ "date": "2024-07-26",
+ "field": "decoding_tpot",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "084a01fd3544557990f8af8af6fd3c1185bae848",
+ "merge_sha": "89a84b0bb7b30706a02836234a94493ea8f780bf",
+ "source_path": "vllm/model_executor/sampling_metadata.py",
+ "reported_gain": "18% (e2e 24.76->29.44 it/s)",
+ "gain_kind": "pct",
+ "gain_evidence": "Nice to see an 18% speedup from this optimization.",
+ "source_files": [
+  "vllm/model_executor/layers/sampler.py",
+  "vllm/model_executor/sampling_metadata.py",
+  "vllm/sequence.py"
+ ],
+ "test_files": [],
+ "wheel": "0.5.4",
+ "wheel_note": "first PyPI release after merge (2024-08-05 > 2024-07-26); picked by gen_tasks.py from PyPI upload dates.",
+ "extra_pip": "pyairports",
+ "test_note": "perf-only PR, no test in the diff; v0 sampler, wheel 0.5.4 pins torch 2.4 cu121 (no sm_120 kernels) - the bench execs the source by file and never touches CUDA, so it still measures.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_6779/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "ms",
+  "needs": "gpu",
+  "headline": "make_tensor_with_pad",
+  "note": "Microbench pasted in PR body; make_tensor_with_pad over SequenceData, input_len=1024 batch=2048. v0 API."
+ },
+ "experiments": [
+  {
+   "name": "make_tensor_with_pad",
+   "unit": "ms",
+   "reported": {
+    "base": 79.0,
+    "patch": 22.0
+   },
+   "parse": "latency ms"
+  },
+  {
+   "name": "e2e_qwen05b",
+   "unit": "it/s",
+   "reported": {
+    "base": 24.76,
+    "patch": 29.44
+   },
+   "parse": "it/s"
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "hardware_overrides": {},
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 31.0
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": true,
+   "hf_token": false,
+   "vllm_wheel": "0.5.4",
+   "models": [
+    "Qwen/Qwen2-0.5B"
+   ],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ }
+}

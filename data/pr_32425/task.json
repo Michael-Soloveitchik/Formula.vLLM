@@ -1,0 +1,90 @@
+{
+ "pr": 32425,
+ "title": "[LoRA] Update LoRA expand kernel heuristic (#32425)",
+ "url": "https://github.com/vllm-project/vllm/pull/32425",
+ "date": "2026-01-16",
+ "field": "gpu_kernels",
+ "area": "lora/ops",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "7a1030431ade33439902f5b0cf7ff4a69c0fc033",
+ "merge_sha": "a884bc62d6eeeb58e87e56b2d966c63f073ada77",
+ "source_path": null,
+ "reported_gain": "30%",
+ "gain_kind": "pct",
+ "gain_evidence": "* Profiling shows `_lora_expand_kernel` improves about 30%.",
+ "source_files": [
+  "vllm/lora/ops/triton_ops/utils.py"
+ ],
+ "test_files": [],
+ "wheel": "0.14.0",
+ "wheel_note": "first PyPI release after merge (2026-01-20 > 2026-01-16); picked by gen_tasks.py from PyPI upload dates.",
+ "test_note": "perf-only one-line heuristic; no test in the diff (tests/lora/test_punica_ops.py covers correctness); default-config path only.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_32425/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "us",
+  "needs": "gpu",
+  "headline": "lora_expand_3slice_h1024_t16",
+  "note": "lora_expand custom op via LoRAKernelMeta (as tests/lora/test_punica_ops.py): 3 slices x hidden 1024 (QKV-like), rank 16, 1 LoRA, 16 and 256 tokens, plus a 1-slice x 4096 control; PR = default block_n 128 -> max(64, next_pow2(128//num_slices)) (untuned GPU path). CUDA-event us per call. Author: _lora_expand_kernel ~14 -> ~10 us (profiler), e2e +1%."
+ },
+ "experiments": [
+  {
+   "name": "lora_expand_3slice_h1024_t16",
+   "unit": "us",
+   "reported": {
+    "base": 14.0,
+    "patch": 10.0
+   },
+   "parse": "lora_expand_3slice_h1024_t16"
+  },
+  {
+   "name": "lora_expand_3slice_h1024_t256",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "parse": "lora_expand_3slice_h1024_t256"
+  },
+  {
+   "name": "lora_expand_1slice_h4096_t16",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "parse": "lora_expand_1slice_h4096_t16"
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "hardware_overrides": {},
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.14.0",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ }
+}

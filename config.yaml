@@ -15,11 +15,12 @@ machine:
   default_model: facebook/opt-125m   # 8 GB -> small models only
   dtype: float16
 
-# where the vLLM git clone lives on the target box (needed to export base_sha
-# and merge_sha trees). The clone is huge, so it is NOT vendored in this repo.
+# vLLM sources: NOT needed on the host. Every task is wheel-mode — the per-PR image
+# (data/pr_<n>/workload/<hw>/Dockerfile) installs the PyPI wheel and shallow-fetches the PR's
+# two commits itself. vllm_git is kept only for tooling that wants a local clone (legacy).
 paths:
-  vllm_url: https://github.com/vllm-project/vllm.git   # --reproduce clones from here if vllm_git is missing
-  vllm_git: ../../vllm   # ONLY for source-mode (Dockerfile.gpu). Wheel-mode tasks clone inside the image; no host clone needed.
+  vllm_url: https://github.com/vllm-project/vllm.git
+  vllm_git: ../../vllm   # legacy, unused by run_one.sh
 
 # measurement: repeat each timing to get mean + variance (see rules.md noise model)
 measure:
@@ -86,10 +87,10 @@ solvers:
 run:
   default: interesting        # see interesting_prs.md
   sets:
-    # CPU-runnable workloads (needs:cpu in workloads.json) — no CUDA kernels
+    # benches without CUDA kernels of their own (still run through the GPU wheel image)
     cpu: [21222, 21281, 6779, 13365, 27793, 29499, 32975, 33593, 39328]
-    # all 20 PRs with a mined, runnable workload (workloads.json)
+    # the first 20 PRs with a mined, runnable workload (the full set = every data/pr_*/task.json with workload.cmd)
     workloads: [21222, 21281, 9972, 22940, 12583, 23504, 16436, 6779, 6442, 13365, 37225, 33538, 41163, 33593, 27793, 39328, 32975, 29499, 27673, 28280]
     interesting: [21222, 21281, 6779, 13365, 27793]
-    # GPU Triton sampler PRs, run via the pip wheel image (tasks/pr_<n>/metadata.json:wheel)
+    # GPU Triton sampler PRs, run via the pip wheel image (data/pr_<n>/task.json:wheel)
     gpu_triton: [37225, 33538]

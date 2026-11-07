@@ -1,0 +1,274 @@
+{
+ "schema": "workload_v2",
+ "pr": 20839,
+ "title": "[Model] Replace Mamba2 RMSNorm Gated with Fused Triton Kernel (#20839)",
+ "url": "https://github.com/vllm-project/vllm/pull/20839",
+ "field": "gpu_kernels",
+ "area": "model_executor/layers",
+ "date": "2025-07-25",
+ "hw": "default",
+ "hw_override": null,
+ "base_sha": "9fe98d42508f9a67d5b1c491a4a306966ded3976",
+ "merge_sha": "eab2f3980cd30132dd99e23ea8d6fc0274365757",
+ "source_files": [
+  "vllm/model_executor/layers/mamba/mamba_mixer2.py",
+  "vllm/model_executor/layers/mamba/ops/layernorm_gated.py"
+ ],
+ "test_files": [],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:20839",
+  "dockerfile": "data/pr_20839/workload/default/Dockerfile",
+  "template": "templates/Dockerfile.gpu-wheel",
+  "wheel": "0.10.1",
+  "wheel_note": "first PyPI release after merge (2025-08-19 > 2025-07-25); picked by gen_tasks.py from PyPI upload dates.",
+  "torch_fix": "torch==2.7.1 --index-url https://download.pytorch.org/whl/cu128",
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:20839 data/pr_20839/workload/default"
+ },
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_20839/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "needs": "gpu",
+  "cluster": "none_gpu",
+  "all_clusters": [
+   "none_gpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "data/pr_20839 (bench.py, tests/)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "Mixer2RMSNormGated.forward_cuda on Bamba-9B-v2 shapes (hidden 8192, bf16, 16k/32k tokens); baseline = python silu-gate + ops.rms_norm, PR's solution = fused Triton rms_norm_gated. TP helpers stubbed to world_size 1. CUDA-event us per call. Author numbers are whole-model benchmark_latency (kept reported-only).",
+  "base_note": null
+ },
+ "policy": {
+  "source": "pipeline/run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "task.json:repeats (or hardware_overrides[<hw>].repeats)",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in data/pr_<n>/work/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> data/pr_<n>/work/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY task.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "rmsnorm_gated_16k",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": true,
+   "parse": "rmsnorm_gated_16k",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "rmsnorm_gated_32k",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "rmsnorm_gated_32k",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "latency_16k",
+   "unit": "s",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "Avg latency (not measured: benchmark_latency Bamba-9B-v2 16k)",
+   "reported": {
+    "baseline": 0.6323,
+    "pr_solution": 0.5812
+   },
+   "note": null
+  },
+  {
+   "name": "latency_32k",
+   "unit": "s",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "Avg latency (not measured: benchmark_latency Bamba-9B-v2 32k)",
+   "reported": {
+    "baseline": 1.2799,
+    "pr_solution": 1.1791
+   },
+   "note": null
+  }
+ ],
+ "headline": "rmsnorm_gated_16k",
+ "reported": {
+  "gain": "9%",
+  "gain_kind": "pct",
+  "gain_evidence": "**Approximately 8~9% latency improvements observed.**",
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
+  "author_hardware_args": [
+   {
+    "line": 28,
+    "text": "Since the RMSNormGated is replaced with a new implementation, the output quality will be tested e2e using lm_eval with gsm8k. The performance gain will be show through benchmark_latency results."
+   },
+   {
+    "line": 32,
+    "text": "Experiments done on H100-80GB"
+   },
+   {
+    "line": 35,
+    "text": "### benchmark_latency.py"
+   },
+   {
+    "line": 40,
+    "text": "python benchmarks/benchmark_latency.py --model ibm-ai-platform/Bamba-9B-v2 --input-len=16384 --output-len=1 --batch-size=1 --max_num_batched_tokens=16384"
+   },
+   {
+    "line": 42,
+    "text": "10% percentile latency: 0.6287146508228034 seconds"
+   },
+   {
+    "line": 43,
+    "text": "25% percentile latency: 0.6306551870657131 seconds"
+   },
+   {
+    "line": 44,
+    "text": "50% percentile latency: 0.6316098154056817 seconds"
+   },
+   {
+    "line": 45,
+    "text": "75% percentile latency: 0.6337889281567186 seconds"
+   },
+   {
+    "line": 46,
+    "text": "90% percentile latency: 0.63668047292158 seconds"
+   },
+   {
+    "line": 47,
+    "text": "99% percentile latency: 0.6390077278809622 seconds"
+   },
+   {
+    "line": 52,
+    "text": "python benchmarks/benchmark_latency.py --model ibm-ai-platform/Bamba-9B-v2 --input-len=32768 --output-len=1 --batch-size=1 --max_num_batched_tokens=32768"
+   },
+   {
+    "line": 54,
+    "text": "10% percentile latency: 1.2776596304494887 seconds"
+   },
+   {
+    "line": 55,
+    "text": "25% percentile latency: 1.2785978385945782 seconds"
+   },
+   {
+    "line": 56,
+    "text": "50% percentile latency: 1.2790819348301739 seconds"
+   },
+   {
+    "line": 57,
+    "text": "75% percentile latency: 1.2802647254429758 seconds"
+   },
+   {
+    "line": 58,
+    "text": "90% percentile latency: 1.2838081065099687 seconds"
+   },
+   {
+    "line": 59,
+    "text": "99% percentile latency: 1.286418360499665 seconds"
+   },
+   {
+    "line": 65,
+    "text": "python benchmarks/benchmark_latency.py --model ibm-ai-platform/Bamba-9B-v2 --input-len=16384 --output-len=1 --batch-size=1 --max_num_batched_tokens=16384"
+   },
+   {
+    "line": 67,
+    "text": "10% percentile latency: 0.5767858538310975 seconds"
+   },
+   {
+    "line": 68,
+    "text": "25% percentile latency: 0.5795957769732922 seconds"
+   }
+  ],
+  "source": "data/pr_20839/pr.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.10.1",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ },
+ "reproduced": null,
+ "gap": {
+  "verdict": "not analysed",
+  "note": null,
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:20839 data/pr_20839/workload/default",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_20839:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:20839 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_20839:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:20839 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": "perf-only fused Triton rms_norm_gated; no test in the diff. Wheel 0.10.1 pins torch 2.7.1 cu126 (no sm_120) -> torch_fix swaps in the cu128 build of the same torch."
+}

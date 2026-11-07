@@ -1,0 +1,18 @@
+{
+ "pr": 24217,
+ "title": "Fix Auto_Round Quatization Loading on SM75 and Lower GPUs (#24217)",
+ "url": "https://github.com/vllm-project/vllm/pull/24217",
+ "date": "2025-09-10",
+ "field": "quantization",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "3144d90217081aa7b4d3367f0614eb13c35ad4ae",
+ "merge_sha": "c0bd6a684aee2b47fe52b75ec97379e40ca5d36c",
+ "source_path": "vllm/model_executor/layers/quantization/auto_round.py",
+ "reported_gain": "0.1%, 0.0%",
+ "gain_kind": "pct",
+ "gain_evidence": "INFO 09-03 21:26:52 [metrics.py:417] Avg prompt throughput: 3.8 tokens/s, Avg generation throughput: 0.1 tokens/s, Running: 1 reqs, Swapped: 0 reqs, Pending: 0 ",
+ "hardware_overrides": {}
+}

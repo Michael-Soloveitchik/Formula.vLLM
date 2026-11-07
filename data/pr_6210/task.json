@@ -1,0 +1,34 @@
+{
+ "pr": 6210,
+ "title": "[Kernel] reloading fused_moe config on the last chunk (#6210)",
+ "url": "https://github.com/vllm-project/vllm/pull/6210",
+ "date": "2024-07-08",
+ "field": "gpu_kernels",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "717f4bcea036a049e86802b3a05dd6f7cd17efc8",
+ "merge_sha": "f7a8fa39d828136d0b8bbdd20c262602e5543ffd",
+ "source_path": "vllm/model_executor/layers/fused_moe/fused_moe.py",
+ "reported_gain": "5%",
+ "gain_kind": "pct",
+ "gain_evidence": "In our experiments, this can yield a ~5% speedup on average (see plot for a general idea of the diff in performance).",
+ "experiments": [
+  {
+   "name": "fused_experts_last_chunk_config_reload",
+   "unit": "pct",
+   "workload": "Author ran fused_moe chunked execution (follow-up to the #6029 chunking mechanism) and observed that reloading the Triton kernel config sized for the smaller last chunk yields a ~5% average speedup across their experiments (reported as a performance plot, no tabulated numbers).",
+   "needs": "gpu",
+   "note": "Diff refactors the config lookup in fused_experts into a try_get_optimal_moe_config helper wrapped in functools.partial, then calls get_config_func(tokens_in_chunk) to RELOAD the config for the final (smaller) chunk instead of reusing the full CHUNK_SIZE config. Number source: PR body 'this can yield a ~5% speedup on average'; only a plot is attached, no absolute before/after values.",
+   "reported": {
+    "pct": 0.05,
+    "comparable": false,
+    "scope": "end-to-end fused_moe layer throughput averaged across the author's unspecified MoE model/batch experiments, shown only as a performance plot",
+    "scale_short": "Author gives a ~5% average from a plot over whole-layer fused_moe runs on GPU; our isolated microbench cannot reproduce the Triton-kernel autotune path on CPU. TO MAKE 1:1: run fused_experts on a CUDA box with a real MoE weight set and a batch whose final chunk is smaller than VLLM_FUSED_MOE_CHUNK_SIZE, comparing per-call latency with and without the last-chunk config reload.",
+    "scale_note": "The win is a GPU Triton autotune effect: the last chunk is smaller than CHUNK_SIZE, so reusing the full-chunk kernel config is suboptimal; reloading a config tuned for the smaller chunk recovers ~5%. No absolute baseline published (plot only), and the path only exercises on GPU, so direction is genuine but magnitude is not CPU-reproducible."
+   }
+  }
+ ],
+ "hardware_overrides": {}
+}

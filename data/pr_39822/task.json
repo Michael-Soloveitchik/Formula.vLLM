@@ -1,0 +1,18 @@
+{
+ "pr": 39822,
+ "title": "[Hybrid] Warmup Mamba2 SSD kernel (#39822)",
+ "url": "https://github.com/vllm-project/vllm/pull/39822",
+ "date": "2026-05-12",
+ "field": "attention",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "a7b801e26d6b9d96bb49e939c0b6b3acf1d85796",
+ "merge_sha": "8f89381fc6b2d54591a7a560e20ee5211ce1ac33",
+ "source_path": "vllm/model_executor/layers/mamba/gdn_linear_attn.py",
+ "reported_gain": "91%, 378x, 35x, 10.8x",
+ "gain_kind": "pct",
+ "gain_evidence": "| Metric | Baseline (main) | With Warmup | Change | |--------|-----------------|-------------|--------| | Model load time | 30.0s | 76.9s | +46.9s (autotuning s",
+ "hardware_overrides": {}
+}

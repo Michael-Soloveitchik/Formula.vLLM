@@ -1,0 +1,18 @@
+{
+ "pr": 29795,
+ "title": "[Perf] Improve fp8 quant in mla; replace ReduceSum with ReduceScatterSum (#29795)",
+ "url": "https://github.com/vllm-project/vllm/pull/29795",
+ "date": "2025-12-08",
+ "field": "quantization",
+ "area": "distributed/device_communicators",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "6af70e11a0a3cb7109ce904e23ff90c73f573ef0",
+ "merge_sha": "1fb632fdb6b6391cd1fe3146d05cc2858c2446ab",
+ "source_path": "vllm/v1/attention/backends/mla/common.py",
+ "reported_gain": "5%",
+ "gain_kind": "pct",
+ "gain_evidence": "Perf gain: 5% projected improvement in decode when using flashinfer mla backend when serving DeepSeek R1 FP4 on 4 GB200 with DEP4",
+ "hardware_overrides": {}
+}

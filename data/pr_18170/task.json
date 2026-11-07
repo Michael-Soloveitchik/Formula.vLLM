@@ -1,0 +1,18 @@
+{
+ "pr": 18170,
+ "title": "[V1][P/D] Local attention optimization for NIXL (#18170)",
+ "url": "https://github.com/vllm-project/vllm/pull/18170",
+ "date": "2025-05-16",
+ "field": "attention",
+ "area": "distributed/kv_transfer",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "fabe89bbc41b34558558c0d5401e23776460eecb",
+ "merge_sha": "fd195b194e43ebd736182224f5904d9790d3db91",
+ "source_path": "vllm/distributed/kv_transfer/kv_connector/v1/nixl_connector.py",
+ "reported_gain": "10%, 5%",
+ "gain_kind": "pct",
+ "gain_evidence": "Thanks to @tlrmchlsmth for benchmarking, showing a reduction in multi-node NIXL P/D overhead from ~10% to ~5% on 4xH200 Llama-4-Scout for 100k input tokens, com",
+ "hardware_overrides": {}
+}

@@ -1,0 +1,18 @@
+{
+ "pr": 24330,
+ "title": "QWEN3 Thinking Fused MoE kernels Optimization configs (#24330)",
+ "url": "https://github.com/vllm-project/vllm/pull/24330",
+ "date": "2025-09-06",
+ "field": "gpu_kernels",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "77aec83b8c6e6c15a9b5c333a531c29eff0b61fc",
+ "merge_sha": "75334956c2a88dc7d9d73243bed26a75c8a68b85",
+ "source_path": "vllm/model_executor/layers/fused_moe/configs/E=128,N=768,device_name=NVIDIA_B200,dtype=fp8_w8a8,block_shape=[128,128].json",
+ "reported_gain": "13.7%",
+ "gain_kind": "pct",
+ "gain_evidence": "We see 13.7% in `Output token throughput (tok/s)`.",
+ "hardware_overrides": {}
+}

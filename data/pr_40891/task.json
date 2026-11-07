@@ -1,0 +1,18 @@
+{
+ "pr": 40891,
+ "title": "[Core] Avoid using extra thread in `UniProcExecutor` (#40891)",
+ "url": "https://github.com/vllm-project/vllm/pull/40891",
+ "date": "2026-05-07",
+ "field": "scheduling",
+ "area": "v1/executor",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "54f548e9e58087f0155e4e164e416ad7efdfde6d",
+ "merge_sha": "10ebb40d62e024116c1a4473f8e357a3e72761ed",
+ "source_path": "vllm/v1/executor/uniproc_executor.py",
+ "reported_gain": "2.78%, 10.17%",
+ "gain_kind": "pct",
+ "gain_evidence": "| Output throughput (tok/s) | 631.21 ±0.64 | 648.73 ±14.60 | +2.78% ✓ | 17221.96 ±168.39 | 18974.27 ±176.49 | +10.17% ✓ |",
+ "hardware_overrides": {}
+}

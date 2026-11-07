@@ -1,0 +1,18 @@
+{
+ "pr": 37136,
+ "title": "[Performance][Model Loader] Skip non-local expert weights during EP model loading (#37136)",
+ "url": "https://github.com/vllm-project/vllm/pull/37136",
+ "date": "2026-03-16",
+ "field": "quantization",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "a2956a0f8e8f44cc79c14a9d3b45167631b7c249",
+ "merge_sha": "821eb80c0d9c3eec0201fda21dbeead83b6ac1fc",
+ "source_path": "vllm/model_executor/model_loader/weight_utils.py",
+ "reported_gain": "up to 2.3x faster weight load, ~87% less I/O (Kimi-K2.5 EP)",
+ "gain_kind": "unit",
+ "gain_evidence": "skip non-local expert reads, cut 87% I/O",
+ "hardware_overrides": {}
+}

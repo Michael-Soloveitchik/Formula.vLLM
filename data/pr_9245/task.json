@@ -1,0 +1,18 @@
+{
+ "pr": 9245,
+ "title": "[Kernel] adding fused moe kernel config for L40S TP4 (#9245)",
+ "url": "https://github.com/vllm-project/vllm/pull/9245",
+ "date": "2024-10-11",
+ "field": "gpu_kernels",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "7342a7d7f87ea3f4e03ec0775093a0f1ce56e2a1",
+ "merge_sha": "f710090d8e40451879690b6a27b7d3b1a41b53ec",
+ "source_path": null,
+ "reported_gain": "6%",
+ "gain_kind": "pct",
+ "gain_evidence": "Results in up to 10% more throughput, ~6% better latency.",
+ "hardware_overrides": {}
+}

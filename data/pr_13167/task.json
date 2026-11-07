@@ -1,0 +1,18 @@
+{
+ "pr": 13167,
+ "title": "[Model] Deepseek GGUF support  (#13167)",
+ "url": "https://github.com/vllm-project/vllm/pull/13167",
+ "date": "2025-02-27",
+ "field": "quantization",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "edf309ebbe25fcf55569c7fe94e3fe78428a8244",
+ "merge_sha": "7f0be2aa24dfacf6f7aaf92411fdcd2f55ff8478",
+ "source_path": "vllm/config.py",
+ "reported_gain": "15.8%, 0.0%",
+ "gain_kind": "pct",
+ "gain_evidence": "INFO 03-08 05:58:19 metrics.py:455] Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 5.7 tokens/s, Running: 1 reqs, Swapped: 0 reqs, Pending: 0 r",
+ "hardware_overrides": {}
+}

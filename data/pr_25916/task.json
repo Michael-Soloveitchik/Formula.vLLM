@@ -1,0 +1,18 @@
+{
+ "pr": 25916,
+ "title": "EAGLE 3: Fix preamble so that measured speedup over Eagle 1 becomes 32% instead of 5% on MTBench (#25916)",
+ "url": "https://github.com/vllm-project/vllm/pull/25916",
+ "date": "2025-10-02",
+ "field": "decoding_tpot",
+ "area": "vllm/benchmarks",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "1e50f1be705832b0f193b1bd4599109a0c405851",
+ "merge_sha": "1cab2f9cad22807150c93b4b5635ff884884ca5a",
+ "source_path": "vllm/benchmarks/datasets.py",
+ "reported_gain": "32%, 5%",
+ "gain_kind": "pct",
+ "gain_evidence": "# PR #25916: EAGLE 3: Fix preamble so that measured speedup over Eagle 1 becomes 32% instead of 5% on MTBench",
+ "hardware_overrides": {}
+}

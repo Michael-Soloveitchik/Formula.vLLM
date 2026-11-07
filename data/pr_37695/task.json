@@ -1,0 +1,18 @@
+{
+ "pr": 37695,
+ "title": "[Perf] Use torch compile to fuse pack topk in trtllm moe (#37695)",
+ "url": "https://github.com/vllm-project/vllm/pull/37695",
+ "date": "2026-03-27",
+ "field": "parallelism",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "88149b635e3ba9ef70ca18c45876d992ab6c522c",
+ "merge_sha": "b69bf2f0b170ac5b43f72f4dd4139c5388fa5de8",
+ "source_path": "vllm/model_executor/layers/fused_moe/experts/trtllm_fp8_moe.py",
+ "reported_gain": "2%",
+ "gain_kind": "pct",
+ "gain_evidence": "From benchmarking, this gives ~2% speedup in Minimax M2.5 TP=2 Concurrency 64 1K/1K across FP8 and NVFP4.",
+ "hardware_overrides": {}
+}

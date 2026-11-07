@@ -1,0 +1,18 @@
+{
+ "pr": 24989,
+ "title": "[Core] Get num_encoder_tokens from scheduler config (#24989)",
+ "url": "https://github.com/vllm-project/vllm/pull/24989",
+ "date": "2025-09-16",
+ "field": "scheduling",
+ "area": "v1/core",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "ea3de5ef0d8cbf0e61ee27647954e5a867fae020",
+ "merge_sha": "58d4c705a88adc3187591b4b2e651eae3b190061",
+ "source_path": "vllm/v1/core/sched/scheduler.py",
+ "reported_gain": "3%",
+ "gain_kind": "pct",
+ "gain_evidence": "This isn't a huge improvement (about 3% throughput increase), but it's a good step.",
+ "hardware_overrides": {}
+}

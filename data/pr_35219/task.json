@@ -1,0 +1,18 @@
+{
+ "pr": 35219,
+ "title": "[BUGFIX][Mamba][Qwen3.5] Zero freed SSM cache blocks on GPU (#35219)",
+ "url": "https://github.com/vllm-project/vllm/pull/35219",
+ "date": "2026-03-10",
+ "field": "attention",
+ "area": "v1/core",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "507ddbe9927f421a1d574b283d1611044859a30d",
+ "merge_sha": "4ff8c3c8f9ece010a1d0e376f5cc1b468b95f366",
+ "source_path": "vllm/v1/core/sched/scheduler.py",
+ "reported_gain": "2.1%, 2.3%",
+ "gain_kind": "pct",
+ "gain_evidence": "| Metric | Triton | index_fill_ | Delta | |--------|--------|-------------|-------| | Output tok/s | 15,634 | 15,307 | **-2.1%** | | TPOT median (ms) | 15.88 | ",
+ "hardware_overrides": {}
+}

@@ -1,0 +1,18 @@
+{
+ "pr": 35457,
+ "title": "[Model Performance] Add Qwen3MoE tuned MoE configs for H200 (#35457)",
+ "url": "https://github.com/vllm-project/vllm/pull/35457",
+ "date": "2026-02-26",
+ "field": "parallelism",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "516cf26698f07d2c92dd61bd5541ceb1376401bc",
+ "merge_sha": "a572baff5e5fde4aa3fb92961de04eb043dc5cf4",
+ "source_path": null,
+ "reported_gain": "24%, 12%",
+ "gain_kind": "pct",
+ "gain_evidence": "BF16 (tuned vs default): - Batch 16-64: 20-24% faster - Batch 1-8: 2-12% faster",
+ "hardware_overrides": {}
+}

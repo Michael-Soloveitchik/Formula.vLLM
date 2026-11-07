@@ -1,0 +1,18 @@
+{
+ "pr": 9948,
+ "title": "[Bugfix] Fix Phi-3 BNB quantization with tensor parallel (#9948)",
+ "url": "https://github.com/vllm-project/vllm/pull/9948",
+ "date": "2024-11-22",
+ "field": "quantization",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "a111d0151ffed94582bec65635979e04e5b63676",
+ "merge_sha": "b6374e09b0af4f8fa4c0b911b3cd1bd45342ead6",
+ "source_path": "vllm/model_executor/layers/linear.py",
+ "reported_gain": "0.8%, 0.0%",
+ "gain_kind": "pct",
+ "gain_evidence": "INFO 11-19 04:40:33 metrics.py:449] Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 28.7 tokens/s, Running: 4 reqs, Swapped: 0 reqs, Pending: 0 ",
+ "hardware_overrides": {}
+}

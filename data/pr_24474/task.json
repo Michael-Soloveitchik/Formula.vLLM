@@ -1,0 +1,18 @@
+{
+ "pr": 24474,
+ "title": "[Perf] Convert np array to torch tensor to index into block table for attn chunking (#24474)",
+ "url": "https://github.com/vllm-project/vllm/pull/24474",
+ "date": "2025-09-09",
+ "field": "parallelism",
+ "area": "v1/attention",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "b23fb78623f0019854af7a820d398cba9a316677",
+ "merge_sha": "dc625ea6b8f8072afd3e0923f7ef5a39be87fc96",
+ "source_path": "vllm/v1/attention/backends/utils.py",
+ "reported_gain": "16% (10.27ms→8.66ms)",
+ "gain_kind": "unit",
+ "gain_evidence": "on latest torch, TPOT goes from 10.27ms -> 8.66ms",
+ "hardware_overrides": {}
+}

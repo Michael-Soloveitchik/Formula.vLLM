@@ -1,0 +1,109 @@
+{
+ "pr": 20308,
+ "title": "[Kernel] Optimize Prefill Attention in Unified Triton Attention Kernel (#20308)",
+ "url": "https://github.com/vllm-project/vllm/pull/20308",
+ "date": "2025-07-07",
+ "field": "gpu_kernels",
+ "area": "attention/ops",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "a6d795d593046abd490b16349bcd9b40feedd334",
+ "merge_sha": "22dd9c2730dc1124b9d0ac15fff223d0b8d9020b",
+ "source_path": "vllm/attention/ops/triton_unified_attention.py",
+ "reported_gain": "3%, 5%",
+ "gain_kind": "pct",
+ "gain_evidence": "Despite the relatively short prompt lengths used in this benchmark, the results still demonstrate a ~3% improvement in throughput, along with over 5% reductions",
+ "source_files": [
+  "vllm/attention/ops/triton_unified_attention.py"
+ ],
+ "test_files": [],
+ "wheel": "0.9.2",
+ "wheel_note": "first PyPI release after merge (2025-07-08 > 2025-07-07); picked by gen_tasks.py from PyPI upload dates. torch_fix added by hand: 0.9.2 pins torch 2.7.0 (cu126 wheel lacks sm_120), swapped for the cu128 build of the same version.",
+ "torch_fix": "torch==2.7.0 --index-url https://download.pytorch.org/whl/cu128",
+ "test_note": "perf-only causal tile skipping; no test in the diff. Wheel 0.9.2 pins torch 2.7.0 cu126 (no sm_120) -> torch_fix set by hand to the cu128 build of the same torch 2.7.0 (triton 3.3.0; first sm_120 run of this wheel is unverified).",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_20308/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "us",
+  "needs": "gpu",
+  "headline": "prefill_attn_s2000",
+  "note": "unified_attention (2D Triton kernel) pure prefill, 1 sequence, Llama-3.1-8B shapes (32/8 heads, head 128, block 16, bf16), prompts 2000/8000/16000; PR = skip KV tiles beyond the causal prefix. CUDA-event us per call. Wheel 0.9.2 pins torch 2.7.0 cu126 (no sm_120): metadata torch_fix swaps the cu128 build of the same torch. Author: ~1.75x kernel-side at 16k (graph) + ShareGPT serving (reported-only)."
+ },
+ "experiments": [
+  {
+   "name": "prefill_attn_s2000",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "parse": "prefill_attn_s2000"
+  },
+  {
+   "name": "prefill_attn_s8000",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "parse": "prefill_attn_s8000"
+  },
+  {
+   "name": "prefill_attn_s16000",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "parse": "prefill_attn_s16000"
+  },
+  {
+   "name": "serving_mean_ttft",
+   "unit": "ms",
+   "reported": {
+    "base": 3874.12,
+    "patch": 3588.36
+   },
+   "parse": "Mean TTFT (not measured: Llama-3.1-8B ShareGPT, H100)"
+  },
+  {
+   "name": "serving_request_throughput",
+   "unit": "req/s",
+   "reported": {
+    "base": 44.37,
+    "patch": 45.9
+   },
+   "parse": "Request throughput (not measured)"
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "hardware_overrides": {},
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.9.2",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ }
+}

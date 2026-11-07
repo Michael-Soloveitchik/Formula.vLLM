@@ -1,0 +1,72 @@
+{
+ "pr": 41163,
+ "title": "[Perf] Optimize `AllPool.forward` by slicing first, 51% faster in the method level benchmark (#41163)",
+ "url": "https://github.com/vllm-project/vllm/pull/41163",
+ "date": "2026-04-29",
+ "field": "gpu_kernels",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "b92ef9ec5a041b538f44d9584bef0e34bfbeecd1",
+ "merge_sha": "39a7f4f4e2635012ead0ad127970d7b6778890af",
+ "source_path": "vllm/model_executor/layers/pooler/tokwise/methods.py",
+ "reported_gain": "51%",
+ "gain_kind": "pct",
+ "gain_evidence": "# PR #41163: [Perf] Optimize `AllPool.forward` by slicing first, 51% faster in the method level benchmark",
+ "source_files": [
+  "vllm/model_executor/layers/pooler/tokwise/methods.py"
+ ],
+ "test_files": [
+  "tests/models/language/pooling/test_token_classification.py"
+ ],
+ "wheel": "0.20.1",
+ "wheel_note": "first PyPI release after merge (2026-05-04 > 2026-04-29); torch 2.11 cu128 wheel runs on sm_120.",
+ "test_note": "PR says 'covered in current CI'; test_token_classification.py exercises the token-wise pooler (AllPool) end-to-end on a small HF model (downloads into the shared HF cache). Perf-only PR: baseline and PR's solution both expected PASS.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_41163/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "us",
+  "needs": "gpu",
+  "headline": "allpool_forward_median",
+  "note": "bench.py is the author's method-level benchmark from the PR body, verbatim (64 reqs x 128 tokens, subgroup 32, hidden 4096, bf16; median of 5 x 4000 iters). /task = tasks/pr_41163 mounted read-only in the task image."
+ },
+ "experiments": [
+  {
+   "name": "allpool_forward_median",
+   "reported": {
+    "base": 59.89,
+    "patch": 39.65
+   }
+  }
+ ],
+ "experiments_note": "reported = PR body (us, median of the author's benchmark on their GPU)",
+ "hardware_overrides": {},
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": "AllPool.forward on cuda:0",
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.20.1",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ }
+}

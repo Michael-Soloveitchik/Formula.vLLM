@@ -1,9 +1,9 @@
 # Why our absolute baselines differ from the PR authors' — and what to change
 
 Scope: the six PRs whose *absolute* reproduced numbers diverge from the author's table
-even where the *ratio* reproduces. Evidence = `results/<pr>.json`, `.work/pr_<pr>/wl_*.log`,
-`tasks/pr_<pr>/metadata.json`, the PR bodies under `data/prs/`, and a machine snapshot
-taken 2026-11-07 (`python3 machine.py snapshot`). No workload was re-run for this analysis.
+even where the *ratio* reproduces. Evidence = `data/pr_<n>/results.<hw-slug>.json`, `data/pr_<n>/logs/<hw-slug>/wl_*.log`,
+`data/pr_<n>/task.json`, the PR bodies in `data/pr_<n>/pr.md`, and a machine snapshot
+taken 2026-11-07 (`python3 pipeline/machine.py snapshot`). No workload was re-run for this analysis.
 
 ## The box (what every number below was measured on)
 
@@ -49,7 +49,7 @@ P/E-core placement of the WSL2 vCPU and/or other tenants. Bench script is the au
 
 ### 33538 — Triton top-k/top-p sampler vs PyTorch sort — **WSL2 launch latency (box), small-batch rows**
 Baseline arm cannot run the script (it is introduced by the PR); baseline = the script's own
-"PyTorch (ms)" column in the PR's-solution run (by design, `metadata.json:base_note`). Reported PyTorch
+"PyTorch (ms)" column in the PR's-solution run (by design, `task.json:workload.base_note`). Reported PyTorch
 0.28 ms at b16 v32k; ours 1.21 ms. Our PyTorch column is **flat in batch**: 1.14 ms at b128,
 1.23 ms at b16, 0.23-0.28 ms at b1 — i.e. ~1.1 ms of fixed per-call overhead for the ~20-30
 kernels the sort/cumsum/mask path launches, vs the author's floor of ~0.10 ms (their b1 row).
@@ -76,7 +76,7 @@ is below any reasonable noise gate anyway.
 ### 13365 — Numba n-gram matcher — **workload mismatch (call count), per-call speed is 1:1**
 Reported 54.3 s → 1.9 s *cumulative over a 5K-request ShareGPT run*: `propose()` runs once per
 decode step per request (~1.2 M calls at ~250 output tokens each), so 54.3 s ≈ 45 µs/call.
-Ours: `tasks/pr_13365/bench.py` calls `propose()` **once per sequence** (5000 calls), 0.165 s ≈
+Ours: `data/pr_13365/bench.py` calls `propose()` **once per sequence** (5000 calls), 0.165 s ≈
 33 µs/call — the same order as the author's per-call cost. The 1.9 s on the author side also
 includes the one-off Numba JIT (~0.5-1 s) which our bench deliberately warms up outside the
 timed region, which is why our ratio (63×) exceeds theirs (28×). To match: time the cumulative
@@ -92,7 +92,7 @@ unquantified. Ours: three inlined primitives at `NUM_LOCAL=16`: `get_ep_ranks_wi
 0.38× — at 16 local experts the pure-Python body is 16×16 = 256 trivial iterations (23 µs) while
 the numpy body pays ~10 numpy-call overheads (31 µs); numpy only wins once `num_local_experts`
 and the per-layer loop are large. The headline/median therefore reports a regression the author
-never claimed. Also: `bench.py:_best_ms` returns **ms** (`*1e3`) but `metadata.json` declares
+never claimed. Also: `bench.py:_best_ms` returns **ms** (`*1e3`) but `task.json` declares
 `unit: "us"` — every 29499 number on the dashboard is mislabelled by 1000×. To match the author:
 bench the whole per-layer rebalance (loop over all `ep_rank`s × 58 layers, i.e. the
 `rearrange_expert_weights_inplace` index-mapping path with `num_local_experts` ≥ 32 as in
@@ -115,9 +115,9 @@ headline, and fix the unit to `ms`. Verdict: workload, not hardware (CPU-only).
 1. **Pin the device explicitly**: `GPU_FLAG='--gpus "device=0"'` and pass
    `-e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID`. Harmless on a 1-GPU box, and
    it stops a second GPU ever being picked up silently when the box changes.
-2. **Record a machine snapshot per arm**: call `python3 machine.py snapshot -o "$WORK/machine_${arm}_${i}.json"`
+2. **Record a machine snapshot per arm**: call `python3 pipeline/machine.py snapshot -o "$WORK/machine_${arm}_${i}.json"`
    right before each `run_in_img` in `run_workload`, and have `record.py` copy the first one
-   into `results/<pr>.json:machine`. Then any 41163-style bimodality can be matched to GPU
+   into `results.<hw-slug>.json:machine`. Then any 41163-style bimodality can be matched to GPU
    util / other tenants / load1 after the fact instead of guessed.
 3. **Refuse (or flag) a contended run**: before `run_workload`, if `nvidia-smi
    --query-gpu=utilization.gpu` > 5 % or any compute process other than the idle ComfyUI server
@@ -150,7 +150,7 @@ headline, and fix the unit to `ms`. Verdict: workload, not hardware (CPU-only).
 9. **Docker overhead is not the cause**: container start (~1 s) is outside every timed region
    (all benches time inside the process); `--shm-size=2g` and the ro bind mounts do not touch
    the hot path. No change needed; mention it once in the README so the question stops coming up.
-10. **Per-task arg fixes (metadata.json, not run_one.sh)**: 22940 add `--max-num-seqs 1024
+10. **Per-task arg fixes (task.json, or hardware_overrides[<hw-slug>] for one GPU class; not run_one.sh)**: 22940 add `--max-num-seqs 1024
     --max-num-batched-tokens 16384` (and optionally `--num-prompts 30000` with `REPEATS=1`); 13365 replace the per-sequence call
     with per-decode-step calls (≈1.2 M) and report JIT separately; 29499 fix `unit` to `ms`,
     bench at `num_local_experts ≥ 32` over all ranks × layers, and make `get_ep_ranks_with_expert`

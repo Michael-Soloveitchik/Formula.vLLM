@@ -1,0 +1,18 @@
+{
+ "pr": 37416,
+ "title": "[Kernel] Mamba support different layout for Conv state (#37416)",
+ "url": "https://github.com/vllm-project/vllm/pull/37416",
+ "date": "2026-04-03",
+ "field": "gpu_kernels",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "bb39382b2b28b0571054fee4a266b96d7e33ab58",
+ "merge_sha": "66e86f1dbd565292a253e7d2d6851f65dc4f14ba",
+ "source_path": "vllm/model_executor/layers/mamba/mamba_mixer2.py",
+ "reported_gain": "1.5x",
+ "gain_kind": "pct",
+ "gain_evidence": "DS layout is still exhibiting significantly better TTFT (up to ~1.5x).",
+ "hardware_overrides": {}
+}

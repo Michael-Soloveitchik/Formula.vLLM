@@ -1,0 +1,261 @@
+{
+ "schema": "workload_v2",
+ "pr": 32975,
+ "title": "[Perf] Optimize detokenizer python logic (#32975)",
+ "url": "https://github.com/vllm-project/vllm/pull/32975",
+ "field": "scheduling",
+ "area": "v1/engine",
+ "date": "2026-02-10",
+ "hw": "rtx5070ti",
+ "hw_override": null,
+ "base_sha": "97fa8f65909d4d8f2eb0edc2137fb22f576a5b25",
+ "merge_sha": "e1060a71a1bb96103ce9ca98345184dcdc982467",
+ "source_files": [
+  "vllm/v1/engine/detokenizer.py",
+  "vllm/v1/engine/output_processor.py"
+ ],
+ "test_files": [],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:32975",
+  "dockerfile": "data/pr_32975/workload/rtx5070ti/Dockerfile",
+  "template": "templates/Dockerfile.gpu-wheel",
+  "wheel": "0.16.0",
+  "wheel_note": "first PyPI release after merge (2026-02-26 > 2026-02-10); picked by gen_tasks.py from PyPI upload dates.",
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:32975 data/pr_32975/workload/rtx5070ti"
+ },
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_32975/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "needs": "gpu",
+  "cluster": "none_cpu",
+  "all_clusters": [
+   "none_cpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "data/pr_32975 (bench.py, tests/)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "Real SlowIncrementalDetokenizer.update() one token at a time with a stop string set (per-update output length check), 8 seqs x 2048 tokens after a 256-token prompt, in-process byte-level BPE tokenizer (no download). us per generated token, median of 5 passes. Author: 1.628x micro ratio only.",
+  "base_note": null
+ },
+ "policy": {
+  "source": "pipeline/run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "task.json:repeats (or hardware_overrides[<hw>].repeats)",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in data/pr_<n>/work/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> data/pr_<n>/work/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY task.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "detokenize",
+   "unit": "us/tok",
+   "higher_is_better": false,
+   "headline": true,
+   "parse": "detokenize",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  }
+ ],
+ "headline": "detokenize",
+ "reported": {
+  "gain": "1.628x, 38.57%",
+  "gain_kind": "pct",
+  "gain_evidence": "```bash yewentao256@dgx-b200-02:~/vllm-source$ python benchmarks/overheads/benchmark_detokenizer_min_tokens.py old: 787.270 ms (39.36 ns/token) new: 483.633 ms ",
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
+  "author_hardware_args": [
+   {
+    "line": 13,
+    "text": "1. adding a `num_output_tokens` function, to avoid `len(self.output_token_ids)` might do a slice in SlowIncrementalDetokenizer"
+   },
+   {
+    "line": 18,
+    "text": "def output_token_ids(self) -> list[int]:"
+   }
+  ],
+  "source": "data/pr_32975/pr.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.16.0",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ },
+ "reproduced": {
+  "source": "data/pr_32975/results.rtx5070ti.json",
+  "hw_slug": "rtx5070ti",
+  "ts": "2026-11-07T22:15:26Z",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.16.0",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "tests": {
+   "base": "SKIP",
+   "gold": "SKIP"
+  },
+  "verdict": "no_reported_number",
+  "reproduced_ratio_median": 1.053,
+  "reported_ratio_median": null,
+  "machine": {
+   "ts": "2026-11-07T22:13:43Z",
+   "host": {
+    "hostname": "DESKTOP-michael",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "wsl2": true,
+    "os": "Ubuntu 24.04.3 LTS"
+   },
+   "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Ti",
+    "driver": "591.86",
+    "cuda": "13.1",
+    "sm_mhz": 180.0,
+    "sm_max_mhz": 3090.0,
+    "mem_mhz": 405.0,
+    "mem_max_mhz": 14001.0,
+    "vram_total_mib": 16303.0,
+    "vram_used_mib": 275.0,
+    "util_pct": 0.0,
+    "power_w": 30.18,
+    "power_limit_w": 300.0,
+    "temp_c": 35.0,
+    "pstate": "P8",
+    "throttle_reasons": "0x0000000000000000",
+    "processes": [
+     {
+      "pid": 2903,
+      "name": "python main.py --listen 0.0.0.0 --port 8188",
+      "mem_mib": null
+     }
+    ]
+   },
+   "cpu": {
+    "model": "Intel(R) Core(TM) i7-14700KF",
+    "nproc": 12,
+    "load1": 2.2421875,
+    "load5": 1.5947265625,
+    "load15": 1.103515625,
+    "top_cpu_procs": []
+   },
+   "ram": {
+    "total_gb": 94.3,
+    "free_gb": 37.2,
+    "available_gb": 89.1
+   },
+   "docker": {
+    "version": "Docker version 29.8.1, build 4a63305",
+    "engine": "docker"
+   }
+  },
+  "experiments": [
+   {
+    "name": "detokenize",
+    "unit": "us/tok",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 24.4438,
+    "baseline_sd": 0.4408,
+    "pr_solution": 23.2144,
+    "pr_solution_sd": 0.19,
+    "n": 5,
+    "ratio": 1.052959,
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  ]
+ },
+ "gap": {
+  "verdict": "not analysed",
+  "note": null,
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:32975 data/pr_32975/workload/rtx5070ti",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_32975:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:32975 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_32975:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:32975 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": "perf-only detokenizer change; bench builds the detokenizer against the real gpt2 tokenizer (downloads into the shared HF cache)."
+}

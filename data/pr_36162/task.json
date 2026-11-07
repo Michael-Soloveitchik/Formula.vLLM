@@ -1,0 +1,18 @@
+{
+ "pr": 36162,
+ "title": "[Mamba] Flashinfer selective_state_update (#36162)",
+ "url": "https://github.com/vllm-project/vllm/pull/36162",
+ "date": "2026-04-14",
+ "field": "attention",
+ "area": "vllm/config",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "30679319e83a78f6fd405130e562043c1e7f5e7e",
+ "merge_sha": "ecf5ff7ce3ac2a8db51654712cbcea3540faaef8",
+ "source_path": "vllm/config/cache.py",
+ "reported_gain": "5.8%",
+ "gain_kind": "pct",
+ "gain_evidence": "│ Peak output throughput │ 31,129 tok/s │ 32,938 tok/s │ +5.8% │",
+ "hardware_overrides": {}
+}

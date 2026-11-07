@@ -1,0 +1,97 @@
+{
+ "pr": 23928,
+ "title": "[Model loader]: support multi-thread model weight loading (#23928)",
+ "url": "https://github.com/vllm-project/vllm/pull/23928",
+ "date": "2025-09-09",
+ "field": "memory",
+ "area": "model_executor/model_loader",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "7be141b2c52366f0cc4e731c36819aed178d2258",
+ "merge_sha": "43d9ad03ba8584547537da71aee3e1810a0abbfd",
+ "source_path": "vllm/model_executor/model_loader/default_loader.py",
+ "reported_gain": "30% (Load Time (s): 20→14)",
+ "gain_kind": "unit",
+ "gain_evidence": "Load Time (s): before 20 / after 14",
+ "source_files": [
+  "vllm/model_executor/model_loader/default_loader.py",
+  "vllm/model_executor/model_loader/weight_utils.py"
+ ],
+ "test_files": [],
+ "wheel": "0.10.2",
+ "wheel_note": "first PyPI release after merge (2025-09-13 > 2025-09-09); picked by gen_tasks.py from PyPI upload dates.",
+ "test_note": "opt-in multi-thread loader; no test in the diff; bench writes 1 GB of synthetic shards to a temp dir and deletes them.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_23928/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "s",
+  "needs": "gpu",
+  "headline": "weights_load_1gb_s",
+  "note": "Weight-shard iteration over 8 synthetic 128 MB bf16 safetensors files (1 GB, written to a temp dir, page-cached): PR's solution = multi_thread_safetensors_weights_iterator (8 workers), baseline tree lacks it so the bench runs the single-thread safetensors_weights_iterator the loader uses there. Seconds per full pass, best of 3. Author: QwQ-32B 62 GB load 20 s -> 14 s (reported-only). Opt-in feature (enable_multithread_load)."
+ },
+ "experiments": [
+  {
+   "name": "weights_load_1gb_s",
+   "unit": "s",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "parse": "weights_load_1gb_s"
+  },
+  {
+   "name": "model_load_time",
+   "unit": "s",
+   "reported": {
+    "base": 20.0,
+    "patch": 14.0
+   },
+   "parse": "Load Time (not measured: QwQ-32B 62 GB, TP8, NVMe)"
+  },
+  {
+   "name": "multi_thread_weight_loading",
+   "unit": "s",
+   "workload": "Author loaded QwQ-32B (62 GB) from a single NVMe SSD (page cache dropped before each run, reads hit disk) via the OpenAI api_server with --model-loader-extra-config '{\"enable_multithread_load\": true, \"num_threads\": 8}', comparing total weight Load Time with and without multi-thread loading.",
+   "needs": "cpu",
+   "note": "Diff adds multi_thread_safetensors_weights_iterator and multi_thread_pt_weights_iterator (concurrent.futures.ThreadPoolExecutor over shard files) in weight_utils.py, and DefaultModelLoader selects them when enable_multithread_load is set (num_threads default 8); also validates extra-config keys. Number source: PR body Test Result table - disable 20 s / 3.1 GB/s vs enable 14 s / 4.42 GB/s, 'Load Weight speed up 1.43x'.",
+   "reported": {
+    "base": 20,
+    "patch": 14,
+    "comparable": false,
+    "scope": "wall-clock weight Load Time for a 62 GB QwQ-32B model read from a single NVMe SSD with page cache dropped; the win is disk-bandwidth-bound (3.1 -> 4.42 GB/s) not compute",
+    "scale_short": "Author's 20->14s is for a 62 GB model streamed from a specific NVMe SSD with cold page cache; the gain depends entirely on the storage device's parallel-read bandwidth. TO MAKE 1:1: load a multi-shard safetensors model from the SAME class of NVMe with the page cache dropped, timing _get_weights_iterator with num_threads=1 vs 8; a tiny model or warm page cache collapses the gap (author saw only ~0.2s from cache).",
+    "scale_note": "This is CPU/IO-measurable later but NOT GPU-dependent. The speedup is purely from parallelizing shard reads to saturate NVMe bandwidth; the author confirmed in comments that with a warm page cache the improvement shrinks to ~0.2s, so magnitude is highly storage- and model-size-dependent. Direction is genuine for cold large-model loads from fast disks."
+   }
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "hardware_overrides": {},
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.10.2",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ }
+}

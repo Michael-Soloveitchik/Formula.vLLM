@@ -1,0 +1,18 @@
+{
+ "pr": 10640,
+ "title": "[V1] VLM - Run the mm_mapper preprocessor in the frontend process (#10640)",
+ "url": "https://github.com/vllm-project/vllm/pull/10640",
+ "date": "2024-12-03",
+ "field": "scheduling",
+ "area": "v1/engine",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "f6084f63248a89df52bed9d9c24d6604f87e51f3",
+ "merge_sha": "3bc94cab695387eb16be90b6368029f56ce5dbc7",
+ "source_path": "vllm/v1/engine/core.py",
+ "reported_gain": "1.7X",
+ "gain_kind": "pct",
+ "gain_evidence": "Execution of 512 prompts with 64 output tokens results in 1.7X improvement.",
+ "hardware_overrides": {}
+}

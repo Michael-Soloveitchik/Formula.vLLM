@@ -1,0 +1,18 @@
+{
+ "pr": 26319,
+ "title": "[Lora]Load tuned multi-lora kernel configs from json files (#26319)",
+ "url": "https://github.com/vllm-project/vllm/pull/26319",
+ "date": "2025-10-15",
+ "field": "gpu_kernels",
+ "area": "lora/ops",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "db1764e4e05b06c93073b9f26df7b1f3b684e638",
+ "merge_sha": "d4d1a6024f526129941d2fecaec504d93f9072ed",
+ "source_path": "vllm/lora/ops/triton_ops/lora_shrink_op.py",
+ "reported_gain": "12%, 17%",
+ "gain_kind": "pct",
+ "gain_evidence": "According to our benchmarking, we see 12% to 17% ITL gain on Llama3.3 70B with 16 lora adapters with rank=16:",
+ "hardware_overrides": {}
+}

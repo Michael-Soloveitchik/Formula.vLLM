@@ -11,7 +11,7 @@ QUANTIFIED performance gain** the author reports. This set is the trustworthy
 
 ## Inputs
 - `data/index.jsonl` — contributing PRs (field set).
-- `data/prs/<field>/<area>/<pr>.md` — the conversation (title + body + comments).
+- `data/pr_<n>/pr.md` (was `data/prs/<field>/<area>/<pr>.md`) — the conversation (title + body + comments).
 
 ## Outputs (research / stats files)
 - `data/views/perf_gains.jsonl` — one record per PR with a measured gain:

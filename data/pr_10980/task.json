@@ -1,0 +1,18 @@
+{
+ "pr": 10980,
+ "title": "[V1] V1 engine implements parallel sampling (AsyncLLM and LLMEngine) (#10980)",
+ "url": "https://github.com/vllm-project/vllm/pull/10980",
+ "date": "2025-02-24",
+ "field": "decoding_tpot",
+ "area": "v1/engine",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "444b0f0f62989246abe115f0b24d2ba289612b23",
+ "merge_sha": "befc402d34c2563477ff33bfdd9548ae20a42acd",
+ "source_path": "tests/v1/engine/test_llm_engine.py",
+ "reported_gain": "5x",
+ "gain_kind": "pct",
+ "gain_evidence": "In contrast, the prompt throughput rises by about 4-5x.",
+ "hardware_overrides": {}
+}

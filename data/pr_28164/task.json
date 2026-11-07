@@ -1,0 +1,18 @@
+{
+ "pr": 28164,
+ "title": "[Feature] Enable TP + EP `shared_experts` overlap with router, 3.7% E2E performance improvement (#28164)",
+ "url": "https://github.com/vllm-project/vllm/pull/28164",
+ "date": "2025-11-05",
+ "field": "parallelism",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "90189c71a9629cf2c866b213d6d28b08937a7566",
+ "merge_sha": "d71af5f5020e0fee5375b3cf7898852abbae22f2",
+ "source_path": "vllm/model_executor/layers/fused_moe/shared_fused_moe.py",
+ "reported_gain": "3.7%",
+ "gain_kind": "pct",
+ "gain_evidence": "# PR #28164: [Feature] Enable TP + EP `shared_experts` overlap with router, 3.7% E2E performance improvement",
+ "hardware_overrides": {}
+}

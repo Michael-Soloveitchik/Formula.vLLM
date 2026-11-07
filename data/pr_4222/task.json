@@ -1,0 +1,18 @@
+{
+ "pr": 4222,
+ "title": "Updating lm-format-enforcer version and adding links to decoding libraries in docs (#4222)",
+ "url": "https://github.com/vllm-project/vllm/pull/4222",
+ "date": "2024-04-20",
+ "field": "quantization",
+ "area": "requirements-common.txt",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "91528575ec0e6fd251bac08973a3abf23d4c318c",
+ "merge_sha": "cc74b2b232070f74d8765a5eefa49ae93ee45490",
+ "source_path": "vllm/model_executor/layers/quantization/fp8.py",
+ "reported_gain": "2x",
+ "gain_kind": "pct",
+ "gain_evidence": "These versions have no API changes, solve a few bugs and improve JSONSchemaParser performance by 2x in many cases.",
+ "hardware_overrides": {}
+}

@@ -1,0 +1,884 @@
+{
+ "schema": "workload_v2",
+ "pr": 37225,
+ "title": "[Perf] Optimize top-k search in apply_top_k_top_p_triton sampler (#37225)",
+ "url": "https://github.com/vllm-project/vllm/pull/37225",
+ "field": "gpu_kernels",
+ "area": "v1/sample",
+ "date": "2026-03-17",
+ "hw": "rtx5070ti",
+ "hw_override": null,
+ "base_sha": "4ed51308c8826619459be858a6dc4333206f41c1",
+ "merge_sha": "51b2333be19000db7d03b76ccf1b842972c98541",
+ "source_files": [
+  "vllm/v1/sample/ops/topk_topp_triton.py"
+ ],
+ "test_files": [
+  "tests/v1/sample/test_topk_topp_sampler.py"
+ ],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:37225",
+  "dockerfile": "data/pr_37225/workload/rtx5070ti/Dockerfile",
+  "template": "templates/Dockerfile.gpu-wheel",
+  "wheel": "0.18.0",
+  "wheel_note": "first PyPI release after merge (v0.17.2rc0 tag at merge); compiled ops match PR's solution tree; arms are .py swaps inside this image. Needed because the cu121 source build cannot target sm_120 (RTX 5070 Ti).",
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:37225 data/pr_37225/workload/rtx5070ti"
+ },
+ "workload": {
+  "kind": "repo_benchmark",
+  "script": "benchmarks/benchmark_topk_topp.py",
+  "cmd": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+  "needs": "gpu",
+  "cluster": "none_gpu",
+  "all_clusters": [
+   "none_gpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "data/pr_37225 (bench.py, tests/)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "CUDA-only (aborts without torch.cuda). topk_whole b2048/32k 0.761->0.550ms.",
+  "base_note": null
+ },
+ "policy": {
+  "source": "pipeline/run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "task.json:repeats (or hardware_overrides[<hw>].repeats)",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in data/pr_<n>/work/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> data/pr_<n>/work/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY task.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "topk_whole_b2048_v32768",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": true,
+   "parse": "benchmark_topk_topp.py SUMMARY TABLE row '<scenario> <batch> <vocab> ...' (Triton ms column; PyTorch column kept as pytorch_ref)",
+   "reported": {
+    "baseline": 0.761,
+    "pr_solution": 0.55
+   },
+   "note": null
+  },
+  {
+   "name": "topk_whole_b2048_v131072",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "benchmark_topk_topp.py SUMMARY TABLE row '<scenario> <batch> <vocab> ...' (Triton ms column; PyTorch column kept as pytorch_ref)",
+   "reported": {
+    "baseline": 2.312,
+    "pr_solution": 1.891
+   },
+   "note": null
+  },
+  {
+   "name": "topk_topp_whole_b2048_v32768",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "benchmark_topk_topp.py SUMMARY TABLE row '<scenario> <batch> <vocab> ...' (Triton ms column; PyTorch column kept as pytorch_ref)",
+   "reported": {
+    "baseline": 1.211,
+    "pr_solution": 0.907
+   },
+   "note": null
+  },
+  {
+   "name": "topk_topp_whole_b2048_v131072",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "benchmark_topk_topp.py SUMMARY TABLE row '<scenario> <batch> <vocab> ...' (Triton ms column; PyTorch column kept as pytorch_ref)",
+   "reported": {
+    "baseline": 3.206,
+    "pr_solution": 2.652
+   },
+   "note": null
+  },
+  {
+   "name": "topk_whole_b128_v32768",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "benchmark_topk_topp.py SUMMARY TABLE row '<scenario> <batch> <vocab> ...' (Triton ms column; PyTorch column kept as pytorch_ref)",
+   "reported": {
+    "baseline": 0.071,
+    "pr_solution": 0.056
+   },
+   "note": null
+  }
+ ],
+ "headline": "topk_whole_b2048_v32768",
+ "reported": {
+  "gain": "28%, 25%",
+  "gain_kind": "pct",
+  "gain_evidence": "## Benchmark results (benchmark_topk_topp.py) - **top-k only: 17–28% faster** across all batch sizes and vocab sizes - **top-k + top-p combined: 16–25% faster**",
+  "experiments_note": "reported = PR author's table (ms), same scenario key as benchmark_topk_topp.py SUMMARY TABLE: <scenario>_b<batch>_v<vocab>",
+  "author_hardware_args": [
+   {
+    "line": 17,
+    "text": "## Benchmark results (benchmark_topk_topp.py)"
+   },
+   {
+    "line": 18,
+    "text": "- **top-k only: 17–28% faster** across all batch sizes and vocab sizes"
+   },
+   {
+    "line": 19,
+    "text": "- **top-k + top-p combined: 16–25% faster**"
+   },
+   {
+    "line": 24,
+    "text": "| topk_whole | 128 | 32k | 0.071 | 0.056 | -21% |"
+   },
+   {
+    "line": 25,
+    "text": "| topk_whole | 2048 | 32k | 0.761 | 0.550 | -28% |"
+   },
+   {
+    "line": 26,
+    "text": "| topk_whole | 2048 | 128k | 2.312 | 1.891 | -18% |"
+   },
+   {
+    "line": 27,
+    "text": "| topk_topp_whole | 2048 | 32k | 1.211 | 0.907 | -25% |"
+   },
+   {
+    "line": 28,
+    "text": "| topk_topp_whole | 2048 | 128k | 3.206 | 2.652 | -17% |"
+   }
+  ],
+  "source": "data/pr_37225/pr.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.5,
+   "compute_cap_max": null,
+   "gpu_hint": "Triton kernel",
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.18.0",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ },
+ "reproduced": {
+  "source": "data/pr_37225/results.rtx5070ti.json",
+  "hw_slug": "rtx5070ti",
+  "ts": "2026-11-07T11:03:00Z",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.18.0",
+   "workload_cmd": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+   "repeats": 5
+  },
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  },
+  "verdict": "reproduced",
+  "reproduced_ratio_median": 1.1178,
+  "reported_ratio_median": 1.2679,
+  "machine": null,
+  "experiments": [
+   {
+    "name": "topk_whole_b2048_v32768",
+    "unit": "ms",
+    "reported": {
+     "baseline": 0.761,
+     "pr_solution": 0.55,
+     "how": "absolute",
+     "marker": "",
+     "raw": "0.761 -> 0.55 ms",
+     "note": "author gave absolute numbers",
+     "ratio": 1.383636,
+     "pct": 38.36
+    },
+    "baseline": 1.2552,
+    "baseline_sd": 0.0013,
+    "pr_solution": 0.951,
+    "pr_solution_sd": 0.0024,
+    "n": 5,
+    "ratio": 1.319874,
+    "ratio_of_ratios": 0.954,
+    "verdict": "reproduced",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "topk_whole_b2048_v131072",
+    "unit": "ms",
+    "reported": {
+     "baseline": 2.312,
+     "pr_solution": 1.891,
+     "how": "absolute",
+     "marker": "",
+     "raw": "2.312 -> 1.891 ms",
+     "note": "author gave absolute numbers",
+     "ratio": 1.222634,
+     "pct": 22.26
+    },
+    "baseline": 4.0678,
+    "baseline_sd": 0.145,
+    "pr_solution": 3.5402,
+    "pr_solution_sd": 0.0157,
+    "n": 5,
+    "ratio": 1.149031,
+    "ratio_of_ratios": 0.94,
+    "verdict": "reproduced",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "topk_topp_whole_b2048_v32768",
+    "unit": "ms",
+    "reported": {
+     "baseline": 1.211,
+     "pr_solution": 0.907,
+     "how": "absolute",
+     "marker": "",
+     "raw": "1.211 -> 0.907 ms",
+     "note": "author gave absolute numbers",
+     "ratio": 1.335171,
+     "pct": 33.52
+    },
+    "baseline": 2.101,
+    "baseline_sd": 0.0041,
+    "pr_solution": 1.5766,
+    "pr_solution_sd": 0.0028,
+    "n": 5,
+    "ratio": 1.332614,
+    "ratio_of_ratios": 0.998,
+    "verdict": "reproduced",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "topk_topp_whole_b2048_v131072",
+    "unit": "ms",
+    "reported": {
+     "baseline": 3.206,
+     "pr_solution": 2.652,
+     "how": "absolute",
+     "marker": "",
+     "raw": "3.206 -> 2.652 ms",
+     "note": "author gave absolute numbers",
+     "ratio": 1.208899,
+     "pct": 20.89
+    },
+    "baseline": 6.3734,
+    "baseline_sd": 0.0061,
+    "pr_solution": 5.1868,
+    "pr_solution_sd": 0.004,
+    "n": 5,
+    "ratio": 1.228773,
+    "ratio_of_ratios": 1.016,
+    "verdict": "reproduced",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "topk_whole_b128_v32768",
+    "unit": "ms",
+    "reported": {
+     "baseline": 0.071,
+     "pr_solution": 0.056,
+     "how": "absolute",
+     "marker": "",
+     "raw": "0.071 -> 0.056 ms",
+     "note": "author gave absolute numbers",
+     "ratio": 1.267857,
+     "pct": 26.79
+    },
+    "baseline": 0.1018,
+    "baseline_sd": 0.0098,
+    "pr_solution": 0.0848,
+    "pr_solution_sd": 0.0165,
+    "n": 5,
+    "ratio": 1.200472,
+    "ratio_of_ratios": 0.947,
+    "verdict": "reproduced",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "mixed_partial_b128_v131072",
+    "unit": "ms",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 0.5292,
+    "baseline_sd": 0.0125,
+    "pr_solution": 0.5302,
+    "pr_solution_sd": 0.0107,
+    "n": 5,
+    "ratio": 0.998114,
+    "ratio_of_ratios": null,
+    "verdict": "regression",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "mixed_partial_b128_v32768",
+    "unit": "ms",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 0.1706,
+    "baseline_sd": 0.0075,
+    "pr_solution": 0.159,
+    "pr_solution_sd": 0.0033,
+    "n": 5,
+    "ratio": 1.072956,
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "mixed_partial_b2048_v131072",
+    "unit": "ms",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 6.578,
+    "baseline_sd": 0.0054,
+    "pr_solution": 5.9778,
+    "pr_solution_sd": 0.0282,
+    "n": 5,
+    "ratio": 1.100405,
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "mixed_partial_b2048_v32768",
+    "unit": "ms",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 1.9384,
+    "baseline_sd": 0.0123,
+    "pr_solution": 1.5916,
+    "pr_solution_sd": 0.0068,
+    "n": 5,
+    "ratio": 1.217894,
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "topk_partial_b128_v131072",
+    "unit": "ms",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 0.1526,
+    "baseline_sd": 0.0068,
+    "pr_solution": 0.1358,
+    "pr_solution_sd": 0.0026,
+    "n": 5,
+    "ratio": 1.123711,
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "topk_partial_b128_v32768",
+    "unit": "ms",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 0.0832,
+    "baseline_sd": 0.025,
+    "pr_solution": 0.057,
+    "pr_solution_sd": 0.009,
+    "n": 5,
+    "ratio": 1.459649,
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number",
+    "reliability": {
+     "flag": "below_host_floor",
+     "note": "baseline 0.0832 ms < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+    }
+   },
+   {
+    "name": "topk_partial_b2048_v131072",
+    "unit": "ms",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 2.0676,
+    "baseline_sd": 0.0097,
+    "pr_solution": 1.8274,
+    "pr_solution_sd": 0.0181,
+    "n": 5,
+    "ratio": 1.131444,
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "topk_partial_b2048_v32768",
+    "unit": "ms",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 0.6482,
+    "baseline_sd": 0.009,
+    "pr_solution": 0.49,
+    "pr_solution_sd": 0.0017,
+    "n": 5,
+    "ratio": 1.322857,
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "topk_topp_whole_b128_v131072",
+    "unit": "ms",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 0.568,
+    "baseline_sd": 0.0225,
+    "pr_solution": 0.4998,
+    "pr_solution_sd": 0.0061,
+    "n": 5,
+    "ratio": 1.136455,
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "topk_topp_whole_b128_v32768",
+    "unit": "ms",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 0.178,
+    "baseline_sd": 0.004,
+    "pr_solution": 0.1474,
+    "pr_solution_sd": 0.0144,
+    "n": 5,
+    "ratio": 1.207598,
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "topk_whole_b128_v131072",
+    "unit": "ms",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 0.2842,
+    "baseline_sd": 0.0015,
+    "pr_solution": 0.2556,
+    "pr_solution_sd": 0.0121,
+    "n": 5,
+    "ratio": 1.111894,
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "topp_partial_b128_v131072",
+    "unit": "ms",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 0.3376,
+    "baseline_sd": 0.0028,
+    "pr_solution": 0.3394,
+    "pr_solution_sd": 0.0053,
+    "n": 5,
+    "ratio": 0.994697,
+    "ratio_of_ratios": null,
+    "verdict": "regression",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "topp_partial_b128_v32768",
+    "unit": "ms",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 0.3254,
+    "baseline_sd": 0.0047,
+    "pr_solution": 0.3174,
+    "pr_solution_sd": 0.0046,
+    "n": 5,
+    "ratio": 1.025205,
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "topp_partial_b2048_v131072",
+    "unit": "ms",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 4.4366,
+    "baseline_sd": 0.0086,
+    "pr_solution": 4.4208,
+    "pr_solution_sd": 0.0251,
+    "n": 5,
+    "ratio": 1.003574,
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "topp_partial_b2048_v32768",
+    "unit": "ms",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 4.5114,
+    "baseline_sd": 0.0128,
+    "pr_solution": 4.5352,
+    "pr_solution_sd": 0.012,
+    "n": 5,
+    "ratio": 0.994752,
+    "ratio_of_ratios": null,
+    "verdict": "regression",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "topp_whole_b128_v131072",
+    "unit": "ms",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 0.642,
+    "baseline_sd": 0.0036,
+    "pr_solution": 0.6742,
+    "pr_solution_sd": 0.0733,
+    "n": 5,
+    "ratio": 0.95224,
+    "ratio_of_ratios": null,
+    "verdict": "regression",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "topp_whole_b128_v32768",
+    "unit": "ms",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 0.6164,
+    "baseline_sd": 0.0059,
+    "pr_solution": 0.612,
+    "pr_solution_sd": 0.0029,
+    "n": 5,
+    "ratio": 1.00719,
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "topp_whole_b2048_v131072",
+    "unit": "ms",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 8.764,
+    "baseline_sd": 0.0593,
+    "pr_solution": 8.7394,
+    "pr_solution_sd": 0.0493,
+    "n": 5,
+    "ratio": 1.002815,
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "topp_whole_b2048_v32768",
+    "unit": "ms",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 9.01,
+    "baseline_sd": 0.0161,
+    "pr_solution": 8.9258,
+    "pr_solution_sd": 0.0971,
+    "n": 5,
+    "ratio": 1.009433,
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  ]
+ },
+ "gap": {
+  "verdict": "hardware",
+  "what": "top-k ternary search (`benchmark_topk_topp.py`)",
+  "note": "Reported 0.761→0.550 ms, ours 1.255→0.951 ms (b2048 v32k); all five reported rows are 1.65-2.0× slower here, ratio-of-ratios 0.94-0.95 → **reproduced**. The Triton kernel at b2048 reads the whole logits matrix per search iteration, i.e. bandwidth-bound; 896 GB/s vs ~3.35 TB/s predicts ≈3.7×, the observed 1.65-2× says the kernel is not saturating either card, but the direction and size are hardware. Args match the author exactly (`--batch-sizes 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20`). The b128 rows have 10-30 % sd (0.0098/0.1018, 0.025/0.083): 5 warmup iters × ~0.1 ms is far too little for a P8-idling card to boost — see recommendation 6. Cannot be made 1:1; the ratio is the comparable quantity.",
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:37225 data/pr_37225/workload/rtx5070ti",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_37225:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:37225 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 benchmarks/benchmark_topk_topp.py --batch-sizes 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_37225:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:37225 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 benchmarks/benchmark_topk_topp.py --batch-sizes 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": null
+}

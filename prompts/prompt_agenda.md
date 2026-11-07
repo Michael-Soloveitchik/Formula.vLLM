@@ -25,7 +25,7 @@ as an advisory `perf_intent` flag on enabling PRs.
 
 ## Inputs
 - `data/index.jsonl` (contributing PRs) + `data/views/perf_gains.jsonl` (the
-  measured set) + `data/prs/<field>/<area>/<pr>.md` (author text).
+  measured set) + `data/pr_<n>/pr.md` (was `data/prs/<field>/<area>/<pr>.md`) (author text).
 
 ## Outputs (research / stats files)
 - `data/views/agenda.jsonl` — one record per contributing PR:

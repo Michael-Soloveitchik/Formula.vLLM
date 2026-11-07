@@ -1,0 +1,194 @@
+{
+ "schema": "workload_v2",
+ "pr": 23928,
+ "title": "[Model loader]: support multi-thread model weight loading (#23928)",
+ "url": "https://github.com/vllm-project/vllm/pull/23928",
+ "field": "memory",
+ "area": "model_executor/model_loader",
+ "date": "2025-09-09",
+ "hw": "default",
+ "hw_override": null,
+ "base_sha": "7be141b2c52366f0cc4e731c36819aed178d2258",
+ "merge_sha": "43d9ad03ba8584547537da71aee3e1810a0abbfd",
+ "source_files": [
+  "vllm/model_executor/model_loader/default_loader.py",
+  "vllm/model_executor/model_loader/weight_utils.py"
+ ],
+ "test_files": [],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:23928",
+  "dockerfile": "data/pr_23928/workload/default/Dockerfile",
+  "template": "templates/Dockerfile.gpu-wheel",
+  "wheel": "0.10.2",
+  "wheel_note": "first PyPI release after merge (2025-09-13 > 2025-09-09); picked by gen_tasks.py from PyPI upload dates.",
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:23928 data/pr_23928/workload/default"
+ },
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_23928/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "needs": "gpu",
+  "cluster": "none_gpu",
+  "all_clusters": [
+   "none_gpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "data/pr_23928 (bench.py, tests/)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "Weight-shard iteration over 8 synthetic 128 MB bf16 safetensors files (1 GB, written to a temp dir, page-cached): PR's solution = multi_thread_safetensors_weights_iterator (8 workers), baseline tree lacks it so the bench runs the single-thread safetensors_weights_iterator the loader uses there. Seconds per full pass, best of 3. Author: QwQ-32B 62 GB load 20 s -> 14 s (reported-only). Opt-in feature (enable_multithread_load).",
+  "base_note": null
+ },
+ "policy": {
+  "source": "pipeline/run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "task.json:repeats (or hardware_overrides[<hw>].repeats)",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in data/pr_<n>/work/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> data/pr_<n>/work/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY task.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "weights_load_1gb_s",
+   "unit": "s",
+   "higher_is_better": false,
+   "headline": true,
+   "parse": "weights_load_1gb_s",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "model_load_time",
+   "unit": "s",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "Load Time (not measured: QwQ-32B 62 GB, TP8, NVMe)",
+   "reported": {
+    "baseline": 20.0,
+    "pr_solution": 14.0
+   },
+   "note": null
+  },
+  {
+   "name": "multi_thread_weight_loading",
+   "unit": "s",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "GENERIC line 'multi_thread_weight_loading [label] <number>' (s)",
+   "reported": {
+    "baseline": 20,
+    "pr_solution": 14,
+    "comparable": false,
+    "scope": "wall-clock weight Load Time for a 62 GB QwQ-32B model read from a single NVMe SSD with page cache dropped; the win is disk-bandwidth-bound (3.1 -> 4.42 GB/s) not compute",
+    "scale_short": "Author's 20->14s is for a 62 GB model streamed from a specific NVMe SSD with cold page cache; the gain depends entirely on the storage device's parallel-read bandwidth. TO MAKE 1:1: load a multi-shard safetensors model from the SAME class of NVMe with the page cache dropped, timing _get_weights_iterator with num_threads=1 vs 8; a tiny model or warm page cache collapses the gap (author saw only ~0.2s from cache).",
+    "scale_note": "This is CPU/IO-measurable later but NOT GPU-dependent. The speedup is purely from parallelizing shard reads to saturate NVMe bandwidth; the author confirmed in comments that with a warm page cache the improvement shrinks to ~0.2s, so magnitude is highly storage- and model-size-dependent. Direction is genuine for cold large-model loads from fast disks."
+   },
+   "note": "Diff adds multi_thread_safetensors_weights_iterator and multi_thread_pt_weights_iterator (concurrent.futures.ThreadPoolExecutor over shard files) in weight_utils.py, and DefaultModelLoader selects them when enable_multithread_load is set (num_threads default 8); also validates extra-config keys. Number source: PR body Test Result table - disable 20 s / 3.1 GB/s vs enable 14 s / 4.42 GB/s, 'Load Weight speed up 1.43x'."
+  }
+ ],
+ "headline": "weights_load_1gb_s",
+ "reported": {
+  "gain": "30% (Load Time (s): 20→14)",
+  "gain_kind": "unit",
+  "gain_evidence": "Load Time (s): before 20 / after 14",
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
+  "author_hardware_args": [
+   {
+    "line": 14,
+    "text": "This pull request introduces support for multi-threaded model weight loading in the `DefaultModelLoader`, allowing faster initialization of models by parallelizing the loading of safetensor and pt/bin weight files. It also adds configuratio"
+   },
+   {
+    "line": 44,
+    "text": "--max-num-seqs 192 \\"
+   }
+  ],
+  "source": "data/pr_23928/pr.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.10.2",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ },
+ "reproduced": null,
+ "gap": {
+  "verdict": "not analysed",
+  "note": null,
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:23928 data/pr_23928/workload/default",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_23928:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:23928 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_23928:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:23928 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": "opt-in multi-thread loader; no test in the diff; bench writes 1 GB of synthetic shards to a temp dir and deletes them."
+}

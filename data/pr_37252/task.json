@@ -1,0 +1,18 @@
+{
+ "pr": 37252,
+ "title": "[Perf] Set Flashinfer sparse MLA as default backend for FP8 kv cache (#37252)",
+ "url": "https://github.com/vllm-project/vllm/pull/37252",
+ "date": "2026-03-17",
+ "field": "gpu_kernels",
+ "area": "rocm_amd",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "e78821b4387839bb198ebb35cc175518a6afc115",
+ "merge_sha": "b36adfa349cfab0e79f3d736d5e5413bd3ee19f5",
+ "source_path": "vllm/platforms/cuda.py",
+ "reported_gain": null,
+ "gain_kind": "audit",
+ "gain_evidence": "faster Flashinfer sparse MLA default",
+ "hardware_overrides": {}
+}

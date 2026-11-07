@@ -1,0 +1,18 @@
+{
+ "pr": 24266,
+ "title": "QWEN3 Coder Fused MoE kernels Optimization configs (#24266)",
+ "url": "https://github.com/vllm-project/vllm/pull/24266",
+ "date": "2025-09-04",
+ "field": "gpu_kernels",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "78336a0c3ee4eb9dba6e37959d926160e91623fd",
+ "merge_sha": "482e52f56ccd9f7e86654909acc2f99384ae874f",
+ "source_path": null,
+ "reported_gain": "17%, 5.9x",
+ "gain_kind": "pct",
+ "gain_evidence": "17% in `Median TPOT (ms)` and 5.9x improvement in P99 TPOT (ms).",
+ "hardware_overrides": {}
+}

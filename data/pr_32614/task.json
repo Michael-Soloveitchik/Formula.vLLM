@@ -1,0 +1,18 @@
+{
+ "pr": 32614,
+ "title": "fix: Add glm4_moe_lite to MLA detection (#32614)",
+ "url": "https://github.com/vllm-project/vllm/pull/32614",
+ "date": "2026-01-23",
+ "field": "attention",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "3a4145950176d966558d06ed5b05b29c489555f0",
+ "merge_sha": "586a57ad7ede5c5132a70d021fc48fe05b10f5c3",
+ "source_path": "vllm/platforms/cuda.py",
+ "reported_gain": "4x",
+ "gain_kind": "pct",
+ "gain_evidence": "Without this fix, vLLM falls back to standard KV caching instead of efficient MLA caching, resulting in ~4x higher KV cache memory usage.",
+ "hardware_overrides": {}
+}

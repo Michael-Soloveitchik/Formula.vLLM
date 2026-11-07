@@ -1,0 +1,101 @@
+{
+ "pr": 20839,
+ "title": "[Model] Replace Mamba2 RMSNorm Gated with Fused Triton Kernel (#20839)",
+ "url": "https://github.com/vllm-project/vllm/pull/20839",
+ "date": "2025-07-25",
+ "field": "gpu_kernels",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "9fe98d42508f9a67d5b1c491a4a306966ded3976",
+ "merge_sha": "eab2f3980cd30132dd99e23ea8d6fc0274365757",
+ "source_path": "vllm/model_executor/layers/mamba/mamba_mixer2.py",
+ "reported_gain": "9%",
+ "gain_kind": "pct",
+ "gain_evidence": "**Approximately 8~9% latency improvements observed.**",
+ "source_files": [
+  "vllm/model_executor/layers/mamba/mamba_mixer2.py",
+  "vllm/model_executor/layers/mamba/ops/layernorm_gated.py"
+ ],
+ "test_files": [],
+ "wheel": "0.10.1",
+ "wheel_note": "first PyPI release after merge (2025-08-19 > 2025-07-25); picked by gen_tasks.py from PyPI upload dates.",
+ "torch_fix": "torch==2.7.1 --index-url https://download.pytorch.org/whl/cu128",
+ "test_note": "perf-only fused Triton rms_norm_gated; no test in the diff. Wheel 0.10.1 pins torch 2.7.1 cu126 (no sm_120) -> torch_fix swaps in the cu128 build of the same torch.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_20839/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "us",
+  "needs": "gpu",
+  "headline": "rmsnorm_gated_16k",
+  "note": "Mixer2RMSNormGated.forward_cuda on Bamba-9B-v2 shapes (hidden 8192, bf16, 16k/32k tokens); baseline = python silu-gate + ops.rms_norm, PR's solution = fused Triton rms_norm_gated. TP helpers stubbed to world_size 1. CUDA-event us per call. Author numbers are whole-model benchmark_latency (kept reported-only)."
+ },
+ "experiments": [
+  {
+   "name": "rmsnorm_gated_16k",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "parse": "rmsnorm_gated_16k"
+  },
+  {
+   "name": "rmsnorm_gated_32k",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "parse": "rmsnorm_gated_32k"
+  },
+  {
+   "name": "latency_16k",
+   "unit": "s",
+   "reported": {
+    "base": 0.6323,
+    "patch": 0.5812
+   },
+   "parse": "Avg latency (not measured: benchmark_latency Bamba-9B-v2 16k)"
+  },
+  {
+   "name": "latency_32k",
+   "unit": "s",
+   "reported": {
+    "base": 1.2799,
+    "patch": 1.1791
+   },
+   "parse": "Avg latency (not measured: benchmark_latency Bamba-9B-v2 32k)"
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "hardware_overrides": {},
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.10.1",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ }
+}

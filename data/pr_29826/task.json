@@ -1,0 +1,81 @@
+{
+ "pr": 29826,
+ "title": "[Perf] Avoid pageable HtoD transfer in MinTokensLogitsProcessor (#29826)",
+ "url": "https://github.com/vllm-project/vllm/pull/29826",
+ "date": "2025-12-02",
+ "field": "decoding_tpot",
+ "area": "v1/sample",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "afb1e5b380ff623e478d19a246b42b2903b9331f",
+ "merge_sha": "1528e079e2b2cf8a807e4dce86ef05540e16a430",
+ "source_path": "vllm/v1/sample/logits_processor/builtin.py",
+ "reported_gain": "30%",
+ "gain_kind": "pct",
+ "gain_evidence": "At low concurrencies, this leads to a significant (up to 30%) increase in TPOT when including min_tokens in the request.",
+ "source_files": [
+  "vllm/v1/sample/logits_processor/builtin.py"
+ ],
+ "test_files": [],
+ "wheel": "0.12.0",
+ "wheel_note": "first PyPI release after merge (2025-12-03 > 2025-12-02); picked by gen_tasks.py from PyPI upload dates.",
+ "test_note": "perf-only (sync removal); no test in the diff; existing logits-processor tests cover correctness.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_29826/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "us",
+  "needs": "gpu",
+  "headline": "min_tokens_apply",
+  "note": "MinTokensLogitsProcessor.apply on [64, 151936] fp32 logits with 64 pending min_tokens requests; baseline = pageable HtoD scalar copy (device sync), PR's solution = index_put_ with a device scalar. Wall-clock us, alone and right after an async filler kernel. PR gives nsys traces only (up to 30% TPOT at low concurrency), no numbers."
+ },
+ "experiments": [
+  {
+   "name": "min_tokens_apply",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "parse": "min_tokens_apply"
+  },
+  {
+   "name": "min_tokens_apply_after_kernel",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "parse": "min_tokens_apply_after_kernel"
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "hardware_overrides": {},
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.12.0",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ }
+}

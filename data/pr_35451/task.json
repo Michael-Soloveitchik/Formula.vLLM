@@ -1,0 +1,18 @@
+{
+ "pr": 35451,
+ "title": "[Core] Add optional flags to check for repetitive token patterns in engine output (#35451)",
+ "url": "https://github.com/vllm-project/vllm/pull/35451",
+ "date": "2026-03-02",
+ "field": "scheduling",
+ "area": "entrypoints/openai",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "a0a5178ab4c032c8031e11563e4f1b29a65b92a5",
+ "merge_sha": "25e02647c272eeb0ec076884d046816bdb86159e",
+ "source_path": "vllm/v1/engine/__init__.py",
+ "reported_gain": "33%",
+ "gain_kind": "pct",
+ "gain_evidence": "Testing with Qwen3 VL on multimodal input shows a ~33% increase in throughput and near-total reduction in models hitting the configured max_output_len.",
+ "hardware_overrides": {}
+}

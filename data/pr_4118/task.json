@@ -1,0 +1,18 @@
+{
+ "pr": 4118,
+ "title": "[Kernel][FP8] Initial support with dynamic per-tensor scaling (#4118)",
+ "url": "https://github.com/vllm-project/vllm/pull/4118",
+ "date": "2024-04-19",
+ "field": "quantization",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "682789d4026429a04cc32acb88064265441080dd",
+ "merge_sha": "a22cdea371bb26b4bdba112d4602736b48ca4a3a",
+ "source_path": "vllm/entrypoints/llm.py",
+ "reported_gain": "2x",
+ "gain_kind": "pct",
+ "gain_evidence": "Obviously some interesting stuff seeing more than 2x speedup, but I wouldn't take that so seriously since this is individual layer benchmarking and it is likely",
+ "hardware_overrides": {}
+}

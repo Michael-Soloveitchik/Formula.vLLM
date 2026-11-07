@@ -37,7 +37,7 @@ All paths below are relative to
                                    │
                       ┌────────────┤  (gate: distribution stable?)
                       ▼            │
-            download.py ──► data/prs/<field>/<area>/<pr>.md               [STAGE 2 aggregate conversations]
+            download.py ──► data/pr_<n>/pr.md (+ pr.diff, solution.md) [STAGE 2 aggregate conversations]
             (parallel per field)   │
                       │            ├── migrate.py   (ONLY after a recluster)
                       ▼            ▼
@@ -96,7 +96,7 @@ after download forces a `migrate.py` reshuffle.
 ## STAGE 2 — download PR conversations   `[parallel per field]`
 
 **What:** `python3 pipeline/download.py --fields all` (or a comma list). Fetches
-each contributing PR's conversation via `gh pr view` → `data/prs/<field>/<area>/
+each contributing PR's conversation via `gh pr view` → `data/pr_<n>/pr.md` (was `data/prs/<field>/<area>/
 <pr>.md`. Resumable (skips existing); self-throttles on rate limits.
 
 - **Parallelize** by launching one background process per field
@@ -194,7 +194,7 @@ NEW sites/bugs/cases where a pattern could be applied for a real advance. Launch
 one agent per agenda category in parallel; each writes
 `experiments/<agenda>/<proposal>/{localization.md,solution.md}` (file+function+line
 localization + proposed solution). Strict rules: no web, do NOT propose existing
-merged PRs (dedupe against `data/index.jsonl` + `data/prs/**`), do NOT edit source.
+merged PRs (dedupe against `data/index.jsonl` + `data/pr_*/pr.md`), do NOT edit source.
 5-6 categories, up to 10 proposals each. **STOP condition:** every proposal cites
 real on-disk code and passes the dedupe check.
 

@@ -1,0 +1,239 @@
+{
+ "schema": "workload_v2",
+ "pr": 9972,
+ "title": "[V1] Prefix caching (take 2) (#9972)",
+ "url": "https://github.com/vllm-project/vllm/pull/9972",
+ "field": "scheduling",
+ "area": "v1/core",
+ "date": "2024-11-07",
+ "hw": "default",
+ "hw_override": null,
+ "base_sha": "42b4f46b71572e21582fd12c498ec3b0b78ada7b",
+ "merge_sha": "201fc07730ec96dd88b758064f148a424f4b251b",
+ "source_files": null,
+ "test_files": null,
+ "image": {
+  "mode": "wheel (UNPINNED: no task.json:wheel)",
+  "tag": "vllm-task:9972",
+  "dockerfile": "data/pr_9972/workload/default/Dockerfile",
+  "template": "templates/Dockerfile.gpu-wheel",
+  "wheel": null,
+  "wheel_note": null,
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:9972 data/pr_9972/workload/default"
+ },
+ "workload": {
+  "kind": "serving",
+  "script": "benchmarks/benchmark_prefix_caching.py",
+  "cmd": "VLLM_USE_V1=1 python3 benchmarks/benchmark_prefix_caching.py --model neuralmagic/Meta-Llama-3-8B-Instruct-FP8 --num-prompts 200 --repeat-count 2 --input-length-range 256:512 --dataset-path ./ShareGPT_V3_unfiltered_cleaned_split.json --seed 0 --enable-prefix-caching",
+  "needs": "gpu",
+  "cluster": "llama8b_fp8",
+  "all_clusters": [
+   "llama8b_fp8"
+  ],
+  "model": "neuralmagic/Meta-Llama-3-8B-Instruct-FP8",
+  "weights": {
+   "hf_id": "neuralmagic/Meta-Llama-3-8B-Instruct-FP8",
+   "size": "~8.6GB (model) + ~650MB (ShareGPT)",
+   "cache": ".weights/llama8b_fp8"
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "data/pr_9972 (bench.py, tests/)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "Offline batching bench; needs model + ShareGPT dataset. GPU serving run. Numbers are cache-enabled (49% hit).",
+  "base_note": null
+ },
+ "policy": {
+  "source": "pipeline/run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "task.json:repeats (or hardware_overrides[<hw>].repeats)",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in data/pr_<n>/work/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> data/pr_<n>/work/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY task.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "input_throughput",
+   "unit": "tok/s",
+   "higher_is_better": true,
+   "headline": false,
+   "parse": "input tok/s",
+   "reported": {
+    "baseline": 17916.0,
+    "pr_solution": 32258.0
+   },
+   "note": null
+  },
+  {
+   "name": "output_throughput",
+   "unit": "tok/s",
+   "higher_is_better": true,
+   "headline": false,
+   "parse": "output tok/s",
+   "reported": {
+    "baseline": 485.0,
+    "pr_solution": 874.0
+   },
+   "note": null
+  },
+  {
+   "name": "cost_time",
+   "unit": "s",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "cost time",
+   "reported": {
+    "baseline": 8.49,
+    "pr_solution": 4.83
+   },
+   "note": null
+  }
+ ],
+ "headline": null,
+ "reported": {
+  "gain": "3x",
+  "gain_kind": "pct",
+  "gain_evidence": "It is ~3x faster than list matching.",
+  "experiments_note": null,
+  "author_hardware_args": [
+   {
+    "line": 21,
+    "text": "VLLM_USE_V1=1 python3 benchmarks/benchmark_prefix_caching.py \\"
+   },
+   {
+    "line": 23,
+    "text": "--num-prompts 200 --repeat-count 2 \\"
+   },
+   {
+    "line": 24,
+    "text": "--input-length-range 256:512 \\"
+   },
+   {
+    "line": 29,
+    "text": "Version | Input (tok/s) | Output (tok/s) | Cost Time (s)"
+   },
+   {
+    "line": 33,
+    "text": "This PR w. cache (49%) | 32258.08 | 874.38 | 4.83"
+   },
+   {
+    "line": 39,
+    "text": "VLLM_USE_V1=1 vllm serve neuralmagic/Meta-Llama-3-8B-Instruct-FP8 --disable-log-requests [--enable-prefix-caching]"
+   },
+   {
+    "line": 47,
+    "text": "python3 benchmarks/benchmark_serving.py --backend vllm \\"
+   },
+   {
+    "line": 49,
+    "text": "--dataset-name random --random-input-len $INPUT_LEN --random-output-len 150 \\"
+   },
+   {
+    "line": 50,
+    "text": "--random-prefix-len $PREFIX_LEN --seed 0 --request-rate 8 --num-prompts 500"
+   },
+   {
+    "line": 57,
+    "text": "0% | 107.97 | 28.97"
+   },
+   {
+    "line": 58,
+    "text": "20%| 87.73 | 26.21"
+   },
+   {
+    "line": 59,
+    "text": "40%| 79.63 | 25.50"
+   },
+   {
+    "line": 60,
+    "text": "60%| 70.93 | 24.50"
+   },
+   {
+    "line": 61,
+    "text": "80%| 67.61 | 25.22"
+   }
+  ],
+  "source": "data/pr_9972/pr.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 16,
+   "compute_cap_min": 8.9,
+   "compute_cap_max": null,
+   "gpu_hint": "FP8 model (Ada/Hopper+)",
+   "ram_gb": 8,
+   "disk_gb": 39.234765625
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": true,
+   "hf_token": false,
+   "vllm_wheel": null,
+   "models": [
+    "neuralmagic/Meta-Llama-3-8B-Instruct-FP8"
+   ],
+   "datasets": [
+    "ShareGPT_V3_unfiltered_cleaned_split.json"
+   ],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "needs-wheel-task"
+  }
+ },
+ "reproduced": null,
+ "gap": {
+  "verdict": "not analysed",
+  "note": null,
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:9972 data/pr_9972/workload/default",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_9972:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:9972 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; VLLM_USE_V1=1 python3 benchmarks/benchmark_prefix_caching.py --model neuralmagic/Meta-Llama-3-8B-Instruct-FP8 --num-prompts 200 --repeat-count 2 --input-length-range 256:512 --dataset-path ./ShareGPT_V3_unfiltered_cleaned_split.json --seed 0 --enable-prefix-caching'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_9972:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:9972 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; VLLM_USE_V1=1 python3 benchmarks/benchmark_prefix_caching.py --model neuralmagic/Meta-Llama-3-8B-Instruct-FP8 --num-prompts 200 --repeat-count 2 --input-length-range 256:512 --dataset-path ./ShareGPT_V3_unfiltered_cleaned_split.json --seed 0 --enable-prefix-caching'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/). NOT PINNED: task.json has no `wheel` yet, so the Dockerfile installs the latest PyPI vLLM (compiled ops may not match either tree) and run_one.sh refuses to run it. `python3 gen/gen_tasks.py <pr>` picks the first PyPI release after merge_sha."
+ },
+ "test_note": null
+}

@@ -1,0 +1,34 @@
+{
+ "pr": 6455,
+ "title": "[Distributed][PP] only create embedding & lm head when necessary (#6455)",
+ "url": "https://github.com/vllm-project/vllm/pull/6455",
+ "date": "2024-07-16",
+ "field": "parallelism",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "ce37be7ba05f21f2a8f3b792034195305ebe1b27",
+ "merge_sha": "1d094fd7c0d72e7eaf3a2b65fff9f7de8d812a49",
+ "source_path": "vllm/model_executor/models/llama.py",
+ "reported_gain": "25%",
+ "gain_kind": "pct",
+ "gain_evidence": "Testing with `--pipeline-parallel-size 8` showed up to 25% per-rank memory savings for the Llama-3-70B model.",
+ "experiments": [
+  {
+   "name": "pp_rank_embedding_lm_head_elision",
+   "unit": "pct",
+   "workload": "Author ran Llama-3-70B with --pipeline-parallel-size 8 and measured per-rank memory, observing up to 25% per-rank memory savings by not allocating the embedding / lm head / norm on ranks that do not use them (no absolute GB numbers published).",
+   "needs": "gpu",
+   "note": "Diff edits vllm/model_executor/models/llama.py to create VocabParallelEmbedding only on the first (or tie_word_embeddings last) rank, RMSNorm + ParallelLMHead + LogitsProcessor + Sampler only on the last rank, substituting PPMissingLayer elsewhere. Number source: PR body 'Testing with --pipeline-parallel-size 8 showed up to 25% per-rank memory savings for the Llama-3-70B model'; a maintainer (youkaichao) notes the min across ranks drops by roughly one embedding / lm-head layer. No absolute memory figures given.",
+   "reported": {
+    "pct": 0.25,
+    "comparable": false,
+    "scope": "per-rank GPU memory footprint reduction (not latency/throughput) for Llama-3-70B under 8-way pipeline parallelism; the saving is roughly one word-embedding or lm-head layer per rank",
+    "scale_short": "Author's ~25% is a per-rank MEMORY saving under 8-way PP, measured as a fraction with no absolute GB; it is a distributed multi-GPU effect, not CPU-reproducible and not a speed gain. TO MAKE 1:1: on an 8-GPU box run Llama-3-70B with --pipeline-parallel-size 8 and compare per-rank allocated memory before/after, confirming the drop equals the embedding/lm-head tensor size.",
+    "scale_note": "This is a memory-footprint optimization that only indirectly helps throughput (freed memory can hold more KV cache). The 25% is a reported fraction, not an absolute, and only manifests across real PP ranks on multiple GPUs, so it cannot be reproduced on our single-host CPU microbench. Because vLLM takes the min number of blocks across ranks, the effective win is bounded by the per-rank saving the maintainer described."
+   }
+  }
+ ],
+ "hardware_overrides": {}
+}

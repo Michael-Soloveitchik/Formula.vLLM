@@ -1,0 +1,81 @@
+{
+ "pr": 13365,
+ "title": "[V1][Spec Decode] Optimize N-gram matching with Numba (#13365)",
+ "url": "https://github.com/vllm-project/vllm/pull/13365",
+ "date": "2025-02-18",
+ "field": "decoding_tpot",
+ "area": "requirements-common.txt",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "c8d70e2437feecdb3762ce17298df33439ae1bd1",
+ "merge_sha": "4c822298981a8f7521492075ff72659985fc4c3f",
+ "source_path": "vllm/v1/spec_decode/ngram_proposer.py",
+ "reported_gain": "30x, 2.5%",
+ "gain_kind": "pct",
+ "gain_evidence": "I've observed 20-30x speedup with large batch sizes: For ShareGPT benchmark with 5K requests, the cumulative overhead reduces from 54.3 sec to 1.9 sec, which is",
+ "source_files": [
+  "vllm/v1/spec_decode/ngram_proposer.py",
+  "vllm/v1/worker/gpu_model_runner.py"
+ ],
+ "test_files": [],
+ "wheel": "0.7.3",
+ "wheel_note": "first PyPI release after merge (2025-02-20 > 2025-02-18); picked by gen_tasks.py from PyPI upload dates.",
+ "extra_pip": "numba",
+ "test_note": "perf-only PR (numba JIT n-gram matcher); wheel 0.7.3 pins torch 2.5.1 cu124 (no sm_120) - bench is CPU-only numba, unaffected.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_13365/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "s",
+  "needs": "gpu",
+  "headline": "ngram_match_overhead",
+  "note": "Numba-JIT N-gram matcher; CPU-only. bench.py mirrors the author's workload: 5000 ShareGPT-like requests, NgramProposer.propose() called once per decode step on the growing context (~1.1M calls, like the engine does), cumulative seconds = ngram_match_overhead. The first call of the process (Numba JIT on the PR's solution) is reported separately as ngram_match_cold_first_call."
+ },
+ "experiments": [
+  {
+   "name": "ngram_match_overhead",
+   "unit": "s",
+   "reported": {
+    "base": 54.3,
+    "patch": 1.9
+   },
+   "note": "author: cumulative propose() overhead over a 5K-request ShareGPT run (per decode step); ours: same call pattern on synthetic requests, steady state",
+   "parse": "cumulative s"
+  },
+  {
+   "name": "ngram_match_cold_first_call",
+   "unit": "s",
+   "reported": null,
+   "note": "first propose() call of the process: Numba JIT compile on the PR's solution (author: 'under 1 second', paid once per engine start), plain call on the baseline"
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine); headline ngram_match_overhead",
+ "hardware_overrides": {},
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.7.3",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ }
+}

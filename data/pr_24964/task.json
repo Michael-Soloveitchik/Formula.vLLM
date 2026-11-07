@@ -1,0 +1,18 @@
+{
+ "pr": 24964,
+ "title": "[Core] Reuse empty block lists whenever possible in KVCacheBlocks to mitigate GC costs (#24964)",
+ "url": "https://github.com/vllm-project/vllm/pull/24964",
+ "date": "2025-10-14",
+ "field": "scheduling",
+ "area": "v1/core",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "82af928c41886a9e7e56467a08c9b99982f7c980",
+ "merge_sha": "acaa2c0a4a53dbb57f85f1042b1a6f1e3f24cef5",
+ "source_path": "vllm/v1/core/kv_cache_manager.py",
+ "reported_gain": "4%",
+ "gain_kind": "pct",
+ "gain_evidence": "It could roughly convert to 3-4% throughput improvements.",
+ "hardware_overrides": {}
+}

@@ -1,0 +1,18 @@
+{
+ "pr": 24123,
+ "title": "[Compilation][WideEP] Enable Piecewise CUDAGraph for DeepEPHT (#24123)",
+ "url": "https://github.com/vllm-project/vllm/pull/24123",
+ "date": "2025-09-09",
+ "field": "gpu_kernels",
+ "area": "vllm/config",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "6fb27881634d89c2e70e9e5fbad1b918c0d916cf",
+ "merge_sha": "a55cf41a0971f606413194a03dbe8b091104c309",
+ "source_path": "vllm/platforms/cuda.py",
+ "reported_gain": "33%",
+ "gain_kind": "pct",
+ "gain_evidence": "**Around 33% E2E improvement for decode**",
+ "hardware_overrides": {}
+}

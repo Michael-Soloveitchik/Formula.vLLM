@@ -1,0 +1,18 @@
+{
+ "pr": 34674,
+ "title": "Adding Nemotron fp8 Triton MoE Config (#34674)",
+ "url": "https://github.com/vllm-project/vllm/pull/34674",
+ "date": "2026-02-24",
+ "field": "quantization",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "a0e50a4260d20d021d6caa137a078ae2d16a8f93",
+ "merge_sha": "576fe50333a8a8fc91ee28595779452f3d997d32",
+ "source_path": null,
+ "reported_gain": "7%",
+ "gain_kind": "pct",
+ "gain_evidence": "See around ~5-7% in OTPS",
+ "hardware_overrides": {}
+}

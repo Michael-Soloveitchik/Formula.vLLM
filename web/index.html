@@ -302,13 +302,14 @@ sup.mark{font-weight:700;color:#d97706;margin-left:2px;cursor:help}
    <select id="status"><option value="">all</option><option value="improved">improved</option><option value="not">not improved</option><option value="pending">pending</option></select>
   </div>
   <div class="grid" id="grid"></div>
-  <footer>live: reads <code>index.json</code> + <code>results/&lt;pr&gt;.json</code> per PR (manifest) · auto-refresh every 60 s</footer>
+  <footer>live: reads <code>index.json</code> + <code>data/pr_&lt;n&gt;/results.&lt;hw&gt;.json</code> per PR (via <code>results/manifest.json</code>) · auto-refresh every 60 s</footer>
  </div>
 </div>
 <script>
 const $=s=>document.querySelector(s);
 const esc=s=>(s==null?'':(''+s)).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-let IDX=[], RES={}, AREA={};   // AREA: pr -> {field, area}
+let IDX=[], RES={}, IDXBY={};   // IDXBY: pr -> index.json entry (catalog + reported-only experiments)
+let HW={current:null, files:{}, shown:{}};   // results/manifest.json: hardware slugs per PR; shown[pr] = slug displayed
 let SEL=null;    // PR selected in the tree: its results go to the top of the list
 let TFILT='all';   // tree scope: all | run (has a measured result) | solved (has a harness arm)
 // run  = we executed the workload (result exists in RES)
@@ -324,22 +325,8 @@ async function boot(){
  const setHH=()=>document.documentElement.style.setProperty('--hh',document.querySelector('header').offsetHeight+'px');
  setHH(); window.addEventListener('resize',setHH); document.querySelector('header img').addEventListener('load',setHH);
  IDX=await fetch('../index.json',no).then(r=>r.json()).catch(()=>[]);
+ IDX.forEach(r=>{IDXBY[r.pr]=r;});
  RES=await loadResults();
- // pr -> {field, area} map (needed to construct md paths). data/area.json is the
- // compact 202-PR subset (~20 KB, built by gen_area.py); the full crawl jsonl
- // (~10 MB) is only a fallback and is fetched AFTER first render so a slow link
- // (Tailscale Funnel) never blocks the dashboard.
- const want=new Set(IDX.map(r=>r.pr));
- const area=await fetch('../data/area.json',no).then(r=>r.ok?r.json():null).catch(()=>null);
- if(area){Object.keys(area).forEach(k=>{AREA[+k]=area[k];});}
- else{
-  fetch('../data/index.jsonl',no).then(r=>r.text()).catch(()=>'').then(jl=>{
-   jl.split('\n').forEach(line=>{
-    if(!line) return;
-    try{const r=JSON.parse(line); if(want.has(r.pr)) AREA[r.pr]={field:r.field,area:r.area};}catch(e){}
-   });
-  });
- }
  const fields=[...new Set(IDX.map(r=>r.field).filter(Boolean))].sort();
  fields.forEach(f=>$('#field').add(new Option(f,f)));
  ['q','field','status'].forEach(id=>$('#'+id).addEventListener('input',render));
@@ -355,23 +342,32 @@ async function boot(){
  render();
  setInterval(refreshResults,60000);   // live: pick up new results/all.json without a reload
 }
-// Results are read PER PR: results/manifest.json lists the PR ids that have a
-// results/<pr>.json (written by aggregate.py); each file is fetched directly, in
-// parallel. results/all.json is only the fallback when the manifest is missing.
+// Results are read PER PR: results/manifest.json (aggregate.py) lists, per PR, the hardware slugs that
+// have a data/pr_<n>/results.<hw>.json and the slug of the machine that serves the page ("current").
+// Per PR we show the current slug when it has a result, else the first available one, and name it in
+// the detail header. results/all.json is only the fallback when the manifest is missing.
+function pickSlug(slugs){ if(!slugs||!slugs.length) return null; return slugs.includes(HW.current)?HW.current:slugs[0]; }
+function resPath(pr){ const f=HW.files[pr]||{}; const s=HW.shown[pr]; return s&&f[s]?`../${f[s]}`:null; }
 async function loadResults(){
  const no={cache:'no-store'};
  const man=await fetch('../results/manifest.json',no).then(r=>r.ok?r.json():null).catch(()=>null);
  const out={};
- if(man&&Array.isArray(man.prs)){
-  const rows=await Promise.all(man.prs.map(pr=>fetch(`../results/${pr}.json`,no).then(r=>r.ok?r.json():null).catch(()=>null)));
+ if(man&&man.files){
+  HW.current=man.current||null; HW.files={}; HW.shown={};
+  Object.keys(man.files).forEach(pr=>{HW.files[+pr]=man.files[pr]; HW.shown[+pr]=pickSlug(Object.keys(man.files[pr]));});
+  const prs=Object.keys(HW.files).map(Number);
+  const rows=await Promise.all(prs.map(pr=>fetch(resPath(pr),no).then(r=>r.ok?r.json():null).catch(()=>null)));
   rows.forEach(r=>{if(r&&r.pr!=null) out[r.pr]=r;});
   return out;
  }
  const all=await fetch('../results/all.json',no).then(r=>r.ok?r.json():[]).catch(()=>[]);
- all.forEach(r=>out[r.pr]=r); return out;
+ const by={}; all.forEach(r=>{(by[r.pr]=by[r.pr]||[]).push(r);});
+ Object.keys(by).forEach(pr=>{const slugs=by[pr].map(r=>r.hw_slug||'?'); const s=pickSlug(slugs); const r=by[pr][slugs.indexOf(s)]; HW.shown[+pr]=s; out[pr]=r;});
+ return out;
 }
-async function loadOne(pr){   // fresh read of one PR's own results file
- try{const r=await fetch(`../results/${pr}.json`,{cache:'no-store'}); if(r.ok){const j=await r.json(); if(j&&j.pr!=null) RES[j.pr]=j; return j;}}catch(e){}
+async function loadOne(pr){   // fresh read of one PR's own results file (the slug shown for it)
+ const p=resPath(pr); if(!p) return RES[pr];
+ try{const r=await fetch(p,{cache:'no-store'}); if(r.ok){const j=await r.json(); if(j&&j.pr!=null) RES[j.pr]=j; return j;}}catch(e){}
  return RES[pr];
 }
 let LAST_SIG='';
@@ -391,8 +387,7 @@ function fmt(x,d=3){return (x==null||isNaN(x))?'—':(+x).toFixed(d)}
 function statusOf(pr){const r=RES[pr]; if(!r)return 'pending'; return r.improved?'improved':'not'}
 
 // ---------- LEFT TREE ----------
-function mdPath(pr){const a=AREA[pr]; if(!a||!a.field||!a.area)return null;
- return `../data/prs/${a.field}/${a.area.replace(/\//g,'_')}/${pr}.md`;}
+function mdPath(pr){return `../data/pr_${pr}/pr.md`;}   // raw PR material lives next to everything else about the PR
 function shortTitle(t){return (t||'').replace(/\s*\(#\d+\)\s*$/,'');}
 
 function buildTree(){
@@ -480,8 +475,9 @@ function mdToHtml(src){
 // ---------- per-experiment results table (reported / measured / <harness_i>) ----------
 // One table PER experiment. measured = our run of the PR's solution = 1.00x ref; variance in (±).
 // A PR carries res.experiments[] (schema experiments_v2). Legacy res.latency -> single synthetic exp.
-function experimentsOf(res){
- if(!res) return [];
+// No result yet -> the reported-only experiments from index.json (task.json), measured rows pending.
+function experimentsOf(res,pr){
+ if(!res){const ix=pr!=null?IDXBY[pr]:null; return (ix&&ix.experiments||[]).map(e=>Object.assign({arms:{}},e));}
  if(res.experiments) return res.experiments;
  if(res.latency){const L=res.latency;
   const rep=L.reported&&(L.reported.get_new_blocks||Object.values(L.reported)[0]);
@@ -507,7 +503,7 @@ function gainVs(val,baseVal,unit){
 // baseline defaults to OUR measured baseline when the author gave none.
 // sign direction-aware: throughput improves UP, time improves DOWN.
 function resolveReported(rep,baseV,unit,derived){
- // preferred: numbers pre-computed by derive.py (results/<pr>.json experiments[i].derived); the browser does no math then
+ // preferred: numbers pre-computed by derive.py (results.<hw>.json experiments[i].derived); the browser does no math then
  if(derived&&derived.reported&&derived.reported.pr_solution!=null)
   return {value:+derived.reported.pr_solution, authorBase:derived.reported.baseline!=null?+derived.reported.baseline:null, how:derived.reported.how||'derived',
           marker:derived.reported.marker||'', raw:derived.reported.raw||'', note:derived.reported.note||''};
@@ -603,14 +599,15 @@ function expTable(exp){
  }
  return h;
 }
-function harnessTable(res){
- const exps=experimentsOf(res);
+function harnessTable(res,pr){
+ const exps=experimentsOf(res,pr);
  if(!exps.length){
   if(res&&res.schema==='experiments_v2') // ran, but correctness-only (no timing)
    return '<div class="muted" style="padding:8px 2px">correctness-only — no timing experiment'+(res.note?'. '+esc(res.note):'')+'</div>';
-  return '<div class="muted" style="padding:8px 2px">no results yet — run <code>./run.sh '+(res?res.pr:'')+'</code></div>';
+  return '<div class="muted" style="padding:8px 2px">no results yet — run <code>./run.sh --reproduce '+(pr!=null?pr:(res?res.pr:''))+'</code></div>';
  }
- return exps.map(expTable).join('');
+ const pre=res?'':'<div class="muted" style="padding:4px 2px">reported numbers from <code>task.json</code>; nothing measured yet — run <code>./run.sh --reproduce '+esc(pr)+'</code></div>';
+ return pre+exps.map(expTable).join('');
 }
 
 // ---------- PR DETAIL PANEL (challenge results TOP · PR info BOTTOM) ----------
@@ -628,16 +625,20 @@ async function showPR(pr){
  const stChip=st==='improved'?'<span class="chip imp">improved</span>':
    st==='not'?'<span class="chip no">not improved</span>':'<span class="chip pend">pending</span>';
  const arms=res?Object.entries(res.arms||{}).map(([k,v])=>`${esc(k)}:${esc(v.tests)}`).join(' · '):'';
+ // hardware: the slug whose results.<hw>.json is shown (+ the other slugs this PR was measured on)
+ const slugs=Object.keys(HW.files[pr]||{}); const shown=HW.shown[pr]||(res&&res.hw_slug)||null;
+ const others=slugs.filter(s=>s!==shown);
+ const hwChip=shown?`<span class="chip field" title="data/pr_${pr}/results.${esc(shown)}.json${shown===HW.current?' (this machine)':''}">hw: ${esc(shown)}${shown===HW.current?' · this machine':''}</span>`+(others.length?` <span class="muted">also measured on ${esc(others.join(', '))}</span>`:''):'';
  D.innerHTML=`<div class="detail">
   <span class="close" title="close" onclick="document.getElementById('detailWrap').innerHTML='';document.querySelectorAll('.tpr.sel').forEach(n=>n.classList.remove('sel'))">×</span>
   <h2>#${pr} ${esc(shortTitle(r.title))}</h2>
-  <div class="dmeta"><span class="chip field">${esc(r.field||'—')}</span> ${stChip}
+  <div class="dmeta"><span class="chip field">${esc(r.field||'—')}</span> ${stChip} ${hwChip}
    · <a href="${url}" target="_blank">GitHub PR #${pr}</a>
    · reported: ${esc(r.reported_gain||'—')}</div>
   <!-- TOP: challenge results with harnesses -->
   <div class="dsec${FOLD.results?' folded':''}" data-k="results">
-   <div class="dsecH" onclick="toggleSec(this)"><span class="fcaret">▾</span>challenge results · baseline (measured) = 1.00× reference · <span style="color:#0b8ce8">measured=our run</span> · <span style="color:#b97a00">reported=PR author</span></div>
-   <div class="dbody">${harnessTable(res)}
+   <div class="dsecH" onclick="toggleSec(this)"><span class="fcaret">▾</span>challenge results${shown?' on <b>'+esc(shown)+'</b>':''} · baseline (measured) = 1.00× reference · <span style="color:#0b8ce8">measured=our run</span> · <span style="color:#b97a00">reported=PR author</span></div>
+   <div class="dbody">${harnessTable(res,pr)}
    ${arms?`<div class="meta" style="margin-top:4px">tests: ${arms}</div>`:''}</div>
   </div>
   <!-- BOTTOM: PR info -->
@@ -647,7 +648,6 @@ async function showPR(pr){
   </div>
  </div>`;
  const p=mdPath(pr);
- if(!p){$('#mdbody').innerHTML='<span class="muted">no detail file (missing area mapping)</span>';return;}
  try{
   const t=await fetch(p,{cache:'no-store'}).then(x=>{if(!x.ok)throw 0;return x.text();});
   $('#mdbody').innerHTML=mdToHtml(t);
@@ -673,9 +673,9 @@ async function showPR(pr){
 // ---------- STATS COLUMN: reported vs reproduced, PRs on x, values on y ----------
 let STAB='gapratio';
 function statRows(){
- // one row per PR actually measured here (summary.measured>0, a real run, not a hand-entered scaffold entry)
+ // one row per PR actually measured here (summary.measured>0) — same selection as stats/build_stats.py
  const out=[];
- for(const r of IDX){const res=RES[r.pr]; const s=res&&res.summary; if(!s||!s.measured||!(res.ts>='2026-11-07')) continue;
+ for(const r of IDX){const res=RES[r.pr]; const s=res&&res.summary; if(!s||!s.measured) continue;
   const d=s.headline_derived||{}; const rp=(d.reproduced||{}), rr=(d.reported||{});
   if(rp.ratio==null) continue;
   out.push({pr:r.pr, field:r.field||res.field||'—', head:s.headline||'', unit:d.unit||'',
@@ -757,7 +757,7 @@ function render(){
  const imp=processed.filter(r=>RES[r.pr].improved).length;
  const N=IDX.length, nP=processed.length, nM=measured.length;
  const solvedN=IDX.filter(r=>isSolved(r.pr)).length;
- $('#ts').textContent = nP? ('updated '+ (RES[processed[0].pr]||{}).ts||'') : '';
+ $('#ts').textContent = nP? ('updated '+ ((RES[processed[0].pr]||{}).ts||'')+(HW.current?' · hw '+HW.current:'')) : '';
  const pct=x=>N?(x/N*100):0;
  $('#stats').innerHTML=[
   ['total PRs',N,'a'],
@@ -805,7 +805,7 @@ function render(){
   const stChip=st==='improved'?'<span class="chip imp">improved</span>':
     st==='not'?'<span class="chip no">not improved</span>':'<span class="chip pend">pending</span>';
   let lat='';
-  const exps=experimentsOf(res);
+  const exps=res?experimentsOf(res):[];
   if(exps.length){
    lat='<div class="lat"><table>'+exps.map(e=>{const a=e.arms||{},g=a.gold||{};
      return `<tr><td>${esc(e.name)}</td><td class="n">${fmt(g.mean)} ${esc(e.unit||'')}${g.speedup_x!=null?' · '+fmt(g.speedup_x,1)+'×':''}</td></tr>`;}).join('')+

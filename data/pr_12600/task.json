@@ -1,0 +1,18 @@
+{
+ "pr": 12600,
+ "title": "[V1] Bugfix: Validate Model Input Length (#12600)",
+ "url": "https://github.com/vllm-project/vllm/pull/12600",
+ "date": "2025-01-31",
+ "field": "scheduling",
+ "area": "v1/engine",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "44bbca78d71330909dbfdde232debdc73a4d5a81",
+ "merge_sha": "b1340f9d55cd36a92aff713213e95f354a1bd1b4",
+ "source_path": null,
+ "reported_gain": "0.0%",
+ "gain_kind": "pct",
+ "gain_evidence": "INFO 01-31 19:06:14 loggers.py:69] Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 0.0 tokens/s, Running: 0 reqs, Waiting: 0 reqs GPU KV cache u",
+ "hardware_overrides": {}
+}

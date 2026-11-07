@@ -5,41 +5,36 @@ Governs the HARNESS that produces the numbers. The NUMBERS themselves (units, ro
 `numeric_solution.md`. This file: directory layout, per-PR `workload/Dockerfile`,
 weight-download scripts, and how `run.sh` drives the isolated per-task images.
 
-Benchmark root: `Knowledge/benchmark/` (its own git repo, remote
-`github.com/Michael-Soloveitchik/Formula.vLLM`). Self-contained: push the dir, clone on the
-GPU box, set `VLLM_GIT`, run. The ONLY thing not vendored is the vLLM git clone (too large).
+Benchmark root: this repo (remote `github.com/Michael-Soloveitchik/Formula.vLLM`). Self-contained:
+clone on the GPU box (docker + NVIDIA container toolkit), run. Nothing vLLM-related is needed on
+the host: every per-PR image installs the PyPI wheel and fetches the PR's two commits itself.
 
 ---
 
 ## 1. Directory layout
 
-```
-benchmark/
-  index.json            # 202 PRs: pr,title,field,reported_gain,base_sha,merge_sha,...
-  config.yaml           # machine spec, measure knobs, paths.vllm_git, run sets
-  conf.py               # dependency-free config.yaml reader (no PyYAML on target box)
-  dict_of_harnesses.json# SOURCE OF TRUTH for solver arms (conf.py reads this first)
-  workloads.json        # 20 mined runnable workloads: cmd, needs cpu|gpu, experiments[]
-  index.json / gen_index.py  # (re)build index.json with base_sha from the clone
-  Dockerfile.gpu        # build vLLM from source at a PR base_sha (CUDA 12.1, sm_86)
-  Dockerfile.cpu-bench  # CPU-only: no compile, mount vllm/ on PYTHONPATH (pure-py PRs)
-  run.sh                # run all / a named set / specific PRs / `workloads`
-  run_one.sh            # build+verify+solve+measure ONE pr -> results/<pr>.json
-  run_workloads.sh      # cluster-ordered: download weights once + run workload/ images
-  clusters.json         # PRs grouped by hw target + shared model (download once, reuse)
-  gen_workloads.py      # (re)generate every tasks/pr_<n>/workload/ from clusters+workloads
-  measure.py            # paired A-B-B-A timing, log-speedup, MAD noise gate
-  serve.sh              # http.server from ROOT (web/ fetches ../index.json)
-  tasks/pr_<n>/         # vendored per-task: problem.md, metadata.json, bench.py,
-                        #   results_measured.json  (+ planned: workload/)
-  data/prs/<field>/     # 202-PR offline detail cards (.md/.diff)
-  results/<pr>.json     # per-PR result; all.json = aggregate the dashboard live-reads
-  web/index.html        # live dashboard (one table per experiment)
-  .work/                # SCRATCH (gitignored): exported base_full/gold_full trees per PR
-```
+The authoritative tree, with the owner of every file, is the first section of `README.md`
+("Repository layout"); `gen/layout.py` is the single owner of paths in code. In short:
 
-`tasks/` currently vendored for the 9 CPU PRs (21222 has `metadata.json`+results; the rest
-ship `bench.py`+`problem.md`). `.work/` is scratch — exported trees, never committed.
+```
+data/pr_<n>/            # EVERYTHING about one PR
+  pr.md pr.diff solution.md     raw PR material (crawl)
+  task.json                     the experiment definition (hand-written; `requirements` generated)
+  bench.py tests/ notes.md      hand-written extras (optional)
+  problem.md                    generated: solver objective (solution.md quoted + experiments)
+  workload/default/             generated: Dockerfile, run_workload.sh, download.sh, workload.json, WORKLOAD.md
+  workload/<hw-slug>/           generated: same, with task.json:hardware_overrides[<hw-slug>] applied
+  results.<hw-slug>.json        written by a run (record.py) — one per hardware the PR ran on
+  logs/<hw-slug>/  work/        written by a run (git-ignored)
+pipeline/   run.sh run_one.sh queue.sh health_check.sh run_workloads.sh record.py parse_workload.py
+            measure.py aggregate.py derive.py machine.py requirements.py next_prs.py reproduce_report.py
+gen/        layout.py layout.sh gen_index.py gen_requirements.py gen_workloads.py gen_tasks.py conf.py migrate_layout.py
+tools/      check_terms.py serve.py serve.sh        stats/  build_stats.py stats.ipynb + generated csv/png
+templates/  Dockerfile.gpu-wheel (rendered per PR) + legacy Dockerfile.gpu-source, Dockerfile.cpu-bench (unused)
+web/index.html  index.json (generated catalog)  results/{all,manifest}.json (generated aggregate)
+clusters.json config.yaml dict_of_harnesses.json (hand-written)   .work/ (global scratch)
+run.sh run_one.sh queue.sh serve.sh   thin root wrappers into pipeline/ and tools/
+```
 
 ---
 
@@ -53,9 +48,11 @@ Arms per PR:
 - `gold`  = `merge_sha` tree (PR's solution). Oracle expects tests PASS.
 - each enabled solver = a copy of the `base` tree that the harness edits, then re-verified.
 
-`run_one.sh` pipeline: checkout (git archive baseline+merge) → build (`Dockerfile.gpu`) →
+`run_one.sh` pipeline: regenerate + build the per-PR image (`data/pr_<n>/workload/<hw-slug>/Dockerfile`,
+rendered from `templates/Dockerfile.gpu-wheel`; /base and /gold are exported from it) →
 isolate (`cp -a /arm/vllm → site-packages`, run hidden pytest oracle) → solve (each harness
-edits `./vllm`) → measure (fold `results_measured.json` µs/op + variance).
+edits `./vllm`) → measure (the task's workload cmd, `repeats` × per arm, ABBA) → record
+(`data/pr_<n>/results.<hw-slug>.json`).
 
 `measure.py`: paired A-B-B-A in one process, `repeats` independent runs → mean ± sd,
 nop (baseline-vs-baseline) spread sets the MAD noise gate. Knobs in `config.yaml:measure`.
@@ -64,7 +61,7 @@ nop (baseline-vs-baseline) spread sets the MAD noise gate. Knobs in `config.yaml
 
 ## 3. Solvers — `dict_of_harnesses.json` is the source of truth
 
-`conf.py solvers` reads `dict_of_harnesses.json` first, falls back to `config.yaml:solvers`
+`gen/conf.py solvers` reads `dict_of_harnesses.json` first, falls back to `config.yaml:solvers`
 only if absent. Each arm: `key` (dashboard arm name, MUST match `web/index.html` HARNESSES),
 `model`, `cmd`, `guided`, `enabled`, `env`.
 
@@ -80,46 +77,47 @@ Runner invokes `<cmd> "<objective>"` inside a copy of the baseline tree; the com
 
 ## 4. Per-PR workload/ + Dockerfile (the per-task reproduction kit)
 
-GOAL: each task carries `tasks/pr_<n>/workload/` that reproduces the PR AUTHOR's workload as
+GOAL: each task carries `data/pr_<n>/workload/` that reproduces the PR AUTHOR's workload as
 closely as possible — same model, same dataset, same bench cmd — so our measured ratio can
 converge on the author's (the 1:1 goal from `numeric_solution.md §4`).
 
 ```
-tasks/pr_<n>/workload/            # AUTO-GENERATED by gen_workloads.py (idempotent)
-  Dockerfile        # isolated image for THIS task (cpu: python:3.12-slim+CPU torch;
-                    #   gpu: nvidia/cuda + pip install vllm). vllm tree mounted at /src.
-  run_workload.sh   # exact author bench cmd (from workloads.json:cmd), BOTH arms,
+data/pr_<n>/workload/<hw-slug>/   # AUTO-GENERATED by gen/gen_workloads.py (idempotent); one dir per
+                                  # hardware slug (`default` = generic, `<hw-slug>` = this machine with
+                                  # task.json:hardware_overrides[<hw-slug>] applied: cmd, repeats, extra_pip, torch_fix, note)
+  Dockerfile        # THE image run_one.sh builds: templates/Dockerfile.gpu-wheel rendered with the
+                    #   task's wheel, shas, torch_fix, extra_pip (nvidia/cuda + pip install vllm==wheel;
+                    #   /base + /gold cloned in-image)
+  run_workload.sh   # exact author bench cmd (task.json:workload.cmd), one arm per call (ARM env),
                     #   prints parseable lines, exit 0 even if an arm skips (GPU absent)
   download.sh       # fetch-on-demand weights for THIS pr's cluster into the SHARED
-                    #   ../../../.weights/<cluster> (gitignored); gated + idempotent
-  meta.json         # resolved {pr,needs,cluster,model,cmd,workload_kind,all_clusters}
+                    #   <repo>/.weights/<cluster> (gitignored); gated + idempotent
   workload.json     # CANONICAL experiment description: image + build cmd, exact cmd/env,
-                    #   measurement policy (read from run_one.sh at generation time), metrics
+                    #   measurement policy (read from pipeline/run_one.sh at generation time), metrics
                     #   [{name,unit,higher_is_better,parse}], reported numbers + the author's
-                    #   hardware/args quoted from the PR body, requirements, reproduced numbers
-                    #   (results/<pr>.json), BASELINE_GAP.md verdict, standalone docker lines
+                    #   hardware/args quoted from pr.md, requirements, reproduced numbers
+                    #   (results.<hw-slug>.json), BASELINE_GAP.md verdict, standalone docker lines
   WORKLOAD.md       # the same, rendered for humans: what is measured, how to re-run 1:1
                     #   without run_one.sh, reported vs reproduced, gap note
 ```
 
-`gen_workloads.py` generates all six files for every PR in `clusters.json` from
-`clusters.json` + `workloads.json` + `index.json` + `tasks/pr_<n>/metadata.json` +
-`data/prs/**/<pr>.md` + `results/<pr>.json` + `BASELINE_GAP.md` + `run_one.sh`.
-Re-runnable and idempotent (no timestamps): overwrites the generated files, never
-touches `bench.py`/`problem.md`.
+`gen/gen_workloads.py` generates these five files (for `default` + this machine's slug) and
+`data/pr_<n>/problem.md` for every PR whose task.json has a workload cmd, from `task.json` +
+`clusters.json` + `solution.md` + `pr.md` + `results.<hw>.json` + `BASELINE_GAP.md` +
+`pipeline/run_one.sh`. Re-runnable and idempotent (no timestamps): overwrites the generated
+files, never touches `task.json` / `bench.py` / `notes.md`. `run_one.sh` regenerates the PR's
+dir before every build, so the image always matches task.json.
 
-`./run.sh workloads` → `run_workloads.sh`: iterates `clusters.json["order"]`, runs each
-cluster's `download.sh` ONCE, then builds + runs every PR's `workload/Dockerfile` for both
-arms (`.work/<pr>/{base,gold}` trees mounted at `/src`, shared weights at `/weights`). GPU
-clusters self-skip on non-CUDA hosts; Mixtral is last and gated. One image per task.
+`./run.sh workloads` → `pipeline/run_workloads.sh`: iterates `clusters.json["order"]`, runs each
+cluster's `download.sh` ONCE, then builds + runs every PR's workload Dockerfile for both
+arms (`data/pr_<n>/work/{base,gold}_full` trees mounted at `/src`, shared weights at
+`/weights`). GPU clusters self-skip on non-CUDA hosts; Mixtral is last and gated. One image per task.
 
-Workload taxonomy (`workloads.json:workload_kind`, 20 mined): `microbench_in_pr` (9),
-`repo_benchmark` (6), `serving` (4), `pytest_bench` (1). `needs`: 10 cpu, 10 gpu.
+Workload taxonomy (`task.json:workload.kind`, 40 mined): `microbench_in_pr`, `repo_benchmark`,
+`serving`, `pytest_bench`. Every workload runs through the GPU wheel image (`needs: gpu`), even
+when the bench itself has no CUDA kernels.
 
-- CPU tasks (`needs:cpu`): build + execute fully on any box (incl. this arm Mac). Use
-  `Dockerfile.cpu-bench` style (no CUDA compile, mount vllm/ on PYTHONPATH).
-- GPU tasks (`needs:gpu`): SCAFFOLD ONLY on non-GPU hosts — build/wire the Dockerfile +
-  run.sh but DO NOT execute; they run on the Ubuntu + RTX 3060 Ti (8 GB) box.
+- Non-GPU hosts: SCAFFOLD ONLY — generate the workload dirs, do not execute.
 
 ---
 
@@ -142,7 +140,7 @@ Rules:
 - Each PR's `download.sh` fetches its cluster's weights into the SHARED
   `.weights/<cluster>/` (gitignored), NOT a per-PR dir — cluster reuse, pull once.
 - SAFE + idempotent: `cache HIT` skip if present, `resume_download=True`, snapshot_download.
-- `run_workloads.sh` runs `download.sh` ONCE per cluster (first PR in the cluster), then
+- `pipeline/run_workloads.sh` runs `download.sh` ONCE per cluster (first PR in the cluster), then
   runs all that cluster's tasks off the shared cache before the next cluster.
 - Mixtral refuses unless `ALLOW_MIXTRAL=1` (~90 GB, multi-GPU TP=2); ordered LAST.
 - Download NOTHING at author time — scripts only; they pull + run when invoked on the GPU box.
@@ -152,8 +150,8 @@ Rules:
 ## 6. DO / DON'T
 
 **DO**
-- Keep the dir self-contained + pushable; vendor everything except the vLLM clone + weights.
-- One image per PR at `base_sha`; arms = `.py` swaps in that same image.
+- Keep the dir self-contained + pushable; vendor everything except weights.
+- One image per PR (wheel + both trees); arms = `.py` swaps in that same image.
 - Make per-PR `workload/` reproduce the author's model+dataset+cmd (1:1 goal).
 - Scaffold (don't execute) GPU tasks on non-GPU hosts.
 - Cluster weight downloads by shared model; idempotent, resumable scripts.

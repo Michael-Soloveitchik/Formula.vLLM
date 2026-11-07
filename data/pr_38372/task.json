@@ -1,0 +1,18 @@
+{
+ "pr": 38372,
+ "title": "[Hybrid] Simplify accepted token counting in spec decode for hybrid models (#38372)",
+ "url": "https://github.com/vllm-project/vllm/pull/38372",
+ "date": "2026-04-15",
+ "field": "decoding_tpot",
+ "area": "v1/worker",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "1696c864b90afb9cec925312d0cf12c396517007",
+ "merge_sha": "507df79a29ac8733ea03c624d215ccfffad7bbe9",
+ "source_path": "vllm/v1/worker/gpu_model_runner.py",
+ "reported_gain": "7.64%",
+ "gain_kind": "pct",
+ "gain_evidence": "- _Significant Tail Improvement_: The P99 latency dropped by 7.64% (over 110ms), which is the most impactful change.",
+ "hardware_overrides": {}
+}

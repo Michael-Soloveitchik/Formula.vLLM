@@ -1,0 +1,226 @@
+{
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "get_new_blocks",
+   "unit": "us/op",
+   "workload": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
+   "reported": {
+    "base": 150.0,
+    "patch": 8.0
+   },
+   "arms": {},
+   "derived": {
+    "unit": "us/op",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 150.0,
+     "pr_solution": 8.0,
+     "how": "absolute",
+     "marker": "",
+     "raw": "150.0 -> 8.0 us/op",
+     "note": "author gave absolute numbers",
+     "ratio": 18.75,
+     "pct": 1775.0
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "free_blocks",
+   "unit": "us/op",
+   "workload": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
+   "reported": {
+    "base": 33.0,
+    "patch": 9.0
+   },
+   "arms": {},
+   "derived": {
+    "unit": "us/op",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 33.0,
+     "pr_solution": 9.0,
+     "how": "absolute",
+     "marker": "",
+     "raw": "33.0 -> 9.0 us/op",
+     "note": "author gave absolute numbers",
+     "ratio": 3.666667,
+     "pct": 266.67
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  }
+ ],
+ "pr": 21222,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/21222",
+ "title": "[Core] Introduce popleft_n and append_n in FreeKVCacheBlockQueue to further optimize block_pool (#21222)",
+ "field": "kv_cache",
+ "reported_gain": "95% (0.15ms\u21920.008ms)",
+ "gain_kind": "unit",
+ "base_sha": "10904e6d755051260a7c3ce98659d8907c74caa9",
+ "merge_sha": "ed25054577f7abca2aee32a5290200c4a1aed561",
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.10.0",
+  "workload_cmd": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "FAIL",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "FAIL",
+   "slug": "gold"
+  }
+ },
+ "improved": false,
+ "latency": {
+  "scenarios": {},
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {
+   "tests": {
+    "bytes": 2010,
+    "tail": "r import (BasevLLMParameter,\n/usr/local/lib/python3.10/dist-packages/vllm/model_executor/parameter.py:10: in <module>\n    from vllm.distributed import get_tensor_model_parallel_rank\n/usr/local/lib/python3.10/dist-packages/vllm/distributed/__init__.py:4: in <module>\n    from .communication_op import *\n/usr/local/lib/python3.10/dist-packages/vllm/distributed/communication_op.py:9: in <module>\n    from .parallel_state import get_tp_group\n/usr/local/lib/python3.10/dist-packages/vllm/distributed/parallel_state.py:150: in <module>\n    from vllm.platforms import current_platform\n/usr/local/lib/python3.10/dist-packages/vllm/platforms/__init__.py:12: in <module>\n    from .interface import _Backend  # noqa: F401\n/usr/local/lib/python3.10/dist-packages/vllm/platforms/interface.py:16: in <module>\n    from vllm.inputs import ProcessorInputs, PromptType\n/usr/local/lib/python3.10/dist-packages/vllm/inputs/__init__.py:9: in <module>\n    from .registry import (DummyData, InputContext, InputProcessingContext,\n/usr/local/lib/python3.10/dist-packages/vllm/inputs/registry.py:8: in <module>\n    from transformers import BatchFeature, PretrainedConfig, ProcessorMixin\n/usr/local/lib/python3.10/dist-packages/transformers/utils/import_utils.py:2688: in __getattr__\n    raise ModuleNotFoundError(import_error_message) from e\nE   ModuleNotFoundError: Could not import module 'ProcessorMixin'. Are this object's requirements defined correctly? Set the logging verbosity to DEBUG for the original import error.\n"
+   }
+  },
+  "gold": {
+   "tests": {
+    "bytes": 2010,
+    "tail": "r import (BasevLLMParameter,\n/usr/local/lib/python3.10/dist-packages/vllm/model_executor/parameter.py:10: in <module>\n    from vllm.distributed import get_tensor_model_parallel_rank\n/usr/local/lib/python3.10/dist-packages/vllm/distributed/__init__.py:4: in <module>\n    from .communication_op import *\n/usr/local/lib/python3.10/dist-packages/vllm/distributed/communication_op.py:9: in <module>\n    from .parallel_state import get_tp_group\n/usr/local/lib/python3.10/dist-packages/vllm/distributed/parallel_state.py:150: in <module>\n    from vllm.platforms import current_platform\n/usr/local/lib/python3.10/dist-packages/vllm/platforms/__init__.py:12: in <module>\n    from .interface import _Backend  # noqa: F401\n/usr/local/lib/python3.10/dist-packages/vllm/platforms/interface.py:16: in <module>\n    from vllm.inputs import ProcessorInputs, PromptType\n/usr/local/lib/python3.10/dist-packages/vllm/inputs/__init__.py:9: in <module>\n    from .registry import (DummyData, InputContext, InputProcessingContext,\n/usr/local/lib/python3.10/dist-packages/vllm/inputs/registry.py:8: in <module>\n    from transformers import BatchFeature, PretrainedConfig, ProcessorMixin\n/usr/local/lib/python3.10/dist-packages/transformers/utils/import_utils.py:2688: in __getattr__\n    raise ModuleNotFoundError(import_error_message) from e\nE   ModuleNotFoundError: Could not import module 'ProcessorMixin'. Are this object's requirements defined correctly? Set the logging verbosity to DEBUG for the original import error.\n"
+   }
+  }
+ },
+ "ts": "2026-11-07T22:05:58Z",
+ "machine": {
+  "ts": "2026-11-07T22:05:30Z",
+  "host": {
+   "hostname": "DESKTOP-michael",
+   "kernel": "6.18.33.2-microsoft-standard-WSL2",
+   "wsl2": true,
+   "os": "Ubuntu 24.04.3 LTS"
+  },
+  "gpu": {
+   "name": "NVIDIA GeForce RTX 5070 Ti",
+   "driver": "591.86",
+   "cuda": "13.1",
+   "sm_mhz": 180.0,
+   "sm_max_mhz": 3090.0,
+   "mem_mhz": 405.0,
+   "mem_max_mhz": 14001.0,
+   "vram_total_mib": 16303.0,
+   "vram_used_mib": 273.0,
+   "util_pct": 0.0,
+   "power_w": 30.3,
+   "power_limit_w": 300.0,
+   "temp_c": 34.0,
+   "pstate": "P8",
+   "throttle_reasons": "0x0000000000000000",
+   "processes": [
+    {
+     "pid": 2903,
+     "name": "python main.py --listen 0.0.0.0 --port 8188",
+     "mem_mib": null
+    }
+   ]
+  },
+  "cpu": {
+   "model": "Intel(R) Core(TM) i7-14700KF",
+   "nproc": 12,
+   "load1": 2.9326171875,
+   "load5": 1.56103515625,
+   "load15": 0.8173828125,
+   "top_cpu_procs": []
+  },
+  "ram": {
+   "total_gb": 94.3,
+   "free_gb": 49.1,
+   "available_gb": 89.2
+  },
+  "docker": {
+   "version": "Docker version 29.8.1, build 4a63305",
+   "engine": "docker"
+  }
+ },
+ "summary": {
+  "experiments": 2,
+  "measured": 0,
+  "headline": "get_new_blocks",
+  "headline_derived": {
+   "unit": "us/op",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": 150.0,
+    "pr_solution": 8.0,
+    "how": "absolute",
+    "marker": "",
+    "raw": "150.0 -> 8.0 us/op",
+    "note": "author gave absolute numbers",
+    "ratio": 18.75,
+    "pct": 1775.0
+   },
+   "reproduced": {
+    "baseline": null,
+    "pr_solution": null,
+    "ratio_sd": null,
+    "baseline_sd": null,
+    "pr_solution_sd": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "unknown"
+   },
+   "reliability": {
+    "flag": "ok",
+    "note": ""
+   }
+  },
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": 11.2083,
+  "verdict": "unknown",
+  "tests": {
+   "base": "FAIL",
+   "gold": "FAIL"
+  }
+ },
+ "hw_slug": "rtx5070ti"
+}

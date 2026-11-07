@@ -1,0 +1,328 @@
+{
+ "schema": "workload_v2",
+ "pr": 22940,
+ "title": "[Core] direct indexing on self.block_table_np in compute_slot_mapping (#22940)",
+ "url": "https://github.com/vllm-project/vllm/pull/22940",
+ "field": "kv_cache",
+ "area": "v1/worker",
+ "date": "2025-08-15",
+ "hw": "rtx5070ti",
+ "hw_override": null,
+ "base_sha": "df5afa82e5c41be7d87ddd1968e13891d22003a7",
+ "merge_sha": "6e670778cdd87c282c42002a2304cb0a4a165904",
+ "source_files": [
+  "vllm/v1/worker/block_table.py"
+ ],
+ "test_files": [
+  "/task/tests/test_block_table_slot_mapping.py"
+ ],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:22940",
+  "dockerfile": "data/pr_22940/workload/rtx5070ti/Dockerfile",
+  "template": "templates/Dockerfile.gpu-wheel",
+  "wheel": "0.10.1",
+  "wheel_note": "first PyPI release after merge (2025-08-19 > 2025-08-15). Its torch pin resolves to 2.7.1+cu126 (no sm_120), so torch_fix swaps in torch 2.7.1+cu128 (same version, Blackwell-capable).",
+  "torch_fix": "torch==2.7.1 --index-url https://download.pytorch.org/whl/cu128",
+  "extra_pip": "transformers==4.56.2 pandas datasets",
+  "swap": "files",
+  "swap_note": "whole-tree swap fails: the Aug-15 tree registers _C::aqlm_gemm fake impls that the 0.10.1 wheel (post AQLM removal) lacks. files mode overlays only block_table.py (baseline vs merge) on the wheel's own tree.",
+  "build": "docker build -t vllm-task:22940 data/pr_22940/workload/rtx5070ti"
+ },
+ "workload": {
+  "kind": "serving",
+  "script": "benchmarks/benchmark_throughput.py",
+  "cmd": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 30000 --dtype float16 --max-num-seqs 1024 --max-num-batched-tokens 16384",
+  "needs": "gpu",
+  "cluster": "opt125m",
+  "all_clusters": [
+   "opt125m"
+  ],
+  "model": "facebook/opt-125m",
+  "weights": {
+   "hf_id": "facebook/opt-125m",
+   "size": "~250MB",
+   "cache": ".weights/opt125m"
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "data/pr_22940 (bench.py, tests/)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": 1,
+  "note": "Author ran --num-prompts 30000 (opt-125m, in 800 / out 75). We run 2000 prompts per repeat so 5 repeats x 4 arms fit in a session; same per-step hot path (compute_slot_mapping runs every step), throughput ratio comparable, absolute tok/s not 1:1 (different GPU, shorter run). Weights come from the HF cache mounted at /root/.cache/huggingface (.weights/hf on the host). Args match the author: vllm 0.10.1 gives >=70 GiB GPUs max_num_seqs=1024/max_num_batched_tokens=16384 by default, we must pass them; 30000 prompts ~16 min/run so repeats=1.",
+  "base_note": null
+ },
+ "policy": {
+  "source": "pipeline/run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "task.json:repeats (or hardware_overrides[<hw>].repeats)",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in data/pr_<n>/work/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> data/pr_<n>/work/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY task.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "throughput_output_tok_s",
+   "unit": "tok/s",
+   "higher_is_better": true,
+   "headline": true,
+   "parse": "regex 'Throughput: <req/s> requests/s, <tok/s> total tokens/s, <tok/s> output tokens/s'",
+   "reported": {
+    "pct": 2.07,
+    "comparable": false,
+    "scale_short": "author: 30000 prompts on H100-class GPU; ours: 2000 prompts on RTX 5070 Ti",
+    "scale_note": "Author reported +2.07% end-to-end throughput at 30000 prompts; we run 2000 prompts per repeat on an RTX 5070 Ti. Ratio is the comparable quantity, not absolute tok/s."
+   },
+   "note": null
+  },
+  {
+   "name": "throughput_total_tok_s",
+   "unit": "tok/s",
+   "higher_is_better": true,
+   "headline": false,
+   "parse": "regex 'Throughput: <req/s> requests/s, <tok/s> total tokens/s, <tok/s> output tokens/s'",
+   "reported": null,
+   "note": null
+  },
+  {
+   "name": "throughput_req_s",
+   "unit": "tok/s",
+   "higher_is_better": true,
+   "headline": false,
+   "parse": "regex 'Throughput: <req/s> requests/s, <tok/s> total tokens/s, <tok/s> output tokens/s'",
+   "reported": null,
+   "note": null
+  }
+ ],
+ "headline": "throughput_output_tok_s",
+ "reported": {
+  "gain": "2.07%",
+  "gain_kind": "pct",
+  "gain_evidence": "Throughput improved 2.07% for opt-125m with input=800 and output=75",
+  "experiments_note": "reported pct = author's end-to-end throughput gain; dashboard applies it to our measured baseline",
+  "author_hardware_args": [
+   {
+    "line": 17,
+    "text": "VLLM_USE_V1=1 vllm serve facebook/opt-125m \\"
+   },
+   {
+    "line": 24,
+    "text": "VLLM_USE_V1=1 vllm bench serve \\"
+   },
+   {
+    "line": 29,
+    "text": "--random-output-len 1 \\"
+   },
+   {
+    "line": 34,
+    "text": "--num-prompts 100 \\"
+   },
+   {
+    "line": 40,
+    "text": "CUDA_VISIBLE_DEVICES=7 VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py \\"
+   },
+   {
+    "line": 43,
+    "text": "--input-len 800 \\"
+   },
+   {
+    "line": 44,
+    "text": "--output-len 75 \\"
+   },
+   {
+    "line": 45,
+    "text": "--num-prompts 30000"
+   },
+   {
+    "line": 52,
+    "text": "Reduced `compute_slot_mapping` from 400+μs to 15-30μs."
+   },
+   {
+    "line": 53,
+    "text": "Throughput improved 2.07% for opt-125m with input=800 and output=75"
+   },
+   {
+    "line": 56,
+    "text": "Throughput: 268.45 requests/s, 234888.85 total tokens/s, 20133.98 output tokens/s"
+   },
+   {
+    "line": 61,
+    "text": "Throughput: 274.01 requests/s, 239750.19 total tokens/s, 20550.72 output tokens/s"
+   }
+  ],
+  "source": "data/pr_22940/pr.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 4,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30.244140625
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": true,
+   "hf_token": false,
+   "vllm_wheel": "0.10.1",
+   "models": [
+    "facebook/opt-125m"
+   ],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ },
+ "reproduced": {
+  "source": "data/pr_22940/results.rtx5070ti.json",
+  "hw_slug": "rtx5070ti",
+  "ts": "2026-11-07T10:44:17Z",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.10.1",
+   "workload_cmd": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 2000 --dtype float16",
+   "repeats": 5
+  },
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  },
+  "verdict": "reproduced",
+  "reproduced_ratio_median": 1.0022,
+  "reported_ratio_median": 1.0207,
+  "machine": null,
+  "experiments": [
+   {
+    "name": "throughput_output_tok_s",
+    "unit": "tok/s",
+    "reported": {
+     "baseline": 2260.996,
+     "pr_solution": 2307.798617,
+     "how": "our baseline ± %",
+     "marker": "*",
+     "raw": "2.07% gain, no baseline number",
+     "note": "author gave a ratio/percentage only; applied to our reproduced baseline",
+     "ratio": 1.0207,
+     "pct": 2.07
+    },
+    "baseline": 2260.996,
+    "baseline_sd": 15.9951,
+    "pr_solution": 2265.852,
+    "pr_solution_sd": 17.7261,
+    "n": 5,
+    "ratio": 1.002148,
+    "ratio_of_ratios": 0.982,
+    "verdict": "reproduced",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "throughput_total_tok_s",
+    "unit": "tok/s",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 26377.464,
+    "baseline_sd": 186.527,
+    "pr_solution": 26434.172,
+    "pr_solution_sd": 206.8499,
+    "n": 5,
+    "ratio": 1.00215,
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "throughput_req_s",
+    "unit": "req/s",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 30.146,
+    "baseline_sd": 0.213,
+    "pr_solution": 30.212,
+    "pr_solution_sd": 0.2366,
+    "n": 5,
+    "ratio": 1.002189,
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  ]
+ },
+ "gap": {
+  "verdict": "hardware (CPU share hidden) + config",
+  "what": "`compute_slot_mapping` direct indexing",
+  "note": "Author: `--num-prompts 30000`, 268→274 req/s (+2.07 %, single run, no sd) on an 8-GPU node; ours `--num-prompts 2000`, 30.1→30.2 req/s (+0.2 %, sd 0.7 %). The PR saves ~400 µs of host work per step; it is only visible when the step is host-bound. On the 5070 Ti the same opt-125m step is ~9× slower on the GPU side (26 K vs 235 K tok/s), so the host saving is <0.3 % of step time — consistent with what we measured. Secondary config gap: vLLM 0.10.1 (`vllm/engine/arg_utils.py:1633`) defaults `max_num_seqs=1024, max_num_batched_tokens=16384` when the GPU has ≥ 70 GiB (and is not an A100), else `256 / 8192`, so the author's slot-mapping loop ran over 4× more requests and 2× more tokens per step. To match the author's args: add `--max-num-seqs 1024 --max-num-batched-tokens 16384` and `--num-prompts 30000` (≈16 min/run; 1 repeat per arm is enough, the metric is already an average over 30000 requests). Even then expect ≤1 % here. Verdict: hardware; the author's 2 % is below any reasonable noise gate anyway.",
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:22940 data/pr_22940/workload/rtx5070ti",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_22940:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:22940 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); for f in vllm/v1/worker/block_table.py; do if [ -f \"$A/$f\" ]; then mkdir -p \"$site/$(dirname \"$f\")\"; cp \"$A/$f\" \"$site/$f\"; else rm -f \"$site/$f\"; fi; done; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 30000 --dtype float16 --max-num-seqs 1024 --max-num-batched-tokens 16384'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_22940:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:22940 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); for f in vllm/v1/worker/block_table.py; do if [ -f \"$A/$f\" ]; then mkdir -p \"$site/$(dirname \"$f\")\"; cp \"$A/$f\" \"$site/$f\"; else rm -f \"$site/$f\"; fi; done; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 30000 --dtype float16 --max-num-seqs 1024 --max-num-batched-tokens 16384'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": "Vendored oracle (data/pr_22940/tests): the merge-tree tests/v1/worker/test_gpu_input_batch.py imports LogitsProcessorManager, renamed in the 0.10.1 wheel, so it cannot collect in files-swap mode. Perf-only PR: baseline and PR's solution both expected PASS."
+}

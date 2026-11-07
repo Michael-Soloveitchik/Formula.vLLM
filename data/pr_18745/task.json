@@ -1,0 +1,18 @@
+{
+ "pr": 18745,
+ "title": "[Core] Support inplace model weights loading (#18745)",
+ "url": "https://github.com/vllm-project/vllm/pull/18745",
+ "date": "2025-06-02",
+ "field": "quantization",
+ "area": "model_executor/model_loader",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "b9f61e13875e1682d3982829006bec26981fde4d",
+ "merge_sha": "9760fd8f6acc752168333a25f5da80a6d2097608",
+ "source_path": "vllm/model_executor/model_loader/tensorizer.py",
+ "reported_gain": "70%",
+ "gain_kind": "pct",
+ "gain_evidence": "This is needed for the GRPO flow, where we need to frequently re-load new weights, and do online conversion of bf16->fp8 for faster rollouts (and rollouts take ",
+ "hardware_overrides": {}
+}

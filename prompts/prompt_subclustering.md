@@ -3,7 +3,7 @@
 Source-of-truth for `extract.py` area derivation. Edit `json`, rerun extract.
 Subcluster = **which part of the code the PR contributed to**, from changed
 file paths. One dominant area per PR (most-touched). Determines the
-`data/prs/<field>/<area>/` tree depth-2.
+`data/pr_<n>/pr.md` (area kept in task.json; was the `data/prs/<field>/<area>/` tree).
 
 ## Rules
 - `vllm/<sub>/...`: if `<sub>` ∈ `two_level` → area = `<sub>/<next>` (finer,

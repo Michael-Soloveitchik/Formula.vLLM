@@ -1,0 +1,18 @@
+{
+ "pr": 26397,
+ "title": "[Attention] Add MLA prefill backend: trtllm_ragged_attention_deepseek (#26397)",
+ "url": "https://github.com/vllm-project/vllm/pull/26397",
+ "date": "2025-10-24",
+ "field": "attention",
+ "area": "vllm/envs.py",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "7e1d697b568d4da27a013e2f3e4016c2e23d3fc1",
+ "merge_sha": "0f67d4d962872767ac1fca8e98d1bb679aae762a",
+ "source_path": "vllm/v1/attention/backends/mla/common.py",
+ "reported_gain": "12.7%, 10.2%",
+ "gain_kind": "pct",
+ "gain_evidence": "12.7% qps improvement -10.2% TTFT improvement",
+ "hardware_overrides": {}
+}

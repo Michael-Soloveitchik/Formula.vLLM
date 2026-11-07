@@ -1,0 +1,18 @@
+{
+ "pr": 14377,
+ "title": "[Perf]:Optimize qwen2-vl to reduce cudaMemcpyAsync (#14377)",
+ "url": "https://github.com/vllm-project/vllm/pull/14377",
+ "date": "2025-03-11",
+ "field": "gpu_kernels",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "63d635d17962377df089cdc9d4a2684f0b007208",
+ "merge_sha": "70b808fe1a63322bc6bf5f46a91981a8f6b8af00",
+ "source_path": "vllm/model_executor/models/qwen2_vl.py",
+ "reported_gain": "15%, 7%",
+ "gain_kind": "pct",
+ "gain_evidence": "After optimization, the online environment xformer branch QPS can be improved by 15%, and the flash attn branch QPS can be improved by 7%",
+ "hardware_overrides": {}
+}

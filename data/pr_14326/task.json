@@ -1,0 +1,18 @@
+{
+ "pr": 14326,
+ "title": "[Bugfix][Core] fix abort_seq_group and memory leak when n>1 (#14326)",
+ "url": "https://github.com/vllm-project/vllm/pull/14326",
+ "date": "2025-03-06",
+ "field": "scheduling",
+ "area": "core/scheduler.py",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "6bd1dd9d2625ac0ac81e8b5c740aa855399990b9",
+ "merge_sha": "caac5c2e597b1780c3df54a537c34e6061c32cff",
+ "source_path": "vllm/core/scheduler.py",
+ "reported_gain": "0.5%, 0.0%",
+ "gain_kind": "pct",
+ "gain_evidence": "INFO 03-06 03:31:48 [metrics.py:481] Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 259.4 tokens/s, Running: 2 reqs, Swapped: 0 reqs, Pending: ",
+ "hardware_overrides": {}
+}

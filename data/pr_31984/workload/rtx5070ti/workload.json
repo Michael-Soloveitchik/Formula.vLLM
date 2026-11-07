@@ -1,0 +1,241 @@
+{
+ "schema": "workload_v2",
+ "pr": 31984,
+ "title": "[Kernel] Optimize Sliding Window Attention in 3D Triton Kernel (#31984)",
+ "url": "https://github.com/vllm-project/vllm/pull/31984",
+ "field": "gpu_kernels",
+ "area": "v1/attention",
+ "date": "2026-01-10",
+ "hw": "rtx5070ti",
+ "hw_override": null,
+ "base_sha": "e6c6f2c79d2c1e0765d17b4dec83a4a8283342e4",
+ "merge_sha": "b8bf5c45bbbb1249bd1656557603da71e9d4c3b9",
+ "source_files": [
+  "vllm/v1/attention/ops/triton_unified_attention.py"
+ ],
+ "test_files": [],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:31984",
+  "dockerfile": "data/pr_31984/workload/rtx5070ti/Dockerfile",
+  "template": "templates/Dockerfile.gpu-wheel",
+  "wheel": "0.14.0",
+  "wheel_note": "first PyPI release after merge (2026-01-20 > 2026-01-10); picked by gen_tasks.py from PyPI upload dates.",
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:31984 data/pr_31984/workload/rtx5070ti"
+ },
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_31984/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "needs": "gpu",
+  "cluster": "none_gpu",
+  "all_clusters": [
+   "none_gpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "data/pr_31984 (bench.py, tests/)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "unified_attention forced onto the 3D (split-softmax decode) Triton kernel with gpt-oss-20b shapes (64/8 heads, head 64, window 128, block 16, bf16): 1 decode query vs KV 4096/8192/16384 and 8 x 8192; PR prunes out-of-window tiles in the 3D kernel. CUDA-event us per call. Author: 3-4% e2e latency at 6.4k-12.8k output tokens (no kernel number).",
+  "base_note": null
+ },
+ "policy": {
+  "source": "pipeline/run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "task.json:repeats (or hardware_overrides[<hw>].repeats)",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in data/pr_<n>/work/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> data/pr_<n>/work/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY task.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "sw128_decode_b1_kv4096",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": true,
+   "parse": "sw128_decode_b1_kv4096",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "sw128_decode_b1_kv8192",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "sw128_decode_b1_kv8192",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "sw128_decode_b1_kv16384",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "sw128_decode_b1_kv16384",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "sw128_decode_b8_kv8192",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "sw128_decode_b8_kv8192",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  }
+ ],
+ "headline": "sw128_decode_b1_kv4096",
+ "reported": {
+  "gain": "4%",
+  "gain_kind": "pct",
+  "gain_evidence": "For longer sequence lengths, the performance improvement introduced by this PR becomes more pronounced, reaching approximately 3–4% for output lengths of 6,400 ",
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
+  "author_hardware_args": [
+   {
+    "line": 16,
+    "text": "The following results were obtained for `openai/gpt-oss-20b` on an NVIDIA H100 GPU, by running"
+   },
+   {
+    "line": 18,
+    "text": "<pre>$ VLLM_ATTENTION_BACKEND=TRITON_ATTN vllm bench latency \\"
+   },
+   {
+    "line": 20,
+    "text": "--input-len 500 --output-len &ltoutput-length&gt \\"
+   },
+   {
+    "line": 21,
+    "text": "--batch-size &ltbatch-size&gt </pre>"
+   },
+   {
+    "line": 28,
+    "text": "Results for batch size 1, for which the 3D kernel is executed,  are shown in the graph below. In these experiments, the output length (in tokens) was varied across the following values: 10, 100, 200, 400, 800, 1600, 3200, 6400, and 12800. T"
+   },
+   {
+    "line": 33,
+    "text": "For longer sequence lengths, the performance improvement introduced by this PR becomes more pronounced, reaching approximately 3–4% for output lengths of 6,400 and 12,800 tokens. Additionally, the FlashAttention backend appears to perform w"
+   },
+   {
+    "line": 51,
+    "text": "<pre>VLLM_ATTENTION_BACKEND=TRITON_ATTN lm_eval --model vllm --model_args pretrained=openai/gpt-oss-20b --tasks gsm8k --num_fewshot 5 --batch_size auto --limit 500"
+   },
+   {
+    "line": 55,
+    "text": "|gsm8k|      3|flexible-extract|     5|exact_match|↑  |0.352|±  |0.0214|"
+   },
+   {
+    "line": 56,
+    "text": "|     |       |strict-match    |     5|exact_match|↑  |0.262|±  |0.0197|</pre>"
+   },
+   {
+    "line": 59,
+    "text": "<pre>lm_eval --model vllm --model_args pretrained=openai/gpt-oss-20b --tasks gsm8k --num_fewshot 5 --batch_size auto --limit 500"
+   },
+   {
+    "line": 63,
+    "text": "|gsm8k|      3|flexible-extract|     5|exact_match|↑  |0.328|±  |0.0210|"
+   },
+   {
+    "line": 64,
+    "text": "|     |       |strict-match    |     5|exact_match|↑  |0.218|±  |0.0185|</pre>"
+   }
+  ],
+  "source": "data/pr_31984/pr.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.14.0",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ },
+ "reproduced": null,
+ "gap": {
+  "verdict": "not analysed",
+  "note": null,
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:31984 data/pr_31984/workload/rtx5070ti",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_31984:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:31984 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_31984:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:31984 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": "perf-only kernel tile pruning; no test in the diff (existing test_triton_unified_attention.py covers sliding window)."
+}

@@ -1,0 +1,18 @@
+{
+ "pr": 36557,
+ "title": "[Bugfix] Fix `RuntimeError: Already borrowed` that degrades VLM serving throughput under concurrent load. (#36557)",
+ "url": "https://github.com/vllm-project/vllm/pull/36557",
+ "date": "2026-03-09",
+ "field": "scheduling",
+ "area": "vllm/renderers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "195c9972037034355c5e85207f611aa09023cb66",
+ "merge_sha": "d0cd736caadafea1ec1721737af432d8b0a7e919",
+ "source_path": null,
+ "reported_gain": "5×",
+ "gain_kind": "pct",
+ "gain_evidence": "The `call_hf_processor` retry loop (up to 5× with `time.sleep(0.5)`) masks the error from clients but causes severe latency spikes.",
+ "hardware_overrides": {}
+}

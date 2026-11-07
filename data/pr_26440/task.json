@@ -1,0 +1,18 @@
+{
+ "pr": 26440,
+ "title": "[Performance] Dual stream execution of \"shared_experts\" and \"selected_experts\" inside FusedMoE (#26440)",
+ "url": "https://github.com/vllm-project/vllm/pull/26440",
+ "date": "2025-10-21",
+ "field": "parallelism",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "becb7de40b293c840a930c008a648a6177666da9",
+ "merge_sha": "344a0017c06e40041efe35ccff7670c1131067e3",
+ "source_path": "vllm/model_executor/models/deepseek_v2.py",
+ "reported_gain": "5.7%",
+ "gain_kind": "pct",
+ "gain_evidence": "For DeepSeekR1 FP8 with Flashinfer latency kernels (trtllm-gen) on 8xB200s batch size 32, the TPOT improves from 23.35ms to 22.09ms (with latest FlashInfer code",
+ "hardware_overrides": {}
+}

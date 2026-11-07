@@ -1,0 +1,18 @@
+{
+ "pr": 24243,
+ "title": "Eagle3 that supports the Minicpm3 model (#24243)",
+ "url": "https://github.com/vllm-project/vllm/pull/24243",
+ "date": "2025-09-27",
+ "field": "decoding_tpot",
+ "area": "vllm/config",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "56aafa8c0bb9cce3594d834b996a5352504b985e",
+ "merge_sha": "33f6aaf9725ab3c0b07ed88d8a6113621f9eb4d2",
+ "source_path": "vllm/model_executor/models/minicpm.py",
+ "reported_gain": "1.62×",
+ "gain_kind": "pct",
+ "gain_evidence": "Baseline (non-speculative): 215.84 s Speculative decoding model: 133.24 s Speedup: 1.62×",
+ "hardware_overrides": {}
+}

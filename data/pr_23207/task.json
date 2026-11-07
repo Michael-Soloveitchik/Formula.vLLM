@@ -1,0 +1,18 @@
+{
+ "pr": 23207,
+ "title": "[Misc][qwen2_5_vl][torch.compile] Enable `supports_torch_compile` on generic nn.Module and demonstrate speedup on Qwen Vision model (#23207)",
+ "url": "https://github.com/vllm-project/vllm/pull/23207",
+ "date": "2025-10-28",
+ "field": "gpu_kernels",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "4fe58953611ede752e34b67ae785fed28be66465",
+ "merge_sha": "94666612a938380cb643c1555ef9aa68b7ab1e53",
+ "source_path": "vllm/model_executor/models/qwen2_5_vl.py",
+ "reported_gain": "20%",
+ "gain_kind": "pct",
+ "gain_evidence": "After making a patch on our local version of vLLM, we gain about 20% vision encoder speedup (result from torch profiler) in some test cases.",
+ "hardware_overrides": {}
+}

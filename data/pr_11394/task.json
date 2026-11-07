@@ -1,0 +1,18 @@
+{
+ "pr": 11394,
+ "title": "[V1] Use FlashInfer Sampling Kernel for Top-P & Top-K Sampling (#11394)",
+ "url": "https://github.com/vllm-project/vllm/pull/11394",
+ "date": "2024-12-27",
+ "field": "gpu_kernels",
+ "area": "v1/sample",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "0c0c2015c526f1fe6f86fdd8d6bd99a935d2d275",
+ "merge_sha": "371d04d39bf056e4cc56100c83d4812b7cb230e4",
+ "source_path": "vllm/v1/sample/sampler.py",
+ "reported_gain": "20%",
+ "gain_kind": "pct",
+ "gain_evidence": "As a result, the sorting op can take ~20% performance overhead in high-throughput settings.",
+ "hardware_overrides": {}
+}

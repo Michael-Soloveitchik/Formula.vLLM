@@ -1,0 +1,99 @@
+{
+ "pr": 37225,
+ "title": "[Perf] Optimize top-k search in apply_top_k_top_p_triton sampler (#37225)",
+ "url": "https://github.com/vllm-project/vllm/pull/37225",
+ "date": "2026-03-17",
+ "field": "gpu_kernels",
+ "area": "v1/sample",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "4ed51308c8826619459be858a6dc4333206f41c1",
+ "merge_sha": "51b2333be19000db7d03b76ccf1b842972c98541",
+ "source_path": "vllm/v1/sample/ops/topk_topp_triton.py",
+ "reported_gain": "28%, 25%",
+ "gain_kind": "pct",
+ "gain_evidence": "## Benchmark results (benchmark_topk_topp.py) - **top-k only: 17–28% faster** across all batch sizes and vocab sizes - **top-k + top-p combined: 16–25% faster**",
+ "source_files": [
+  "vllm/v1/sample/ops/topk_topp_triton.py"
+ ],
+ "test_files": [
+  "tests/v1/sample/test_topk_topp_sampler.py"
+ ],
+ "wheel": "0.18.0",
+ "wheel_note": "first PyPI release after merge (v0.17.2rc0 tag at merge); compiled ops match PR's solution tree; arms are .py swaps inside this image. Needed because the cu121 source build cannot target sm_120 (RTX 5070 Ti).",
+ "workload": {
+  "kind": "repo_benchmark",
+  "script": "benchmarks/benchmark_topk_topp.py",
+  "cmd": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
+  "unit": "ms",
+  "needs": "gpu",
+  "headline": "topk_whole_b2048_v32768",
+  "note": "CUDA-only (aborts without torch.cuda). topk_whole b2048/32k 0.761->0.550ms."
+ },
+ "experiments": [
+  {
+   "name": "topk_whole_b2048_v32768",
+   "reported": {
+    "base": 0.761,
+    "patch": 0.55
+   }
+  },
+  {
+   "name": "topk_whole_b2048_v131072",
+   "reported": {
+    "base": 2.312,
+    "patch": 1.891
+   }
+  },
+  {
+   "name": "topk_topp_whole_b2048_v32768",
+   "reported": {
+    "base": 1.211,
+    "patch": 0.907
+   }
+  },
+  {
+   "name": "topk_topp_whole_b2048_v131072",
+   "reported": {
+    "base": 3.206,
+    "patch": 2.652
+   }
+  },
+  {
+   "name": "topk_whole_b128_v32768",
+   "reported": {
+    "base": 0.071,
+    "patch": 0.056
+   }
+  }
+ ],
+ "experiments_note": "reported = PR author's table (ms), same scenario key as benchmark_topk_topp.py SUMMARY TABLE: <scenario>_b<batch>_v<vocab>",
+ "hardware_overrides": {},
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.5,
+   "compute_cap_max": null,
+   "gpu_hint": "Triton kernel",
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.18.0",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ }
+}

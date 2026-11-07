@@ -1,0 +1,72 @@
+{
+ "pr": 27793,
+ "title": "[Core][Observability] Add KV cache residency metrics (#27793)",
+ "url": "https://github.com/vllm-project/vllm/pull/27793",
+ "date": "2025-12-01",
+ "field": "scheduling",
+ "area": "v1/core",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "ec7035c9d40cda43fa9c3d2d1c148b1382aa04a4",
+ "merge_sha": "cabc77cc86586206134a19e3e70aa401ec30b71f",
+ "source_path": "vllm/v1/core/sched/scheduler.py",
+ "reported_gain": "N/A (observability feature; <0.1% overhead, not a speedup)",
+ "gain_kind": "pct",
+ "gain_evidence": "Assuming typical request latency of 100-500ms, this represents **< 0.1% overhead per request**.",
+ "source_files": [
+  "vllm/config/observability.py",
+  "vllm/engine/arg_utils.py",
+  "vllm/v1/core/block_pool.py",
+  "vllm/v1/core/kv_cache_coordinator.py",
+  "vllm/v1/core/kv_cache_manager.py",
+  "vllm/v1/core/kv_cache_metrics.py",
+  "vllm/v1/core/sched/scheduler.py",
+  "vllm/v1/metrics/loggers.py",
+  "vllm/v1/metrics/stats.py"
+ ],
+ "test_files": [
+  "tests/v1/core/test_kv_cache_metrics.py"
+ ],
+ "wheel": "0.12.0",
+ "wheel_note": "first PyPI release after merge (2025-12-03 > 2025-12-01); picked by gen_tasks.py from PyPI upload dates.",
+ "test_note": "correctness-only PR: the oracle test IS the workload (deterministic fake clock), no latency number.",
+ "workload": {
+  "kind": "pytest_bench",
+  "script": "tests/v1/core/test_kv_cache_metrics.py",
+  "cmd": "pytest -v tests/v1/core/test_kv_cache_metrics.py",
+  "unit": null,
+  "needs": "gpu",
+  "headline": null,
+  "note": "Correctness-only; deterministic fake clock. No timing number (overhead ~48 bytes/block, zero cost when off)."
+ },
+ "experiments": [],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "hardware_overrides": {},
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.12.0",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ }
+}

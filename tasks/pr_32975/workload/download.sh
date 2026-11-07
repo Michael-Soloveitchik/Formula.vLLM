@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-# AUTO-GENERATED — PR #32975. No model weights needed (cluster=none_cpu).
-set -euo pipefail
-echo "# pr=32975: no weights to download (cluster none_cpu)."
-exit 0

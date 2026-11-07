@@ -1,0 +1,18 @@
+{
+ "pr": 31167,
+ "title": "[Perf] Remove blocking copy in GDN Attention (#31167)",
+ "url": "https://github.com/vllm-project/vllm/pull/31167",
+ "date": "2025-12-22",
+ "field": "attention",
+ "area": "v1/attention",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "5312a7284e58e47bd10f7acbab52f703714027c2",
+ "merge_sha": "85aff45e24de7af96d30baa1d7d0fc7aec43c28a",
+ "source_path": "vllm/v1/attention/backends/gdn_attn.py",
+ "reported_gain": "1%",
+ "gain_kind": "pct",
+ "gain_evidence": "Nets +1% speedup at BS1 on 4xB200.",
+ "hardware_overrides": {}
+}

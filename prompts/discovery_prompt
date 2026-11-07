@@ -9,7 +9,7 @@ could be applied to produce a real — ideally significant — efficiency advanc
 **Hard constraints**
 - Do NOT use the web. Read the local repo + the Knowledge data only.
 - Do NOT propose anything that already exists as a merged PR. Cross-check every
-  candidate against `data/index.jsonl` (titles) and `data/prs/**` before writing
+  candidate against `data/index.jsonl` (titles) and `data/pr_*/pr.md` before writing
   it. If vLLM already did it, drop it.
 - Do NOT modify vLLM source. This stage only *reads* source and *writes proposals*.
 - Be efficient: strongest candidates first, concrete over exhaustive.
@@ -18,7 +18,7 @@ could be applied to produce a real — ideally significant — efficiency advanc
 - `agendas_research.md` — pick the cross-cluster / cross-area agenda categories
   with the clearest reusable `WHEN → DO → GAIN` pattern (see §2, §2b, §3, §5).
 - `agendas.md` — the per-agenda `pattern` lines are the recipe to re-apply.
-- `data/index.jsonl` + `data/prs/**` — the "already done" set, to avoid dupes.
+- `data/index.jsonl` + `data/pr_*/pr.md` — the "already done" set, to avoid dupes.
 - vLLM source on disk: `/Users/michaelsoloveitchik/Repositories/Projects/vLLM/vllm`
   — the search target. Read actual files/functions/lines.
 

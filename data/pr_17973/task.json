@@ -1,0 +1,18 @@
+{
+ "pr": 17973,
+ "title": "[PERF] Speed up Qwen2.5-VL model by speed up rotary position embedding (#17973)",
+ "url": "https://github.com/vllm-project/vllm/pull/17973",
+ "date": "2025-05-16",
+ "field": "attention",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "5c04bb8b863bfdef8122b193631479315cc764f5",
+ "merge_sha": "67da5720d4ed2aa1f615ec812031f4f3753b3f62",
+ "source_path": "vllm/model_executor/models/qwen2_5_vl.py",
+ "reported_gain": "2.46%",
+ "gain_kind": "pct",
+ "gain_evidence": "Before: 25.99 reqs/s After: 26.63 req/s **Speed up: 2.46%**",
+ "hardware_overrides": {}
+}

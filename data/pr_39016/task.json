@@ -1,0 +1,18 @@
+{
+ "pr": 39016,
+ "title": "[MoE] Triton MoE Perf regression - restore low latency path (#39016)",
+ "url": "https://github.com/vllm-project/vllm/pull/39016",
+ "date": "2026-04-20",
+ "field": "parallelism",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "b47840019e61a3983c8144066a99c843d177947d",
+ "merge_sha": "257015d5e50029e8ebcbce4fe0c83f43b531552e",
+ "source_path": "vllm/model_executor/layers/fused_moe/fused_moe.py",
+ "reported_gain": "4.35%, 4.20%",
+ "gain_kind": "pct",
+ "gain_evidence": "| This PR | 409.27 | 2,462.04| +4.35% tok/s, -4.20% latency |",
+ "hardware_overrides": {}
+}

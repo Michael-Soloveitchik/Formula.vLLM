@@ -1,0 +1,18 @@
+{
+ "pr": 4298,
+ "title": "[Model] Adds Phi-3 support (#4298)",
+ "url": "https://github.com/vllm-project/vllm/pull/4298",
+ "date": "2024-04-25",
+ "field": "attention",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "a395a638c2f18d549e7d01655cf7a6dbee566f91",
+ "merge_sha": "96e90fdeb3c4ebacfe24513556afccb918722b7c",
+ "source_path": "vllm/model_executor/models/llama.py",
+ "reported_gain": "5x",
+ "gain_kind": "pct",
+ "gain_evidence": "The speedup is between 2-5x depending on the sequence length.",
+ "hardware_overrides": {}
+}

@@ -2,7 +2,7 @@
 
 Defines the NUMERIC contract shared by two artifacts:
 
-1. `Knowledge/benchmark/results/<pr>.json` — the per-PR result the dashboard live-reads.
+1. `data/pr_<n>/results.<hw-slug>.json` — the per-PR, per-hardware result the dashboard live-reads (via `results/manifest.json`).
 2. `Knowledge/benchmark/web/index.html` — the dashboard that renders those numbers into
    one table per experiment (`expTable`).
 
