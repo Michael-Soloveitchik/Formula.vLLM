@@ -16,7 +16,7 @@
    "model": null,
    "size": "0",
    "download": null,
-   "prs": [6442, 12583, 20839, 23504, 29826, 31722, 31984, 32403, 33538, 35330, 37225, 38559, 41043, 41163, 42311],
+   "prs": [6442, 12583, 20308, 20839, 23504, 23928, 24573, 26437, 27402, 29354, 29826, 31722, 31984, 32403, 32425, 33529, 33538, 34846, 35330, 37225, 37347, 38559, 41043, 41163, 42311],
    "notes": "GPU kernel / Triton microbench, no model weights but needs CUDA. Scaffold only here; execute on GPU box. 12583 also loads Mixtral config via --model (see mixtral cluster)."
   },
   "opt125m": {

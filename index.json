@@ -1023,7 +1023,34 @@
   "gain_evidence": "Despite the relatively short prompt lengths used in this benchmark, the results still demonstrate a ~3% improvement in throughput, along with over 5% reductions",
   "base_sha": "a6d795d593046abd490b16349bcd9b40feedd334",
   "merge_sha": "22dd9c2730dc1124b9d0ac15fff223d0b8d9020b",
-  "source_path": "vllm/attention/ops/triton_unified_attention.py"
+  "source_path": "vllm/attention/ops/triton_unified_attention.py",
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.9.2",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
+  }
  },
  {
   "pr": 20759,
@@ -1485,7 +1512,34 @@
   "gain_evidence": "Load Time (s): before 20 / after 14",
   "base_sha": "7be141b2c52366f0cc4e731c36819aed178d2258",
   "merge_sha": "43d9ad03ba8584547537da71aee3e1810a0abbfd",
-  "source_path": "vllm/model_executor/model_loader/default_loader.py"
+  "source_path": "vllm/model_executor/model_loader/default_loader.py",
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.10.2",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
+  }
  },
  {
   "pr": 24123,
@@ -1665,7 +1719,34 @@
   "gain_evidence": "**Summary:** Not accounting for the benefits of improved expert load balancing, on the main branch, EPLB introduces ~3.97% throughput drop.",
   "base_sha": "175811e3b53f8f13eb3e8ac6aae02050f6e1412f",
   "merge_sha": "06a41334c7e5c23b9a053f866c02524945d7d1db",
-  "source_path": "vllm/model_executor/layers/fused_moe/layer.py"
+  "source_path": "vllm/model_executor/layers/fused_moe/layer.py",
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.11.0",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
+  }
  },
  {
   "pr": 24597,
@@ -1845,7 +1926,34 @@
   "gain_evidence": "Speedup of Output token throughput is **12%**",
   "base_sha": "f6cdc9a02fcb15eee6c7511eef657bc118c2db90",
   "merge_sha": "785d8b6410c3f1dc138947ea861a194b061f0293",
-  "source_path": "vllm/model_executor/models/qwen3_next.py"
+  "source_path": "vllm/model_executor/models/qwen3_next.py",
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.11.1",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
+  }
  },
  {
   "pr": 26440,
@@ -1935,7 +2043,34 @@
   "gain_evidence": "This is a good feature to have, see following results, we generally see 5% to 20% kernel runtime speedup for smaller Ms.",
   "base_sha": "a736e5ff770bd0e69492c24d24d04b7fd47789c0",
   "merge_sha": "21b82f4ea2f12ab2c3d74f9156b50616b892ea7d",
-  "source_path": "vllm/lora/ops/triton_ops/kernel_utils.py"
+  "source_path": "vllm/lora/ops/triton_ops/kernel_utils.py",
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.11.1",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
+  }
  },
  {
   "pr": 27435,
@@ -2337,7 +2472,34 @@
   "gain_evidence": "faster unpermute MoE path, benchmark speedups",
   "base_sha": "657e9c0e183d4bdb157b07db987644d2d9d36245",
   "merge_sha": "a4d5d663e295e3b90a515c79df74048bc715e804",
-  "source_path": "vllm/model_executor/layers/fused_moe/fused_moe.py"
+  "source_path": "vllm/model_executor/layers/fused_moe/fused_moe.py",
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.14.0",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
+  }
  },
  {
   "pr": 29499,
@@ -2764,7 +2926,34 @@
   "gain_evidence": "* Profiling shows `_lora_expand_kernel` improves about 30%.",
   "base_sha": "7a1030431ade33439902f5b0cf7ff4a69c0fc033",
   "merge_sha": "a884bc62d6eeeb58e87e56b2d966c63f073ada77",
-  "source_path": null
+  "source_path": null,
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.14.0",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
+  }
  },
  {
   "pr": 32614,
@@ -2903,7 +3092,34 @@
   "gain_evidence": "| Context | OLD (tok/s) | NEW (tok/s) | Improvement | |---------|-------------|-------------|-------------| | Short (100 in / 400 out) | 69.14 | 72.37 | 1.05x |",
   "base_sha": "16a65e41736c5e8d27e9e843668f6e3f99d68d9a",
   "merge_sha": "d9408ffba3c8da5e289b5695d507707afce10a2f",
-  "source_path": "vllm/v1/attention/ops/triton_decode_attention.py"
+  "source_path": "vllm/v1/attention/ops/triton_decode_attention.py",
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.19.0",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
+  }
  },
  {
   "pr": 33538,
@@ -3136,7 +3352,34 @@
   "gain_evidence": "improved default triton fused-MoE configs",
   "base_sha": "596ed1f02ef2a068e459a019d7d3f54593cc7e9e",
   "merge_sha": "22a97e66134a26c74b9dae73d9446c4e32718269",
-  "source_path": "vllm/model_executor/layers/fused_moe/fused_moe.py"
+  "source_path": "vllm/model_executor/layers/fused_moe/fused_moe.py",
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.16.0",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
+  }
  },
  {
   "pr": 34933,
@@ -3482,7 +3725,34 @@
   "gain_evidence": "I benched again using only option 2, we can still get around 1% perf improvement, would you take a look again?",
   "base_sha": "6accb21f2a9aa2411a2eb23f96ac90828554f3f4",
   "merge_sha": "e37ff5b5c8c1ca692f4a83df3ba4c564a4bf1df6",
-  "source_path": "vllm/v1/pool/metadata.py"
+  "source_path": "vllm/v1/pool/metadata.py",
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.18.0",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
+  }
  },
  {
   "pr": 37416,

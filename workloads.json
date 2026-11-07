@@ -969,5 +969,485 @@
     }
    }
   ]
+ },
+ "29354": {
+  "pr": 29354,
+  "field": "quantization",
+  "title": "Add unpermute-aware fused MoE path and small-batch fallback (#29354)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_29354/bench.py",
+  "cmd": "python3 tasks/pr_29354/bench.py",
+  "needs": "gpu",
+  "notes": "fused_experts small-batch naive-block-assignment path: E=128 top_k=1 N=1024 K=5120 bf16 (Maverick TP8 shape), M in 1/4/16/32 (all on the new path), torch softmax+topk routing, CUDA-event us per call. Reported = author's benchmark_moe.py table (H100).",
+  "experiments": [
+   {
+    "name": "fused_moe_e128_top1_m1",
+    "unit": "us",
+    "parse": "fused_moe_e128_top1_m1",
+    "reported": {
+     "base": 33.14,
+     "patch": 28.19
+    }
+   },
+   {
+    "name": "fused_moe_e128_top1_m4",
+    "unit": "us",
+    "parse": "fused_moe_e128_top1_m4",
+    "reported": {
+     "base": 49.42,
+     "patch": 44.02
+    }
+   },
+   {
+    "name": "fused_moe_e128_top1_m16",
+    "unit": "us",
+    "parse": "fused_moe_e128_top1_m16",
+    "reported": {
+     "base": 136.29,
+     "patch": 130.47
+    }
+   },
+   {
+    "name": "fused_moe_e128_top1_m32",
+    "unit": "us",
+    "parse": "fused_moe_e128_top1_m32",
+    "reported": {
+     "base": 234.63,
+     "patch": 228.19
+    }
+   }
+  ]
+ },
+ "34846": {
+  "pr": 34846,
+  "field": "quantization",
+  "title": "[Perf] Improve default triton fused moe configs (#34846)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_34846/bench.py",
+  "cmd": "python3 tasks/pr_34846/bench.py",
+  "needs": "gpu",
+  "notes": "fused_experts with the arm's get_default_config (untuned GPU: no tuned JSON for RTX 5070 Ti): E=64 N=1408 K=2048 top_k=6 bf16, M in 1/16/128/1024/4096, CUDA-event us. Author gives only New/Old ratios per model (E=64 class: 0.93-1.01x bs1-8, 0.74-1.00x bs16-128, 0.54-0.71x bs256-4096 on H100) and an fp8 Mixtral table -> reported null. If a tuned config exists for the GPU both arms tie (bench prints the config).",
+  "experiments": [
+   {
+    "name": "fused_moe_e64_top6_m1",
+    "unit": "us",
+    "parse": "fused_moe_e64_top6_m1",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "fused_moe_e64_top6_m16",
+    "unit": "us",
+    "parse": "fused_moe_e64_top6_m16",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "fused_moe_e64_top6_m128",
+    "unit": "us",
+    "parse": "fused_moe_e64_top6_m128",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "fused_moe_e64_top6_m1024",
+    "unit": "us",
+    "parse": "fused_moe_e64_top6_m1024",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "fused_moe_e64_top6_m4096",
+    "unit": "us",
+    "parse": "fused_moe_e64_top6_m4096",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   }
+  ]
+ },
+ "24573": {
+  "pr": 24573,
+  "field": "parallelism",
+  "title": "[EPLB] Reduce EPLB Inference Overhead (#24573)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_24573/bench.py",
+  "cmd": "python3 tasks/pr_24573/bench.py",
+  "needs": "gpu",
+  "notes": "FusedMoE.select_experts (static) with enable_eplb=True on synthetic routing: 256 logical / 288 physical experts (32 replicated), top_k 8, M=64 and 1024; base = torch.rand replica pick + masks inline, gold = torch.compile'd eplb_map_to_physical_and_record. Wall-clock us per call. Author numbers are DP16 DeepSeek-V3 serving w/ EPLB main vs PR (reported-only).",
+  "experiments": [
+   {
+    "name": "eplb_select_experts_m64",
+    "unit": "us",
+    "parse": "eplb_select_experts_m64",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "eplb_select_experts_m1024",
+    "unit": "us",
+    "parse": "eplb_select_experts_m1024",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "serving_request_throughput",
+    "unit": "req/s",
+    "parse": "Request throughput (not measured: DeepSeek-V3 DP16 w/ EPLB)",
+    "reported": {
+     "base": 27.74,
+     "patch": 28.41
+    }
+   },
+   {
+    "name": "serving_mean_tpot",
+    "unit": "ms",
+    "parse": "Mean TPOT (not measured)",
+    "reported": {
+     "base": 192.38,
+     "patch": 188.17
+    }
+   }
+  ]
+ },
+ "32425": {
+  "pr": 32425,
+  "field": "gpu_kernels",
+  "title": "[LoRA] Update LoRA expand kernel heuristic (#32425)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_32425/bench.py",
+  "cmd": "python3 tasks/pr_32425/bench.py",
+  "needs": "gpu",
+  "notes": "lora_expand custom op via LoRAKernelMeta (as tests/lora/test_punica_ops.py): 3 slices x hidden 1024 (QKV-like), rank 16, 1 LoRA, 16 and 256 tokens, plus a 1-slice x 4096 control; PR = default block_n 128 -> max(64, next_pow2(128//num_slices)) (untuned GPU path). CUDA-event us per call. Author: _lora_expand_kernel ~14 -> ~10 us (profiler), e2e +1%.",
+  "experiments": [
+   {
+    "name": "lora_expand_3slice_h1024_t16",
+    "unit": "us",
+    "parse": "lora_expand_3slice_h1024_t16",
+    "reported": {
+     "base": 14.0,
+     "patch": 10.0
+    }
+   },
+   {
+    "name": "lora_expand_3slice_h1024_t256",
+    "unit": "us",
+    "parse": "lora_expand_3slice_h1024_t256",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "lora_expand_1slice_h4096_t16",
+    "unit": "us",
+    "parse": "lora_expand_1slice_h4096_t16",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   }
+  ]
+ },
+ "27402": {
+  "pr": 27402,
+  "field": "gpu_kernels",
+  "title": "[Kernel] LoRA triton kernels support PDL (#27402)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_27402/bench.py",
+  "cmd": "python3 tasks/pr_27402/bench.py",
+  "needs": "gpu",
+  "notes": "lora_shrink + lora_expand back to back (a LoRA linear) via LoRAKernelMeta: hidden 4096, rank 16, 1 LoRA, 1 and 3 slices, 16 and 256 tokens; PR = PDL (griddepcontrol) in the LoRA Triton kernels (sm_90+, sm_120 ok). CUDA-event us per shrink+expand pair. Author: '5-20% kernel runtime speedup' + Qwen3-30B-A3B LoRA serving on H20 (reported-only).",
+  "experiments": [
+   {
+    "name": "lora_shrink_expand_1slice_t16",
+    "unit": "us",
+    "parse": "lora_shrink_expand_1slice_t16",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "lora_shrink_expand_1slice_t256",
+    "unit": "us",
+    "parse": "lora_shrink_expand_1slice_t256",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "lora_shrink_expand_3slice_t16",
+    "unit": "us",
+    "parse": "lora_shrink_expand_3slice_t16",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "lora_shrink_expand_3slice_t256",
+    "unit": "us",
+    "parse": "lora_shrink_expand_3slice_t256",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "serving_output_throughput",
+    "unit": "tok/s",
+    "parse": "Output token throughput (not measured: Qwen3-30B-A3B + LoRA, H20)",
+    "reported": {
+     "base": 1382.92,
+     "patch": 1468.21
+    }
+   },
+   {
+    "name": "serving_mean_tpot",
+    "unit": "ms",
+    "parse": "Mean TPOT (not measured)",
+    "reported": {
+     "base": 63.67,
+     "patch": 59.51
+    }
+   }
+  ]
+ },
+ "33529": {
+  "pr": 33529,
+  "field": "attention",
+  "title": "Triton MLA perf fixes (#33529)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_33529/bench.py",
+  "cmd": "python3 tasks/pr_33529/bench.py",
+  "needs": "gpu",
+  "notes": "TritonMLAImpl.forward_mqa (unbound, minimal self/metadata/layer stubs) on DeepSeek-V2-Lite-like MLA decode: 16 heads, latent 512+64, bf16 KV, block 64; ctx 8K/32K/80K at batch 1 and 8K at batch 8. PR = SM-aware num_kv_splits (was fixed 4) + kernel load tweaks + is_mla path. CUDA-event us per call. Author (Kimi K2.5 DCP8, sm120) peak tok/s reported-only.",
+  "experiments": [
+   {
+    "name": "mla_decode_b1_kv8192",
+    "unit": "us",
+    "parse": "mla_decode_b1_kv8192",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "mla_decode_b1_kv32768",
+    "unit": "us",
+    "parse": "mla_decode_b1_kv32768",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "mla_decode_b1_kv81920",
+    "unit": "us",
+    "parse": "mla_decode_b1_kv81920",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "mla_decode_b8_kv8192",
+    "unit": "us",
+    "parse": "mla_decode_b8_kv8192",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "peak_throughput_1req_80k",
+    "unit": "tok/s",
+    "parse": "Peak throughput (not measured: Kimi K2.5 DCP8, 1 req, 80K ctx)",
+    "reported": {
+     "base": 34.0,
+     "patch": 52.0
+    }
+   },
+   {
+    "name": "peak_throughput_8req_80k",
+    "unit": "tok/s",
+    "parse": "Peak throughput (not measured: 8 reqs, 80K ctx)",
+    "reported": {
+     "base": 176.0,
+     "patch": 184.0
+    }
+   }
+  ]
+ },
+ "20308": {
+  "pr": 20308,
+  "field": "gpu_kernels",
+  "title": "[Kernel] Optimize Prefill Attention in Unified Triton Attention Kernel (#20308)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_20308/bench.py",
+  "cmd": "python3 tasks/pr_20308/bench.py",
+  "needs": "gpu",
+  "notes": "unified_attention (2D Triton kernel) pure prefill, 1 sequence, Llama-3.1-8B shapes (32/8 heads, head 128, block 16, bf16), prompts 2000/8000/16000; PR = skip KV tiles beyond the causal prefix. CUDA-event us per call. Wheel 0.9.2 pins torch 2.7.0 cu126 (no sm_120): metadata torch_fix swaps the cu128 build of the same torch. Author: ~1.75x kernel-side at 16k (graph) + ShareGPT serving (reported-only).",
+  "experiments": [
+   {
+    "name": "prefill_attn_s2000",
+    "unit": "us",
+    "parse": "prefill_attn_s2000",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "prefill_attn_s8000",
+    "unit": "us",
+    "parse": "prefill_attn_s8000",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "prefill_attn_s16000",
+    "unit": "us",
+    "parse": "prefill_attn_s16000",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "serving_mean_ttft",
+    "unit": "ms",
+    "parse": "Mean TTFT (not measured: Llama-3.1-8B ShareGPT, H100)",
+    "reported": {
+     "base": 3874.12,
+     "patch": 3588.36
+    }
+   },
+   {
+    "name": "serving_request_throughput",
+    "unit": "req/s",
+    "parse": "Request throughput (not measured)",
+    "reported": {
+     "base": 44.37,
+     "patch": 45.9
+    }
+   }
+  ]
+ },
+ "37347": {
+  "pr": 37347,
+  "field": "scheduling",
+  "title": "[Perf] Optimize token_embed for pooling models, 1.0% token throughput improvement (#37347)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_37347/bench.py",
+  "cmd": "python3 tasks/pr_37347/bench.py",
+  "needs": "gpu",
+  "notes": "PoolingMetadata.build_pooling_cursor per pooling step: gold reuses the runner's GPU query_start_loc (new kwarg), base tree rejects the kwarg so the bench calls it the pre-PR way (pinned CPU cumsum + H2D). 128 and 16 sequences x 256 tokens, wall-clock us per call. Author: ~1% token_embed throughput (no absolute numbers) -> reported null.",
+  "experiments": [
+   {
+    "name": "build_pooling_cursor_n128",
+    "unit": "us",
+    "parse": "build_pooling_cursor_n128",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "build_pooling_cursor_n16",
+    "unit": "us",
+    "parse": "build_pooling_cursor_n16",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   }
+  ]
+ },
+ "23928": {
+  "pr": 23928,
+  "field": "memory",
+  "title": "[Model loader]: support multi-thread model weight loading (#23928)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_23928/bench.py",
+  "cmd": "python3 tasks/pr_23928/bench.py",
+  "needs": "gpu",
+  "notes": "Weight-shard iteration over 8 synthetic 128 MB bf16 safetensors files (1 GB, written to a temp dir, page-cached): gold = multi_thread_safetensors_weights_iterator (8 workers), base tree lacks it so the bench runs the single-thread safetensors_weights_iterator the loader uses there. Seconds per full pass, best of 3. Author: QwQ-32B 62 GB load 20 s -> 14 s (reported-only). Opt-in feature (enable_multithread_load).",
+  "experiments": [
+   {
+    "name": "weights_load_1gb_s",
+    "unit": "s",
+    "parse": "weights_load_1gb_s",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "model_load_time",
+    "unit": "s",
+    "parse": "Load Time (not measured: QwQ-32B 62 GB, TP8, NVMe)",
+    "reported": {
+     "base": 20.0,
+     "patch": 14.0
+    }
+   }
+  ]
+ },
+ "26437": {
+  "pr": 26437,
+  "field": "decoding_tpot",
+  "title": "[PERF] Qwen3-next MTP speedup (change bool mask indexing to index_select / index_copy to reduce d2h) (#26437)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_26437/bench.py",
+  "cmd": "python3 tasks/pr_26437/bench.py",
+  "needs": "gpu",
+  "notes": "fla @tensor_cache 4 -> 8 entries (part 2 of the PR): prepare_chunk_indices cycled over 6 distinct cu_seqlens (2 calls x 3 groups per GDN layer) - base LRU thrashes and recomputes (incl. .tolist() sync), gold hits. Wall-clock us per call. Parts 1 (bool-mask -> index_select in qwen3_next.py) and 3 are model-level and not measured. Author e2e (Qwen3-Next-80B MTP, B200) reported-only.",
+  "experiments": [
+   {
+    "name": "chunk_indices_6way_cycle",
+    "unit": "us",
+    "parse": "chunk_indices_6way_cycle",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "serving_mean_tpot",
+    "unit": "ms",
+    "parse": "Mean TPOT (not measured: Qwen3-Next-80B MTP, 512 conc, B200)",
+    "reported": {
+     "base": 22.89,
+     "patch": 21.12
+    }
+   },
+   {
+    "name": "serving_output_throughput",
+    "unit": "tok/s",
+    "parse": "Output token throughput (not measured)",
+    "reported": {
+     "base": 15947.5,
+     "patch": 17872.27
+    }
+   }
+  ]
  }
 }

@@ -58,7 +58,11 @@ sup.mark{font-weight:700;color:#d97706;margin-left:2px;cursor:help}
  header .gh{margin-left:0;font-size:12px;font-weight:700;color:var(--acc);text-decoration:none;border:1px solid var(--border2);background:#fff;border-radius:20px;padding:4px 12px;transition:.15s}
  header .gh:hover{border-color:var(--acc);box-shadow:0 0 0 3px rgba(11,140,232,.14)}
  /* app shell: left tree + main content */
- #app{display:grid;grid-template-columns:250px minmax(0,1fr);align-items:start}
+ #app{display:grid;grid-template-columns:var(--c1,250px) 6px var(--c2,340px) 6px minmax(0,1fr);align-items:start}
+ .split{cursor:col-resize;height:calc(100vh - var(--hh,180px));position:sticky;top:var(--hh,180px);background:transparent;border-left:1px solid var(--border);transition:background .12s}
+ .split:hover,.split.on{background:rgba(11,140,232,.18)}
+ #mid{border-right:1px solid var(--border);height:calc(100vh - var(--hh,180px));overflow:auto;position:sticky;top:var(--hh,180px);background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(244,248,255,.75))}
+ #mid .lh{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);padding:12px 14px 4px}
  #app>*{min-width:0}
  /* ---- LEFT TREE PANE ---- */
  #left{border-right:1px solid var(--border);height:calc(100vh - var(--hh,180px));overflow:auto;position:sticky;top:var(--hh,180px);
@@ -100,8 +104,9 @@ sup.mark{font-weight:700;color:#d97706;margin-left:2px;cursor:help}
  .empty{color:var(--faint);padding:30px 16px;text-align:center}
  /* ---- LEFT: stats pane + background fold ---- */
  .spane{padding:6px 12px 8px;border-bottom:1px solid var(--border)}
- .spane .stabs{display:flex;gap:4px;margin:4px 0 6px}
- .spane .stabs button{flex:1;background:var(--panel);border:1px solid var(--border2);border-radius:10px;padding:4px 0;font:700 11px var(--ui);color:var(--mut);cursor:pointer}
+ .spane .stabs{display:flex;gap:4px;margin:4px 0 6px;flex-wrap:wrap}
+ .spane .stabs button{flex:1 1 auto;min-width:70px;background:var(--panel);border:1px solid var(--border2);border-radius:10px;padding:4px 6px;font:700 11px var(--ui);color:var(--mut);cursor:pointer;white-space:nowrap}
+ .spane .stitle{font-size:12px;font-weight:700;color:var(--navy);margin:2px 0 2px}
  .spane .stabs button.on{background:var(--grad);color:#fff;border-color:transparent}
  .spane svg{display:block;width:100%;height:auto;font-family:var(--mono);font-size:9.5px}
  .spane .slgd{display:flex;gap:10px;font-size:10px;color:var(--mut);margin:2px 0 4px;flex-wrap:wrap}
@@ -258,6 +263,19 @@ sup.mark{font-weight:700;color:#d97706;margin-left:2px;cursor:help}
 </header>
 <div id="app">
  <div id="left">
+  <div class="lh">Fields → PRs</div>
+  <div class="lsearch"><input id="tq" placeholder="search pr / title…"></div>
+  <div class="tfilt" id="tfilt">
+   <button data-f="all" class="on">all<span class="c" id="cAll"></span></button>
+   <button data-f="run">run<span class="c" id="cRun"></span></button>
+   <button data-f="solved">solved<span class="c" id="cSolved"></span></button>
+  </div>
+  <div class="treeCount" id="treeCount"></div>
+  <div class="treeLgd"><span><i class="dot g"></i>improved</span><span><i class="dot r"></i>not</span><span><i class="dot o"></i>pending</span><span><i class="dot a"></i>harness run</span></div>
+  <div class="tree" id="tree"><div class="empty">loading…</div></div>
+ </div>
+ <div class="split" data-var="--c1" data-min="170" data-max="520"></div>
+ <div id="mid">
   <div class="lh">Stats</div>
   <div class="spane" id="spane"><div class="empty" style="padding:10px">loading…</div></div>
   <div class="bgfold"><div class="dsec folded" id="bgsec">
@@ -272,17 +290,8 @@ sup.mark{font-weight:700;color:#d97706;margin-left:2px;cursor:help}
     <p><a href="../BASELINE_GAP.md" target="_blank">Full per-PR analysis (BASELINE_GAP.md) ↗</a></p>
    </div></div>
   </div></div>
-  <div class="lh">Fields → PRs</div>
-  <div class="lsearch"><input id="tq" placeholder="search pr / title…"></div>
-  <div class="tfilt" id="tfilt">
-   <button data-f="all" class="on">all<span class="c" id="cAll"></span></button>
-   <button data-f="run">run<span class="c" id="cRun"></span></button>
-   <button data-f="solved">solved<span class="c" id="cSolved"></span></button>
-  </div>
-  <div class="treeCount" id="treeCount"></div>
-  <div class="treeLgd"><span><i class="dot g"></i>improved</span><span><i class="dot r"></i>not</span><span><i class="dot o"></i>pending</span><span><i class="dot a"></i>harness run</span></div>
-  <div class="tree" id="tree"><div class="empty">loading…</div></div>
  </div>
+ <div class="split" data-var="--c2" data-min="240" data-max="900"></div>
  <div class="wrap">
   <div id="detailWrap"></div>
   <div class="stats" id="stats"></div>
@@ -645,68 +654,97 @@ async function showPR(pr){
  }catch(e){$('#mdbody').innerHTML='<span class="muted">could not load '+esc(p)+'</span>';}
 }
 
-// ---------- LEFT STATS PANE: reported vs reproduced ratio, global / per field ----------
-let STAB='global';
+// ---------- column splitters (drag to resize left tree / stats column; remembered per browser) ----------
+(function(){
+ const root=document.documentElement;
+ try{ for(const v of ['--c1','--c2']){const s=localStorage.getItem('col'+v); if(s) root.style.setProperty(v,s);} }catch(e){}
+ document.querySelectorAll('.split').forEach(sp=>{
+  sp.addEventListener('mousedown',e=>{e.preventDefault(); sp.classList.add('on');
+   const v=sp.dataset.var, min=+sp.dataset.min, max=+sp.dataset.max;
+   const prev=sp.previousElementSibling, startX=e.clientX, startW=prev.getBoundingClientRect().width;
+   const mv=ev=>{const w=Math.max(min,Math.min(max,startW+ev.clientX-startX)); root.style.setProperty(v,w+'px');};
+   const up=()=>{sp.classList.remove('on'); window.removeEventListener('mousemove',mv); window.removeEventListener('mouseup',up);
+     try{localStorage.setItem('col'+v,root.style.getPropertyValue(v));}catch(e){} renderStatsPane();};
+   window.addEventListener('mousemove',mv); window.addEventListener('mouseup',up);});
+ });
+ if(window.ResizeObserver){const m=$('#mid'); if(m) new ResizeObserver(()=>renderStatsPane()).observe(m);}
+})();
+
+// ---------- STATS COLUMN: reported vs reproduced, PRs on x, values on y ----------
+let STAB='speedup';
 function statRows(){
  // one row per PR actually measured here (summary.measured>0, a real run, not a hand-entered scaffold entry)
  const out=[];
  for(const r of IDX){const res=RES[r.pr]; const s=res&&res.summary; if(!s||!s.measured||!(res.ts>='2026-11-07')) continue;
   const d=s.headline_derived||{}; const rp=(d.reproduced||{}), rr=(d.reported||{});
   if(rp.ratio==null) continue;
-  out.push({pr:r.pr, field:r.field||res.field||'—', rep:rr.ratio, meas:rp.ratio, sd:rp.ratio_sd||0, verdict:(d.reproduced_vs_reported||{}).verdict||'', rel:(d.reliability||{}).flag||'ok', head:s.headline||''});}
+  out.push({pr:r.pr, field:r.field||res.field||'—', head:s.headline||'', unit:d.unit||'',
+   rep:rr.ratio, meas:rp.ratio, sd:rp.ratio_sd||0, repPct:rr.pct, measPct:rp.pct,
+   repBase:(rr.marker===''&&rr.baseline!=null)?rr.baseline:null, measBase:rp.baseline, marker:rr.marker||'',
+   verdict:(d.reproduced_vs_reported||{}).verdict||'', rel:(d.reliability||{}).flag||'ok'});}
  return out;
 }
+const TABS=[['speedup','speedup ×'],['pct','improvement %'],['baseline','baseline ratio'],['field','per field']];
+// generic column chart: x = categories, y = numeric (log2 or linear); series = [{key,color,shape,err?}]
+function colChart(el,rows,opts){
+ const W=Math.max(260,(el.clientWidth||300)-4), L=48, R=8, TOP=12, XL=opts.xl||46, PH=Math.max(120,Math.min(260,Math.round(W*0.55)));
+ const H=TOP+PH+XL; const n=rows.length; const step=(W-L-R)/Math.max(1,n); const xc=i=>L+step*(i+0.5);
+ const vals=[]; rows.forEach(r=>opts.series.forEach(s=>{const v=r[s.key]; if(v!=null&&isFinite(v)&&(!opts.log||v>0)) {vals.push(v); if(s.err&&r[s.err]){vals.push(v+r[s.err]); if(!opts.log||v-r[s.err]>0) vals.push(v-r[s.err]);}}}));
+ if(!vals.length) return `<div class="shint">nothing to plot yet</div>`;
+ let lo=Math.min(...vals,opts.ref!=null?opts.ref:Infinity), hi=Math.max(...vals,opts.ref!=null?opts.ref:-Infinity);
+ if(opts.log){lo=Math.pow(2,Math.floor(Math.log2(lo))); hi=Math.pow(2,Math.ceil(Math.log2(hi))); if(hi===lo) hi=lo*2;}
+ else {const pad=(hi-lo)*0.1||1; lo-=pad; hi+=pad;}
+ const y=v=>opts.log? TOP+PH-(Math.log2(v)-Math.log2(lo))/(Math.log2(hi)-Math.log2(lo))*PH : TOP+PH-(v-lo)/(hi-lo)*PH;
+ // ticks: log -> powers of 2 thinned to <= 8 labels; linear -> "nice" steps (1,2,5 x 10^k)
+ let ticks=[];
+ if(opts.log){const all=[]; for(let t=lo;t<=hi*1.0001;t*=2) all.push(t); const every=Math.ceil(all.length/8); ticks=all.filter((_,i)=>i%every===0);}
+ else {const raw=(hi-lo)/5, mag=Math.pow(10,Math.floor(Math.log10(raw||1))); const st=[1,2,5,10].map(m=>m*mag).find(s=>s>=raw)||raw;
+   lo=Math.floor(lo/st)*st; hi=Math.ceil(hi/st)*st; for(let t=lo;t<=hi+st/2;t+=st) ticks.push(+t.toFixed(10));}
+ let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.title)}">`;
+ s+=ticks.map(t=>`<line x1="${L}" y1="${y(t).toFixed(1)}" x2="${W-R}" y2="${y(t).toFixed(1)}" stroke="${opts.ref!=null&&Math.abs(t-opts.ref)<1e-9?'#c9d6ec':'#eef2f9'}" stroke-width="1"/><text x="${L-4}" y="${(y(t)+3).toFixed(1)}" text-anchor="end" fill="#98a2b8">${opts.fmt(t)}</text>`).join('');
+ if(opts.ref!=null&&opts.ref>=lo&&opts.ref<=hi) s+=`<line x1="${L}" y1="${y(opts.ref).toFixed(1)}" x2="${W-R}" y2="${y(opts.ref).toFixed(1)}" stroke="#c9d6ec" stroke-width="1.4"/>`;
+ rows.forEach((r,i)=>{const x=xc(i);
+  const tip=`#${r.pr} ${r.head}\n`+opts.series.map(se=>`${se.label}: ${r[se.key]!=null?opts.fmt(r[se.key]):'—'}${se.err&&r[se.err]?' ±'+opts.fmt(r[se.err]):''}`).join('\n')+`\n${r.verdict||''}${r.rel&&r.rel!=='ok'?' · '+r.rel:''}`;
+  s+=`<g><title>${esc(tip)}</title>`;
+  s+=`<text transform="translate(${x.toFixed(1)},${TOP+PH+6}) rotate(55)" fill="#172a5c" font-weight="700" font-size="9">#${r.pr}</text>`;
+  opts.series.forEach((se,k)=>{const v=r[se.key]; if(v==null||!isFinite(v)||(opts.log&&v<=0)) return; const dx=(k-(opts.series.length-1)/2)*7; const px=x+dx, py=y(v);
+   if(se.err&&r[se.err]){const a=opts.log?Math.max(lo,v-r[se.err]):v-r[se.err], b=Math.min(hi,v+r[se.err]); s+=`<line x1="${px.toFixed(1)}" y1="${y(a).toFixed(1)}" x2="${px.toFixed(1)}" y2="${y(b).toFixed(1)}" stroke="${se.color}" stroke-width="2" stroke-linecap="round" opacity=".55"/>`;}
+   if(se.shape==='diamond') s+=`<path d="M${px.toFixed(1)} ${(py-4.5).toFixed(1)} l4.5 4.5 l-4.5 4.5 l-4.5 -4.5 z" fill="${se.color}" stroke="#fff" stroke-width="1"/>`;
+   else s+=`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="4" fill="${se.color}" stroke="${r.rel!=='ok'&&se.key!=='rep'?'#e5533f':'#fff'}" stroke-width="1.2"${r.rel!=='ok'&&se.key!=='rep'?' stroke-dasharray="1.5 1.5"':''}/>`;});
+  s+='</g>';});
+ s+='</svg>';
+ const lgd=`<div class="slgd">`+opts.series.map(se=>`<span><i style="width:8px;height:8px;${se.shape==='diamond'?'transform:rotate(45deg);':'border-radius:50%;'}background:${se.color};display:inline-block"></i>${esc(se.label)}</span>`).join('')+`</div>`;
+ return `<div class="stitle">${esc(opts.title)}</div>`+lgd+s+`<div class="shint">${opts.hint}</div>`;
+}
 function renderStatsPane(){
- const rows=statRows(); const el=$('#spane'); if(!el) return;
- const tabs=`<div class="stabs"><button class="${STAB==='global'?'on':''}" onclick="STAB='global';renderStatsPane()">global</button><button class="${STAB==='field'?'on':''}" onclick="STAB='field';renderStatsPane()">per field</button></div>`;
+ const el=$('#spane'); if(!el) return;
+ const rows=statRows().sort((a,b)=>a.pr-b.pr);
+ const tabs=`<div class="stabs">`+TABS.map(([k,l])=>`<button class="${STAB===k?'on':''}" onclick="STAB='${k}';renderStatsPane()">${l}</button>`).join('')+`</div>`;
  if(!rows.length){el.innerHTML=tabs+'<div class="shint">no reproduced PRs yet</div>';return;}
- const W=226, L=44, R=8, RH=17, TOP=14;
- const lg=Math.log2;
- if(STAB==='global'){
-  // dot-range chart, log2 x-axis: reported ratio (◆ orange) vs reproduced ratio ± sd (● blue, bar)
-  const vals=rows.flatMap(r=>[r.rep,r.meas-r.sd,r.meas+r.sd]).filter(v=>v>0);
-  const lo=Math.min(0.5,...vals), hi=Math.max(2,...vals);
-  const x=v=>L+(lg(v)-lg(lo))/(lg(hi)-lg(lo))*(W-L-R);
-  const ticks=[0.5,1,2,4,8,16,32,64,128,256].filter(t=>t>=lo&&t<=hi);
-  const H=TOP+rows.length*RH+6;
-  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="reported vs reproduced speedup per PR">`;
-  s+=ticks.map(t=>`<line x1="${x(t).toFixed(1)}" y1="${TOP-2}" x2="${x(t).toFixed(1)}" y2="${H-4}" stroke="${t===1?'#c9d6ec':'#eef2f9'}" stroke-width="${t===1?1.2:1}"/><text x="${x(t).toFixed(1)}" y="8" text-anchor="middle" fill="#98a2b8">${t}×</text>`).join('');
-  rows.sort((a,b)=>b.meas-a.meas).forEach((r,i)=>{
-   const y=TOP+i*RH+RH/2;
-   const tip=`#${r.pr} ${r.head}\nreproduced ${r.meas.toFixed(2)}× ±${r.sd.toFixed(2)}\nreported ${r.rep!=null?r.rep.toFixed(2)+'×':'no number'}\n${r.verdict}${r.rel!=='ok'?' · '+r.rel:''}`;
-   s+=`<g class="srow"><title>${esc(tip)}</title>`;
-   s+=`<text x="${L-4}" y="${y+3.5}" text-anchor="end" fill="#172a5c" font-weight="700">#${r.pr}</text>`;
-   s+=`<line x1="${x(Math.max(lo,r.meas-r.sd)).toFixed(1)}" y1="${y}" x2="${x(Math.min(hi,r.meas+r.sd)).toFixed(1)}" y2="${y}" stroke="#0b8ce8" stroke-width="2" stroke-linecap="round" opacity=".55"/>`;
-   if(r.rep!=null&&r.rep>0) s+=`<path d="M${x(r.rep).toFixed(1)} ${y-4.5} l4.5 4.5 l-4.5 4.5 l-4.5 -4.5 z" fill="#e39b00" stroke="#fff" stroke-width="1"/>`;
-   s+=`<circle cx="${x(r.meas).toFixed(1)}" cy="${y}" r="4" fill="#0b8ce8" stroke="#fff" stroke-width="1.2"${r.rel!=='ok'?' stroke-dasharray="1.5 1.5" stroke="#e5533f"':''}/>`;
-   s+=`</g>`;
-  });
-  s+='</svg>';
-  const n=rows.length, ok=rows.filter(r=>r.verdict==='reproduced').length;
-  el.innerHTML=tabs+`<div class="slgd"><span><i style="width:8px;height:8px;border-radius:50%;background:#0b8ce8;display:inline-block"></i>reproduced ± sd</span><span><i style="width:7px;height:7px;background:#e39b00;transform:rotate(45deg);display:inline-block"></i>reported</span></div>`+s+
-   `<div class="shint">speedup = baseline ÷ PR's solution (log scale, 1× = no change) · ${n} PRs reproduced here, ${ok} match the reported ratio (≥0.8 of it) · red-dashed dot = below host floor</div>`;
+ const BLUE='#0b8ce8', ORG='#e39b00', x2=v=>(v>=10?v.toFixed(0):v>=1?v.toFixed(1):v.toFixed(2))+'×', pc=v=>(v>=0?'+':'')+v.toFixed(0)+'%';
+ const n=rows.length, ok=rows.filter(r=>r.verdict==='reproduced').length;
+ if(STAB==='speedup'){
+  el.innerHTML=tabs+colChart(el,rows,{title:'speedup: reported vs reproduced',log:true,ref:1,fmt:x2,
+   series:[{key:'rep',label:'reported (PR author)',color:ORG,shape:'diamond'},{key:'meas',label:'reproduced ± sd (this GPU)',color:BLUE,err:'sd'}],
+   hint:`speedup = baseline ÷ PR's solution per PR (log scale, 1× = no change) · ${n} PRs reproduced, ${ok} match the reported ratio (≥0.8 of it) · red-dashed = below host floor`});
+ } else if(STAB==='pct'){
+  el.innerHTML=tabs+colChart(el,rows,{title:'improvement %: reported vs reproduced',log:false,ref:0,fmt:pc,
+   series:[{key:'repPct',label:'reported %',color:ORG,shape:'diamond'},{key:'measPct',label:'reproduced %',color:BLUE}],
+   hint:`improvement = (speedup − 1) × 100, i.e. the delta relative to the baseline, so PRs with different units share one axis · negative = PR's solution slower here`});
+ } else if(STAB==='baseline'){
+  const rr=rows.map(r=>({...r,bratio:(r.repBase&&r.measBase)?r.repBase/r.measBase:null}));
+  const have=rr.filter(r=>r.bratio!=null).length;
+  el.innerHTML=tabs+colChart(el,rr,{title:'baseline: reported ÷ reproduced',log:true,ref:1,fmt:x2,
+   series:[{key:'bratio',label:'author baseline ÷ our baseline',color:'#2457d8'}],
+   hint:`how much faster the author's machine ran the UNCHANGED code (1 = same speed) · only PRs whose author gave an absolute baseline (${have} of ${n}); * / + rows have none · <1 = our box is faster (rare), >1 = theirs`});
  } else {
-  // per field: n, median of reproduced/reported ratio-of-ratios (1 = exactly the author's gain), min–max range
+  // per field: median + range of reproduced ÷ reported
   const F={}; rows.forEach(r=>{(F[r.field]=F[r.field]||[]).push(r);});
-  const frows=Object.entries(F).map(([f,rs])=>{const rr=rs.filter(r=>r.rep>0).map(r=>r.meas/r.rep).sort((a,b)=>a-b);
-    const med=rr.length?rr[Math.floor(rr.length/2)]:null; return {f,n:rs.length,k:rr.length,med,lo:rr[0],hi:rr[rr.length-1],meds:rs.map(r=>r.meas).sort((a,b)=>a-b)};}).sort((a,b)=>b.n-a.n);
-  const vals=frows.flatMap(r=>[r.lo,r.hi]).filter(v=>v>0);
-  const lo=Math.min(0.25,...vals), hi=Math.max(2,...vals);
-  const L2=88, R2=30;   // wider label gutter for field names, room for n=
-  const x=v=>L2+(lg(v)-lg(lo))/(lg(hi)-lg(lo))*(W-L2-R2);
-  const ticks=[0.25,0.5,1,2,4,8,16,32].filter(t=>t>=lo&&t<=hi);
-  const H=TOP+frows.length*(RH+4)+6;
-  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="per field: reproduced over reported ratio">`;
-  s+=ticks.map(t=>`<line x1="${x(t).toFixed(1)}" y1="${TOP-2}" x2="${x(t).toFixed(1)}" y2="${H-4}" stroke="${t===1?'#c9d6ec':'#eef2f9'}" stroke-width="${t===1?1.2:1}"/><text x="${x(t).toFixed(1)}" y="8" text-anchor="middle" fill="#98a2b8">${t}</text>`).join('');
-  frows.forEach((r,i)=>{const y=TOP+i*(RH+4)+RH/2;
-   const tip=`${r.f}: ${r.n} PR(s) reproduced, ${r.k} with a reported number\nmedian reproduced/reported = ${r.med!=null?r.med.toFixed(2):'—'}\nrange ${r.lo!=null?r.lo.toFixed(2):'—'} – ${r.hi!=null?r.hi.toFixed(2):'—'}`;
-   s+=`<g><title>${esc(tip)}</title><text x="${L2-4}" y="${y+3.5}" text-anchor="end" fill="#172a5c" font-weight="700">${esc(r.f.slice(0,14))}</text>`;
-   if(r.med!=null){ s+=`<rect x="${x(r.lo).toFixed(1)}" y="${y-5}" width="${Math.max(2,x(r.hi)-x(r.lo)).toFixed(1)}" height="10" rx="4" fill="#0b8ce8" opacity=".25"/>`;
-     s+=`<circle cx="${x(r.med).toFixed(1)}" cy="${y}" r="4" fill="#0b8ce8" stroke="#fff" stroke-width="1.2"/>`;}
-   s+=`<text x="${W-2}" y="${y+3.5}" text-anchor="end" fill="#5a6786">n=${r.n}</text></g>`;});
-  s+='</svg>';
-  el.innerHTML=tabs+`<div class="slgd"><span><i style="width:8px;height:8px;border-radius:50%;background:#0b8ce8;display:inline-block"></i>median</span><span><i style="width:14px;height:7px;border-radius:3px;background:#0b8ce8;opacity:.25;display:inline-block"></i>min–max</span></div>`+s+
-   `<div class="shint">reproduced ÷ reported speedup per PR, grouped by field · 1 = exactly the author's gain, &lt;1 = we see less</div>`;
+  const fr=Object.entries(F).map(([f,rs])=>{const q=rs.filter(r=>r.rep>0).map(r=>r.meas/r.rep).sort((a,b)=>a-b); const med=q.length?q[Math.floor(q.length/2)]:null;
+    return {pr:f,head:`${rs.length} PR(s)`,rel:'ok',verdict:'',med,lo:q[0],hi:q[q.length-1],err:(med!=null&&q.length>1)?Math.max(med-q[0],q[q.length-1]-med):0};}).sort((a,b)=>b.head.localeCompare(a.head));
+  let h=colChart(el,fr,{title:'per field: reproduced ÷ reported',log:true,ref:1,fmt:x2,xl:74,series:[{key:'med',label:'median (bar = min–max)',color:BLUE,err:'err'}],
+   hint:`1 = exactly the author's gain, <1 = we see less · grouped by field`});
+  el.innerHTML=tabs+h.replace(/#([a-z_]+)<\/text>/g,'$1</text>');
  }
 }
 
