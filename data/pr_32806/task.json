@@ -1,0 +1,18 @@
+{
+ "pr": 32806,
+ "title": "[torch.compile] Compile `CustomOp.forward_native` for `SiluAndMul` and `QuantFP8` to avoid raw torch ops inside opaque custom ops (#32806)",
+ "url": "https://github.com/vllm-project/vllm/pull/32806",
+ "date": "2026-01-22",
+ "field": "quantization",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "f61c9da711d846220cb59738d10c0a937ffb80e2",
+ "merge_sha": "5e4e0e51f4fbb6d6fbf7a94feef07bd3617bfa5f",
+ "source_path": "vllm/model_executor/custom_op.py",
+ "reported_gain": "15.8%",
+ "gain_kind": "pct",
+ "gain_evidence": "Average latency improvement of 15.8%.",
+ "hardware_overrides": {}
+}

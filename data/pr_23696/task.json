@@ -1,0 +1,18 @@
+{
+ "pr": 23696,
+ "title": "[Kernel][B200] `mxfp4` fused cutlass moe (#23696)",
+ "url": "https://github.com/vllm-project/vllm/pull/23696",
+ "date": "2025-09-11",
+ "field": "gpu_kernels",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "79ac59f32e5e04b1da606ce4bdad14cadb0075d6",
+ "merge_sha": "074854b24f6e0b1e237a004283e1f46d98c0d73c",
+ "source_path": "vllm/model_executor/layers/quantization/mxfp4.py",
+ "reported_gain": "8x, 7%",
+ "gain_kind": "pct",
+ "gain_evidence": "For Blackwell the mxfp8 x mxfp4 cutlass provides around `7%` higher throughput compared to trtllm at high concurrency, however for low concurrency trtllm is sti",
+ "hardware_overrides": {}
+}

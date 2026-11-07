@@ -1,0 +1,281 @@
+{
+ "schema": "workload_v2",
+ "pr": 20308,
+ "title": "[Kernel] Optimize Prefill Attention in Unified Triton Attention Kernel (#20308)",
+ "url": "https://github.com/vllm-project/vllm/pull/20308",
+ "field": "gpu_kernels",
+ "area": "attention/ops",
+ "date": "2025-07-07",
+ "hw": "rtx5070ti",
+ "hw_override": null,
+ "base_sha": "a6d795d593046abd490b16349bcd9b40feedd334",
+ "merge_sha": "22dd9c2730dc1124b9d0ac15fff223d0b8d9020b",
+ "source_files": [
+  "vllm/attention/ops/triton_unified_attention.py"
+ ],
+ "test_files": [],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:20308",
+  "dockerfile": "data/pr_20308/workload/rtx5070ti/Dockerfile",
+  "template": "templates/Dockerfile.gpu-wheel",
+  "wheel": "0.9.2",
+  "wheel_note": "first PyPI release after merge (2025-07-08 > 2025-07-07); picked by gen_tasks.py from PyPI upload dates. torch_fix added by hand: 0.9.2 pins torch 2.7.0 (cu126 wheel lacks sm_120), swapped for the cu128 build of the same version.",
+  "torch_fix": "torch==2.7.0 --index-url https://download.pytorch.org/whl/cu128",
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:20308 data/pr_20308/workload/rtx5070ti"
+ },
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_20308/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "needs": "gpu",
+  "cluster": "none_gpu",
+  "all_clusters": [
+   "none_gpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "data/pr_20308 (bench.py, tests/)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "unified_attention (2D Triton kernel) pure prefill, 1 sequence, Llama-3.1-8B shapes (32/8 heads, head 128, block 16, bf16), prompts 2000/8000/16000; PR = skip KV tiles beyond the causal prefix. CUDA-event us per call. Wheel 0.9.2 pins torch 2.7.0 cu126 (no sm_120): metadata torch_fix swaps the cu128 build of the same torch. Author: ~1.75x kernel-side at 16k (graph) + ShareGPT serving (reported-only).",
+  "base_note": null
+ },
+ "policy": {
+  "source": "pipeline/run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "task.json:repeats (or hardware_overrides[<hw>].repeats)",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in data/pr_<n>/work/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> data/pr_<n>/work/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY task.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "prefill_attn_s2000",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": true,
+   "parse": "prefill_attn_s2000",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "prefill_attn_s8000",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "prefill_attn_s8000",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "prefill_attn_s16000",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "prefill_attn_s16000",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "serving_mean_ttft",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "Mean TTFT (not measured: Llama-3.1-8B ShareGPT, H100)",
+   "reported": {
+    "baseline": 3874.12,
+    "pr_solution": 3588.36
+   },
+   "note": null
+  },
+  {
+   "name": "serving_request_throughput",
+   "unit": "req/s",
+   "higher_is_better": true,
+   "headline": false,
+   "parse": "Request throughput (not measured)",
+   "reported": {
+    "baseline": 44.37,
+    "pr_solution": 45.9
+   },
+   "note": null
+  }
+ ],
+ "headline": "prefill_attn_s2000",
+ "reported": {
+  "gain": "3%, 5%",
+  "gain_kind": "pct",
+  "gain_evidence": "Despite the relatively short prompt lengths used in this benchmark, the results still demonstrate a ~3% improvement in throughput, along with over 5% reductions",
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
+  "author_hardware_args": [
+   {
+    "line": 14,
+    "text": "The following results were obtained for `meta-llama/Llama-3.1-8B-Instruct` on an NVIDIA H100 GPU, by running"
+   },
+   {
+    "line": 16,
+    "text": "<pre>$ VLLM_ATTENTION_BACKEND=TRITON_ATTN_VLLM_V1 VLLM_USE_V1=1 python benchmarks/benchmark_latency.py \\"
+   },
+   {
+    "line": 18,
+    "text": "--input-len &ltinput-length&gt --output-len 4 \\"
+   },
+   {
+    "line": 19,
+    "text": "--batch-size &ltbatch-size&gt </pre>"
+   },
+   {
+    "line": 31,
+    "text": "Additional results were collected using `benchmark_serving.py`, which only includes sequence lengths under 2000 tokens:"
+   },
+   {
+    "line": 33,
+    "text": "<pre>$ python benchmarks/benchmark_serving.py \\"
+   },
+   {
+    "line": 43,
+    "text": "Output token throughput (tok/s):         8793.44"
+   },
+   {
+    "line": 49,
+    "text": "-----Time per Output Token (excl. 1st token)------"
+   },
+   {
+    "line": 60,
+    "text": "<pre>$ python benchmarks/benchmark_serving.py \\"
+   },
+   {
+    "line": 70,
+    "text": "Output token throughput (tok/s):         9137.19"
+   },
+   {
+    "line": 76,
+    "text": "-----Time per Output Token (excl. 1st token)------"
+   },
+   {
+    "line": 85,
+    "text": "Despite the relatively short prompt lengths used in this benchmark, the results still demonstrate a ~3% improvement in throughput, along with over 5% reductions in latency metrics (TTFT, TPOT, and ITL)."
+   },
+   {
+    "line": 91,
+    "text": "<pre>VLLM_USE_V1=1 lm_eval --model vllm --model_args pretrained=meta-llama/Llama-3.1-8B-Instruct --tasks gsm8k --num_fewshot 5 --batch_size auto --limit 500"
+   },
+   {
+    "line": 95,
+    "text": "|gsm8k|      3|flexible-extract|     5|exact_match|↑  |0.794|±  |0.0181|"
+   },
+   {
+    "line": 96,
+    "text": "|     |       |strict-match    |     5|exact_match|↑  |0.772|±  |0.0188| </pre>"
+   },
+   {
+    "line": 99,
+    "text": "<pre>VLLM_USE_V1=1 VLLM_ATTENTION_BACKEND=TRITON_ATTN_VLLM_V1 lm_eval --model vllm --model_args pretrained=meta-llama/Llama-3.1-8B-Instruct --tasks gsm8k --num_fewshot 5 --batch_size auto --limit 500"
+   },
+   {
+    "line": 102,
+    "text": "|gsm8k|      3|flexible-extract|     5|exact_match|↑  |0.800|±  |0.0179|"
+   },
+   {
+    "line": 103,
+    "text": "|     |       |strict-match    |     5|exact_match|↑  |0.784|±  |0.0184|</pre>"
+   },
+   {
+    "line": 110,
+    "text": "The triton unified attention kernel employs a loop that iteratively processes multiple tiles, computing attention locally for each tile and accumulating the results across tiles to form the final output. During prefill processing, a causal "
+   }
+  ],
+  "source": "data/pr_20308/pr.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.9.2",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ },
+ "reproduced": null,
+ "gap": {
+  "verdict": "not analysed",
+  "note": null,
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:20308 data/pr_20308/workload/rtx5070ti",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_20308:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:20308 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_20308:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:20308 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": "perf-only causal tile skipping; no test in the diff. Wheel 0.9.2 pins torch 2.7.0 cu126 (no sm_120) -> torch_fix set by hand to the cu128 build of the same torch 2.7.0 (triton 3.3.0; first sm_120 run of this wheel is unverified)."
+}

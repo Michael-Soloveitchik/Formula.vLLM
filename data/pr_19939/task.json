@@ -1,0 +1,18 @@
+{
+ "pr": 19939,
+ "title": "[PERF] Speedup of MRoPE prepare inputs (#19939)",
+ "url": "https://github.com/vllm-project/vllm/pull/19939",
+ "date": "2025-06-24",
+ "field": "attention",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "3014c920dae5a2360b9b4141395522cc52b59193",
+ "merge_sha": "9a3b88328f7e434cac35b90ee463de6689f9a833",
+ "source_path": "vllm/v1/worker/gpu_model_runner.py",
+ "reported_gain": "2.6x",
+ "gain_kind": "pct",
+ "gain_evidence": "`_prepare_inputs` average time Before: 3.869 ms With this PR: 1.487 ms (speedup 2.6x) For info, with #17617: 2.511 ms",
+ "hardware_overrides": {}
+}

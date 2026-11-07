@@ -1,0 +1,18 @@
+{
+ "pr": 32167,
+ "title": "[Model] Re-implement Qwen3Omni Audio Encoder (#32167)",
+ "url": "https://github.com/vllm-project/vllm/pull/32167",
+ "date": "2026-01-13",
+ "field": "parallelism",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "7e6f12381092cd0b457ad10c57fa48ca73c415a7",
+ "merge_sha": "b8199f604931012c433e018980aac22d44ad30b5",
+ "source_path": "vllm/model_executor/models/qwen3_omni_moe_thinker.py",
+ "reported_gain": "10%",
+ "gain_kind": "pct",
+ "gain_evidence": "- roughly 10% speedup at high batch sizes according to profiling run with TP=1.",
+ "hardware_overrides": {}
+}

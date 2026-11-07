@@ -1,0 +1,218 @@
+{
+ "schema": "workload_v2",
+ "pr": 13365,
+ "title": "[V1][Spec Decode] Optimize N-gram matching with Numba (#13365)",
+ "url": "https://github.com/vllm-project/vllm/pull/13365",
+ "field": "decoding_tpot",
+ "area": "requirements-common.txt",
+ "date": "2025-02-18",
+ "hw": "rtx5070ti",
+ "hw_override": null,
+ "base_sha": "c8d70e2437feecdb3762ce17298df33439ae1bd1",
+ "merge_sha": "4c822298981a8f7521492075ff72659985fc4c3f",
+ "source_files": [
+  "vllm/v1/spec_decode/ngram_proposer.py",
+  "vllm/v1/worker/gpu_model_runner.py"
+ ],
+ "test_files": [],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:13365",
+  "dockerfile": "data/pr_13365/workload/rtx5070ti/Dockerfile",
+  "template": "templates/Dockerfile.gpu-wheel",
+  "wheel": "0.7.3",
+  "wheel_note": "first PyPI release after merge (2025-02-20 > 2025-02-18); picked by gen_tasks.py from PyPI upload dates.",
+  "torch_fix": null,
+  "extra_pip": "numba",
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:13365 data/pr_13365/workload/rtx5070ti"
+ },
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_13365/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "needs": "gpu",
+  "cluster": "none_cpu",
+  "all_clusters": [
+   "none_cpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "data/pr_13365 (bench.py, tests/)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "Numba-JIT N-gram matcher; CPU-only. bench.py mirrors the author's workload: 5000 ShareGPT-like requests, NgramProposer.propose() called once per decode step on the growing context (~1.1M calls, like the engine does), cumulative seconds = ngram_match_overhead. The first call of the process (Numba JIT on the PR's solution) is reported separately as ngram_match_cold_first_call.",
+  "base_note": null
+ },
+ "policy": {
+  "source": "pipeline/run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "task.json:repeats (or hardware_overrides[<hw>].repeats)",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in data/pr_<n>/work/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> data/pr_<n>/work/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY task.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "ngram_match_overhead",
+   "unit": "s",
+   "higher_is_better": false,
+   "headline": true,
+   "parse": "cumulative s",
+   "reported": {
+    "baseline": 54.3,
+    "pr_solution": 1.9
+   },
+   "note": "author: cumulative propose() overhead over a 5K-request ShareGPT run (per decode step); ours: same call pattern on synthetic requests, steady state"
+  },
+  {
+   "name": "ngram_match_cold_first_call",
+   "unit": "s",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "GENERIC line 'ngram_match_cold_first_call [label] <number>' (s)",
+   "reported": null,
+   "note": "first propose() call of the process: Numba JIT compile on the PR's solution (author: 'under 1 second', paid once per engine start), plain call on the baseline"
+  }
+ ],
+ "headline": "ngram_match_overhead",
+ "reported": {
+  "gain": "30x, 2.5%",
+  "gain_kind": "pct",
+  "gain_evidence": "I've observed 20-30x speedup with large batch sizes: For ShareGPT benchmark with 5K requests, the cumulative overhead reduces from 54.3 sec to 1.9 sec, which is",
+  "experiments_note": "reported = numbers from the PR body (author's machine); headline ngram_match_overhead",
+  "author_hardware_args": [
+   {
+    "line": 12,
+    "text": "I've observed 20-30x speedup with large batch sizes: For ShareGPT benchmark with 5K requests, the cumulative overhead reduces from 54.3 sec to 1.9 sec, which is ~2.5% of the entire running time."
+   }
+  ],
+  "source": "data/pr_13365/pr.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.7.3",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ },
+ "reproduced": {
+  "source": "data/pr_13365/results.rtx5070ti.json",
+  "hw_slug": "rtx5070ti",
+  "ts": "2026-11-07T16:18:11Z",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.7.3",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "tests": {
+   "base": "SKIP",
+   "gold": "SKIP"
+  },
+  "verdict": "reproduced",
+  "reproduced_ratio_median": 63.5385,
+  "reported_ratio_median": 28.5789,
+  "machine": null,
+  "experiments": [
+   {
+    "name": "ngram_match_overhead",
+    "unit": "s",
+    "reported": {
+     "baseline": 54.3,
+     "pr_solution": 1.9,
+     "how": "absolute",
+     "marker": "",
+     "raw": "54.3 -> 1.9 s",
+     "note": "author gave absolute numbers",
+     "ratio": 28.578947,
+     "pct": 2757.89
+    },
+    "baseline": 0.1652,
+    "baseline_sd": 0.0022,
+    "pr_solution": 0.0026,
+    "pr_solution_sd": 0.0004,
+    "n": 5,
+    "ratio": 63.538462,
+    "ratio_of_ratios": 2.223,
+    "verdict": "reproduced",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  ]
+ },
+ "gap": {
+  "verdict": "workload mismatch (call count), per-call speed is 1:1",
+  "what": "Numba n-gram matcher",
+  "note": "Reported 54.3 s → 1.9 s *cumulative over a 5K-request ShareGPT run*: `propose()` runs once per decode step per request (~1.2 M calls at ~250 output tokens each), so 54.3 s ≈ 45 µs/call. Ours: `data/pr_13365/bench.py` calls `propose()` **once per sequence** (5000 calls), 0.165 s ≈ 33 µs/call — the same order as the author's per-call cost. The 1.9 s on the author side also includes the one-off Numba JIT (~0.5-1 s) which our bench deliberately warms up outside the timed region, which is why our ratio (63×) exceeds theirs (28×). To match: time the cumulative cost over decode-step-like calls, e.g. for each of the 5000 sequences call `propose(arr[:t], n, k)` for `t` in `range(prompt_len, len(arr))` (≈1.2 M calls), and either include the JIT in the PR's-solution total or report it separately. Hardware is irrelevant (CPU-only, CPU-scaled 1:1).",
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:13365 data/pr_13365/workload/rtx5070ti",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_13365:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:13365 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_13365:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:13365 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": "perf-only PR (numba JIT n-gram matcher); wheel 0.7.3 pins torch 2.5.1 cu124 (no sm_120) - bench is CPU-only numba, unaffected."
+}

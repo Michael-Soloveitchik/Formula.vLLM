@@ -1,0 +1,18 @@
+{
+ "pr": 29322,
+ "title": "[LoRA] Continue optimizing MoE LoRA weight loading (#29322)",
+ "url": "https://github.com/vllm-project/vllm/pull/29322",
+ "date": "2025-11-27",
+ "field": "parallelism",
+ "area": "lora/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "cf348c8d27c34247f5976a86ebe6f4a3b4f9e888",
+ "merge_sha": "2f5f9acd551cfb737997a1f7f86982ec74aabf79",
+ "source_path": "vllm/lora/layers/fused_moe.py",
+ "reported_gain": "90% (200ms→20ms)",
+ "gain_kind": "unit",
+ "gain_evidence": "Using [olmoe-lora](https://huggingface.co/jeeejeee/olmoe-instruct-text2sql-spider/blob/main/adapter_model.safetensors) testing, the time consumption decreased f",
+ "hardware_overrides": {}
+}

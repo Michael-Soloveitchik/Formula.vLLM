@@ -1,0 +1,18 @@
+{
+ "pr": 28587,
+ "title": "[Hybrid][torch.compile] Refactor mamba2 forward to avoid obscuring linear projections under custom op (#28587)",
+ "url": "https://github.com/vllm-project/vllm/pull/28587",
+ "date": "2025-11-19",
+ "field": "gpu_kernels",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "9912b8ccb861593d76216afa583ac593faf5a309",
+ "merge_sha": "1395461f5fb76145433c1dc8a3b7262ee3799bf8",
+ "source_path": "vllm/model_executor/layers/mamba/mamba_mixer2.py",
+ "reported_gain": "15%, 22%",
+ "gain_kind": "pct",
+ "gain_evidence": "For [nvidia/NVIDIA-Nemotron-Nano-9B-v2-FP8](https://huggingface.co/nvidia/NVIDIA-Nemotron-Nano-9B-v2-FP8) with ISL/OSL/BS = 1K/1K/256 on a single H100, we obser",
+ "hardware_overrides": {}
+}

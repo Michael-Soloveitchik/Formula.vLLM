@@ -1,0 +1,373 @@
+{
+ "schema": "workload_v2",
+ "pr": 29499,
+ "title": "[EPLB] Optimize EPLB with numpy (#29499)",
+ "url": "https://github.com/vllm-project/vllm/pull/29499",
+ "field": "parallelism",
+ "area": "distributed/eplb",
+ "date": "2026-01-07",
+ "hw": "default",
+ "hw_override": null,
+ "base_sha": "0ada960a20766fa1de9063576979f9d807583785",
+ "merge_sha": "6170d47d2220bc464fb561b93caf799a7560e304",
+ "source_files": [
+  "vllm/config/parallel.py",
+  "vllm/distributed/eplb/async_worker.py",
+  "vllm/distributed/eplb/eplb_state.py",
+  "vllm/distributed/eplb/policy/abstract.py",
+  "vllm/distributed/eplb/policy/default.py",
+  "vllm/distributed/eplb/rebalance_execute.py"
+ ],
+ "test_files": [
+  "tests/distributed/test_eplb_algo.py",
+  "tests/distributed/test_eplb_execute.py"
+ ],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:29499",
+  "dockerfile": "data/pr_29499/workload/default/Dockerfile",
+  "template": "templates/Dockerfile.gpu-wheel",
+  "wheel": "0.14.0",
+  "wheel_note": "first PyPI release after merge (2026-01-20 > 2026-01-07); picked by gen_tasks.py from PyPI upload dates.",
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:29499 data/pr_29499/workload/default"
+ },
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_29499/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "needs": "gpu",
+  "cluster": "none_cpu",
+  "all_clusters": [
+   "none_cpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "data/pr_29499 (bench.py, tests/)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "EPLB rebalance index logic on CPU, Qwen3-Next-80B -dp 8 geometry (8 ranks x 68 local = 544 physical experts, 48 MoE layers) as in the author's server. rearrange_e2e = the arm's real move_to_buffer + move_from_buffer for every layer and every rank with P2P transport stubbed and tiny weights (index mapping only). Three primitives kept as secondary metrics. All units ms (bench.py times in ms).",
+  "base_note": null
+ },
+ "policy": {
+  "source": "pipeline/run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "task.json:repeats (or hardware_overrides[<hw>].repeats)",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in data/pr_<n>/work/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> data/pr_<n>/work/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY task.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "rearrange_e2e",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": true,
+   "parse": "GENERIC line 'rearrange_e2e [label] <number>' (ms)",
+   "reported": {
+    "baseline": 1370,
+    "pr_solution": 1077
+   },
+   "note": "author: profile of eplb_state.py rearrange on one rank incl. P2P + GPU copies (1s370ms -> 1s77ms); ours: CPU index-mapping path for all 8 ranks x 48 layers, no transport -- compare the ratio, not the absolute"
+  },
+  {
+   "name": "get_ep_ranks_with_expert",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "get_ep_ranks",
+   "reported": null,
+   "note": null
+  },
+  {
+   "name": "move_to_buffer",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "move_to_buffer",
+   "reported": null,
+   "note": null
+  },
+  {
+   "name": "move_from_buffer",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "move_from_buffer",
+   "reported": null,
+   "note": null
+  }
+ ],
+ "headline": "rearrange_e2e",
+ "reported": {
+  "gain": "27% (rearrange 1370->1077ms E2E); 20-25% per primitive",
+  "gain_kind": "pct",
+  "gain_evidence": "~27% speedup",
+  "experiments_note": "reported = numbers from the PR body (author's machine); primitives unquantified by the author ('20-25% on average')",
+  "author_hardware_args": [
+   {
+    "line": 13,
+    "text": "- Implements `get_ep_ranks_with_expert`, `move_to_buffer`, `move_from_buffer` in numpy which gives 20-25% on average for each primitive"
+   },
+   {
+    "line": 32,
+    "text": "vllm serve Qwen/Qwen3-30B-A3B-Instruct-2507-FP8 --disable-log-requests --no-enable-prefix-caching -tp 1 -dp 8 -enable-eplb --eplb-config.window_size 128 --eplb-config.step_interval 512 --eplb-config.num_redundant_experts 32 --eplb-config.us"
+   },
+   {
+    "line": 38,
+    "text": "|gsm8k|      3|flexible-extract|     5|exact_match|↑  |0.8939|±  |0.0085|"
+   },
+   {
+    "line": 39,
+    "text": "|     |       |strict-match    |     5|exact_match|↑  |0.8870|±  |0.0087|"
+   },
+   {
+    "line": 45,
+    "text": "vllm serve Qwen/Qwen3-30B-A3B-Instruct-2507-FP8 --disable-log-requests --no-enable-prefix-caching -tp 1 -dp 8 --max-num-seqs 256 --enable-expert-parallel --port $port --gpu-memory-utilization 0.8 --enable-eplb --eplb-config.window_size 128 "
+   },
+   {
+    "line": 51,
+    "text": "|gsm8k|      3|flexible-extract|     5|exact_match|↑  |0.8848|±  |0.0088|"
+   },
+   {
+    "line": 52,
+    "text": "|     |       |strict-match    |     5|exact_match|↑  |0.8764|±  |0.0091|"
+   },
+   {
+    "line": 57,
+    "text": "vllm serve Qwen/Qwen3-30B-A3B-Instruct-2507-FP8 --disable-log-requests --no-enable-prefix-caching -tp 1 -dp 8 --max-num-seqs 256 --enable-expert-parallel  --gpu-memory-utilization 0.8 --enable-eplb --eplb-config.window_size 128 --eplb-confi"
+   },
+   {
+    "line": 63,
+    "text": "|gsm8k|      3|flexible-extract|     5|exact_match|↑  |0.8855|±  |0.0088|"
+   },
+   {
+    "line": 64,
+    "text": "|     |       |strict-match    |     5|exact_match|↑  |0.8719|±  |0.0092|"
+   },
+   {
+    "line": 71,
+    "text": "`vllm serve deepseek-ai/DeepSeek-V2-Lite --disable-log-requests --no-enable-prefix-caching -tp 1 -dp 4 --enable-eplb --eplb-config.window_size 128 --eplb-config.step_interval 512 --eplb-config.num_redundant_experts 16 --eplb-config.use_asyn"
+   },
+   {
+    "line": 76,
+    "text": "|gsm8k|      3|flexible-extract|     5|exact_match|↑  |0.3813|±  |0.0134|"
+   },
+   {
+    "line": 77,
+    "text": "|     |       |strict-match    |     5|exact_match|↑  |0.3776|±  |0.0134|"
+   },
+   {
+    "line": 82,
+    "text": "vllm serve deepseek-ai/DeepSeek-V2-Lite --disable-log-requests --no-enable-prefix-caching -tp 1 -dp 4 --max-num-seqs 256 --enable-expert-parallel --gpu-memory-utilization 0.9 --enable-eplb --eplb-config.window_size 128 --eplb-config.step_in"
+   },
+   {
+    "line": 88,
+    "text": "|gsm8k|      3|flexible-extract|     5|exact_match|↑  |0.3813|±  |0.0134|"
+   },
+   {
+    "line": 89,
+    "text": "|     |       |strict-match    |     5|exact_match|↑  |0.3768|±  |0.0133|"
+   },
+   {
+    "line": 95,
+    "text": "vllm serve deepseek-ai/DeepSeek-V2-Lite --disable-log-requests --no-enable-prefix-caching -tp 1 -dp 4 --max-num-seqs 256 --enable-expert-parallel --gpu-memory-utilization 0.9 --enable-eplb --eplb-config.window_size 128 --eplb-config.step_in"
+   },
+   {
+    "line": 101,
+    "text": "|gsm8k|      3|flexible-extract|     5|exact_match|↑  |0.3783|±  |0.0134|"
+   },
+   {
+    "line": 102,
+    "text": "|     |       |strict-match    |     5|exact_match|↑  |0.3745|±  |0.0133|"
+   },
+   {
+    "line": 110,
+    "text": "vllm serve Qwen/Qwen3-Next-80B-A3B-Instruct --disable-log-requests --no-enable-prefix-caching -dp 8 -tp 1 --max-num-seqs 256 --enable-expert-parallel --gpu-memory-utilization 0.9 --enable-eplb --eplb-config.window_size 32 --eplb-config.step"
+   }
+  ],
+  "source": "data/pr_29499/pr.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.14.0",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ },
+ "reproduced": {
+  "rtx5070ti": {
+   "source": "data/pr_29499/results.rtx5070ti.json",
+   "hw_slug": "rtx5070ti",
+   "ts": "2026-11-07T16:42:54Z",
+   "image": {
+    "mode": "wheel",
+    "wheel": "0.14.0",
+    "workload_cmd": "python3 /task/bench.py",
+    "repeats": 5
+   },
+   "tests": {
+    "base": "FAIL",
+    "gold": "PASS"
+   },
+   "verdict": "regression",
+   "reproduced_ratio_median": 0.7379,
+   "reported_ratio_median": null,
+   "machine": null,
+   "experiments": [
+    {
+     "name": "move_from_buffer",
+     "unit": "us",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 0.0015,
+     "baseline_sd": 0.0,
+     "pr_solution": 0.004,
+     "pr_solution_sd": 0.0,
+     "n": 5,
+     "ratio": 0.375,
+     "ratio_of_ratios": null,
+     "verdict": "regression",
+     "reliability": {
+      "flag": "below_host_floor",
+      "note": "baseline 0.0015 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+     }
+    },
+    {
+     "name": "get_ep_ranks_with_expert",
+     "unit": "us",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 16.3273,
+     "baseline_sd": 0.1054,
+     "pr_solution": 1.9819,
+     "pr_solution_sd": 0.0036,
+     "n": 5,
+     "ratio": 8.238206,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "below_host_floor",
+      "note": "baseline 16.3273 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+     }
+    },
+    {
+     "name": "move_to_buffer",
+     "unit": "us",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 0.0228,
+     "baseline_sd": 0.0001,
+     "pr_solution": 0.0309,
+     "pr_solution_sd": 0.0005,
+     "n": 5,
+     "ratio": 0.737864,
+     "ratio_of_ratios": null,
+     "verdict": "regression",
+     "reliability": {
+      "flag": "below_host_floor",
+      "note": "baseline 0.0228 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+     }
+    }
+   ]
+  }
+ },
+ "gap": {
+  "verdict": "workload mismatch (micro-bench regime) + unit label bug",
+  "what": "EPLB numpy rewrite",
+  "note": "Author: 27 % on `rearrange` (1.37 s → 1.08 s) inside a live `-dp 8` Qwen3-Next-80B EPLB rebalance (58 MoE layers × 512 physical experts, real P2P), plus \"20-25 % per primitive\" unquantified. Ours: three inlined primitives at `NUM_LOCAL=16`: `get_ep_ranks_with_expert` 8.2× faster (consistent with the author), but `move_to_buffer` 0.74× and `move_from_buffer` 0.38× — at 16 local experts the pure-Python body is 16×16 = 256 trivial iterations (23 µs) while the numpy body pays ~10 numpy-call overheads (31 µs); numpy only wins once `num_local_experts` and the per-layer loop are large. The headline/median therefore reports a regression the author never claimed. Also: `bench.py:_best_ms` returns **ms** (`*1e3`) but `task.json` declares `unit: \"us\"` — every 29499 number on the dashboard is mislabelled by 1000×. To match the author: bench the whole per-layer rebalance (loop over all `ep_rank`s × 58 layers, i.e. the `rearrange_expert_weights_inplace` index-mapping path with `num_local_experts` ≥ 32 as in Qwen3-Next with 32 redundant experts), make `get_ep_ranks_with_expert` or the E2E loop the headline, and fix the unit to `ms`. Verdict: workload, not hardware (CPU-only).",
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:29499 data/pr_29499/workload/default",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_29499:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:29499 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_29499:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:29499 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": "EPLB numpy rewrite; tests in the diff cover algo + execute."
+}

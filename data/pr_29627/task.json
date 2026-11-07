@@ -1,0 +1,18 @@
+{
+ "pr": 29627,
+ "title": "[Attention] Cache attention metadata builds across hybrid KV-cache groups (#29627)",
+ "url": "https://github.com/vllm-project/vllm/pull/29627",
+ "date": "2025-12-16",
+ "field": "attention",
+ "area": "v1/attention",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "254a7f8fd613d6b6964abc277b73ca1f0b823cdb",
+ "merge_sha": "9fec0e13d512b6b9082e40297582d8052f434610",
+ "source_path": "vllm/v1/attention/backends/utils.py",
+ "reported_gain": "13.7%",
+ "gain_kind": "pct",
+ "gain_evidence": "Decode-heavy workload with APC enabled => **latency reduction through this PR: 13.7%**",
+ "hardware_overrides": {}
+}

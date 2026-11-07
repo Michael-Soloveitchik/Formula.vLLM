@@ -1,0 +1,18 @@
+{
+ "pr": 36795,
+ "title": "[Perf] Enable dual stream execution of input projection for Qwen3 (#36795)",
+ "url": "https://github.com/vllm-project/vllm/pull/36795",
+ "date": "2026-03-17",
+ "field": "quantization",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "58cde5c026efee42987fbc87681ecbf262f9db2b",
+ "merge_sha": "f1740006e47d580656668ba5a9253a4e4340e198",
+ "source_path": "vllm/model_executor/models/qwen3_next.py",
+ "reported_gain": null,
+ "gain_kind": "audit",
+ "gain_evidence": "dual-stream parallel input projection",
+ "hardware_overrides": {}
+}

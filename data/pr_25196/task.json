@@ -1,0 +1,18 @@
+{
+ "pr": 25196,
+ "title": "[Spec Decode] Enable FlashInfer Spec Decoding (#25196)",
+ "url": "https://github.com/vllm-project/vllm/pull/25196",
+ "date": "2025-09-23",
+ "field": "decoding_tpot",
+ "area": "v1/attention",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "77d906995c464fd24fc5b3effad29b65bcf65798",
+ "merge_sha": "c30b405b8f022d41f57042cad7032256d4831355",
+ "source_path": "vllm/v1/spec_decode/eagle.py",
+ "reported_gain": "2.5x",
+ "gain_kind": "pct",
+ "gain_evidence": "Examination of `nsys` traces shows that the main model's attention kernels are about 2.5x faster when using the decode-optimized trtllm-gen kernels.",
+ "hardware_overrides": {}
+}

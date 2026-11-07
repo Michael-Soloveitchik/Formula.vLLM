@@ -1,0 +1,18 @@
+{
+ "pr": 40850,
+ "title": "[Kernel][Helion] Optimize Helion config parsing latency (#40850)",
+ "url": "https://github.com/vllm-project/vllm/pull/40850",
+ "date": "2026-05-07",
+ "field": "gpu_kernels",
+ "area": "vllm/kernels",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "baf068d8be09b22db636ae8c6a2082033e2b6911",
+ "merge_sha": "0b999713522099cfdf0de57d42972369dddff053",
+ "source_path": "vllm/kernels/helion/configs/silu_mul_fp8/nvidia_h100.json",
+ "reported_gain": "1.0×, 28×, 719×",
+ "gain_kind": "pct",
+ "gain_evidence": "| Approach | us/call | Speedup | |---|---|---| | Old (regex, no cache) | 1289 | 1.0× | | New (CaseKey, no cache) | 46 | 28× | | New (CaseKey, cached) | 1.8 | 71",
+ "hardware_overrides": {}
+}

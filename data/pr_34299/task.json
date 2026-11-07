@@ -1,0 +1,18 @@
+{
+ "pr": 34299,
+ "title": "[torch.compile] Enable AR+rms fusion by default available for `-O2` (#34299)",
+ "url": "https://github.com/vllm-project/vllm/pull/34299",
+ "date": "2026-02-11",
+ "field": "gpu_kernels",
+ "area": "vllm/config",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "675a22ed66c4a34be7d2a60cac77078578f49892",
+ "merge_sha": "addac0e65343e4c24a109975d54c4673bbfb029c",
+ "source_path": "vllm/config/compilation.py",
+ "reported_gain": "22%",
+ "gain_kind": "pct",
+ "gain_evidence": "5-22% improvement",
+ "hardware_overrides": {}
+}

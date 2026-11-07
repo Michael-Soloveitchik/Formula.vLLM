@@ -1,0 +1,18 @@
+{
+ "pr": 33839,
+ "title": "[Kernel][perf] optimize NCCL symm_mem vs custom_AR selection thresholds (#33839)",
+ "url": "https://github.com/vllm-project/vllm/pull/33839",
+ "date": "2026-02-26",
+ "field": "gpu_kernels",
+ "area": "distributed/device_communicators",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "eb19955c37089056883831838dc155340ae67edd",
+ "merge_sha": "31fb6f43dac735369851c1d908d3d6ed5d6dc1c2",
+ "source_path": "vllm/distributed/device_communicators/all_reduce_utils.py",
+ "reported_gain": "1.35x, 1.48x, 1.12x, 6.14x",
+ "gain_kind": "pct",
+ "gain_evidence": "| Size Range | Best Communicator | Speedup vs Custom AR-1stage | |------------|-------------------|----------------------------| | 2K - 16K | **PyNCCL-symm** | ",
+ "hardware_overrides": {}
+}

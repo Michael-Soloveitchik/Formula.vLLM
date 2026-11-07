@@ -1,0 +1,73 @@
+{
+ "pr": 21281,
+ "title": "[Core] Minimize number of dict lookup in _maybe_evict_cached_block (#21281)",
+ "url": "https://github.com/vllm-project/vllm/pull/21281",
+ "date": "2025-07-21",
+ "field": "scheduling",
+ "area": "v1/core",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "e7b204268132cb775c139574c1ff4ad7e15c8f66",
+ "merge_sha": "af376ca19d4588b1d5ace72ffc0b4bbd778c15f2",
+ "source_path": "vllm/v1/core/block_pool.py",
+ "reported_gain": "77% (0.13ms→0.03ms)",
+ "gain_kind": "unit",
+ "gain_evidence": "## Test Result Quite significant improvements 0.13ms -> 0.03ms",
+ "source_files": [
+  "vllm/v1/core/block_pool.py"
+ ],
+ "test_files": [],
+ "wheel": "0.10.0",
+ "wheel_note": "first PyPI release after merge (2025-07-25 > 2025-07-21); picked by gen_tasks.py from PyPI upload dates.",
+ "torch_fix": "torch==2.7.1 --index-url https://download.pytorch.org/whl/cu128",
+ "test_note": "perf-only follow-up of #21222 (same block_pool microbench); no test in the diff.",
+ "workload": {
+  "kind": "repo_benchmark",
+  "script": "benchmarks/kv_cache/benchmark_block_pool.py",
+  "cmd": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
+  "unit": "us/op",
+  "needs": "gpu",
+  "headline": "allocate_new_block",
+  "note": "Builds on 21222; same block_pool microbench exercises the evict/allocate path. CPU-only."
+ },
+ "experiments": [
+  {
+   "name": "allocate_new_block",
+   "unit": "us/op",
+   "reported": {
+    "base": 130.0,
+    "patch": 30.0
+   },
+   "parse": "get_new_blocks avg"
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "hardware_overrides": {},
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.10.0",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ }
+}

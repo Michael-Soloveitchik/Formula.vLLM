@@ -1,0 +1,72 @@
+{
+ "pr": 6442,
+ "title": "[Core] Use numpy to speed up padded token processing (#6442)",
+ "url": "https://github.com/vllm-project/vllm/pull/6442",
+ "date": "2024-07-16",
+ "field": "scheduling",
+ "area": "model_executor/sampling_metadata.py",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "7508a3dc34c2b7a5c5c971b13f15208d7dade442",
+ "merge_sha": "2bb0489cb3367e46e201e84ab629df535544495b",
+ "source_path": "vllm/model_executor/sampling_metadata.py",
+ "reported_gain": "50%",
+ "gain_kind": "pct",
+ "gain_evidence": "It results in approximately a 50% speedup for the sampler when processing large batch sizes.",
+ "source_files": [
+  "vllm/model_executor/sampling_metadata.py"
+ ],
+ "test_files": [],
+ "wheel": "0.5.3",
+ "wheel_note": "first PyPI release after merge (2024-07-23 > 2024-07-16); picked by gen_tasks.py from PyPI upload dates.",
+ "test_note": "perf-only v0 sampler change; no test in the diff. Wheel 0.5.3 pins torch 2.3 cu121 (no sm_120 kernels): bench is CPU-only and disables pinned memory.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_6442/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "ms",
+  "needs": "gpu",
+  "headline": "sampler_latency",
+  "note": "v0 SamplingTensors.from_lists (real classmethod) on a 256-seq penalty batch (prompts 512..1024, 128 output tokens, vocab 128256), CPU only, pinned memory off (wheel 0.5.3 torch 2.3 cu121 has no sm_120 kernels). ms per call. Author: ~50% sampler speedup at large batch on A100, no absolute numbers."
+ },
+ "experiments": [
+  {
+   "name": "sampler_latency",
+   "unit": "ms",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "parse": "sampler_latency"
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "hardware_overrides": {},
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": "A100 in the PR; v0 Sampler",
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.5.3",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ }
+}

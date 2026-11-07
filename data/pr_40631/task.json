@@ -1,0 +1,18 @@
+{
+ "pr": 40631,
+ "title": "[Refactor] Unify 2D/3D kernels in triton_unified_attention (#40631)",
+ "url": "https://github.com/vllm-project/vllm/pull/40631",
+ "date": "2026-04-24",
+ "field": "gpu_kernels",
+ "area": "v1/attention",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "9f771b3ab92d26a7d91a8255572c5d8d2b3ad601",
+ "merge_sha": "914d0464c1b1ec77d1560b485624f32002532b83",
+ "source_path": "vllm/v1/attention/ops/triton_unified_attention.py",
+ "reported_gain": "12%",
+ "gain_kind": "pct",
+ "gain_evidence": "Run-to-run variance within the same branch is ~11–12% on TTFT, so any single-run TTFT delta below that threshold is noise.",
+ "hardware_overrides": {}
+}

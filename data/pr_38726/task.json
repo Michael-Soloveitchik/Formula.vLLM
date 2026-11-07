@@ -1,0 +1,18 @@
+{
+ "pr": 38726,
+ "title": "[Bugfix][Core] Fix stuck chunked pipeline parallelism with async scheduling (#38726)",
+ "url": "https://github.com/vllm-project/vllm/pull/38726",
+ "date": "2026-04-18",
+ "field": "scheduling",
+ "area": "v1/worker",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "1174723eba176fcc68673a5a0a2c0090416aada8",
+ "merge_sha": "747256bb5d645f28579bdb1a913f3584b6a246f6",
+ "source_path": "vllm/v1/worker/gpu_model_runner.py",
+ "reported_gain": "229% (Input token throughput (: 1392.32→4578.14)",
+ "gain_kind": "unit",
+ "gain_evidence": "Input token throughput (tos/s): before 1392.32 / after 4578.14",
+ "hardware_overrides": {}
+}

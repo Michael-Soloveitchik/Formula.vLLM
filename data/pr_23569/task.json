@@ -1,0 +1,18 @@
+{
+ "pr": 23569,
+ "title": "[Perf][V1] Fully overlap model execution (#23569)",
+ "url": "https://github.com/vllm-project/vllm/pull/23569",
+ "date": "2025-09-05",
+ "field": "scheduling",
+ "area": "v1/worker",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "c954c6629cdf4ebbfc1cab05d7d71af6696c5881",
+ "merge_sha": "cee182b2970b56d3f9d5aa0017ce165cbdb788f6",
+ "source_path": "vllm/v1/worker/gpu_model_runner.py",
+ "reported_gain": "10%",
+ "gain_kind": "pct",
+ "gain_evidence": "Expected speedup is 5-10% over the current async scheduling.",
+ "hardware_overrides": {}
+}

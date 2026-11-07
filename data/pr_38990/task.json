@@ -1,0 +1,18 @@
+{
+ "pr": 38990,
+ "title": "[Bugfix][MoE] Fix 6-8% decode regression: prefer multi-stream shared expert overlap (#38990)",
+ "url": "https://github.com/vllm-project/vllm/pull/38990",
+ "date": "2026-04-05",
+ "field": "parallelism",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "9a528260ef648500262709550807c292098a70c0",
+ "merge_sha": "228023b3a58f78ed028cb4e5fb4e078bb1574262",
+ "source_path": "vllm/model_executor/layers/fused_moe/runner/shared_experts.py",
+ "reported_gain": "14%, 9%",
+ "gain_kind": "pct",
+ "gain_evidence": "| ctx | Before (EXTERNAL) | After (MULTI_STREAM) | Improvement | |-----|-------------------|---------------------|-------------| | 0 | 36.8 tok/s | **41.8 tok/s",
+ "hardware_overrides": {}
+}

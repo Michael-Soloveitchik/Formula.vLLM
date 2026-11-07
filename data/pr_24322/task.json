@@ -1,0 +1,18 @@
+{
+ "pr": 24322,
+ "title": "feat: spec decode with draft models (#24322)",
+ "url": "https://github.com/vllm-project/vllm/pull/24322",
+ "date": "2026-01-19",
+ "field": "decoding_tpot",
+ "area": "model_executor/model_loader",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "73f2a81c757985fcce04c13467c9a67612f64702",
+ "merge_sha": "4a5299c93ff97c26def537b92562df5ada530fea",
+ "source_path": "vllm/engine/arg_utils.py",
+ "reported_gain": "50%",
+ "gain_kind": "pct",
+ "gain_evidence": "* With batch_size=1, using SD reduces runtime and TPOT by 50%.",
+ "hardware_overrides": {}
+}

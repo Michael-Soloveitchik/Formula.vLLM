@@ -1,0 +1,18 @@
+{
+ "pr": 41269,
+ "title": "[Bugfix][KV Transfer][NIXL] Notify P node on pre-admission rejection to free stranded KV blocks (#41269)",
+ "url": "https://github.com/vllm-project/vllm/pull/41269",
+ "date": "2026-05-09",
+ "field": "scheduling",
+ "area": "entrypoints/openai",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "fb1ac806c55a6dc96fe92261b80c8550e9c39d2f",
+ "merge_sha": "3f5bd482f5c1a5dbdffbbf68d624e20bb7032013",
+ "source_path": "vllm/entrypoints/openai/engine/serving.py",
+ "reported_gain": "25%",
+ "gain_kind": "pct",
+ "gain_evidence": "60s is a very large in our tests, that reduced the throughput significantly as the concurrency was only ~4-5 and 1 hanging request affect ~25% concurrency.",
+ "hardware_overrides": {}
+}

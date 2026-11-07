@@ -1,0 +1,18 @@
+{
+ "pr": 26669,
+ "title": "support flashinfer_fp4 moe for 5090 gpu (#26669)",
+ "url": "https://github.com/vllm-project/vllm/pull/26669",
+ "date": "2025-10-16",
+ "field": "parallelism",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "1f491aa0c80c2bf07e3ad37c4b6af8a869d48b5d",
+ "merge_sha": "0b99f5d3023a84f120e6af7df355824e0f39af93",
+ "source_path": "vllm/model_executor/layers/quantization/utils/flashinfer_fp4_moe.py",
+ "reported_gain": "2x",
+ "gain_kind": "pct",
+ "gain_evidence": "It must be theoretically 2x faster - practically at least faster.",
+ "hardware_overrides": {}
+}

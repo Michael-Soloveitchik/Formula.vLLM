@@ -1,0 +1,18 @@
+{
+ "pr": 30528,
+ "title": "[Perf] Set split_k to 1 for triton_kernels (#30528)",
+ "url": "https://github.com/vllm-project/vllm/pull/30528",
+ "date": "2025-12-12",
+ "field": "gpu_kernels",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "cd7740ac5c3906b2913d58ade61f231ec3a93296",
+ "merge_sha": "1f19d8f899b228a530d256bf9476d9b1ea3039af",
+ "source_path": "vllm/model_executor/layers/quantization/utils/mxfp4_utils.py",
+ "reported_gain": "38.9%",
+ "gain_kind": "pct",
+ "gain_evidence": "For small batch size, Output token throughput improves from 575.28 to 799.32 (38.9% improvement).",
+ "hardware_overrides": {}
+}

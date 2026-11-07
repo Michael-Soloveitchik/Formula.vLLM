@@ -1,0 +1,18 @@
+{
+ "pr": 27512,
+ "title": "[PERF] Decouple projections from GDN custom op (#27512)",
+ "url": "https://github.com/vllm-project/vllm/pull/27512",
+ "date": "2025-11-04",
+ "field": "gpu_kernels",
+ "area": "vllm/config",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "97e3dda84ba79100509fafb58d651bde25e3f32f",
+ "merge_sha": "5fd8f02ea9f2bb12b9b68d9dbd9629d555482d98",
+ "source_path": "vllm/model_executor/models/qwen3_next.py",
+ "reported_gain": "16.5%",
+ "gain_kind": "pct",
+ "gain_evidence": "**Decode1** ``` vllm bench serve --backend vllm --model Qwen/Qwen3-Next-80B-A3B-Instruct --endpoint /v1/completions --dataset-name random --random-input 32 --ra",
+ "hardware_overrides": {}
+}

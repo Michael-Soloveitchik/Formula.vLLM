@@ -9,7 +9,7 @@ Source-of-truth for the reporting stage. `data/stats.md` is written by
 |---|---|---|
 | `data/index.jsonl` | extract.py | one record per merged PR (field, area, tags, excl_reason, files) — the spine every other stage reads |
 | `data/stats.md` | extract.py | clustering stats: totals, exclusion-reason table, field × code-area matrix |
-| `data/prs/<field>/<area>/<pr>.md` (+ `.json`) | downloader | the downloaded CONVERSATION (not code) |
+| `data/pr_<n>/pr.md` (was `data/prs/<field>/<area>/<pr>.md`) (+ `.json`) | downloader | the downloaded CONVERSATION (not code) |
 | `data/prs/_excluded/<reason>/` | migrate.py | PRs parked after a recluster (survive re-runs) |
 | `data/views/perf_gains.{jsonl,md}` | perf_scan.py | measured performance gains — see [prompt_perf.md](prompt_perf.md) |
 | `data/views/agenda.{jsonl,md}` | agenda.py | performance vs enabling split — see [prompt_agenda.md](prompt_agenda.md) |

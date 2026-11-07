@@ -1,0 +1,18 @@
+{
+ "pr": 42236,
+ "title": "[DSv4] Improved dequant gather K cache kernel (#42236)",
+ "url": "https://github.com/vllm-project/vllm/pull/42236",
+ "date": "2026-05-11",
+ "field": "gpu_kernels",
+ "area": "v1/attention",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "a51376b3f05a2f74eac6ceeed7e52598b871a0fb",
+ "merge_sha": "724ed2fc352bb388aea7269ca5c6690637c30ce7",
+ "source_path": "vllm/v1/attention/ops/deepseek_v4_ops/fused_indexer_q_cutedsl.py",
+ "reported_gain": "6.6%",
+ "gain_kind": "pct",
+ "gain_evidence": "Branch | TPGS | TTFT ---|---|--- main | 30502 | 267.68s This PR | 32513 (+6.6%) | 250.58s",
+ "hardware_overrides": {}
+}

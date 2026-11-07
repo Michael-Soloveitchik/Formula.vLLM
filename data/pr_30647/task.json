@@ -1,0 +1,18 @@
+{
+ "pr": 30647,
+ "title": "[Perf] Eliminate padding and slicing op for GPT-OSS with Flashinfer MXFP4 MXFP8 MoE (#30647)",
+ "url": "https://github.com/vllm-project/vllm/pull/30647",
+ "date": "2026-03-18",
+ "field": "quantization",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "c373b5c00d1a6f0830099ce5c4b5276e70bc6388",
+ "merge_sha": "296839a1b07e63daecca67bfce80375614b5b863",
+ "source_path": "vllm/model_executor/layers/fused_moe/runner/default_moe_runner.py",
+ "reported_gain": null,
+ "gain_kind": "audit",
+ "gain_evidence": "eliminate MoE padding/slicing, kernel timings",
+ "hardware_overrides": {}
+}

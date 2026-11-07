@@ -1,0 +1,18 @@
+{
+ "pr": 37338,
+ "title": "[Perf] [Bugfix] Fix Triton autotuning in inference for Qwen3.5 (#37338)",
+ "url": "https://github.com/vllm-project/vllm/pull/37338",
+ "date": "2026-03-23",
+ "field": "gpu_kernels",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "54ab804e87dd534c0a8cb8ad8eec7ad5d75775ae",
+ "merge_sha": "a16133a0f12e8e406206be1bc8041727d9f1ea7d",
+ "source_path": "vllm/model_executor/models/qwen3_next.py",
+ "reported_gain": "4.0×, 4.1×",
+ "gain_kind": "pct",
+ "gain_evidence": "| Metric | **A** (without patch) | **B** (with patch) | Improvement | |---|---|---|---| | Duration | 109.73 s | 27.34 s | **4.0× faster** | | Total token throug",
+ "hardware_overrides": {}
+}

@@ -1,0 +1,18 @@
+{
+ "pr": 30243,
+ "title": "[LoRA]  Reduce the loading time of MoE LoRA (#30243)",
+ "url": "https://github.com/vllm-project/vllm/pull/30243",
+ "date": "2025-12-08",
+ "field": "parallelism",
+ "area": "lora/models.py",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "5c2433a6f35a84741f26aa546432649891b896bb",
+ "merge_sha": "80433e225ee0f91a7f6a082bf4e136df75ab4746",
+ "source_path": "vllm/lora/models.py",
+ "reported_gain": "2x",
+ "gain_kind": "pct",
+ "gain_evidence": "Reduces disk loading time for LoRA weights by ~2x",
+ "hardware_overrides": {}
+}

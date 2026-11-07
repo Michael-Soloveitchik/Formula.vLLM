@@ -1,0 +1,65 @@
+{
+ "schema": "experiments_v2",
+ "experiments": [],
+ "pr": 27793,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/27793",
+ "title": "[Core][Observability] Add KV cache residency metrics (#27793)",
+ "field": "scheduling",
+ "reported_gain": "N/A (observability feature; <0.1% overhead, not a speedup)",
+ "gain_kind": "pct",
+ "base_sha": "ec7035c9d40cda43fa9c3d2d1c148b1382aa04a4",
+ "merge_sha": "cabc77cc86586206134a19e3e70aa401ec30b71f",
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.12.0",
+  "workload_cmd": "pytest -v tests/v1/core/test_kv_cache_metrics.py",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "FAIL",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "PASS",
+   "slug": "gold"
+  }
+ },
+ "improved": true,
+ "latency": {
+  "scenarios": {},
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {
+   "tests": {
+    "bytes": 1919,
+    "tail": "rder to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n\n==================================== ERRORS ====================================\n___________ ERROR collecting tests/v1/core/test_kv_cache_metrics.py ____________\nImportError while importing test module '/t/tests/v1/core/test_kv_cache_metrics.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/usr/lib/python3.10/importlib/__init__.py:126: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntests/v1/core/test_kv_cache_metrics.py:8: in <module>\n    from vllm.v1.core.kv_cache_metrics import (\nE   ModuleNotFoundError: No module named 'vllm.v1.core.kv_cache_metrics'\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nERROR tests/v1/core/test_kv_cache_metrics.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 warning, 1 error in 0.05s\n"
+   },
+   "workload_runs": 1
+  },
+  "gold": {
+   "tests": {
+    "bytes": 1164,
+    "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n................                                                         [100%]\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n16 passed, 1 warning in 1.68s\n"
+   },
+   "workload_runs": 5
+  }
+ },
+ "ts": "2026-11-07T16:33:46Z",
+ "summary": {
+  "experiments": 0,
+  "measured": 0,
+  "headline": null,
+  "headline_derived": null,
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": null,
+  "verdict": "unknown",
+  "tests": {
+   "base": "FAIL",
+   "gold": "PASS"
+  }
+ },
+ "hw_slug": "rtx5070ti"
+}

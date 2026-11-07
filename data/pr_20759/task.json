@@ -1,0 +1,18 @@
+{
+ "pr": 20759,
+ "title": "[PERF] PyTorch Symmetric Memory All-Reduce (#20759)",
+ "url": "https://github.com/vllm-project/vllm/pull/20759",
+ "date": "2025-08-22",
+ "field": "parallelism",
+ "area": "distributed/device_communicators",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "0483fabc746c79f6969b600665568255260d0b94",
+ "merge_sha": "0313cf854d87a41c84efb69e89a79cd7b5897593",
+ "source_path": "docs/design/multiprocessing.md",
+ "reported_gain": "10%",
+ "gain_kind": "pct",
+ "gain_evidence": "Up to 10% TTFT improvement, and minor TPOT speedups.",
+ "hardware_overrides": {}
+}

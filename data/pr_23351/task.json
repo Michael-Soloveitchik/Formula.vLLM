@@ -1,0 +1,18 @@
+{
+ "pr": 23351,
+ "title": "[Feature] Enable DeepGEMM Linear on B200; 1.5% E2E throughput improvement (#23351)",
+ "url": "https://github.com/vllm-project/vllm/pull/23351",
+ "date": "2025-08-22",
+ "field": "gpu_kernels",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "3ac849665d91c78c058be380aef12a077ab03cad",
+ "merge_sha": "394591e34371e4a1ad23a85401148df31d8de451",
+ "source_path": "vllm/model_executor/layers/quantization/utils/fp8_utils.py",
+ "reported_gain": "1.5%",
+ "gain_kind": "pct",
+ "gain_evidence": "# PR #23351: [Feature] Enable DeepGEMM Linear on B200; 1.5% E2E throughput improvement",
+ "hardware_overrides": {}
+}

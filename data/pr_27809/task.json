@@ -1,0 +1,18 @@
+{
+ "pr": 27809,
+ "title": "[Model] Introduce Kimi Linear to vLLM (#27809)",
+ "url": "https://github.com/vllm-project/vllm/pull/27809",
+ "date": "2025-10-30",
+ "field": "attention",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "1994de99ea0bf8dd84257a19800f4f62526a7edf",
+ "merge_sha": "4e68cc9b6aa2b9cfe8d799c2b1cd156a01bca438",
+ "source_path": "vllm/v1/worker/gpu_model_runner.py",
+ "reported_gain": "75%",
+ "gain_kind": "pct",
+ "gain_evidence": "By introducing an optimized gating mechanism, Kimi Linear significantly cuts down the need for large KV caches by up to 75%, enhancing hardware efficiency and b",
+ "hardware_overrides": {}
+}

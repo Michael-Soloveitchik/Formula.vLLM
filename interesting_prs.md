@@ -15,7 +15,7 @@ isolable test oracle. Good first PRs to prove the pipeline on an 8 GB 3060 Ti.
 
 - **21222** — only true torch-free CPU unit: `FreeKVCacheBlockQueue.append_n /
   popleft_n` bulk ops replace loop-of-singles. Already measured on CPU
-  (~+298% log-speedup, see `tasks/pr_21222/RESULTS.md`).
+  (~+298% log-speedup, see `data/pr_21222/notes.md`).
 - **21627** — moves request conversion off the engine-core busy loop; torch-free
   target logic, test boots EngineCore (needs the built image).
 - **6865 / 7117** — scheduler/output-processing micro-opts, torch-free source.

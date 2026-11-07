@@ -1,0 +1,181 @@
+{
+ "schema": "workload_v2",
+ "pr": 27793,
+ "title": "[Core][Observability] Add KV cache residency metrics (#27793)",
+ "url": "https://github.com/vllm-project/vllm/pull/27793",
+ "field": "scheduling",
+ "area": "v1/core",
+ "date": "2025-12-01",
+ "hw": "rtx5070ti",
+ "hw_override": null,
+ "base_sha": "ec7035c9d40cda43fa9c3d2d1c148b1382aa04a4",
+ "merge_sha": "cabc77cc86586206134a19e3e70aa401ec30b71f",
+ "source_files": [
+  "vllm/config/observability.py",
+  "vllm/engine/arg_utils.py",
+  "vllm/v1/core/block_pool.py",
+  "vllm/v1/core/kv_cache_coordinator.py",
+  "vllm/v1/core/kv_cache_manager.py",
+  "vllm/v1/core/kv_cache_metrics.py",
+  "vllm/v1/core/sched/scheduler.py",
+  "vllm/v1/metrics/loggers.py",
+  "vllm/v1/metrics/stats.py"
+ ],
+ "test_files": [
+  "tests/v1/core/test_kv_cache_metrics.py"
+ ],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:27793",
+  "dockerfile": "data/pr_27793/workload/rtx5070ti/Dockerfile",
+  "template": "templates/Dockerfile.gpu-wheel",
+  "wheel": "0.12.0",
+  "wheel_note": "first PyPI release after merge (2025-12-03 > 2025-12-01); picked by gen_tasks.py from PyPI upload dates.",
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:27793 data/pr_27793/workload/rtx5070ti"
+ },
+ "workload": {
+  "kind": "pytest_bench",
+  "script": "tests/v1/core/test_kv_cache_metrics.py",
+  "cmd": "pytest -v tests/v1/core/test_kv_cache_metrics.py",
+  "needs": "gpu",
+  "cluster": "none_cpu",
+  "all_clusters": [
+   "none_cpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "data/pr_27793 (bench.py, tests/)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "Correctness-only; deterministic fake clock. No timing number (overhead ~48 bytes/block, zero cost when off).",
+  "base_note": null
+ },
+ "policy": {
+  "source": "pipeline/run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "task.json:repeats (or hardware_overrides[<hw>].repeats)",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in data/pr_<n>/work/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> data/pr_<n>/work/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY task.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [],
+ "headline": null,
+ "reported": {
+  "gain": "N/A (observability feature; <0.1% overhead, not a speedup)",
+  "gain_kind": "pct",
+  "gain_evidence": "Assuming typical request latency of 100-500ms, this represents **< 0.1% overhead per request**.",
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
+  "author_hardware_args": [
+   {
+    "line": 20,
+    "text": "Implementation uses **monotonic timestamps** for accuracy, **1% sampling** for minimal overhead (~48 bytes/block), and is fully thread-safe with **zero runtime cost when disabled**."
+   },
+   {
+    "line": 41,
+    "text": "* `curl http://127.0.0.1:8000/metrics | grep 'vllm:kv_block_'` → lifetime/idle/reuse histograms present"
+   }
+  ],
+  "source": "data/pr_27793/pr.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.12.0",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ },
+ "reproduced": {
+  "source": "data/pr_27793/results.rtx5070ti.json",
+  "hw_slug": "rtx5070ti",
+  "ts": "2026-11-07T16:33:46Z",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.12.0",
+   "workload_cmd": "pytest -v tests/v1/core/test_kv_cache_metrics.py",
+   "repeats": 5
+  },
+  "tests": {
+   "base": "FAIL",
+   "gold": "PASS"
+  },
+  "verdict": "unknown",
+  "reproduced_ratio_median": null,
+  "reported_ratio_median": null,
+  "machine": null,
+  "experiments": []
+ },
+ "gap": {
+  "verdict": "not analysed",
+  "note": null,
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:27793 data/pr_27793/workload/rtx5070ti",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_27793:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:27793 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; pytest -v tests/v1/core/test_kv_cache_metrics.py'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_27793:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:27793 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; pytest -v tests/v1/core/test_kv_cache_metrics.py'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": "correctness-only PR: the oracle test IS the workload (deterministic fake clock), no latency number."
+}

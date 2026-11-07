@@ -1,0 +1,18 @@
+{
+ "pr": 28879,
+ "title": "[Feature] Shared Experts Overlap with FI deepgemm swap kernel, 2.2% throughput improvement and 3.6% TTFT improvement (#28879)",
+ "url": "https://github.com/vllm-project/vllm/pull/28879",
+ "date": "2025-11-20",
+ "field": "gpu_kernels",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "87cbbdff639f96766d4f6604cc970394c550dc5b",
+ "merge_sha": "df44df01431e8af444222addddd2789c0483d70a",
+ "source_path": "vllm/model_executor/layers/fused_moe/layer.py",
+ "reported_gain": "2.2%, 3.6%",
+ "gain_kind": "pct",
+ "gain_evidence": "Now it is overlapped, we get 2.2% throughput improvement and 3.6% TTFT improvement for BS 32",
+ "hardware_overrides": {}
+}

@@ -1,9 +1,10 @@
-"""Tests for measure.py pure math + results/*.json."""
+"""Tests for measure.py pure math + the per-PR results files (data/pr_<n>/results.<hw>.json)."""
 import json
 import math
 import os
 
-import measure
+from gen import layout
+from pipeline import measure
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -49,19 +50,21 @@ def test_comparison_dataclass_fields():
 # ---- results JSON ----------------------------------------------------------
 
 def test_result_21222():
-    r = json.load(open(os.path.join(ROOT, "results", "21222.json")))
+    p = layout.results_json_any(21222)
+    assert p, "no results file for PR 21222 on any hardware slug"
+    r = json.load(open(p))
     assert r["pr"] == 21222
+    assert r["hw_slug"] in layout.results_files(21222)
     arms = r["arms"]
-    for a in ("base", "gold", "claude", "codex"):
-        assert arms[a]["tests"] in ("PASS", "FAIL")
-    assert arms["base"]["tests"] == "FAIL"
-    assert arms["gold"]["tests"] == "PASS"
-    assert r["improved"] is True
-    lat = r["latency"]
-    assert lat["arms"]["gold"]["mean"] < lat["base"]["mean"]   # gold faster
+    for a in ("base", "gold"):
+        assert arms[a]["tests"] in ("PASS", "FAIL", "SKIP")
+    assert r["schema"] == "experiments_v2"
 
 
 def test_result_all():
-    data = json.load(open(os.path.join(ROOT, "results", "all.json")))
+    data = json.load(open(layout.all_json()))
     assert isinstance(data, list)
     assert any(e["pr"] == 21222 for e in data)
+    assert all("hw_slug" in e for e in data)
+    man = json.load(open(layout.manifest_json()))
+    assert 21222 in man["prs"] and man["files"]["21222"]

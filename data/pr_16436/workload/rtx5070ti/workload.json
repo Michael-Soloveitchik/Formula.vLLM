@@ -1,0 +1,225 @@
+{
+ "schema": "workload_v2",
+ "pr": 16436,
+ "title": "[Core] Speed up decode by remove synchronizing operation in sampler (#16436)",
+ "url": "https://github.com/vllm-project/vllm/pull/16436",
+ "field": "decoding_tpot",
+ "area": "model_executor/layers",
+ "date": "2025-04-21",
+ "hw": "rtx5070ti",
+ "hw_override": null,
+ "base_sha": "f728ab8e3578c22b42ed53e51b5e8ec35328d8b9",
+ "merge_sha": "299ebb62b269ce167eb1c71b5e39a1dc1f65ce1c",
+ "source_files": null,
+ "test_files": null,
+ "image": {
+  "mode": "wheel (UNPINNED: no task.json:wheel)",
+  "tag": "vllm-task:16436",
+  "dockerfile": "data/pr_16436/workload/rtx5070ti/Dockerfile",
+  "template": "templates/Dockerfile.gpu-wheel",
+  "wheel": null,
+  "wheel_note": null,
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:16436 data/pr_16436/workload/rtx5070ti"
+ },
+ "workload": {
+  "kind": "serving",
+  "script": "benchmarks/benchmark_serving.py",
+  "cmd": "python3 benchmarks/benchmark_serving.py --backend vllm --model facebook/opt-125m --dataset-name random --random-input-len 1000 --random-output-len 100 --num-prompts 100",
+  "needs": "gpu",
+  "cluster": "opt125m",
+  "all_clusters": [
+   "opt125m"
+  ],
+  "model": "facebook/opt-125m",
+  "weights": {
+   "hf_id": "facebook/opt-125m",
+   "size": "~250MB",
+   "cache": ".weights/opt125m"
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "data/pr_16436 (bench.py, tests/)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "Removes CUDA sync in apply_penalties; win via GPU serving + trace. ~8% decode for small models.",
+  "base_note": null
+ },
+ "policy": {
+  "source": "pipeline/run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "task.json:repeats (or hardware_overrides[<hw>].repeats)",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in data/pr_<n>/work/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> data/pr_<n>/work/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY task.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "tpot",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "Mean TPOT",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "itl",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "Mean ITL",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "throughput",
+   "unit": "tok/s",
+   "higher_is_better": true,
+   "headline": false,
+   "parse": "Output token throughput",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  }
+ ],
+ "headline": null,
+ "reported": {
+  "gain": "8%",
+  "gain_kind": "pct",
+  "gain_evidence": "By refactoring the code to avoid the indexing, we can remove the sync and allow much more of the sampling phase CPU work to overlap with the forward pass on the",
+  "experiments_note": null,
+  "author_hardware_args": [
+   {
+    "line": 18,
+    "text": "logits[logits > 0] /= torch.where(prompt_mask | output_mask,"
+   },
+   {
+    "line": 20,
+    "text": "logits[logits <= 0] *= torch.where(prompt_mask | output_mask,"
+   },
+   {
+    "line": 29,
+    "text": "By refactoring the code to avoid the indexing, we can remove the sync and allow much more of the sampling phase CPU work to overlap with the forward pass on the GPU, providing an 8% speedup to decoding for smaller models."
+   },
+   {
+    "line": 41,
+    "text": "Output token throughput (tok/s):         96.88"
+   },
+   {
+    "line": 47,
+    "text": "-----Time per Output Token (excl. 1st token)------"
+   },
+   {
+    "line": 68,
+    "text": "Output token throughput (tok/s):         96.93"
+   },
+   {
+    "line": 74,
+    "text": "-----Time per Output Token (excl. 1st token)------"
+   },
+   {
+    "line": 87,
+    "text": "VLLM_FLASH_ATTN_VERSION=3 VLLM_USE_V1=1 vllm serve Qwen/Qwen2.5-1.5B-Instruct --enable-prefix-caching --dtype float16 --disable-log-requests -O3"
+   },
+   {
+    "line": 89,
+    "text": "vllm bench serve \\"
+   },
+   {
+    "line": 92,
+    "text": "--num-prompts 100 \\"
+   },
+   {
+    "line": 94,
+    "text": "--random-output-len 100 \\"
+   }
+  ],
+  "source": "data/pr_16436/pr.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 6,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": "serving bench: needs a vllm server + client",
+   "ram_gb": 8,
+   "disk_gb": 30.244140625
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": true,
+   "hf_token": false,
+   "vllm_wheel": null,
+   "models": [
+    "facebook/opt-125m"
+   ],
+   "datasets": [],
+   "env": [],
+   "needs_server": true,
+   "pipeline": "needs-wheel-task"
+  }
+ },
+ "reproduced": null,
+ "gap": {
+  "verdict": "not analysed",
+  "note": null,
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:16436 data/pr_16436/workload/rtx5070ti",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_16436:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:16436 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 benchmarks/benchmark_serving.py --backend vllm --model facebook/opt-125m --dataset-name random --random-input-len 1000 --random-output-len 100 --num-prompts 100'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_16436:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:16436 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 benchmarks/benchmark_serving.py --backend vllm --model facebook/opt-125m --dataset-name random --random-input-len 1000 --random-output-len 100 --num-prompts 100'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/). NOT PINNED: task.json has no `wheel` yet, so the Dockerfile installs the latest PyPI vLLM (compiled ops may not match either tree) and run_one.sh refuses to run it. `python3 gen/gen_tasks.py <pr>` picks the first PyPI release after merge_sha."
+ },
+ "test_note": null
+}

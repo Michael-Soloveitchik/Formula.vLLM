@@ -1,0 +1,18 @@
+{
+ "pr": 30739,
+ "title": "[BugFix] Support online dense model DP without overhead (#30739)",
+ "url": "https://github.com/vllm-project/vllm/pull/30739",
+ "date": "2026-01-02",
+ "field": "scheduling",
+ "area": "v1/engine",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "08f425bad168a8e6ce258b6bf309339473f9d5fe",
+ "merge_sha": "bd877162ebd7a2eb36961a8e49824422dd35bcdc",
+ "source_path": "vllm/v1/engine/coordinator.py",
+ "reported_gain": "5%, 15%",
+ "gain_kind": "pct",
+ "gain_evidence": "Shows about a 5% throughput overhead from the load-balancing which seems fairly high but: - There would also be _some_ overhead from external LB (especially wit",
+ "hardware_overrides": {}
+}

@@ -1,0 +1,18 @@
+{
+ "pr": 30494,
+ "title": "[Perf] Optimize deepgemm experts initialization, 3.9% TTFT improvement (#30494)",
+ "url": "https://github.com/vllm-project/vllm/pull/30494",
+ "date": "2025-12-11",
+ "field": "gpu_kernels",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "3efdc3feaef01d45fb54650163da480bdf2f0ce4",
+ "merge_sha": "c817b1415121cf88178af1e4e78f651d802df4da",
+ "source_path": "vllm/model_executor/layers/fused_moe/deep_gemm_utils.py",
+ "reported_gain": "3.9%",
+ "gain_kind": "pct",
+ "gain_evidence": "# PR #30494: [Perf] Optimize deepgemm experts initialization, 3.9% TTFT improvement",
+ "hardware_overrides": {}
+}

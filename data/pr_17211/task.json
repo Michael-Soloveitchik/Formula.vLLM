@@ -1,0 +1,18 @@
+{
+ "pr": 17211,
+ "title": "[V1][Spec Decode] Apply torch.compile & cudagraph to EAGLE (#17211)",
+ "url": "https://github.com/vllm-project/vllm/pull/17211",
+ "date": "2025-04-29",
+ "field": "decoding_tpot",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "c9c1b59e59a35d5004e3914e23015617fc330b31",
+ "merge_sha": "70788bdbdc590e7fbf9bddb3fa9bc92ac3181733",
+ "source_path": "vllm/v1/spec_decode/eagle.py",
+ "reported_gain": "10%",
+ "gain_kind": "pct",
+ "gain_evidence": "it looks like a further 10% speedup.",
+ "hardware_overrides": {}
+}

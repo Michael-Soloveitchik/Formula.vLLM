@@ -1,0 +1,18 @@
+{
+ "pr": 28892,
+ "title": "Add TRTLLM MoE NVFP4 kernel to CompressedTensorsW4A4MoeMethod (#28892)",
+ "url": "https://github.com/vllm-project/vllm/pull/28892",
+ "date": "2025-11-21",
+ "field": "quantization",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "e99e467384001e284e0722a33362866b10fed65b",
+ "merge_sha": "b4c8fbaae2592501f442817f86e32cfeb795d81f",
+ "source_path": "vllm/model_executor/layers/quantization/modelopt.py",
+ "reported_gain": "23.5%, 81.3%",
+ "gain_kind": "pct",
+ "gain_evidence": "#### Single GB200, trtllm kernel is 23.5% faster than flashinfer.cutlass in request throughput #### TEP=2 on GB200, trtllm kernel is 81.3% faster than flashinfe",
+ "hardware_overrides": {}
+}

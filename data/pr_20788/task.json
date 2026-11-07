@@ -1,0 +1,18 @@
+{
+ "pr": 20788,
+ "title": "[Meta] Official Eagle mm support, first enablement on llama4 (#20788)",
+ "url": "https://github.com/vllm-project/vllm/pull/20788",
+ "date": "2025-07-31",
+ "field": "decoding_tpot",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "53c21e492e0acd140a9984c8ec7cc3a7123efee5",
+ "merge_sha": "9e0726e5bfd201fa2c9209e3997d24c72ecc3b13",
+ "source_path": "tests/v1/e2e/test_spec_decode.py",
+ "reported_gain": "28.9%",
+ "gain_kind": "pct",
+ "gain_evidence": "The ratio of median TPOT of EAGLE MM vs baseline is 28.9% whereas the AL is high as 3.44.",
+ "hardware_overrides": {}
+}

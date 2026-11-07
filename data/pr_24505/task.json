@@ -1,0 +1,18 @@
+{
+ "pr": 24505,
+ "title": "[Bug] [Spec Dec]: Fix kv_cache dtype mismatch for Eagle3 drafter on FP8 target (#24505)",
+ "url": "https://github.com/vllm-project/vllm/pull/24505",
+ "date": "2025-09-16",
+ "field": "decoding_tpot",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "17871983a2efde49d93ee8692f17da490da47e95",
+ "merge_sha": "8c546102658f97b10d13bcf25193b65edc6ea6ff",
+ "source_path": "vllm/model_executor/models/llama_eagle3.py",
+ "reported_gain": "44%, 30.7%",
+ "gain_kind": "pct",
+ "gain_evidence": "We can see that under AMD + FP8, Spec-dec significantly improves throughput (+44%) and reduces TPOT (-30.7%), demonstrating that speculative decoding is very ef",
+ "hardware_overrides": {}
+}

@@ -1,0 +1,67 @@
+{
+ "pr": 12583,
+ "title": "Expert Parallelism (EP) Support for DeepSeek V2 (#12583)",
+ "url": "https://github.com/vllm-project/vllm/pull/12583",
+ "date": "2025-02-24",
+ "field": "quantization",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "7940d8a6a7841113c89b168080b51785946f0cdb",
+ "merge_sha": "781096e385112f799c2b12a9aa2660b85efaf983",
+ "source_path": "vllm/model_executor/layers/fused_moe/fused_moe.py",
+ "reported_gain": "30%",
+ "gain_kind": "pct",
+ "gain_evidence": "I noticed that after enabling EP on a 16-card setup, the time taken for the all-reduce kernel has doubled, and the throughput has dropped by 30%.",
+ "workload": {
+  "kind": "repo_benchmark",
+  "script": "benchmarks/kernels/benchmark_moe.py",
+  "cmd": "python3 benchmarks/kernels/benchmark_moe.py --model mistralai/Mixtral-8x7B-Instruct-v0.1 --tp-size 2 --dtype auto --seed 0",
+  "unit": "us",
+  "needs": "gpu",
+  "note": "FusedMoE Triton kernel microbench, GPU-only. PR gives no before/after numbers (design doc)."
+ },
+ "experiments": [
+  {
+   "name": "fused_moe_kernel",
+   "unit": "us",
+   "parse": "kernel us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  }
+ ],
+ "hardware_overrides": {},
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 2,
+   "vram_gb": 48,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": "Mixtral-8x7B TP=2",
+   "ram_gb": 8,
+   "disk_gb": 120.0
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": true,
+   "hf_token": true,
+   "vllm_wheel": null,
+   "models": [
+    "mistralai/Mixtral-8x7B-Instruct-v0.1"
+   ],
+   "datasets": [],
+   "env": [
+    "ALLOW_MIXTRAL"
+   ],
+   "needs_server": false,
+   "pipeline": "needs-wheel-task"
+  }
+ }
+}

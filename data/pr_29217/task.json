@@ -1,0 +1,18 @@
+{
+ "pr": 29217,
+ "title": "[Model][Qwen3VL] Tune Triton w8a8 block fp8 kernel for L40s (#29217)",
+ "url": "https://github.com/vllm-project/vllm/pull/29217",
+ "date": "2025-11-22",
+ "field": "quantization",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "1d34eb11e057f6b42af36bdb13852d2701f04245",
+ "merge_sha": "d045e22dfeee61ece1a20ac4aec8cf483a42d406",
+ "source_path": null,
+ "reported_gain": "11.4%",
+ "gain_kind": "pct",
+ "gain_evidence": "This tunes the triton w8a8 block fp8 kernels on a single L40s GPU with the shapes used in `Qwen3-VL-32B-Instruct-FP8` which improves throughput by ~11.4% in the",
+ "hardware_overrides": {}
+}

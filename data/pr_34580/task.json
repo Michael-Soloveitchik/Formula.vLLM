@@ -1,0 +1,18 @@
+{
+ "pr": 34580,
+ "title": "Flashinfer cuDNN backend for Qwen3 VL ViT attention (#34580)",
+ "url": "https://github.com/vllm-project/vllm/pull/34580",
+ "date": "2026-02-27",
+ "field": "gpu_kernels",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "b66a74649e40022c6b1180b98fbb1b6e4b4af74a",
+ "merge_sha": "9c3fe9936b929b5503d780bd4e8e3cd524de1c4e",
+ "source_path": "vllm/model_executor/models/qwen3_vl.py",
+ "reported_gain": "19.3%",
+ "gain_kind": "pct",
+ "gain_evidence": "P99.0 40645.69 ``` ***mm encoder performance gain = 19.3%***",
+ "hardware_overrides": {}
+}

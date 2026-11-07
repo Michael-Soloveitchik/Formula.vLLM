@@ -1,0 +1,18 @@
+{
+ "pr": 28284,
+ "title": "[Feature] Support recording expert indices for rollout router replay (#28284)",
+ "url": "https://github.com/vllm-project/vllm/pull/28284",
+ "date": "2026-01-12",
+ "field": "scheduling",
+ "area": "vllm/config",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "0565f1fdec86dd0f38438d50db2219246f0e196d",
+ "merge_sha": "49e6b86c91cddc4a4b2152c6d8834780bbd50deb",
+ "source_path": "vllm/v1/engine/output_processor.py",
+ "reported_gain": "10X",
+ "gain_kind": "pct",
+ "gain_evidence": "(for the context, I cherry-picked this PR into vllm.0.12.0, and observed that the latency is around 10X.",
+ "hardware_overrides": {}
+}

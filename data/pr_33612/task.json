@@ -1,0 +1,18 @@
+{
+ "pr": 33612,
+ "title": "[Perf] Optimize spec decoding + async scheduling, 1.5% Throughput improvement (#33612)",
+ "url": "https://github.com/vllm-project/vllm/pull/33612",
+ "date": "2026-02-04",
+ "field": "scheduling",
+ "area": "v1/core",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "1d367a738e9098ad4af1f6865747914ccd2c65ca",
+ "merge_sha": "711edaf0d089a15df5fa2b99248c516e53929bd2",
+ "source_path": "vllm/v1/core/sched/scheduler.py",
+ "reported_gain": "1.5%",
+ "gain_kind": "pct",
+ "gain_evidence": "# PR #33612: [Perf] Optimize spec decoding + async scheduling, 1.5% Throughput improvement",
+ "hardware_overrides": {}
+}

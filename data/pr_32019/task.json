@@ -1,0 +1,18 @@
+{
+ "pr": 32019,
+ "title": "[LoRA][Perf] Improve FusedMoE LoRA performance for small rank (#32019)",
+ "url": "https://github.com/vllm-project/vllm/pull/32019",
+ "date": "2026-01-10",
+ "field": "gpu_kernels",
+ "area": "lora/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "b8bf5c45bbbb1249bd1656557603da71e9d4c3b9",
+ "merge_sha": "543c23be789cef54bcb8facacaf7417f42fb95cf",
+ "source_path": "vllm/lora/layers/fused_moe.py",
+ "reported_gain": "9%",
+ "gain_kind": "pct",
+ "gain_evidence": "* e2e output token throughput improves 9% for openai/gpt-oss-20b.",
+ "hardware_overrides": {}
+}

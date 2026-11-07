@@ -1,0 +1,18 @@
+{
+ "pr": 34933,
+ "title": "[FIX] fused moe with lora shared expert dual stream (1.07x otps) (#34933)",
+ "url": "https://github.com/vllm-project/vllm/pull/34933",
+ "date": "2026-02-24",
+ "field": "parallelism",
+ "area": "lora/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "f38f8c974277a2fbd4bcb915416fd907fc023366",
+ "merge_sha": "c2c4c4611a6d92f3006dfdedf8598a70d39002b3",
+ "source_path": "vllm/lora/layers/fused_moe.py",
+ "reported_gain": "1.07x",
+ "gain_kind": "pct",
+ "gain_evidence": "# PR #34933: [FIX] fused moe with lora shared expert dual stream (1.07x otps)",
+ "hardware_overrides": {}
+}

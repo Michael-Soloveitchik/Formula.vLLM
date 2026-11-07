@@ -1,0 +1,92 @@
+{
+ "pr": 26437,
+ "title": "[PERF] Qwen3-next MTP speedup (change bool mask indexing to index_select / index_copy to reduce d2h) (#26437)",
+ "url": "https://github.com/vllm-project/vllm/pull/26437",
+ "date": "2025-10-16",
+ "field": "decoding_tpot",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "f6cdc9a02fcb15eee6c7511eef657bc118c2db90",
+ "merge_sha": "785d8b6410c3f1dc138947ea861a194b061f0293",
+ "source_path": "vllm/model_executor/models/qwen3_next.py",
+ "reported_gain": "12%",
+ "gain_kind": "pct",
+ "gain_evidence": "Speedup of Output token throughput is **12%**",
+ "source_files": [
+  "vllm/model_executor/layers/fla/ops/utils.py",
+  "vllm/model_executor/models/qwen3_next.py",
+  "vllm/v1/attention/backends/gdn_attn.py"
+ ],
+ "test_files": [],
+ "wheel": "0.11.1",
+ "wheel_note": "first PyPI release after merge (2025-11-19 > 2025-10-16); picked by gen_tasks.py from PyPI upload dates.",
+ "test_note": "perf-only; no test in the diff; only the tensor_cache part is measured (model parts need Qwen3-Next).",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_26437/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "us",
+  "needs": "gpu",
+  "headline": "chunk_indices_6way_cycle",
+  "note": "fla @tensor_cache 4 -> 8 entries (part 2 of the PR): prepare_chunk_indices cycled over 6 distinct cu_seqlens (2 calls x 3 groups per GDN layer) - baseline LRU thrashes and recomputes (incl. .tolist() sync), PR's solution hits. Wall-clock us per call. Parts 1 (bool-mask -> index_select in qwen3_next.py) and 3 are model-level and not measured. Author e2e (Qwen3-Next-80B MTP, B200) reported-only."
+ },
+ "experiments": [
+  {
+   "name": "chunk_indices_6way_cycle",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "parse": "chunk_indices_6way_cycle"
+  },
+  {
+   "name": "serving_mean_tpot",
+   "unit": "ms",
+   "reported": {
+    "base": 22.89,
+    "patch": 21.12
+   },
+   "parse": "Mean TPOT (not measured: Qwen3-Next-80B MTP, 512 conc, B200)"
+  },
+  {
+   "name": "serving_output_throughput",
+   "unit": "tok/s",
+   "reported": {
+    "base": 15947.5,
+    "patch": 17872.27
+   },
+   "parse": "Output token throughput (not measured)"
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "hardware_overrides": {},
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.11.1",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ }
+}

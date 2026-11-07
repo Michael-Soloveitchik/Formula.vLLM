@@ -1,0 +1,98 @@
+{
+ "pr": 29499,
+ "title": "[EPLB] Optimize EPLB with numpy (#29499)",
+ "url": "https://github.com/vllm-project/vllm/pull/29499",
+ "date": "2026-01-07",
+ "field": "parallelism",
+ "area": "distributed/eplb",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "0ada960a20766fa1de9063576979f9d807583785",
+ "merge_sha": "6170d47d2220bc464fb561b93caf799a7560e304",
+ "source_path": "vllm/distributed/eplb/rebalance_execute.py",
+ "reported_gain": "27% (rearrange 1370->1077ms E2E); 20-25% per primitive",
+ "gain_kind": "pct",
+ "gain_evidence": "~27% speedup",
+ "source_files": [
+  "vllm/config/parallel.py",
+  "vllm/distributed/eplb/async_worker.py",
+  "vllm/distributed/eplb/eplb_state.py",
+  "vllm/distributed/eplb/policy/abstract.py",
+  "vllm/distributed/eplb/policy/default.py",
+  "vllm/distributed/eplb/rebalance_execute.py"
+ ],
+ "test_files": [
+  "tests/distributed/test_eplb_algo.py",
+  "tests/distributed/test_eplb_execute.py"
+ ],
+ "wheel": "0.14.0",
+ "wheel_note": "first PyPI release after merge (2026-01-20 > 2026-01-07); picked by gen_tasks.py from PyPI upload dates.",
+ "test_note": "EPLB numpy rewrite; tests in the diff cover algo + execute.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_29499/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "ms",
+  "needs": "gpu",
+  "headline": "rearrange_e2e",
+  "note": "EPLB rebalance index logic on CPU, Qwen3-Next-80B -dp 8 geometry (8 ranks x 68 local = 544 physical experts, 48 MoE layers) as in the author's server. rearrange_e2e = the arm's real move_to_buffer + move_from_buffer for every layer and every rank with P2P transport stubbed and tiny weights (index mapping only). Three primitives kept as secondary metrics. All units ms (bench.py times in ms)."
+ },
+ "experiments": [
+  {
+   "name": "rearrange_e2e",
+   "unit": "ms",
+   "reported": {
+    "base": 1370,
+    "patch": 1077
+   },
+   "note": "author: profile of eplb_state.py rearrange on one rank incl. P2P + GPU copies (1s370ms -> 1s77ms); ours: CPU index-mapping path for all 8 ranks x 48 layers, no transport -- compare the ratio, not the absolute"
+  },
+  {
+   "name": "get_ep_ranks_with_expert",
+   "unit": "ms",
+   "reported": null,
+   "parse": "get_ep_ranks"
+  },
+  {
+   "name": "move_to_buffer",
+   "unit": "ms",
+   "reported": null,
+   "parse": "move_to_buffer"
+  },
+  {
+   "name": "move_from_buffer",
+   "unit": "ms",
+   "reported": null,
+   "parse": "move_from_buffer"
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine); primitives unquantified by the author ('20-25% on average')",
+ "hardware_overrides": {},
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.14.0",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ }
+}

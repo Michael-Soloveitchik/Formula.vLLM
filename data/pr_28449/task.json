@@ -1,0 +1,18 @@
+{
+ "pr": 28449,
+ "title": "[Feat][Perf] Enable deepep-low-latency with round-robin expert placement. (#28449)",
+ "url": "https://github.com/vllm-project/vllm/pull/28449",
+ "date": "2025-11-19",
+ "field": "quantization",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "ba558c029ad65ab4f040c8320607ebd87612cf08",
+ "merge_sha": "da2f6800e0d6ac768c6f63b95f7c0755407f4263",
+ "source_path": "vllm/model_executor/layers/fused_moe/layer.py",
+ "reported_gain": "14.57%, 13.38%",
+ "gain_kind": "pct",
+ "gain_evidence": "In the benchmark with parameters times=10, num_prompts=512, dataset=sharegpt, input_len=1024, output_len=512, max_concurrency=8, and req_rate=8, the results sho",
+ "hardware_overrides": {}
+}

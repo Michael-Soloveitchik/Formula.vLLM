@@ -1,0 +1,18 @@
+{
+ "pr": 42849,
+ "title": "[Perf] Add do_not_specialize in fused FP8 RoPE kernel (#42849)",
+ "url": "https://github.com/vllm-project/vllm/pull/42849",
+ "date": "2026-05-18",
+ "field": "gpu_kernels",
+ "area": "v1/attention",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "9537542537728af9fac418ecf1604ad8e8d9ff93",
+ "merge_sha": "998714b21b413c78db8eb7af7f384dc90c0b10dc",
+ "source_path": null,
+ "reported_gain": "9%",
+ "gain_kind": "pct",
+ "gain_evidence": "e2e TTFT improves 9% on H200.",
+ "hardware_overrides": {}
+}

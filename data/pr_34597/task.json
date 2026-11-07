@@ -1,0 +1,18 @@
+{
+ "pr": 34597,
+ "title": "[Kernel] Add FP8 KV cache support to Triton MLA decode attention (#34597)",
+ "url": "https://github.com/vllm-project/vllm/pull/34597",
+ "date": "2026-03-12",
+ "field": "gpu_kernels",
+ "area": "v1/attention",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "abcffbba8c1b8752915fe8ddbb6c77e1eecd18b5",
+ "merge_sha": "a1257fd1ea93da6e27b31e4739ac2707781d8ba7",
+ "source_path": "vllm/v1/attention/backends/mla/triton_mla.py",
+ "reported_gain": "2x",
+ "gain_kind": "pct",
+ "gain_evidence": "### E2E Serving: DeepSeek-V2-Lite (MLA) with FP8 KV cache ✅ - **Config:** `--attention-backend TRITON_MLA --kv-cache-dtype fp8 --tensor-parallel-size 1` - **Thr",
+ "hardware_overrides": {}
+}

@@ -1,0 +1,83 @@
+{
+ "pr": 16436,
+ "title": "[Core] Speed up decode by remove synchronizing operation in sampler (#16436)",
+ "url": "https://github.com/vllm-project/vllm/pull/16436",
+ "date": "2025-04-21",
+ "field": "decoding_tpot",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "f728ab8e3578c22b42ed53e51b5e8ec35328d8b9",
+ "merge_sha": "299ebb62b269ce167eb1c71b5e39a1dc1f65ce1c",
+ "source_path": "vllm/model_executor/layers/utils.py",
+ "reported_gain": "8%",
+ "gain_kind": "pct",
+ "gain_evidence": "By refactoring the code to avoid the indexing, we can remove the sync and allow much more of the sampling phase CPU work to overlap with the forward pass on the",
+ "workload": {
+  "kind": "serving",
+  "script": "benchmarks/benchmark_serving.py",
+  "cmd": "python3 benchmarks/benchmark_serving.py --backend vllm --model facebook/opt-125m --dataset-name random --random-input-len 1000 --random-output-len 100 --num-prompts 100",
+  "unit": "ms",
+  "needs": "gpu",
+  "note": "Removes CUDA sync in apply_penalties; win via GPU serving + trace. ~8% decode for small models."
+ },
+ "experiments": [
+  {
+   "name": "tpot",
+   "unit": "ms",
+   "parse": "Mean TPOT",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "itl",
+   "unit": "ms",
+   "parse": "Mean ITL",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "throughput",
+   "unit": "tok/s",
+   "parse": "Output token throughput",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  }
+ ],
+ "hardware_overrides": {},
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 6,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": "serving bench: needs a vllm server + client",
+   "ram_gb": 8,
+   "disk_gb": 30.244140625
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": true,
+   "hf_token": false,
+   "vllm_wheel": null,
+   "models": [
+    "facebook/opt-125m"
+   ],
+   "datasets": [],
+   "env": [],
+   "needs_server": true,
+   "pipeline": "needs-wheel-task"
+  }
+ }
+}

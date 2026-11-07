@@ -1,0 +1,35 @@
+{
+ "pr": 12563,
+ "title": "[Feature] Fix guided decoding blocking bitmask memcpy (#12563)",
+ "url": "https://github.com/vllm-project/vllm/pull/12563",
+ "date": "2025-01-31",
+ "field": "decoding_tpot",
+ "area": "model_executor/guided_decoding",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "eb5741ad422f04d0bac60c9b6c07183e0431ce8c",
+ "merge_sha": "fc542144c4477ffec1d3de6fa43e54f8fb5351e8",
+ "source_path": "vllm/model_executor/guided_decoding/xgrammar_decoding.py",
+ "reported_gain": "5%",
+ "gain_kind": "pct",
+ "gain_evidence": "For single request benchmarks with `Llama 3.1 8B` running on H100, the improvement in tok/s was ~5%:",
+ "experiments": [
+  {
+   "name": "guided_decode_bitmask_async_copy",
+   "unit": "tok/s",
+   "workload": "Single-request generation with xgrammar guided decoding, Llama 3.1 8B on one H100; decode-phase tok/s with the token-bitmask H2D copy blocking vs async.",
+   "needs": "gpu",
+   "note": "Diff is a one-liner in xgrammar_decoding.py: self.token_bitmask.to(scores.device) -> .to(scores.device, non_blocking=True), letting the CPU pre-launch sampler kernels instead of blocking on cudaStreamSynchronize. Numbers are the author's single-request H100 benchmark posted in a comment (87.5 tok/s unoptimized, 92 tok/s optimized).",
+   "reported": {
+    "base": 87.5,
+    "patch": 92.0,
+    "comparable": false,
+    "scope": "end-to-end single-request decode throughput (tok/s) for Llama 3.1 8B on H100 with xgrammar guided decoding",
+    "scale_short": "Author's number is full E2E single-request decode tok/s on an H100; the win is a GPU async-copy / kernel-pre-launch effect not reproducible on CPU. TO MAKE 1:1: run Llama 3.1 8B with xgrammar guided decoding single-request on a CUDA device and measure decode tok/s with the bitmask copy blocking vs non_blocking=True.",
+    "scale_note": "The speedup comes from hiding a blocking H2D bitmask transfer behind sampler-kernel launches (nsys traces in the PR body). It only manifests under real CUDA stream overlap; an isolated CPU timing of the .to() call cannot exercise the stream-synchronize that the fix elides, so the ~5% E2E figure is not 1:1 with any CPU microbench."
+   }
+  }
+ ],
+ "hardware_overrides": {}
+}

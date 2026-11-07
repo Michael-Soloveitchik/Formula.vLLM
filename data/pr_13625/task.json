@@ -1,0 +1,18 @@
+{
+ "pr": 13625,
+ "title": "[Kernel] Optimize moe intermediate_cache usage (#13625)",
+ "url": "https://github.com/vllm-project/vllm/pull/13625",
+ "date": "2025-03-03",
+ "field": "gpu_kernels",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "2b04c209ee98174f29f1fc98f0dc3222d652a7bd",
+ "merge_sha": "19d98e0c7db96713f0e2201649159431177a56e2",
+ "source_path": "vllm/model_executor/layers/fused_moe/fused_moe.py",
+ "reported_gain": "15%",
+ "gain_kind": "pct",
+ "gain_evidence": "Manual peak measurement shows 15% reduction in memory for fused_moe for 64k prefill",
+ "hardware_overrides": {}
+}

@@ -1,0 +1,18 @@
+{
+ "pr": 39752,
+ "title": "add warning when FP8 KV cache misses prefill query quantization (#39752)",
+ "url": "https://github.com/vllm-project/vllm/pull/39752",
+ "date": "2026-04-14",
+ "field": "quantization",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "be0c855ebd6ed4a8bface6c7df6d99150fdb5d90",
+ "merge_sha": "dc8df110bc8a5c80dbb8f1fef02e98deb8aa2b09",
+ "source_path": null,
+ "reported_gain": "79.5%, 103.6%",
+ "gain_kind": "pct",
+ "gain_evidence": "| ISL | BF16 Throughput (tok/s) | FP8 Throughput (tok/s) | FP8 / BF16 | Mean TTFT (BF16) | Mean TTFT (FP8) | |---|---|---|---|---|---| | 1024 | 15,803 | 12,562 ",
+ "hardware_overrides": {}
+}

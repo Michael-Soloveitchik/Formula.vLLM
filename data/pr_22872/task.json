@@ -1,0 +1,18 @@
+{
+ "pr": 22872,
+ "title": "[Multimodal][Speculative Decoding]Eagle Eagle3 mm support, enablement on qwen2.5vl (#22872)",
+ "url": "https://github.com/vllm-project/vllm/pull/22872",
+ "date": "2025-09-27",
+ "field": "decoding_tpot",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "92da847cf5f4eedf0bc9fed45d7c076be78b8c1f",
+ "merge_sha": "f1d53d150c5cd9c7d94db296793fc25f955ea8a9",
+ "source_path": "vllm/v1/spec_decode/eagle.py",
+ "reported_gain": "1.3x",
+ "gain_kind": "pct",
+ "gain_evidence": "@ggg-s > > > > > > /vllm# git rev-parse --abbrev-ref HEAD > > pr-22872 > > Great , with mm-star , I also get 1.3x speedup.",
+ "hardware_overrides": {}
+}

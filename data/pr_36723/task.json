@@ -1,0 +1,18 @@
+{
+ "pr": 36723,
+ "title": "[DSV3.2][MTP] Optimize Indexer MTP handling (#36723)",
+ "url": "https://github.com/vllm-project/vllm/pull/36723",
+ "date": "2026-03-11",
+ "field": "attention",
+ "area": "v1/attention",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "fa0d353acfa3de7610fdcdb6d23b3b34109c5749",
+ "merge_sha": "9040cd40af6bacfd20d1db8637a189f966a2fcc4",
+ "source_path": "vllm/v1/attention/backends/mla/indexer.py",
+ "reported_gain": "30%",
+ "gain_kind": "pct",
+ "gain_evidence": "**Approximately 30% speedup** for DSV3.2 NVFP4 MTP=3 on 8xB200 TP8.",
+ "hardware_overrides": {}
+}

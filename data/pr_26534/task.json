@@ -1,0 +1,18 @@
+{
+ "pr": 26534,
+ "title": "Move query quantization to attention layer for Flashinfer & Triton. (#26534)",
+ "url": "https://github.com/vllm-project/vllm/pull/26534",
+ "date": "2025-10-15",
+ "field": "gpu_kernels",
+ "area": "v1/attention",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "e5b438a24786decebd0b69340f024f18ea184d44",
+ "merge_sha": "0a9ef0cfce131300fea219952b6e85c8dee45578",
+ "source_path": "vllm/attention/backends/abstract.py",
+ "reported_gain": "8%",
+ "gain_kind": "pct",
+ "gain_evidence": "performance across both Triton and FlashInfer backends (up to 8% throughput",
+ "hardware_overrides": {}
+}

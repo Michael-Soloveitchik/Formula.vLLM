@@ -4,14 +4,14 @@ import os
 import subprocess
 import sys
 
-import conf
+from gen import conf
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def _cli(*args):
     out = subprocess.run(
-        [sys.executable, os.path.join(ROOT, "conf.py"), *args],
+        [sys.executable, os.path.join(ROOT, "gen", "conf.py"), *args],
         capture_output=True, text=True, check=True,
     )
     return out.stdout.rstrip("\n")

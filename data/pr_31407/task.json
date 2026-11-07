@@ -1,0 +1,18 @@
+{
+ "pr": 31407,
+ "title": "Add Fused MoE Triton kernels for GLM-4.5-Air, GLM-4.5v, GLM-4.6v on 2x RTX Pro 6000 (#31407)",
+ "url": "https://github.com/vllm-project/vllm/pull/31407",
+ "date": "2025-12-28",
+ "field": "gpu_kernels",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "0b6b7010508f85c3b54c49e35c1341031eb3b9c8",
+ "merge_sha": "b9793e6a8c30bc42f35d2a1eac919284aea27f76",
+ "source_path": null,
+ "reported_gain": "2x",
+ "gain_kind": "pct",
+ "gain_evidence": "Add optimized config for 2x RTX Pro 6000 for: - GLM-4.5-Air model (N=129) - GLM-4.5V, GLM-4.6V and GLM-4.5-Air finetunes with no MTP layers",
+ "hardware_overrides": {}
+}

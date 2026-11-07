@@ -1,0 +1,18 @@
+{
+ "pr": 19497,
+ "title": "[Models] Improve iteration over layers (#19497)",
+ "url": "https://github.com/vllm-project/vllm/pull/19497",
+ "date": "2025-08-29",
+ "field": "quantization",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "235c9db8a755e0404628a568bf29a492257fe52e",
+ "merge_sha": "de533ab2a14192e461900a4950e2b426d99a6862",
+ "source_path": "vllm/model_executor/models/bailing_moe.py",
+ "reported_gain": "0.9%",
+ "gain_kind": "pct",
+ "gain_evidence": "In a quick benchmark I'm seeing 0-0.9% faster time to first token and improved throughput though results are noisy.",
+ "hardware_overrides": {}
+}

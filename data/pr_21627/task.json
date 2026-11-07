@@ -1,0 +1,18 @@
+{
+ "pr": 21627,
+ "title": "[Core] Move EngineCoreRequest to Request conversion out of EngineCore (#21627)",
+ "url": "https://github.com/vllm-project/vllm/pull/21627",
+ "date": "2025-07-30",
+ "field": "scheduling",
+ "area": "v1/engine",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "601f856d5679a474b6488fb7dd75ebbd7125d1ca",
+ "merge_sha": "ca9e2be3ed6320b51f52f536595cd24e254f8bb2",
+ "source_path": "vllm/v1/engine/core.py",
+ "reported_gain": "80% (35us→7us)",
+ "gain_kind": "unit",
+ "gain_evidence": "--profile ``` ## Test Result With the change, handle_client_request in engine core thread reduced from 35us to 7us.",
+ "hardware_overrides": {}
+}

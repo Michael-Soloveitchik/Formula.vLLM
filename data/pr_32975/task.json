@@ -1,0 +1,73 @@
+{
+ "pr": 32975,
+ "title": "[Perf] Optimize detokenizer python logic (#32975)",
+ "url": "https://github.com/vllm-project/vllm/pull/32975",
+ "date": "2026-02-10",
+ "field": "scheduling",
+ "area": "v1/engine",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "97fa8f65909d4d8f2eb0edc2137fb22f576a5b25",
+ "merge_sha": "e1060a71a1bb96103ce9ca98345184dcdc982467",
+ "source_path": "vllm/v1/engine/detokenizer.py",
+ "reported_gain": "1.628x, 38.57%",
+ "gain_kind": "pct",
+ "gain_evidence": "```bash yewentao256@dgx-b200-02:~/vllm-source$ python benchmarks/overheads/benchmark_detokenizer_min_tokens.py old: 787.270 ms (39.36 ns/token) new: 483.633 ms ",
+ "source_files": [
+  "vllm/v1/engine/detokenizer.py",
+  "vllm/v1/engine/output_processor.py"
+ ],
+ "test_files": [],
+ "wheel": "0.16.0",
+ "wheel_note": "first PyPI release after merge (2026-02-26 > 2026-02-10); picked by gen_tasks.py from PyPI upload dates.",
+ "test_note": "perf-only detokenizer change; bench builds the detokenizer against the real gpt2 tokenizer (downloads into the shared HF cache).",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_32975/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "us/tok",
+  "needs": "gpu",
+  "headline": "detokenize",
+  "note": "Real SlowIncrementalDetokenizer.update() one token at a time with a stop string set (per-update output length check), 8 seqs x 2048 tokens after a 256-token prompt, in-process byte-level BPE tokenizer (no download). us per generated token, median of 5 passes. Author: 1.628x micro ratio only."
+ },
+ "experiments": [
+  {
+   "name": "detokenize",
+   "unit": "us/tok",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "parse": "detokenize"
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "hardware_overrides": {},
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.16.0",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ }
+}

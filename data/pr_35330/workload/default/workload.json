@@ -1,0 +1,192 @@
+{
+ "schema": "workload_v2",
+ "pr": 35330,
+ "title": "[Perf] Optimize maxsim scores computation for pooling models, 13.9% E2E throughput improvement (#35330)",
+ "url": "https://github.com/vllm-project/vllm/pull/35330",
+ "field": "scheduling",
+ "area": "entrypoints/pooling",
+ "date": "2026-02-26",
+ "hw": "default",
+ "hw_override": null,
+ "base_sha": "ec8f943db1b8e5f3b32ed2ec29526b8a9a521088",
+ "merge_sha": "99c7892c5bf20afc90e2ef0e1ad0a89637ae67a9",
+ "source_files": [
+  "vllm/entrypoints/pooling/score/serving.py",
+  "vllm/entrypoints/pooling/score/utils.py"
+ ],
+ "test_files": [
+  "tests/entrypoints/pooling/score/test_utils.py"
+ ],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:35330",
+  "dockerfile": "data/pr_35330/workload/default/Dockerfile",
+  "template": "templates/Dockerfile.gpu-wheel",
+  "wheel": "0.17.0",
+  "wheel_note": "first PyPI release after merge (2026-03-07 > 2026-02-26); picked by gen_tasks.py from PyPI upload dates.",
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:35330 data/pr_35330/workload/default"
+ },
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_35330/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "needs": "gpu",
+  "cluster": "none_gpu",
+  "all_clusters": [
+   "none_gpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "data/pr_35330 (bench.py, tests/)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "ColBERT MaxSim over 64 (query 32 x doc 1024..2048, dim 128) CPU fp32 pairs as serving sees pooling outputs; PR's solution imports compute_maxsim_scores (padded GPU bmm batches), baseline tree lacks it so the bench runs serving.py's per-pair compute_maxsim_score loop. Wall-clock ms per 64-pair batch. Author numbers are e2e rerank serving (reported-only).",
+  "base_note": null
+ },
+ "policy": {
+  "source": "pipeline/run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "task.json:repeats (or hardware_overrides[<hw>].repeats)",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in data/pr_<n>/work/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> data/pr_<n>/work/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY task.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "maxsim_64pairs",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": true,
+   "parse": "maxsim_64pairs",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "serving_request_throughput",
+   "unit": "req/s",
+   "higher_is_better": true,
+   "headline": false,
+   "parse": "Request throughput (not measured: jina-colbert-v2 /v1/rerank serving)",
+   "reported": {
+    "baseline": 141.38,
+    "pr_solution": 161.14
+   },
+   "note": null
+  },
+  {
+   "name": "serving_mean_e2el",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "Mean E2EL (not measured)",
+   "reported": {
+    "baseline": 446.27,
+    "pr_solution": 391.46
+   },
+   "note": null
+  }
+ ],
+ "headline": "maxsim_64pairs",
+ "reported": {
+  "gain": "13.9%",
+  "gain_kind": "pct",
+  "gain_evidence": "# PR #35330: [Perf] Optimize maxsim scores computation for pooling models, 13.9% E2E throughput improvement",
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
+  "author_hardware_args": [
+   {
+    "line": 32,
+    "text": "`vllm serve   --model jinaai/jina-colbert-v2   --runner pooling   --port 9256   --enforce-eager   --max-model-len 4096   --max-num-batched-tokens 4096   --disable-log-stats   --hf-overrides '{\"architectures\": [\"ColBERTJinaRobertaModel\"]}'  "
+   },
+   {
+    "line": 34,
+    "text": "`vllm bench serve   --model jinaai/jina-colbert-v2   --backend vllm-rerank   --endpoint /v1/rerank   --host 127.0.0.1 --port 9256   --dataset-name random-rerank   --num-prompts 2000   --request-rate inf   --max-concurrency 64   --seed 0   -"
+   }
+  ],
+  "source": "data/pr_35330/pr.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.17.0",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ },
+ "reproduced": null,
+ "gap": {
+  "verdict": "not analysed",
+  "note": null,
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:35330 data/pr_35330/workload/default",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_35330:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:35330 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_35330:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:35330 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": "the diff adds test_compute_maxsim_scores_matches_reference_per_pair (imports compute_maxsim_scores): baseline tree fails at import, PR tree passes."
+}

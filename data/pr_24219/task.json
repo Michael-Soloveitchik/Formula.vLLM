@@ -1,0 +1,18 @@
+{
+ "pr": 24219,
+ "title": "[Core] Support async scheduling with uniproc executor  (#24219)",
+ "url": "https://github.com/vllm-project/vllm/pull/24219",
+ "date": "2025-09-12",
+ "field": "scheduling",
+ "area": "v1/executor",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "8226dd56bf64f80e04f2aa90c97401d8783aa2bf",
+ "merge_sha": "4fdd6f5cbf877de7c4de33086fe41bb0ac1d3cf3",
+ "source_path": "vllm/executor/uniproc_executor.py",
+ "reported_gain": "22%, 25%",
+ "gain_kind": "pct",
+ "gain_evidence": "> > This provides most of the speedup of that PR, like +22% rather than +25%.",
+ "hardware_overrides": {}
+}

@@ -1,0 +1,18 @@
+{
+ "pr": 19169,
+ "title": "[Core] Batch multi modal input using pinned memory (#19169)",
+ "url": "https://github.com/vllm-project/vllm/pull/19169",
+ "date": "2025-06-10",
+ "field": "scheduling",
+ "area": "multimodal/inputs.py",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "1efef716458ab03e0954ef2825ac71cf4f81cf9d",
+ "merge_sha": "319cb1e351736890e1615ab827639d7fd05fc988",
+ "source_path": "vllm/multimodal/inputs.py",
+ "reported_gain": "1.7%",
+ "gain_kind": "pct",
+ "gain_evidence": "On some internal with multiple images per prompt I'm seeing around a 0.8-1.7% improvement in throughput on a gemma 3 4b model.",
+ "hardware_overrides": {}
+}

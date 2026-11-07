@@ -1,0 +1,18 @@
+{
+ "pr": 25105,
+ "title": "[PERF] Add `conv1d` metadata to GDN attn (#25105)",
+ "url": "https://github.com/vllm-project/vllm/pull/25105",
+ "date": "2025-09-18",
+ "field": "attention",
+ "area": "v1/attention",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "01a583fea40571986ffe277549e5bb441d409768",
+ "merge_sha": "072d7e53e534d337b41262dd44ded9b44aa699ef",
+ "source_path": "vllm/model_executor/layers/mamba/mamba2_metadata.py",
+ "reported_gain": "26%",
+ "gain_kind": "pct",
+ "gain_evidence": "**Speedup is 26%**",
+ "hardware_overrides": {}
+}

@@ -1,0 +1,18 @@
+{
+ "pr": 37188,
+ "title": "[Performance] Enable Triton autotuning disk cache by default (#37188)",
+ "url": "https://github.com/vllm-project/vllm/pull/37188",
+ "date": "2026-03-19",
+ "field": "gpu_kernels",
+ "area": "vllm/env_override.py",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "112944fab91e63c5daaeed3c0d85478af4e13f50",
+ "merge_sha": "b55156eae9aa586b8fbeb752ecb369179442c521",
+ "source_path": null,
+ "reported_gain": "3x",
+ "gain_kind": "pct",
+ "gain_evidence": "By caching Triton kernel autotuning results to disk, the 2nd benchmark run achieved a **3x speedup**.",
+ "hardware_overrides": {}
+}

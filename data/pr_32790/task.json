@@ -1,0 +1,18 @@
+{
+ "pr": 32790,
+ "title": "[MoE] Enable Shared/Routed Overlap For Latent MoE (Nemotron-H) (#32790)",
+ "url": "https://github.com/vllm-project/vllm/pull/32790",
+ "date": "2026-02-02",
+ "field": "parallelism",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "9eb58f8cf123dde43a97216cd7fa0f9c7af81043",
+ "merge_sha": "0aca8b8c628e9a73ab8758d78c9c721bc703ee66",
+ "source_path": "vllm/model_executor/models/nemotron_h.py",
+ "reported_gain": "3.2%",
+ "gain_kind": "pct",
+ "gain_evidence": "| Mean TTFT (ms) | 27157.10 | 26324.07 | +3.2% |",
+ "hardware_overrides": {}
+}

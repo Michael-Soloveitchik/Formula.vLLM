@@ -1,0 +1,18 @@
+{
+ "pr": 14990,
+ "title": "[Feature] Enhance EAGLE Architecture with Proper RMS Norms (#14990)",
+ "url": "https://github.com/vllm-project/vllm/pull/14990",
+ "date": "2025-03-26",
+ "field": "decoding_tpot",
+ "area": "vllm/config.py",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "5aefd6ac3169b7b56023549cfa9614274d6e15f0",
+ "merge_sha": "781d0562809b34f0c548cd354bbc01c861814f94",
+ "source_path": "vllm/config.py",
+ "reported_gain": "15%, 9%",
+ "gain_kind": "pct",
+ "gain_evidence": "2) It alleviates the approximated KV cache bug currently in the vLLM EAGLE implementation as it reduces the caused performance degradation from 15% to 9% https:",
+ "hardware_overrides": {}
+}

@@ -1,0 +1,18 @@
+{
+ "pr": 18608,
+ "title": "[V1][Sampler] Improve performance of FlashInfer sampling by sampling logits instead of probs (#18608)",
+ "url": "https://github.com/vllm-project/vllm/pull/18608",
+ "date": "2025-05-26",
+ "field": "decoding_tpot",
+ "area": "v1/sample",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "a869baca73eb90ae7bd18402915dc4bfc36cf06b",
+ "merge_sha": "e7523c2e031bc96740723ab63833d1cf94229ab4",
+ "source_path": "vllm/v1/sample/ops/topk_topp_sampler.py",
+ "reported_gain": "9.3%",
+ "gain_kind": "pct",
+ "gain_evidence": "In a quick micro benchmark on an **L40s GPU** I am seeing a **9.3 % speedup** with this PR and jitted flashinfer using Cuda 12.8.",
+ "hardware_overrides": {}
+}

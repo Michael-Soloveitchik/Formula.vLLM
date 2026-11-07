@@ -1,0 +1,18 @@
+{
+ "pr": 40941,
+ "title": "[Attention][TurboQuant] Share dequant buffers, eliminate float16_copy (#40941)",
+ "url": "https://github.com/vllm-project/vllm/pull/40941",
+ "date": "2026-04-26",
+ "field": "attention",
+ "area": "v1/attention",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "5d5c7764446da0d4888add9a060604e376e4e856",
+ "merge_sha": "2cc008e7b491bb77f0caf4d27ad55a83f196114c",
+ "source_path": "vllm/model_executor/layers/attention/attention.py",
+ "reported_gain": "14%",
+ "gain_kind": "pct",
+ "gain_evidence": "**Impact**: -14% TTFT at 15K context (377ms → 326ms).",
+ "hardware_overrides": {}
+}

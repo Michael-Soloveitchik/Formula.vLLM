@@ -1,0 +1,18 @@
+{
+ "pr": 5908,
+ "title": "[Model] Add Gemma 2 (#5908)",
+ "url": "https://github.com/vllm-project/vllm/pull/5908",
+ "date": "2024-06-27",
+ "field": "gpu_kernels",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "736ed388492c5c10deb7522637a94c041f163f48",
+ "merge_sha": "79c92c7c8aa6a881421e2007ab216a819f61bc9b",
+ "source_path": "vllm/config.py",
+ "reported_gain": "2x",
+ "gain_kind": "pct",
+ "gain_evidence": "> Multiple sources (e.g., https://www.reddit.com/r/LocalLLaMA/comments/1dusu3s/gemma_2_finetuning_2x_faster_63_less_memory_best/) have confirmed that softcappin",
+ "hardware_overrides": {}
+}

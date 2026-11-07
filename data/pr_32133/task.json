@@ -1,0 +1,18 @@
+{
+ "pr": 32133,
+ "title": "[QeRL] Layerwise Reloading (#32133)",
+ "url": "https://github.com/vllm-project/vllm/pull/32133",
+ "date": "2026-01-30",
+ "field": "quantization",
+ "area": "model_executor/model_loader",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "74898a70159f4217f1abf2a738c5cc6c4695cc44",
+ "merge_sha": "f857a03f6b71101ac3f67b766f9a165c8b617f7b",
+ "source_path": "vllm/model_executor/model_loader/online_quantization.py",
+ "reported_gain": "3x",
+ "gain_kind": "pct",
+ "gain_evidence": "* Reduce memory requirements by 3x for FP8",
+ "hardware_overrides": {}
+}

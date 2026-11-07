@@ -1,0 +1,18 @@
+{
+ "pr": 26189,
+ "title": "[Model] Gemma3: Fix GGUF loading and quantization (#26189)",
+ "url": "https://github.com/vllm-project/vllm/pull/26189",
+ "date": "2025-10-09",
+ "field": "quantization",
+ "area": "model_executor/model_loader",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "5e49c3e777b59312890da254c71ba22a84f28553",
+ "merge_sha": "1317028aa8bc9710532987b27dd044bcea2c161f",
+ "source_path": null,
+ "reported_gain": "50%",
+ "gain_kind": "pct",
+ "gain_evidence": "### After Fix - All 8 models load successfully - Coherent text generation (e.g., \"Hello, my name is Alice and I am a...\") - No shape mismatch warnings - True Q4",
+ "hardware_overrides": {}
+}

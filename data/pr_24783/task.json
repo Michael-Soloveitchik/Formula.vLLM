@@ -1,0 +1,18 @@
+{
+ "pr": 24783,
+ "title": "[Perf] Fix DeepGEMM Contiguous Layout Issue, 5.5% Throughput Improvement (#24783)",
+ "url": "https://github.com/vllm-project/vllm/pull/24783",
+ "date": "2025-09-14",
+ "field": "quantization",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "fec347dee130a79d8a56390ffcb2dde2e480f6ca",
+ "merge_sha": "fc2dbcda8b717e6aac0794cb9b4cc86b78c36504",
+ "source_path": "vllm/model_executor/layers/quantization/fp8.py",
+ "reported_gain": "5.5%",
+ "gain_kind": "pct",
+ "gain_evidence": "# PR #24783: [Perf] Fix DeepGEMM Contiguous Layout Issue, 5.5% Throughput Improvement",
+ "hardware_overrides": {}
+}

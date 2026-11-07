@@ -1,0 +1,18 @@
+{
+ "pr": 32951,
+ "title": "[Async][Spec Decoding] Zero-bubble async scheduling + spec decoding (#32951)",
+ "url": "https://github.com/vllm-project/vllm/pull/32951",
+ "date": "2026-03-23",
+ "field": "scheduling",
+ "area": "v1/spec_decode",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "ffb5b32b5f2a37ea58261747aef9e5f3907b9941",
+ "merge_sha": "fafe76b4af175d48b9b69204c995ee167b46aca1",
+ "source_path": "vllm/v1/worker/block_table.py",
+ "reported_gain": "3%",
+ "gain_kind": "pct",
+ "gain_evidence": "## Test Result TPOT 9.19 ms -> 8.90 ms (3% speedup)",
+ "hardware_overrides": {}
+}

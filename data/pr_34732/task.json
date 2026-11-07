@@ -1,0 +1,18 @@
+{
+ "pr": 34732,
+ "title": "[Attention] Use FA4 for MLA prefill (#34732)",
+ "url": "https://github.com/vllm-project/vllm/pull/34732",
+ "date": "2026-03-12",
+ "field": "quantization",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "85199f9681af6656c3f61f982e826f61664eb2af",
+ "merge_sha": "f444c05c3267ed26f1fd52822d60479b81b2b829",
+ "source_path": "benchmarks/attention_benchmarks/benchmark.py",
+ "reported_gain": null,
+ "gain_kind": "audit",
+ "gain_evidence": "default MLA prefill -> faster FA4",
+ "hardware_overrides": {}
+}

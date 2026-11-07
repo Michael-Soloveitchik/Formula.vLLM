@@ -1,0 +1,108 @@
+{
+ "pr": 34846,
+ "title": "[Perf] Improve default triton fused moe configs (#34846)",
+ "url": "https://github.com/vllm-project/vllm/pull/34846",
+ "date": "2026-02-23",
+ "field": "quantization",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "596ed1f02ef2a068e459a019d7d3f54593cc7e9e",
+ "merge_sha": "22a97e66134a26c74b9dae73d9446c4e32718269",
+ "source_path": "vllm/model_executor/layers/fused_moe/fused_moe.py",
+ "reported_gain": "up to 2x at large batch for many-expert MoE (H100)",
+ "gain_kind": "unit",
+ "gain_evidence": "improved default triton fused-MoE configs",
+ "source_files": [
+  "vllm/model_executor/layers/fused_moe/fused_moe.py"
+ ],
+ "test_files": [],
+ "wheel": "0.16.0",
+ "wheel_note": "first PyPI release after merge (2026-02-26 > 2026-02-23); picked by gen_tasks.py from PyPI upload dates.",
+ "test_note": "perf-only default-config change; no vllm test in the diff (benchmarks/kernels/benchmark_moe_defaults.py is new in the PR tree only). Measures only on a GPU with no tuned MoE JSON.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_34846/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "us",
+  "needs": "gpu",
+  "headline": "fused_moe_e64_top6_m1",
+  "note": "fused_experts with the arm's get_default_config (untuned GPU: no tuned JSON for RTX 5070 Ti): E=64 N=1408 K=2048 top_k=6 bf16, M in 1/16/128/1024/4096, CUDA-event us. Author gives only New/Old ratios per model (E=64 class: 0.93-1.01x bs1-8, 0.74-1.00x bs16-128, 0.54-0.71x bs256-4096 on H100) and an fp8 Mixtral table -> reported null. If a tuned config exists for the GPU both arms tie (bench prints the config)."
+ },
+ "experiments": [
+  {
+   "name": "fused_moe_e64_top6_m1",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "parse": "fused_moe_e64_top6_m1"
+  },
+  {
+   "name": "fused_moe_e64_top6_m16",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "parse": "fused_moe_e64_top6_m16"
+  },
+  {
+   "name": "fused_moe_e64_top6_m128",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "parse": "fused_moe_e64_top6_m128"
+  },
+  {
+   "name": "fused_moe_e64_top6_m1024",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "parse": "fused_moe_e64_top6_m1024"
+  },
+  {
+   "name": "fused_moe_e64_top6_m4096",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "parse": "fused_moe_e64_top6_m4096"
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "hardware_overrides": {},
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.16.0",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ }
+}

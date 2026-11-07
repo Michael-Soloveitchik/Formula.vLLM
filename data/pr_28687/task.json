@@ -1,0 +1,18 @@
+{
+ "pr": 28687,
+ "title": "[Performance] Reduce DeepGEMM N dim restriction from 128 to 64 multiplier  (#28687)",
+ "url": "https://github.com/vllm-project/vllm/pull/28687",
+ "date": "2025-11-19",
+ "field": "gpu_kernels",
+ "area": ".buildkite",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "8e38e998298364b0a94cddf7ccc59d8466c2396a",
+ "merge_sha": "3aaa94ac99f4b295ba95f14b4968620b2127044f",
+ "source_path": "tests/kernels/quantization/test_block_fp8.py",
+ "reported_gain": "2.2%",
+ "gain_kind": "pct",
+ "gain_evidence": "* e2e TPOT improvement is from 28.32ms to 27.72 so about 2.2%",
+ "hardware_overrides": {}
+}

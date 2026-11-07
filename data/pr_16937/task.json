@@ -1,0 +1,18 @@
+{
+ "pr": 16937,
+ "title": "[V1][Spec Decode] EAGLE-3 Support (#16937)",
+ "url": "https://github.com/vllm-project/vllm/pull/16937",
+ "date": "2025-04-25",
+ "field": "decoding_tpot",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "70116459c3d1d52cae954cf0f644203e9f0d3a3c",
+ "merge_sha": "a0e619e62a778073d53fcab2429b5f2ac67d687c",
+ "source_path": "vllm/v1/spec_decode/eagle.py",
+ "reported_gain": "2%",
+ "gain_kind": "pct",
+ "gain_evidence": "The TTFT for MTBench is ~12ms so it contributes to <2% even if output len is 100, i.e., [12/(7.5*100)] *100%.",
+ "hardware_overrides": {}
+}

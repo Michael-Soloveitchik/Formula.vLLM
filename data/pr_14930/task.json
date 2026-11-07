@@ -1,0 +1,18 @@
+{
+ "pr": 14930,
+ "title": "[V1][Spec Decode] Optimize Rejection Sampler with Triton Kernels (#14930)",
+ "url": "https://github.com/vllm-project/vllm/pull/14930",
+ "date": "2025-03-18",
+ "field": "decoding_tpot",
+ "area": "v1/sample",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "3a1e6481586ed7f079275b5d5072a6e246af691e",
+ "merge_sha": "99abb8b650c66664cdc84d815b7f306f33bd9881",
+ "source_path": "vllm/v1/sample/rejection_sampler.py",
+ "reported_gain": "18%",
+ "gain_kind": "pct",
+ "gain_evidence": "25% throughput increase compared to main w/o SD, and 18% increase compared to main w/ SD.",
+ "hardware_overrides": {}
+}

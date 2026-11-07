@@ -1,0 +1,154 @@
+{
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "ngram_match_overhead",
+   "unit": "s",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": 54.3,
+    "patch": 1.9
+   },
+   "arms": {
+    "base": {
+     "mean": 0.1652,
+     "sd": 0.0022,
+     "n": 5
+    },
+    "gold": {
+     "mean": 0.0026,
+     "sd": 0.0004,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "s",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 54.3,
+     "pr_solution": 1.9,
+     "how": "absolute",
+     "marker": "",
+     "raw": "54.3 -> 1.9 s",
+     "note": "author gave absolute numbers",
+     "ratio": 28.578947,
+     "pct": 2757.89
+    },
+    "reproduced": {
+     "baseline": 0.1652,
+     "pr_solution": 0.0026,
+     "ratio_sd": 9.811702,
+     "baseline_sd": 0.0022,
+     "pr_solution_sd": 0.0004,
+     "ratio": 63.538462,
+     "pct": 6253.85
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": 2.223,
+     "verdict": "reproduced"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  }
+ ],
+ "pr": 13365,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/13365",
+ "title": "[V1][Spec Decode] Optimize N-gram matching with Numba (#13365)",
+ "field": "decoding_tpot",
+ "reported_gain": "30x, 2.5%",
+ "gain_kind": "pct",
+ "base_sha": "c8d70e2437feecdb3762ce17298df33439ae1bd1",
+ "merge_sha": "4c822298981a8f7521492075ff72659985fc4c3f",
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.7.3",
+  "workload_cmd": "python3 /task/bench.py",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "SKIP",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "SKIP",
+   "slug": "gold"
+  }
+ },
+ "improved": false,
+ "latency": {
+  "scenarios": {
+   "ngram_match_overhead": {
+    "unit": "s",
+    "base": {
+     "mean": 0.1652,
+     "sd": 0.0022,
+     "n": 5
+    },
+    "gold": {
+     "mean": 0.0026,
+     "sd": 0.0004,
+     "n": 5
+    }
+   }
+  },
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {
+   "workload_runs": 5
+  },
+  "gold": {
+   "workload_runs": 5
+  }
+ },
+ "ts": "2026-11-07T16:18:11Z",
+ "summary": {
+  "experiments": 1,
+  "measured": 1,
+  "headline": "ngram_match_overhead",
+  "headline_derived": {
+   "unit": "s",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": 54.3,
+    "pr_solution": 1.9,
+    "how": "absolute",
+    "marker": "",
+    "raw": "54.3 -> 1.9 s",
+    "note": "author gave absolute numbers",
+    "ratio": 28.578947,
+    "pct": 2757.89
+   },
+   "reproduced": {
+    "baseline": 0.1652,
+    "pr_solution": 0.0026,
+    "ratio_sd": 9.811702,
+    "baseline_sd": 0.0022,
+    "pr_solution_sd": 0.0004,
+    "ratio": 63.538462,
+    "pct": 6253.85
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": 2.223,
+    "verdict": "reproduced"
+   },
+   "reliability": {
+    "flag": "ok",
+    "note": ""
+   }
+  },
+  "reproduced_ratio_median": 63.5385,
+  "reproduced_ratio_max": 63.5385,
+  "reported_ratio_median": 28.5789,
+  "verdict": "reproduced",
+  "tests": {
+   "base": "SKIP",
+   "gold": "SKIP"
+  }
+ },
+ "hw_slug": "rtx5070ti"
+}

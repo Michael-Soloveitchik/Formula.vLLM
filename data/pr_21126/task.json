@@ -1,0 +1,18 @@
+{
+ "pr": 21126,
+ "title": "[Perf] Use FlashInfer RoPE for RotaryEmbedding.forward_cuda when available (#21126)",
+ "url": "https://github.com/vllm-project/vllm/pull/21126",
+ "date": "2025-09-19",
+ "field": "attention",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "e57fc15971dd3c3aff9b2bdcb43741b5f34c329e",
+ "merge_sha": "48ecb4438b2845f757edf228c5455ca6095938af",
+ "source_path": "vllm/model_executor/layers/rotary_embedding/base.py",
+ "reported_gain": "2x",
+ "gain_kind": "pct",
+ "gain_evidence": "Microbenchmarks show ~2x speedup vs our custom op, but haven't seen noticeable end-to-end results yet.",
+ "hardware_overrides": {}
+}

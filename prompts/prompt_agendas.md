@@ -39,7 +39,7 @@ agenda layer consumes its output.
 | `data/index.jsonl` | one JSON per PR: `{pr,title,date,sha,field,area,n_files,tags,excl_reason,files}`. `field` is single-label; `null` = excluded. |
 | `data/digests/<cluster>.md` | per-field title+date digest fed to the extraction agents (one per cluster, 9 files). |
 | `data/stats.md`, `report.md` | human-readable rollups used by agents for context. |
-| `data/prs/<field>/<area-slug>/<pr>.md` | downloaded PR body (title + `## Body` + `## Comments`). Needed by the gain scanners. |
+| `data/pr_<n>/pr.md` (was `data/prs/<field>/<area-slug>/<pr>.md`) | downloaded PR body (title + `## Body` + `## Comments`). Needed by the gain scanners. |
 | `data/views/perf_gains.jsonl` | **strict** gain scan (`perf_scan.py`), 376 PRs. Reliable PR-number→gain map; used to seed evidence-PR gains in assembly. |
 | `data/views/quant_gains.jsonl` | **broad** gain scan (`quant_scan.py`), 443 PRs. Used to attribute gains to ALL quantitative PRs, not just evidence PRs. |
 

@@ -1,0 +1,18 @@
+{
+ "pr": 24511,
+ "title": "[Multi Modal][Performance] Fused Q,K's apply_rope into one (#24511)",
+ "url": "https://github.com/vllm-project/vllm/pull/24511",
+ "date": "2025-09-14",
+ "field": "attention",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "3e903b6cb4292ca1425a37cb809c1e3cddfdadcb",
+ "merge_sha": "cc3173ae982ce4e589b24b70263cc25c3035d172",
+ "source_path": "vllm/model_executor/models/qwen2_5_vl.py",
+ "reported_gain": "11%",
+ "gain_kind": "pct",
+ "gain_evidence": "Overall ~11% improvement in TTFT.",
+ "hardware_overrides": {}
+}

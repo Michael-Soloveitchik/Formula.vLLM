@@ -1,0 +1,18 @@
+{
+ "pr": 27196,
+ "title": "[Bugfix][P/D] Reduce num_threads used by nixl ucx backend (#27196)",
+ "url": "https://github.com/vllm-project/vllm/pull/27196",
+ "date": "2025-10-21",
+ "field": "parallelism",
+ "area": "distributed/kv_transfer",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "86ed77022db254cab1386c211f150d3840af156c",
+ "merge_sha": "ddeec11ba9d39ee72bb3337f810c6197c96b10e1",
+ "source_path": "vllm/distributed/kv_transfer/kv_connector/v1/nixl_connector.py",
+ "reported_gain": "3x",
+ "gain_kind": "pct",
+ "gain_evidence": "## Test Plan Tested `VLLM_ALL2ALL_BACKEND=deepep_low_latency` with this change on a 3x8xH100 node environment on IBM Cloud.",
+ "hardware_overrides": {}
+}

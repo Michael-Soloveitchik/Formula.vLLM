@@ -1,0 +1,18 @@
+{
+ "pr": 35581,
+ "title": "Fix Qwen3_5MTP packed_modules_mapping for gate_up_proj (#35581)",
+ "url": "https://github.com/vllm-project/vllm/pull/35581",
+ "date": "2026-02-28",
+ "field": "decoding_tpot",
+ "area": "model_executor/models",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "c68e69f1449cc6d84f43137fcc36c142de1c8fd3",
+ "merge_sha": "63d7972f13d1c5a9d9bd55b664017067a9abd451",
+ "source_path": "vllm/model_executor/models/qwen3_5_mtp.py",
+ "reported_gain": "8%",
+ "gain_kind": "pct",
+ "gain_evidence": "### Performance Impact This fix enables the intended fused MLP kernel path, which can improve throughput by 2-8% depending on batch size and sequence length for",
+ "hardware_overrides": {}
+}

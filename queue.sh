@@ -1,12 +1,3 @@
 #!/usr/bin/env bash
-# Sequential reproduce queue: each line of QUEUE is one ./run.sh --reproduce invocation, run one after another.
-# Usage: nohup ./queue.sh "6442" "21222 21281 6779" "--next 16" "13365 29499 22940" > .work_queue.log 2>&1 &
-# A line is PR numbers or --next N / --retry-failed. No polling, no pgrep: run.sh's flock already serialises.
-cd "$(dirname "$0")"
-for job in "$@"; do
-  mkdir -p logs; LOG="logs/queue_$(echo "$job" | tr -c 'A-Za-z0-9' '_')_$(date +%Y%m%d_%H%M).log"
-  echo "== $(date +%H:%M) start: ./run.sh --reproduce $job  -> $LOG"
-  CLEAN_IMAGES=1 ./run.sh --reproduce $job >"$LOG" 2>&1; rc=$?
-  echo "== $(date +%H:%M) done rc=$rc: $job"; grep -E "^SKIP|base=|failed rc|timed out" "$LOG" | tail -12 | cut -c1-110
-done
-echo "== QUEUE FINISHED $(date +%H:%M)"; python3 next_prs.py --status
+# thin entry point: the script lives in pipeline/ (see README "Repository layout")
+exec bash "$(cd "$(dirname "$0")" && pwd)/pipeline/queue.sh" "$@"

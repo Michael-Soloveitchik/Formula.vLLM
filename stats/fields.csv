@@ -1,0 +1,6 @@
+field,n,gap_ratio_med,gap_ratio_min,gap_ratio_max,reported_gap_med,reproduced_gap_med
+decoding_tpot,1,1.01995,1.01995,1.01995,0.965009,0.984262
+gpu_kernels,3,0.768126,0,0.874076,0.337953,0.242352
+kv_cache,1,0.103768,0.103768,0.103768,0.0207,0.002148
+parallelism,1,,,,,-1.66667
+scheduling,2,1.19609,1.19609,1.19609,0.760714,0.48009

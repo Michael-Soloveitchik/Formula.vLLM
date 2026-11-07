@@ -1,0 +1,18 @@
+{
+ "pr": 38451,
+ "title": "[Perf] Fix DBO overlap: capture DeepEP event before yield (#38451)",
+ "url": "https://github.com/vllm-project/vllm/pull/38451",
+ "date": "2026-03-31",
+ "field": "scheduling",
+ "area": "model_executor/layers",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "d9b90a07aced1789998f97f14e5e1456d4e671f1",
+ "merge_sha": "517b769b5858a8d8d233d277f54461acfc9def63",
+ "source_path": "vllm/model_executor/layers/fused_moe/prepare_finalize/deepep_ht.py",
+ "reported_gain": "30%",
+ "gain_kind": "pct",
+ "gain_evidence": "about 30% throughput increase",
+ "hardware_overrides": {}
+}

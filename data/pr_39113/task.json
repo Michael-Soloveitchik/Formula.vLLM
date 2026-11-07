@@ -1,0 +1,18 @@
+{
+ "pr": 39113,
+ "title": "[Perf] Optimize redundant sync for pooling model, 3.7% Throughput Improvement (#39113)",
+ "url": "https://github.com/vllm-project/vllm/pull/39113",
+ "date": "2026-04-09",
+ "field": "scheduling",
+ "area": "v1/worker",
+ "hardware": [
+  "agnostic"
+ ],
+ "base_sha": "9e78555743c19207db796f432cc213d118873a08",
+ "merge_sha": "ed2f282bc8cacfbe49a86ab1dbaf7e4471ec6b18",
+ "source_path": "vllm/v1/worker/gpu_model_runner.py",
+ "reported_gain": "3.7%",
+ "gain_kind": "pct",
+ "gain_evidence": "# PR #39113: [Perf] Optimize redundant sync for pooling model, 3.7% Throughput Improvement",
+ "hardware_overrides": {}
+}
