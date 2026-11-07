@@ -23,7 +23,7 @@
   "unit": "us/tok",
   "needs": "gpu",
   "headline": "detokenize",
-  "note": "Pure-Python detokenizer change (num_output_tokens avoids slice). 1.628x / 38.57%."
+  "note": "Real SlowIncrementalDetokenizer.update() one token at a time with a stop string set (per-update output length check), 8 seqs x 2048 tokens after a 256-token prompt, in-process byte-level BPE tokenizer (no download). us per generated token, median of 5 passes. Author: 1.628x micro ratio only."
  },
  "perf_gain": {
   "top_gain": "1.628x, 38.57%",
@@ -36,8 +36,8 @@
    "name": "detokenize",
    "unit": "us/tok",
    "reported": {
-    "base": 1.628,
-    "patch": 1.0
+    "base": null,
+    "patch": null
    }
   }
  ],

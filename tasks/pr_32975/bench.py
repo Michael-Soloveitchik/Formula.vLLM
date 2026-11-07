@@ -1,194 +1,87 @@
 #!/usr/bin/env python3
-"""Benchmark for vLLM PR #32975 "[Perf] Optimize detokenizer python logic".
+"""Microbench for vLLM PR #32975: [Perf] Optimize detokenizer python logic.
 
-The patch adds IncrementalDetokenizer.num_output_tokens() so the hot
-BaseIncrementalDetokenizer.update() loop stops calling
-len(self.output_token_ids). For SlowIncrementalDetokenizer, output_token_ids
-is a property that recomputes a list slice `self.token_ids[self.prompt_len:]`
-on every access; update() hits it per decoded token plus once for the stop
-check. The patch replaces those with num_output_tokens() == len(token_ids) -
-prompt_len, eliminating the per-token slice allocation.
+BaseIncrementalDetokenizer.update() checks `len(self.output_token_ids)` per decoded token
+(min_tokens) and once per update (stop strings). For SlowIncrementalDetokenizer,
+`output_token_ids` is a property that materialises `self.token_ids[self.prompt_len:]` - a copy of
+all generated tokens on every call. The PR adds `num_output_tokens()` (= len(token_ids) -
+prompt_len) and uses it in update() and in OutputProcessor.make_request_output.
 
-PREFERRED (real-path): import the real SlowIncrementalDetokenizer from the
-mounted vllm tree (PYTHONPATH=/src), build it against a real 'gpt2' tokenizer,
-and drive the real update() loop over a long token sequence. The base tree has
-no num_output_tokens() so update() takes the slice path; the gold tree defines
-num_output_tokens() so update() takes the tracked path. Which tree is mounted
-at /src is what makes an arm "base" vs "gold" -- the driver code is identical.
-This measures the FULL detokenizer python path (real decode_next included),
-matching what the PR reports.
-
-FALLBACK (honest, self-contained): if the import chain or the gpt2 tokenizer
-is unavailable (e.g. no network in container), reproduce the exact changed
-inner comparison both ways in one process over synthetic token lists.
+The bench drives the arm's real `SlowIncrementalDetokenizer.update()` one token at a time (decode)
+with stop strings set (so the per-update length check runs, as in any request with `stop`),
+over N_SEQS generations of OUTPUT_LEN tokens after a PROMPT_LEN prompt. The tokenizer is a small
+byte-level BPE trained in-process (no download, no network). us per generated token, mean over
+REPEATS passes; total work ~N_SEQS*OUTPUT_LEN*REPEATS updates (bounded, well under a minute).
+Author gives a 1.628x micro ratio only (no absolute time).
+Runs inside the task image: python3 /task/bench.py
 """
-import os
-import sys
+import random
 import time
-import statistics
+from types import SimpleNamespace
 
-N_SEQS = int(os.environ.get("N_SEQS", "200"))
-N_TOKS = int(os.environ.get("N_TOKS", "2000"))
-# Long prompt so the SlowIncrementalDetokenizer.output_token_ids slice
-# `token_ids[prompt_len:]` (recomputed per update in the base path) is large --
-# this is the cost the PR eliminates with num_output_tokens().
-PROMPT_LEN = int(os.environ.get("PROMPT_LEN", "512"))
-# Tokens delivered per update() call. The PR's removed TODO noted the loop is
-# "very inefficient when the number of new_token_ids is more than 1".
-BATCH = int(os.environ.get("BATCH", "8"))
-REPEATS = int(os.environ.get("REPEATS", "7"))
+from tokenizers import Tokenizer, decoders, models, pre_tokenizers, trainers
+from transformers import PreTrainedTokenizerFast
+
+from vllm.sampling_params import SamplingParams
+from vllm.v1.engine.detokenizer import SlowIncrementalDetokenizer
+
+N_SEQS = 8
+PROMPT_LEN = 256
+OUTPUT_LEN = 2048
+REPEATS = 5
+VOCAB_SIZE = 2000
 
 
-# --------------------------------------------------------------------------- #
-# real-path driver
-# --------------------------------------------------------------------------- #
-def _build_real_detokenizer():
-    """Return a constructed real SlowIncrementalDetokenizer bound to gpt2, or
-    raise if the real path is not usable (caller falls back)."""
-    from transformers import AutoTokenizer
-    from vllm.v1.engine.detokenizer import (
-        SlowIncrementalDetokenizer,
-        BaseIncrementalDetokenizer,
+def build_tokenizer():
+    tok = Tokenizer(models.BPE(unk_token="[UNK]"))
+    tok.pre_tokenizer = pre_tokenizers.ByteLevel(add_prefix_space=False)
+    tok.decoder = decoders.ByteLevel()
+    trainer = trainers.BpeTrainer(vocab_size=VOCAB_SIZE, special_tokens=["[UNK]", "<s>", "</s>"],
+                                  initial_alphabet=pre_tokenizers.ByteLevel.alphabet())
+    rng = random.Random(0)
+    words = ["the", "quick", "brown", "fox", "jumps", "over", "lazy", "dog", "vllm", "token",
+             "stream", "detokenizer", "python", "logic", "fast", "slow", "cache", "block",
+             "model", "serve", "request", "output", "prompt", "stop", "string"]
+    corpus = [" ".join(rng.choice(words) for _ in range(40)) + "." for _ in range(400)]
+    tok.train_from_iterator(corpus, trainer)
+    return PreTrainedTokenizerFast(tokenizer_object=tok, unk_token="[UNK]",
+                                   bos_token="<s>", eos_token="</s>")
+
+
+def make_detokenizer(tokenizer, prompt_ids):
+    request = SimpleNamespace(
+        prompt_token_ids=prompt_ids,
+        prompt_embeds=None,
+        sampling_params=SamplingParams(stop=["<<never>>"], min_tokens=0, max_tokens=OUTPUT_LEN),
     )
-    from vllm.tokenizers.detokenizer_utils import convert_prompt_ids_to_tokens
-
-    tok = AutoTokenizer.from_pretrained("gpt2")
-    prompt_ids = list(range(PROMPT_LEN))
-
-    # Construct without going through EngineCoreRequest (msgspec Struct,
-    # version-fragile). We set exactly the attributes __init__ would set.
-    d = SlowIncrementalDetokenizer.__new__(SlowIncrementalDetokenizer)
-    # IncrementalDetokenizer.__init__
-    d.token_ids = []
-    # BaseIncrementalDetokenizer.__init__ attrs
-    d.stop = []
-    d.min_tokens = 0
-    d.include_stop_str_in_output = False
-    d.stop_buffer_length = 0
-    d._last_output_text_offset = 0
-    d.output_text = ""
-    # SlowIncrementalDetokenizer.__init__ attrs
-    d.tokenizer = tok
-    d.prompt_len = PROMPT_LEN
-    d.tokens, d.prefix_offset, d.read_offset = convert_prompt_ids_to_tokens(
-        tokenizer=tok, prompt_ids=prompt_ids, skip_special_tokens=False
-    )
-    d.token_ids.extend(prompt_ids)
-    d.skip_special_tokens = False
-    d.spaces_between_special_tokens = True
-    return SlowIncrementalDetokenizer, d
-
-
-def _time_real(cls_and_factory) -> float:
-    """Drive the real update() loop one token at a time; return us/tok.
-    base tree -> slice path; gold tree -> tracked path. Identical driver."""
-    from transformers import AutoTokenizer
-    from vllm.v1.engine.detokenizer import SlowIncrementalDetokenizer
-    from vllm.tokenizers.detokenizer_utils import convert_prompt_ids_to_tokens
-
-    tok = AutoTokenizer.from_pretrained("gpt2")
-    vocab = tok.vocab_size
-    prompt_ids = list(range(PROMPT_LEN))
-    total = 0
-    t0 = time.perf_counter()
-    for s in range(N_SEQS):
-        d = SlowIncrementalDetokenizer.__new__(SlowIncrementalDetokenizer)
-        d.token_ids = []
-        d.stop = []
-        d.min_tokens = 0
-        d.include_stop_str_in_output = False
-        d.stop_buffer_length = 0
-        d._last_output_text_offset = 0
-        d.output_text = ""
-        d.tokenizer = tok
-        d.prompt_len = PROMPT_LEN
-        d.tokens, d.prefix_offset, d.read_offset = convert_prompt_ids_to_tokens(
-            tokenizer=tok, prompt_ids=prompt_ids, skip_special_tokens=False
-        )
-        d.token_ids.extend(prompt_ids)
-        d.skip_special_tokens = False
-        d.spaces_between_special_tokens = True
-        base = (s * 7 + 100) % (vocab - N_TOKS - 1)
-        i = 0
-        while i < N_TOKS:
-            n = min(BATCH, N_TOKS - i)
-            d.update([base + i + j for j in range(n)], stop_terminated=False)
-            i += n
-            total += n
-    dt = time.perf_counter() - t0
-    return dt / total * 1e6
-
-
-# --------------------------------------------------------------------------- #
-# fallback driver (self-contained, both arms in one process)
-# --------------------------------------------------------------------------- #
-MIN_TOKENS = 16
-
-
-def _time_fallback(use_tracking: bool) -> float:
-    total = 0
-    t0 = time.perf_counter()
-    for _ in range(N_SEQS):
-        token_ids = list(range(PROMPT_LEN))
-        prompt_len = PROMPT_LEN
-        output_text = ""
-        for i in range(N_TOKS):
-            token_ids.append(i & 0xFFFF)
-            output_text += "x"
-            if use_tracking:
-                n_out = len(token_ids) - prompt_len
-            else:
-                n_out = len(token_ids[prompt_len:])
-            if MIN_TOKENS and n_out <= MIN_TOKENS:
-                stop_check_offset = len(output_text)  # noqa: F841
-            total += 1
-        if use_tracking:
-            _ = (len(token_ids) - prompt_len) > MIN_TOKENS
-        else:
-            _ = len(token_ids[prompt_len:]) > MIN_TOKENS
-    dt = time.perf_counter() - t0
-    return dt / total * 1e6
-
-
-# --------------------------------------------------------------------------- #
-def _try_real():
-    try:
-        cf = _build_real_detokenizer()
-        # smoke: one real update must work
-        cls, d = cf
-        d.update([d.token_ids[-1] + 1 if d.token_ids else 100], False)
-        return cf
-    except Exception as e:
-        print(f"# real-path unavailable, using fallback: {e!r}", file=sys.stderr)
-        return None
+    return SlowIncrementalDetokenizer(tokenizer, request)
 
 
 def main():
-    arm = os.environ.get("ARM", "").strip().lower()
-    real = _try_real()
+    tokenizer = build_tokenizer()
+    vocab = tokenizer.get_vocab()
+    ids = [i for i in range(len(vocab)) if i not in tokenizer.all_special_ids]
+    rng = random.Random(1)
+    prompts = [[rng.choice(ids) for _ in range(PROMPT_LEN)] for _ in range(N_SEQS)]
+    outputs = [[rng.choice(ids) for _ in range(OUTPUT_LEN)] for _ in range(N_SEQS)]
 
-    if real is not None and arm in ("base", "gold"):
-        # Real path: this container has exactly one tree mounted; measure it.
-        runs = [_time_real(real) for _ in range(REPEATS)]
-        for v in runs:
-            print(f"detokenize {arm} {v:.6f}")
-        print(f"# approach=real", file=sys.stderr)
-        print(f"# approach=real")
-        print(f"# {arm}_mean_us_per_tok={statistics.mean(runs):.6f}")
-        return
+    d = make_detokenizer(tokenizer, prompts[0])
+    for t in outputs[0][:64]:
+        d.update([t], False)
+    assert len(d.output_text) > 0 and len(d.output_token_ids) == 64
 
-    # Fallback: run BOTH arms in one process (honest, same CPU/process).
-    base_runs = [_time_fallback(False) for _ in range(REPEATS)]
-    gold_runs = [_time_fallback(True) for _ in range(REPEATS)]
-    for v in base_runs:
-        print(f"detokenize base {v:.6f}")
-    for v in gold_runs:
-        print(f"detokenize gold {v:.6f}")
-    ratios = [b / g for b, g in zip(base_runs, gold_runs)]
-    print("# approach=fallback")
-    print(f"# base_mean_us_per_tok={statistics.mean(base_runs):.6f}")
-    print(f"# gold_mean_us_per_tok={statistics.mean(gold_runs):.6f}")
-    print(f"# speedup_x={statistics.mean(ratios):.6f}")
+    per_tok = []
+    for _ in range(REPEATS):
+        dets = [make_detokenizer(tokenizer, p) for p in prompts]
+        t0 = time.perf_counter()
+        for d, out in zip(dets, outputs):
+            for t in out:
+                d.update([t], False)
+        per_tok.append((time.perf_counter() - t0) * 1e6 / (N_SEQS * OUTPUT_LEN))
+    per_tok.sort()
+    print(f"detokenize {per_tok[len(per_tok) // 2]:.4f}")
+    print(f"# seqs={N_SEQS} prompt={PROMPT_LEN} output={OUTPUT_LEN} repeats={REPEATS} "
+          f"stop_strings=1 runs_us_per_tok={[round(x, 3) for x in per_tok]}")
 
 
 if __name__ == "__main__":

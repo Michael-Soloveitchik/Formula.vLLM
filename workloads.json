@@ -247,15 +247,15 @@
   "script": "tasks/pr_6442/bench.py",
   "cmd": "python3 tasks/pr_6442/bench.py",
   "needs": "gpu",
-  "notes": "Microbench imports v0 vllm Sampler; large batch, A100. ~50% sampler speedup.",
+  "notes": "v0 SamplingTensors.from_lists (real classmethod) on a 256-seq penalty batch (prompts 512..1024, 128 output tokens, vocab 128256), CPU only, pinned memory off (wheel 0.5.3 torch 2.3 cu121 has no sm_120 kernels). ms per call. Author: ~50% sampler speedup at large batch on A100, no absolute numbers.",
   "experiments": [
    {
     "name": "sampler_latency",
     "unit": "ms",
-    "parse": "latency ms",
+    "parse": "sampler_latency",
     "reported": {
-     "base": 2.0,
-     "patch": 1.0
+     "base": null,
+     "patch": null
     }
    }
   ]
@@ -361,7 +361,7 @@
   "script": "tasks/pr_33593/bench.py",
   "cmd": "python3 tasks/pr_33593/bench.py",
   "needs": "gpu",
-  "notes": "Pure-Python microbench, SIZE=2M N=1M R=5; list[:N] vs islice, create + sum.",
+  "notes": "Arm's real call sites: StructuredOutputManager.should_advance (unbound; delta = whole 1M-token sequence) and BaseThinkingReasoningParser.extract_content_ids on a DeepSeekR1 parser over a stub vocab; no end token present. Seconds per call, best of 5. Metric names follow the author's list[:N]-vs-islice microbench (SIZE 2M / N 1M); reported numbers are that microbench's.",
   "experiments": [
    {
     "name": "create_slice",
@@ -402,7 +402,7 @@
   "script": "tasks/pr_39328/bench.py",
   "cmd": "python3 tasks/pr_39328/bench.py",
   "needs": "gpu",
-  "notes": "functools.cache over inspect.getsource; CPU-only hashing path.",
+  "notes": "Real InductorPass.hash_source, 10000 lookups cycling 5 source objects after one untimed call each; total ms per 10000 lookups (author's scale), median of 5. cold_compile (Llama-3-70B TP4 torch.compile) is reported-only.",
   "experiments": [
    {
     "name": "cache_lookup",
@@ -432,15 +432,15 @@
   "script": "tasks/pr_32975/bench.py",
   "cmd": "python3 tasks/pr_32975/bench.py",
   "needs": "gpu",
-  "notes": "Pure-Python detokenizer change (num_output_tokens avoids slice). 1.628x / 38.57%.",
+  "notes": "Real SlowIncrementalDetokenizer.update() one token at a time with a stop string set (per-update output length check), 8 seqs x 2048 tokens after a 256-token prompt, in-process byte-level BPE tokenizer (no download). us per generated token, median of 5 passes. Author: 1.628x micro ratio only.",
   "experiments": [
    {
     "name": "detokenize",
     "unit": "us/tok",
-    "parse": "per tok",
+    "parse": "detokenize",
     "reported": {
-     "base": 1.628,
-     "patch": 1.0
+     "base": null,
+     "patch": null
     }
    }
   ]
@@ -492,15 +492,24 @@
   "script": "tasks/pr_27673/bench.py",
   "cmd": "python3 tasks/pr_27673/bench.py",
   "needs": "gpu",
-  "notes": "Pure-Python early return; driver times remove_skipped_blocks on the no-op path (CPU).",
+  "notes": "Real BlockPool + SlidingWindowManager (block 16, window 4096, 2048 blocks for one request); times the two no-op paths the PR short-circuits: steady state (blocks below the window already freed) and context shorter than the window. us per call, CPU only.",
   "experiments": [
    {
     "name": "remove_skipped_blocks",
     "unit": "us",
-    "parse": "latency us",
+    "parse": "remove_skipped_blocks",
     "reported": {
      "base": 6.3,
      "patch": 1.6
+    }
+   },
+   {
+    "name": "remove_skipped_blocks_short_ctx",
+    "unit": "us",
+    "parse": "remove_skipped_blocks_short_ctx",
+    "reported": {
+     "base": null,
+     "patch": null
     }
    }
   ]

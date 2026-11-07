@@ -22,7 +22,7 @@
   "unit": "us",
   "needs": "gpu",
   "headline": "remove_skipped_blocks",
-  "note": "Pure-Python early return; driver times remove_skipped_blocks on the no-op path (CPU)."
+  "note": "Real BlockPool + SlidingWindowManager (block 16, window 4096, 2048 blocks for one request); times the two no-op paths the PR short-circuits: steady state (blocks below the window already freed) and context shorter than the window. us per call, CPU only."
  },
  "perf_gain": {
   "top_gain": "75% (6.3us→1.6us)",
@@ -37,6 +37,14 @@
    "reported": {
     "base": 6.3,
     "patch": 1.6
+   }
+  },
+  {
+   "name": "remove_skipped_blocks_short_ctx",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
    }
   }
  ],

@@ -22,7 +22,7 @@
   "unit": "ms",
   "needs": "gpu",
   "headline": "cache_lookup",
-  "note": "functools.cache over inspect.getsource; CPU-only hashing path."
+  "note": "Real InductorPass.hash_source, 10000 lookups cycling 5 source objects after one untimed call each; total ms per 10000 lookups (author's scale), median of 5. cold_compile (Llama-3-70B TP4 torch.compile) is reported-only."
  },
  "perf_gain": {
   "top_gain": "1.15x, 2.88x",
@@ -49,6 +49,6 @@
   }
  ],
  "experiments_note": "reported = numbers from the PR body (author's machine)",
- "test_note": "perf-only functools.cache over inspect.getsource; no test in the diff.",
+ "test_note": "perf-only functools.cache over inspect.getsource; no test in the diff. cold_compile needs a real torch.compile of a 70B model - reported-only.",
  "generated_by": "gen_tasks.py"
 }

@@ -1,94 +1,74 @@
 #!/usr/bin/env python3
-"""Microbench for vLLM PR #33593: membership test over a slice, [:] vs islice.
+"""Microbench for vLLM PR #33593: [Perf] Optimize Python Slice for Structured Output using islice.
 
-The PR's real hot path (reasoning/basic_parsers.py BaseThinkingReasoningParser
-.extract_content_ids and step3 parser) is a *membership* test:
+Two real call sites change from a copying list slice to a lazy islice:
+  * StructuredOutputManager.should_advance: the per-step "did reasoning end in this step" check
+    passed `all_token_ids[delta_from:]` (a copy) to is_reasoning_end_streaming; now an islice.
+  * BaseThinkingReasoningParser.extract_content_ids: `end_token_id not in input_ids[:-1]`
+    (copy, then scan) -> membership over `islice(input_ids, 0, len-1)` (scan only).
 
-    base:  self.end_token_id not in input_ids[:-1]
-    gold:  self.end_token_id not in islice(input_ids, 0, max(0, len-1))
-
-The win is NOT materializing a new list. `input_ids[:-1]` copies the whole
-sequence (O(n) alloc) *before* the `in` scan. `islice(...)` is lazy, so the
-`in` membership both (a) allocates nothing and (b) short-circuits at the first
-match. A second hot path slices a suffix `all_token_ids[delta_from:]` that is
-then membership-scanned — same copy-vs-lazy story.
-
-Two experiments, each matched to a real call site:
-  membership_present : end token sits early in a long sequence (typical: the
-                       </think> marker ends reasoning long before generation
-                       finishes). base copies all N then scans; gold scans
-                       lazily and stops at the marker. Big win.
-  membership_absent  : end token absent (reasoning still open). base copies N
-                       then scans N; gold scans N but copies nothing. Win =
-                       the elided allocation.
-
-Emits per-repeat pairs for ratio stats + best-of-R summary.
+The bench calls the arm's own code for both: should_advance (unbound, with a minimal self holding
+the reasoner and a stand-in request whose delta covers the whole sequence) and
+extract_content_ids on a DeepSeekR1ReasoningParser built over a stub tokenizer vocabulary.
+Sequence length N = 1M tokens with no end token, as in the author's microbench
+(SIZE 2M / N 1M, best of R=5). Metric names follow that microbench:
+  create_slice - should_advance per call (slice/islice creation + membership scan)
+  sum_slice    - extract_content_ids per call (slice/islice + membership scan)
+Seconds per call, best of R. CPU only. Runs inside the task image: python3 /task/bench.py
 """
-
 import time
-from itertools import islice
+from types import SimpleNamespace
 
-SIZE = 100_000     # long generation sequence (tokens)
-EARLY = SIZE // 10 # reasoning-end marker lands ~10% in
-R = 9              # repeats (paired)
-INNER = 200        # calls per timed block (membership is cheap; amortize)
+from vllm.reasoning.deepseek_r1_reasoning_parser import DeepSeekR1ReasoningParser
+from vllm.v1.structured_output import StructuredOutputManager
 
-# present: a real token id sitting early; absent: an id that never occurs.
-PRESENT_TOKEN = -7
-ABSENT_TOKEN = -999
-
-seq_present = list(range(SIZE))
-seq_present[EARLY] = PRESENT_TOKEN
-
-seq_absent = list(range(SIZE))
+N = 1_000_000
+R = 5
+THINK_START, THINK_END = 1, 2
 
 
-def timed(fn):
-    start = time.perf_counter()
-    for _ in range(INNER):
+class StubTokenizer:
+    def get_vocab(self):
+        return {"<think>": THINK_START, "</think>": THINK_END, "<unk>": 0}
+
+
+def best_of(fn):
+    best = float("inf")
+    for _ in range(R):
+        t0 = time.perf_counter()
         fn()
-    return (time.perf_counter() - start) / INNER
+        best = min(best, time.perf_counter() - t0)
+    return best
 
 
-def base_present():
-    return PRESENT_TOKEN not in seq_present[:-1]
+def main():
+    parser = DeepSeekR1ReasoningParser(StubTokenizer())
+    assert parser.end_token_id == THINK_END
+    tokens = [1000 + (i % 5000) for i in range(N)]          # no </think> anywhere
+
+    manager = SimpleNamespace(reasoner=parser, enable_in_reasoning=False)
+    request = SimpleNamespace(
+        use_structured_output=True,
+        structured_output_request=SimpleNamespace(reasoning_ended=False),
+        num_computed_tokens=0,          # delta_from = 0 -> the delta is the whole sequence
+        num_output_placeholders=0,
+        all_token_ids=tokens,
+    )
+
+    def advance():
+        return StructuredOutputManager.should_advance(manager, request)
+
+    def extract():
+        return parser.extract_content_ids(tokens)
+
+    assert advance() is False and request.structured_output_request.reasoning_ended is False
+    assert extract() == []
+    s_advance = best_of(advance)
+    s_extract = best_of(extract)
+    print(f"create_slice {s_advance:.6f}")
+    print(f"sum_slice {s_extract:.6f}")
+    print(f"# N={N} R={R} end_token_present=False (should_advance / extract_content_ids per call)")
 
 
-def gold_present():
-    return PRESENT_TOKEN not in islice(seq_present, 0, max(0, len(seq_present) - 1))
-
-
-def base_absent():
-    return ABSENT_TOKEN not in seq_absent[:-1]
-
-
-def gold_absent():
-    return ABSENT_TOKEN not in islice(seq_absent, 0, max(0, len(seq_absent) - 1))
-
-
-# warmup
-for _ in range(2):
-    base_present(); gold_present(); base_absent(); gold_absent()
-
-present_base, present_gold = [], []
-absent_base, absent_gold = [], []
-for _ in range(R):
-    # A-B-B-A paired ordering to cancel drift
-    present_base.append(timed(base_present))
-    present_gold.append(timed(gold_present))
-    present_gold.append(timed(gold_present))
-    present_base.append(timed(base_present))
-    absent_base.append(timed(base_absent))
-    absent_gold.append(timed(gold_absent))
-    absent_gold.append(timed(gold_absent))
-    absent_base.append(timed(base_absent))
-
-print(f"membership_present base {min(present_base):.9f}")
-print(f"membership_present gold {min(present_gold):.9f}")
-print(f"membership_absent base {min(absent_base):.9f}")
-print(f"membership_absent gold {min(absent_gold):.9f}")
-
-for b, g in zip(present_base, present_gold):
-    print(f"run membership_present {b:.9f} {g:.9f}")
-for b, g in zip(absent_base, absent_gold):
-    print(f"run membership_absent {b:.9f} {g:.9f}")
+if __name__ == "__main__":
+    main()
