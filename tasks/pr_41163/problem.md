@@ -2,8 +2,8 @@
 
 ## Objective
 Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the expert's merged patch (the PR's solution)**.
-You are given the expert's known solution below. You may reproduce it, but you
+workload runs **as fast as or faster than the PR's solution**.
+You are given the PR author's known solution below. You may reproduce it, but you
 are explicitly asked to **try to beat it** — find a faster correct version.
 
 ## The problem (issue)
@@ -12,7 +12,7 @@ The token-wise "all" pooler returns, for each request in a sub-group of the batc
 ### Issue — detailed
 In `vllm/model_executor/layers/pooler/tokwise/methods.py`, `AllPool.forward` computes `hidden_states_lst` with a list comprehension that zips `pooling_cursor.first_token_indices_gpu.tolist()` and `pooling_cursor.last_token_indices_gpu.tolist()` and slices `hidden_states[first:last+1]` for each request. The two `.tolist()` calls each force a GPU→CPU transfer and synchronization, and the comprehension issues N separate slice operations. The cursor already knows the sub-group's contiguous token range and the per-request token counts on the CPU (`num_scheduled_tokens_cpu`), so none of that device traffic is necessary. Author's benchmark: 64 requests × 128 tokens, pooling a 32-request sub-group (offset 16), hidden size 4096, bf16 — median `AllPool.forward` 59.89 µs.
 
-## Expert solution (reference — the merged PR)
+## PR's solution (reference — what was merged)
 **General:** Slice the sub-group's contiguous token range out of `hidden_states` once, then split that single slice by the per-request token counts that are already on the CPU. No GPU→CPU index copies, one slice plus one `split` instead of N slices.
 
 **Detailed:** `AllPool.forward` now takes `split_sizes = pooling_cursor.num_scheduled_tokens_cpu.tolist()` (CPU tensor, no device sync), computes the sub-group's start/end token offsets from the cursor, slices `hidden_states[start:end]` once, and calls `.split(split_sizes)` to produce the per-request views. The result list is identical to the old per-request slicing. Only `methods.py` changes.

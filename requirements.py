@@ -128,6 +128,14 @@ def check(pr, M, IDX, install=False):
         add(True, "software", f"dataset {ds}", "downloads on first run")
     for v in sw.get("env", []):
         add(bool(os.environ.get(v)), "software", f"env {v}=1 (opt-in gate)", "" if os.environ.get(v) else f"export {v}=1 to allow")
+    wl = (IDX[pr].get("workload") or {}).get("cmd") or ""
+    try:
+        wl = json.load(open(os.path.join(HERE, "tasks", f"pr_{pr}", "metadata.json"))).get("workload", {}).get("cmd") or wl
+    except Exception:
+        pass
+    if "/task/bench.py" in wl or f"tasks/pr_{pr}/bench.py" in wl:
+        have = os.path.exists(os.path.join(HERE, "tasks", f"pr_{pr}", "bench.py"))
+        add(have, "software", f"vendored bench script tasks/pr_{pr}/bench.py", "" if have else "missing: the workload cmd points at it but it was never written")
     if sw.get("needs_server"):
         add(False, "software", "serving benchmark needs a running vllm server", "run_one.sh runs one command per arm; no server orchestration yet")
     return R

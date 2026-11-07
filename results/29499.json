@@ -1,143 +1,154 @@
 {
- "pr": 29499,
- "pr_url": "https://github.com/vllm-project/vllm/pull/29499",
- "title": "[EPLB] Optimize EPLB with numpy (#29499)",
- "field": "parallelism",
- "reported_gain": "27% (rearrange 1370->1077ms end-to-end); 20-25% per primitive",
- "base_sha": "0ada960a20766fa1de9063576979f9d807583785",
- "merge_sha": "6170d47d2220bc464fb561b93caf799a7560e304",
- "arms": {
-  "base": {
-   "tests": "FAIL"
-  },
-  "gold": {
-   "tests": "PASS"
-  }
- },
- "improved": true,
  "schema": "experiments_v2",
  "experiments": [
   {
    "name": "move_from_buffer",
-   "unit": "ms/op",
-   "workload": "per-rank mapping over 16 local experts (2048-slot cluster); 5 repeats x best-of-100",
-   "note": "inline-from-diff: exact duplicate-resolution mapping body copied verbatim from base_sha / merge_sha (tensor .copy_ excluded as arm-identical). per-rank body over num_local_experts=16 rows; numpy overhead dominates at this size so gold is slower. unit ms/op. speedup = mean of per-repeat base/gold ratios",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
    "reported": {
     "base": null,
-    "patch": null,
-    "pct": 0.225,
-    "comparable": false,
-    "scale_note": "NOT CPU-REPRODUCIBLE. Headline is end-to-end rearrange 1370->1077ms (~27%); this primitive is in the separate '20-25% per primitive' claim (pct~0.225), no absolute ms pair. PRECISE mechanism: the numpy rewrite moved only the INDEX/MASK bookkeeping (np.isin/unique/lexsort/searchsorted) off GPU tensors; the tensor .copy_(non_blocking=True) transfers themselves are UNCHANGED across arms. Author's #1 bullet 'removes multiple gpu-cpu transfers in move_from_buffer' + preserve_intragpu_slots avoids memcopies -- a GPU-sync/transfer saving invisible on CPU. On CPU-only our microbench pays the numpy bookkeeping overhead with NO GPU-sync elision to offset it -> gold SLOWER (0.245x). Sub-1x contradicts no published number (author ran no CPU microbench); real gain is on the GPU path."
+    "patch": null
    },
    "arms": {
     "base": {
-     "mean": 0.00181,
-     "sd": 5e-05,
-     "runs": [
-      0.00185,
-      0.001792,
-      0.001866,
-      0.001816,
-      0.001724
-     ]
+     "mean": 0.0015,
+     "sd": 0.0,
+     "n": 5
     },
     "gold": {
-     "mean": 0.008454,
-     "sd": 0.003279,
-     "runs": [
-      0.005669,
-      0.005882,
-      0.012448,
-      0.012491,
-      0.005782
-     ],
-     "speedup_x": 0.245,
-     "speedup_sd": 0.08,
-     "counts": true
+     "mean": 0.004,
+     "sd": 0.0,
+     "n": 5
     }
    }
   },
   {
    "name": "get_ep_ranks_with_expert",
-   "unit": "ms/op",
-   "workload": "128 ranks x 16 local = 2048 physical slots, 256 logical experts; 5 repeats x best-of-100",
-   "note": "isolated import of real function from each tree. base loops get_ep_ranks_with_expert over all unique experts; gold makes one get_ep_ranks_with_experts_batch call. unit ms/op (whole-layer rank-map computation). speedup = mean of per-repeat base/gold ratios",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
    "reported": {
     "base": null,
-    "patch": null,
-    "pct": 0.225,
-    "comparable": false,
-    "scale_note": "PR gives '20-25% on average for each primitive' (pct~0.225), no absolute pair. This is the ONE primitive that is pure-CPU and genuinely batchable: base loops get_ep_ranks_with_expert per-expert, gold does one batched call -> our 8.3x is a real CPU-reproducible win whose DIRECTION agrees with the PR, but the magnitude is not 1:1 with the PR's 20-25% because the PR's percent is diluted across the whole EPLB step (including GPU-transfer primitives). Absolute ms not comparable (no reported pair)."
+    "patch": null
    },
    "arms": {
     "base": {
-     "mean": 24.043582,
-     "sd": 0.559845,
-     "runs": [
-      24.96972,
-      24.388491,
-      23.435503,
-      23.733472,
-      23.690724
-     ]
+     "mean": 16.3273,
+     "sd": 0.1054,
+     "n": 5
     },
     "gold": {
-     "mean": 2.900953,
-     "sd": 0.032188,
-     "runs": [
-      2.862138,
-      2.861013,
-      2.929905,
-      2.92577,
-      2.92594
-     ],
-     "speedup_x": 8.291,
-     "speedup_sd": 0.282,
-     "counts": true
+     "mean": 1.9819,
+     "sd": 0.0036,
+     "n": 5
     }
    }
   },
   {
    "name": "move_to_buffer",
-   "unit": "ms/op",
-   "workload": "per-rank mapping over 16 local experts (2048-slot cluster); 5 repeats x best-of-100",
-   "note": "inline-from-diff: exact index-mapping body copied verbatim from base_sha / merge_sha (P2P + .copy_ excluded as arm-identical). per-rank body over num_local_experts=16 rows; numpy overhead dominates at this size so gold is slower. unit ms/op. speedup = mean of per-repeat base/gold ratios",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
    "reported": {
     "base": null,
-    "patch": null,
-    "pct": 0.225,
-    "comparable": false,
-    "scale_note": "GPU-TRANSFER-BOUND, NOT CPU-REPRODUCIBLE. Same as move_from_buffer: PR's '20-25% per primitive' (pct~0.225) is dominated by eliding GPU P2P + tensor .copy_ round-trips (arm-identical, excluded). The residual numpy index-mapping body over 16 local experts is too small for numpy to win -> gold SLOWER (0.659x) on CPU. Sub-1x is an isolation artifact, not a regression; the PR's real gain lives on the GPU-transfer path we cannot run here."
+    "patch": null
    },
    "arms": {
     "base": {
-     "mean": 0.026854,
-     "sd": 0.000414,
-     "runs": [
-      0.027419,
-      0.02668,
-      0.027144,
-      0.026824,
-      0.026203
-     ]
+     "mean": 0.0228,
+     "sd": 0.0001,
+     "n": 5
     },
     "gold": {
-     "mean": 0.040745,
-     "sd": 0.000316,
-     "runs": [
-      0.040228,
-      0.041051,
-      0.040838,
-      0.041051,
-      0.040555
-     ],
-     "speedup_x": 0.659,
-     "speedup_sd": 0.013,
-     "counts": true
+     "mean": 0.0309,
+     "sd": 0.0005,
+     "n": 5
     }
    }
   }
  ],
- "environment": "docker vllm-cpu-bench:21222 (python 3.12.16, numpy 2.5.4, torch 2.15.0+cpu), colima arm64 Mac; identical image for both arms, only vllm/ source tree differs (PYTHONPATH). get_ep_ranks_with_expert via isolated import of real function; move_to_buffer/move_from_buffer via inline-from-diff of the exact mapping body the PR changed (multi-rank process group + GPU P2P cannot run in a single CPU container; P2P/.copy_ are arm-identical and excluded)",
- "ts": "2026-11-04T00:00:00Z"
+ "pr": 29499,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/29499",
+ "title": "[EPLB] Optimize EPLB with numpy (#29499)",
+ "field": "parallelism",
+ "reported_gain": "27% (rearrange 1370->1077ms E2E); 20-25% per primitive",
+ "gain_kind": "pct",
+ "base_sha": "0ada960a20766fa1de9063576979f9d807583785",
+ "merge_sha": "6170d47d2220bc464fb561b93caf799a7560e304",
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.14.0",
+  "workload_cmd": "python3 /task/bench.py",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "FAIL",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "PASS",
+   "slug": "gold"
+  }
+ },
+ "improved": true,
+ "latency": {
+  "scenarios": {
+   "get_ep_ranks_with_expert": {
+    "unit": "us",
+    "base": {
+     "mean": 16.3273,
+     "sd": 0.1054,
+     "n": 5
+    },
+    "gold": {
+     "mean": 1.9819,
+     "sd": 0.0036,
+     "n": 5
+    }
+   },
+   "move_from_buffer": {
+    "unit": "us",
+    "base": {
+     "mean": 0.0015,
+     "sd": 0.0,
+     "n": 5
+    },
+    "gold": {
+     "mean": 0.004,
+     "sd": 0.0,
+     "n": 5
+    }
+   },
+   "move_to_buffer": {
+    "unit": "us",
+    "base": {
+     "mean": 0.0228,
+     "sd": 0.0001,
+     "n": 5
+    },
+    "gold": {
+     "mean": 0.0309,
+     "sd": 0.0005,
+     "n": 5
+    }
+   }
+  },
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {
+   "tests": {
+    "bytes": 10581,
+    "tail": "rt\",\n            ),\n        ],\n    )\n    def test_preserve_intragpu_slots(\n        num_ranks: int,\n        slots_per_gpu: int,\n        old_phy2log: torch.Tensor,\n        new_phy2log: torch.Tensor,\n    ):\n        \"\"\"Experts that stay on a GPU keep their old slots; incoming not lost.\"\"\"\n        phy_replicas_idx = _make_phy_replicas_idx_from_phy2log(new_phy2log)\n    \n>       post_phy2log, post_phy_replicas_idx = DefaultEplbPolicy.preserve_intragpu_slots(\n            new_phy2log, phy_replicas_idx, num_ranks, old_phy2log\n        )\nE       AttributeError: type object 'DefaultEplbPolicy' has no attribute 'preserve_intragpu_slots'\n\ntests/distributed/test_eplb_algo.py:436: AttributeError\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED tests/distributed/test_eplb_algo.py::test_preserve_intragpu_slots[simple]\nFAILED tests/distributed/test_eplb_algo.py::test_preserve_intragpu_slots[duplicates]\nFAILED tests/distributed/test_eplb_algo.py::test_preserve_intragpu_slots[skewed_expert]\n3 failed, 11 passed, 11 skipped, 1 warning in 2.34s\n"
+   },
+   "workload_runs": 5
+  },
+  "gold": {
+   "tests": {
+    "bytes": 1176,
+    "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n..............sssssssssss                                                [100%]\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n14 passed, 11 skipped, 1 warning in 2.32s\n"
+   },
+   "workload_runs": 5
+  }
+ },
+ "ts": "2026-11-07T16:42:54Z"
 }

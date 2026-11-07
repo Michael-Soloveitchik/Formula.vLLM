@@ -44,9 +44,9 @@ arms:
 # NOTE: the GPU box has NO IBM LiteLLM, so codex (litellm-wired) is off there.
 # ---------------------------------------------------------------------------
 solvers:
-  # `guided: false` -> objective has the "## Expert solution" section STRIPPED
+  # `guided: false` -> objective has the "## PR's solution" section STRIPPED
   # (blind FormulaCode: discover the optimization). `guided: true` -> full
-  # problem.md incl. expert solution, asked to beat it. Harness names MUST match
+  # problem.md incl. the PR's solution, asked to beat it. Harness names MUST match
   # the HTML arm keys: claude / claude + solution / codex / codex + solution.
   - harness: claude
     model: claude-opus-4-8

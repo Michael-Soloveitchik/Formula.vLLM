@@ -2,8 +2,8 @@
 
 ## Objective
 Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the expert's merged patch (the PR's solution)**.
-You are given the expert's known solution below. You may reproduce it, but you
+workload runs **as fast as or faster than the PR's solution**.
+You are given the PR author's known solution below. You may reproduce it, but you
 are explicitly asked to **try to beat it** — find a faster correct version.
 
 ## The problem (issue)
@@ -12,7 +12,7 @@ A pool of reusable fixed-size memory blocks is kept in a doubly linked list. The
 ### Issue — detailed
 In block_pool.py, get_new_blocks called free_block_queue.popleft() once per block in a loop, and free_blocks called free_block_queue.append() once per block. Each popleft() reconnected the fake head to the next block (even though that block might be popped on the very next iteration), and each append() reconnected the fake tail; doing this per block produces links the next iteration overwrites. Both paths are on the critical path: KV block allocation hard-blocks the forward pass and KV block free hard-blocks the end of the decode cycle. The redundant per-block linked-list pointer updates roughly double the necessary work.
 
-## Expert solution (reference — the merged PR)
+## PR's solution (reference — what was merged)
 **General:** Add bulk operations that pop or append many blocks in one pass. The links between neighboring blocks are set once, and only the endpoint links to the list's head/tail are fixed once at the end instead of once per block. This roughly halves the pointer operations.
 
 **Detailed:** Added popleft_n(n) and append_n(blocks) to FreeKVCacheBlockQueue in kv_cache_utils.py. popleft_n walks n blocks from the head, clears their prev/next pointers, then reconnects the fake head to the new first block a single time. append_n chains the incoming blocks to each other in one loop, then connects the last one to the fake tail once. block_pool.get_new_blocks now calls popleft_n(num_blocks) and bumps ref counts (with eviction when caching is enabled) in a single pass; free_blocks materializes the iterable, decrements ref counts, then calls append_n with the blocks that reached ref_cnt 0 and are not null.

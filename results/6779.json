@@ -1,78 +1,63 @@
 {
- "pr": 6779,
- "pr_url": "https://github.com/vllm-project/vllm/pull/6779",
- "title": "[Core] Use array to speedup padding (#6779)",
- "field": "decoding_tpot",
- "reported_gain": "18%",
- "base_sha": "084a01fd3544557990f8af8af6fd3c1185bae848",
- "merge_sha": "89a84b0bb7b30706a02836234a94493ea8f780bf",
- "arms": {
-  "base": {
-   "tests": "FAIL"
-  },
-  "gold": {
-   "tests": "PASS"
-  }
- },
- "improved": true,
  "schema": "experiments_v2",
  "experiments": [
   {
    "name": "make_tensor_with_pad",
    "unit": "ms",
-   "workload": "SamplingTensors padding-input prep + 2x make_tensor_with_pad (prompt+output), input_len=1024, batch_size=2048, pad=vocab_size(32000), dtype=int64, device=cpu; 1 warmup, 5 timed repeats",
-   "note": "FINDING: PR #6779 does NOT touch make_tensor_with_pad; that fn is BYTE-IDENTICAL at base and gold (already the np.full/make_ndarray_with_pad array path). The real change is the INPUT fed to it inside SamplingTensors.from_sampling_metadata/from_lists: base builds List[List[int]] via list(seq_data.prompt_token_ids) (tuple->list copies); gold passes seq_data.prompt_token_ids_array (array('l')) directly, SequenceData now storing tokens as array. Benchmark loads the REAL unmodified make_tensor_with_pad from each mounted tree by source (vllm import chain needs the absent _custom_ops C ext) and replicates the exact per-arm prep path. speedup_x = mean of per-run base/gold ratios.",
+   "workload": "python3 /task/bench.py",
    "reported": {
     "base": 79.0,
-    "patch": 22.0,
-    "scope": "PR microbench of the FULL from_sampling_metadata / SamplingTensors.from_lists build (NVTX-profiled), input_len=1024 batch=2048 -> 79->22ms (~3.6x)",
-    "comparable": false,
-    "scale_short": "We isolate only the token-store+pad sub-op; author timed the whole metadata build. TO MAKE 1:1: widen our bench to the full from_sampling_metadata build.",
-    "scale_note": "SAME unit (ms) but NOT 1:1. The PR does NOT optimize make_tensor_with_pad (byte-identical across arms); the real change is SequenceData storing tokens as array.array('l') so from_sampling_metadata appends arrays directly instead of list(...) copies. Author's 79->22ms (3.6x) is the WHOLE sampler-metadata build stage; our 54.7->2.7ms (20x) isolates just the token-store+pad sub-op the array change accelerates. TO MAKE SAME ENCLOSING SCOPE: time the full from_sampling_metadata build (not just the pad sub-op) so our ratio converges toward the author's 3.6x. E2E (separate arm) is the headline the author/reviewer agreed on: ~18.9%."
+    "patch": 22.0
    },
-   "arms": {
-    "base": {
-     "mean": 54.6725,
-     "sd": 3.4126,
-     "runs": [
-      61.469011,
-      53.007991,
-      52.754865,
-      53.525083,
-      52.605456
-     ]
-    },
-    "gold": {
-     "mean": 2.725,
-     "sd": 0.2186,
-     "runs": [
-      3.160982,
-      2.601602,
-      2.626848,
-      2.639047,
-      2.596544
-     ],
-     "speedup_x": 20.089,
-     "speedup_sd": 0.335,
-     "counts": true
-    }
-   }
+   "arms": {}
   },
   {
    "name": "e2e_qwen05b",
-   "unit": "it/s",
-   "workload": "end-to-end decode throughput, Qwen2-0.5B",
-   "note": "needs GPU model, reported-only",
+   "unit": "ms",
+   "workload": "python3 /task/bench.py",
    "reported": {
     "base": 24.76,
-    "patch": 29.44,
-    "scope": "E2E Qwen-1.5-0.5B offline throughput (GPU)",
-    "comparable": false,
-    "scale_note": "E2E it/s on GPU (24.76->29.44). NOT run here (CPU arm Mac). Row left as reported-only."
+    "patch": 29.44
    },
    "arms": {}
   }
  ],
- "environment": "docker vllm-cpu-bench:21222 (CPU torch 2.15.0+cpu, numpy 2.5.4), colima arm64 Mac; identical image for both arms, only vllm/ source tree differs; real make_tensor_with_pad loaded by source from each mounted tree",
- "ts": "2026-11-04T00:00:00Z"
+ "pr": 6779,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/6779",
+ "title": "[Core] Use array to speedup padding (#6779)",
+ "field": "decoding_tpot",
+ "reported_gain": "18% (e2e 24.76->29.44 it/s)",
+ "gain_kind": "pct",
+ "base_sha": "084a01fd3544557990f8af8af6fd3c1185bae848",
+ "merge_sha": "89a84b0bb7b30706a02836234a94493ea8f780bf",
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.5.4",
+  "workload_cmd": "python3 /task/bench.py",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "SKIP",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "SKIP",
+   "slug": "gold"
+  }
+ },
+ "improved": false,
+ "latency": {
+  "scenarios": {},
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {
+   "workload_runs": 1
+  },
+  "gold": {
+   "workload_runs": 1
+  }
+ },
+ "ts": "2026-11-07T16:11:29Z"
 }

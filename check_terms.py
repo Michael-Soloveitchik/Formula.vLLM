@@ -30,8 +30,9 @@ ALLOWED = [
     r'":\s*base,',
 ]
 ALLOWED.append(r"""workload (?:base|gold) run""")
+ALLOWED.append(r"""\bbase class\b|\*Base\b|per merged PR""")   # plain English / data-spine wording
 ALLOWED = [re.compile(p) for p in ALLOWED]
-WORD = re.compile(r"\b(?:base|gold|Base|Gold)\b")
+WORD = re.compile(r"\b(?:base|gold|Base|Gold)\b|[Ee]xpert(?:'s)? (?:solution|patch)|merged PR\b")
 
 
 def scan(path):
@@ -48,7 +49,7 @@ def scan(path):
 
 bad = 0
 for root, dirs, files in os.walk(HERE):
-    dirs[:] = [d for d in dirs if d not in SKIP_DIRS and d not in ("prompts", "workload", "tests")]
+    dirs[:] = [d for d in dirs if d not in SKIP_DIRS and d not in ("workload", "tests")]
     for f in files:
         if f in SKIP_FILES or f == "bench.py" or not f.endswith(EXTS):
             continue

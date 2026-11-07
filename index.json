@@ -158,13 +158,13 @@
     "python3": true,
     "hf_cli": false,
     "hf_token": false,
-    "vllm_wheel": null,
+    "vllm_wheel": "0.5.3",
     "cuda_build": null,
     "models": [],
     "datasets": [],
     "env": [],
     "needs_server": false,
-    "pipeline": "needs-wheel-task"
+    "pipeline": "wheel"
    }
   }
  },

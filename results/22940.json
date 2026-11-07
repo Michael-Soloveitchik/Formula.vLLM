@@ -13,13 +13,13 @@
    },
    "arms": {
     "base": {
-     "mean": 2270.438,
-     "sd": 12.0601,
+     "mean": 2260.996,
+     "sd": 15.9951,
      "n": 5
     },
     "gold": {
-     "mean": 2279.978,
-     "sd": 15.9962,
+     "mean": 2265.852,
+     "sd": 17.7261,
      "n": 5
     },
     "claude": {
@@ -41,13 +41,13 @@
    "reported": null,
    "arms": {
     "base": {
-     "mean": 26487.506,
-     "sd": 140.8211,
+     "mean": 26377.464,
+     "sd": 186.527,
      "n": 5
     },
     "gold": {
-     "mean": 26598.798,
-     "sd": 186.7255,
+     "mean": 26434.172,
+     "sd": 206.8499,
      "n": 5
     },
     "claude": {
@@ -69,13 +69,13 @@
    "reported": null,
    "arms": {
     "base": {
-     "mean": 30.274,
-     "sd": 0.1613,
+     "mean": 30.146,
+     "sd": 0.213,
      "n": 5
     },
     "gold": {
-     "mean": 30.4,
-     "sd": 0.214,
+     "mean": 30.212,
+     "sd": 0.2366,
      "n": 5
     },
     "claude": {
@@ -129,13 +129,13 @@
    "throughput_output_tok_s": {
     "unit": "tok/s",
     "base": {
-     "mean": 2270.438,
-     "sd": 12.0601,
+     "mean": 2260.996,
+     "sd": 15.9951,
      "n": 5
     },
     "gold": {
-     "mean": 2279.978,
-     "sd": 15.9962,
+     "mean": 2265.852,
+     "sd": 17.7261,
      "n": 5
     },
     "claude": {
@@ -152,13 +152,13 @@
    "throughput_req_s": {
     "unit": "req/s",
     "base": {
-     "mean": 30.274,
-     "sd": 0.1613,
+     "mean": 30.146,
+     "sd": 0.213,
      "n": 5
     },
     "gold": {
-     "mean": 30.4,
-     "sd": 0.214,
+     "mean": 30.212,
+     "sd": 0.2366,
      "n": 5
     },
     "claude": {
@@ -175,13 +175,13 @@
    "throughput_total_tok_s": {
     "unit": "tok/s",
     "base": {
-     "mean": 26487.506,
-     "sd": 140.8211,
+     "mean": 26377.464,
+     "sd": 186.527,
      "n": 5
     },
     "gold": {
-     "mean": 26598.798,
-     "sd": 186.7255,
+     "mean": 26434.172,
+     "sd": 206.8499,
      "n": 5
     },
     "claude": {
@@ -202,14 +202,14 @@
   "base": {
    "tests": {
     "bytes": 727,
-    "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n......                                                                   [100%]\n6 passed in 1.14s\n"
+    "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n......                                                                   [100%]\n6 passed in 1.61s\n"
    },
    "workload_runs": 5
   },
   "gold": {
    "tests": {
     "bytes": 727,
-    "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n......                                                                   [100%]\n6 passed in 1.08s\n"
+    "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n......                                                                   [100%]\n6 passed in 1.11s\n"
    },
    "workload_runs": 5
   },
@@ -238,5 +238,13 @@
    "patch_bytes": 3457
   }
  },
- "ts": "2026-11-05T14:13:13Z"
+ "ts": "2026-11-07T10:44:17Z",
+ "solver_arms_from": {
+  "ts": "2026-11-05T14:13:13Z",
+  "arms": [
+   "claude",
+   "claude + PR's solution"
+  ],
+  "note": "solver arms recorded by an earlier --run-formula-harnesses run; baseline / PR's solution re-measured by --reproduce"
+ }
 }

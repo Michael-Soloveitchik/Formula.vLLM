@@ -1,103 +1,71 @@
 {
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "get_new_blocks",
+   "unit": "us/op",
+   "workload": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
+   "reported": {
+    "base": 150.0,
+    "patch": 8.0
+   },
+   "arms": {}
+  },
+  {
+   "name": "free_blocks",
+   "unit": "us/op",
+   "workload": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
+   "reported": {
+    "base": 33.0,
+    "patch": 9.0
+   },
+   "arms": {}
+  }
+ ],
  "pr": 21222,
  "pr_url": "https://github.com/vllm-project/vllm/pull/21222",
  "title": "[Core] Introduce popleft_n and append_n in FreeKVCacheBlockQueue to further optimize block_pool (#21222)",
  "field": "kv_cache",
  "reported_gain": "95% (0.15ms\u21920.008ms)",
+ "gain_kind": "unit",
  "base_sha": "10904e6d755051260a7c3ce98659d8907c74caa9",
  "merge_sha": "ed25054577f7abca2aee32a5290200c4a1aed561",
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.10.0",
+  "workload_cmd": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
+  "repeats": 5
+ },
  "arms": {
   "base": {
-   "tests": "FAIL"
+   "tests": "FAIL",
+   "slug": "base"
   },
   "gold": {
-   "tests": "PASS"
+   "tests": "FAIL",
+   "slug": "gold"
   }
  },
- "improved": true,
- "schema": "experiments_v2",
- "experiments": [
-  {
-   "name": "get_new_blocks",
-   "unit": "ms/op",
-   "workload": "block_pool sweep 10/50/100/500/1000 blocks, 1000 iters",
-   "note": "runs = per allocate-block size; speedup = mean of per-size base/gold ratios",
-   "reported": {
-    "base": 0.15,
-    "patch": 0.008,
-    "scope": "per-op TRACE in a serving run",
-    "comparable": false,
-    "scale_note": "PR gave TWO measurements from DIFFERENT harnesses: (1) engine 'benchmark scripts' on a GPU box, single aggregate per-op, 0.15ms->0.008ms (~19x, screenshots only); (2) benchmark_block_pool.py, which the author described only as 'cut in half' (~2x, no typed numbers). OUR bench IS benchmark_block_pool.py, so the ~2x claim is the right comparator (measured 1.83x = match). The 19x headline is the engine-script scope where fixed per-call python overhead dominates a GPU-fast path -- NOT reproducible on, nor scale-comparable to, a CPU linked-list microbench. Author never claimed benchmark_block_pool gives 19x."
+ "improved": false,
+ "latency": {
+  "scenarios": {},
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {
+   "tests": {
+    "bytes": 2010,
+    "tail": "r import (BasevLLMParameter,\n/usr/local/lib/python3.10/dist-packages/vllm/model_executor/parameter.py:10: in <module>\n    from vllm.distributed import get_tensor_model_parallel_rank\n/usr/local/lib/python3.10/dist-packages/vllm/distributed/__init__.py:4: in <module>\n    from .communication_op import *\n/usr/local/lib/python3.10/dist-packages/vllm/distributed/communication_op.py:9: in <module>\n    from .parallel_state import get_tp_group\n/usr/local/lib/python3.10/dist-packages/vllm/distributed/parallel_state.py:150: in <module>\n    from vllm.platforms import current_platform\n/usr/local/lib/python3.10/dist-packages/vllm/platforms/__init__.py:12: in <module>\n    from .interface import _Backend  # noqa: F401\n/usr/local/lib/python3.10/dist-packages/vllm/platforms/interface.py:16: in <module>\n    from vllm.inputs import ProcessorInputs, PromptType\n/usr/local/lib/python3.10/dist-packages/vllm/inputs/__init__.py:9: in <module>\n    from .registry import (DummyData, InputContext, InputProcessingContext,\n/usr/local/lib/python3.10/dist-packages/vllm/inputs/registry.py:8: in <module>\n    from transformers import BatchFeature, PretrainedConfig, ProcessorMixin\n/usr/local/lib/python3.10/dist-packages/transformers/utils/import_utils.py:2688: in __getattr__\n    raise ModuleNotFoundError(import_error_message) from e\nE   ModuleNotFoundError: Could not import module 'ProcessorMixin'. Are this object's requirements defined correctly? Set the logging verbosity to DEBUG for the original import error.\n"
    },
-   "arms": {
-    "base": {
-     "mean": 0.150956,
-     "sd": 0.172406,
-     "runs": [
-      0.004424,
-      0.022943,
-      0.043132,
-      0.228052,
-      0.456227
-     ]
-    },
-    "gold": {
-     "mean": 0.087743,
-     "sd": 0.097173,
-     "runs": [
-      0.00268,
-      0.010689,
-      0.020929,
-      0.16115,
-      0.243266
-     ],
-     "speedup_x": 1.83,
-     "speedup_sd": 0.268,
-     "counts": true
-    }
-   }
+   "workload_runs": 1
   },
-  {
-   "name": "free_blocks",
-   "unit": "ms/op",
-   "workload": "block_pool sweep 10/50/100/500/1000 blocks, 1000 iters",
-   "note": "runs = per allocate-block size; speedup = mean of per-size base/gold ratios",
-   "reported": {
-    "base": 0.033,
-    "patch": 0.009,
-    "scope": "per-op TRACE in a serving run",
-    "comparable": false,
-    "scale_note": "Same as get_new_blocks: 33us->9us is the engine-script TRACE aggregate (GPU box), benchmark_block_pool is 'cut in half' ~2x (measured 1.71x = match). Our base free=0.101ms is NOT 3x the author's 33us 'baseline' -- it is the 500-block-size row average; the 33us is a single engine-aggregate per-call figure from a different harness. Harness mismatch, not a scale error. Pure-python linked-list pointer reduction (popleft_n/append_n), no GPU involved in the list logic."
+  "gold": {
+   "tests": {
+    "bytes": 2010,
+    "tail": "r import (BasevLLMParameter,\n/usr/local/lib/python3.10/dist-packages/vllm/model_executor/parameter.py:10: in <module>\n    from vllm.distributed import get_tensor_model_parallel_rank\n/usr/local/lib/python3.10/dist-packages/vllm/distributed/__init__.py:4: in <module>\n    from .communication_op import *\n/usr/local/lib/python3.10/dist-packages/vllm/distributed/communication_op.py:9: in <module>\n    from .parallel_state import get_tp_group\n/usr/local/lib/python3.10/dist-packages/vllm/distributed/parallel_state.py:150: in <module>\n    from vllm.platforms import current_platform\n/usr/local/lib/python3.10/dist-packages/vllm/platforms/__init__.py:12: in <module>\n    from .interface import _Backend  # noqa: F401\n/usr/local/lib/python3.10/dist-packages/vllm/platforms/interface.py:16: in <module>\n    from vllm.inputs import ProcessorInputs, PromptType\n/usr/local/lib/python3.10/dist-packages/vllm/inputs/__init__.py:9: in <module>\n    from .registry import (DummyData, InputContext, InputProcessingContext,\n/usr/local/lib/python3.10/dist-packages/vllm/inputs/registry.py:8: in <module>\n    from transformers import BatchFeature, PretrainedConfig, ProcessorMixin\n/usr/local/lib/python3.10/dist-packages/transformers/utils/import_utils.py:2688: in __getattr__\n    raise ModuleNotFoundError(import_error_message) from e\nE   ModuleNotFoundError: Could not import module 'ProcessorMixin'. Are this object's requirements defined correctly? Set the logging verbosity to DEBUG for the original import error.\n"
    },
-   "arms": {
-    "base": {
-     "mean": 0.100668,
-     "sd": 0.115137,
-     "runs": [
-      0.002991,
-      0.015285,
-      0.028646,
-      0.151623,
-      0.304795
-     ]
-    },
-    "gold": {
-     "mean": 0.059619,
-     "sd": 0.066554,
-     "runs": [
-      0.00204,
-      0.007899,
-      0.015462,
-      0.101475,
-      0.171221
-     ],
-     "speedup_x": 1.706,
-     "speedup_sd": 0.191,
-     "counts": true
-    }
-   }
+   "workload_runs": 1
   }
- ],
- "environment": "docker python:3.12-slim, CPU torch (arm64 cpu wheel), colima arm64 Mac; identical image for both arms, only vllm/ source differs",
- "ts": "2026-11-04T00:00:00Z"
+ },
+ "ts": "2026-11-07T16:05:02Z"
 }

@@ -12,7 +12,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends python3 python3
 # vLLM wheel: first PyPI release AFTER merge_sha (compiled ops match the PR-solution tree).
 # Empty VLLM_VERSION = latest (pick one and record it in tasks/pr_29499/metadata.json:wheel).
 ARG VLLM_VERSION=0.14.0
-RUN pip install --upgrade pip && pip install "vllm${VLLM_VERSION:+==$VLLM_VERSION}" pytest pytest-asyncio
+# + what vLLM's own benchmarks/ scripts import but the wheel does not pin (tabulate, pandas, datasets)
+RUN pip install --upgrade pip && pip install "vllm${VLLM_VERSION:+==$VLLM_VERSION}" pytest pytest-asyncio tabulate pandas datasets
 # Optional torch swap (e.g. the wheel pins a cu126 torch that lacks sm_120):
 # metadata.json:"torch_fix": "torch==2.7.1 --index-url https://download.pytorch.org/whl/cu128"
 ARG TORCH_FIX=""

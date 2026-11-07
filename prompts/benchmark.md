@@ -50,15 +50,15 @@ image, so the environment is byte-identical across arms — only the vllm source
 
 Arms per PR:
 - `base`  = `base_sha` tree (pre-PR). Oracle expects tests FAIL.
-- `gold`  = `merge_sha` tree (merged PR). Oracle expects tests PASS.
+- `gold`  = `merge_sha` tree (PR's solution). Oracle expects tests PASS.
 - each enabled solver = a copy of the `base` tree that the harness edits, then re-verified.
 
-`run_one.sh` pipeline: checkout (git archive base+merge) → build (`Dockerfile.gpu`) →
+`run_one.sh` pipeline: checkout (git archive baseline+merge) → build (`Dockerfile.gpu`) →
 isolate (`cp -a /arm/vllm → site-packages`, run hidden pytest oracle) → solve (each harness
 edits `./vllm`) → measure (fold `results_measured.json` µs/op + variance).
 
 `measure.py`: paired A-B-B-A in one process, `repeats` independent runs → mean ± sd,
-nop (base-vs-base) spread sets the MAD noise gate. Knobs in `config.yaml:measure`.
+nop (baseline-vs-baseline) spread sets the MAD noise gate. Knobs in `config.yaml:measure`.
 
 ---
 
@@ -68,11 +68,11 @@ nop (base-vs-base) spread sets the MAD noise gate. Knobs in `config.yaml:measure
 only if absent. Each arm: `key` (dashboard arm name, MUST match `web/index.html` HARNESSES),
 `model`, `cmd`, `guided`, `enabled`, `env`.
 
-- `guided:false` = BLIND — objective has the `## Expert solution` section STRIPPED
+- `guided:false` = BLIND — objective has the `## PR's solution` section STRIPPED
   (FormulaCode: discover the optimization yourself).
 - `guided:true`  = objective = full `problem.md` incl. merged patch, asked to BEAT it.
 
-Runner invokes `<cmd> "<objective>"` inside a copy of the base tree; the command edits
+Runner invokes `<cmd> "<objective>"` inside a copy of the baseline tree; the command edits
 `./vllm` and exits. GPU box has NO IBM LiteLLM → codex arms disabled there; default solver
 = Claude Agent SDK. Flip `enabled` to add/remove — no code edits.
 

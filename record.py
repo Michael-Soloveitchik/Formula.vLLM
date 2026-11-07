@@ -20,7 +20,41 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
+def carry_over_solver_arms(out, old):
+    """copy every non-reference arm (claude/codex/...) of `old` into `out` (arms, logs, per-experiment numbers)."""
+    ref = {"base", "gold"}
+    solver = [k for k in (old.get("arms") or {}) if k not in ref]
+    if not solver:
+        return
+    for k in solver:
+        out["arms"][k] = old["arms"][k]
+        if k in (old.get("logs") or {}):
+            out.setdefault("logs", {})[k] = old["logs"][k]
+    old_ex = {e["name"]: e for e in (old.get("experiments") or [])}
+    for e in out.get("experiments") or []:
+        oe = old_ex.get(e["name"])
+        if oe:
+            for k in solver:
+                if k in (oe.get("arms") or {}):
+                    e["arms"][k] = oe["arms"][k]
+    if out.get("latency") and old.get("latency"):
+        for sname, d in (old["latency"].get("scenarios") or {}).items():
+            if sname in out["latency"]["scenarios"]:
+                for k in solver:
+                    if k in d:
+                        out["latency"]["scenarios"][sname][k] = d[k]
+    out["solver_arms_from"] = {"ts": old.get("ts"), "arms": solver,
+                               "note": "solver arms recorded by an earlier --run-formula-harnesses run; baseline / PR's solution re-measured by --reproduce"}
+
+
 def main():
+    if sys.argv[1] == "--carry":          # record.py --carry <pr> <old-results.json>: merge old solver arms into results/<pr>.json
+        pr, old_p = int(sys.argv[2]), sys.argv[3]
+        cur_p = os.path.join(HERE, "results", f"{pr}.json")
+        cur = json.load(open(cur_p)); carry_over_solver_arms(cur, json.load(open(old_p)))
+        tmp = os.path.join(HERE, ".work", f"carry_{pr}.json"); json.dump(cur, open(tmp, "w"), indent=1)
+        subprocess.run([sys.executable, os.path.join(HERE, "aggregate.py"), "--write", str(pr), tmp], check=True)
+        print(f"results/{pr}.json: solver arms carried over -> {list(cur['arms'])}"); return
     pr = int(sys.argv[1])
     work = os.path.join(HERE, ".work", f"pr_{pr}")
     task = os.path.join(HERE, "tasks", f"pr_{pr}")
@@ -95,6 +129,12 @@ def main():
         "logs": logs,
         "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }
+    # reproduce runs (RUN_SOLVERS=0) re-measure only baseline / PR's solution: keep the solver
+    # arms an earlier (token-paid) run already recorded in results/<pr>.json instead of dropping them.
+    if os.environ.get("RUN_SOLVERS", "1") == "0":
+        old_p = os.path.join(HERE, "results", f"{pr}.json")
+        if os.path.exists(old_p):
+            carry_over_solver_arms(out, json.load(open(old_p)))
     tmp = os.path.join(work, "result.json")
     json.dump(out, open(tmp, "w"), indent=1)
     subprocess.run([sys.executable, os.path.join(HERE, "aggregate.py"), "--write", str(pr), tmp], check=True)

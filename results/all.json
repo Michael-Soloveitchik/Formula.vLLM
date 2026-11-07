@@ -178,67 +178,82 @@
   "ts": "2026-11-05T00:00:00Z"
  },
  {
-  "pr": 13365,
-  "pr_url": "https://github.com/vllm-project/vllm/pull/13365",
-  "title": "[V1][Spec Decode] Optimize N-gram matching with Numba (#13365)",
-  "field": "decoding_tpot",
-  "reported_gain": "30x, 2.5%",
-  "base_sha": "c8d70e2437feecdb3762ce17298df33439ae1bd1",
-  "merge_sha": "4c822298981a8f7521492075ff72659985fc4c3f",
-  "arms": {
-   "base": {
-    "tests": "FAIL"
-   },
-   "gold": {
-    "tests": "PASS"
-   }
-  },
-  "improved": true,
   "schema": "experiments_v2",
   "experiments": [
    {
     "name": "ngram_match_overhead",
     "unit": "s",
-    "workload": "5000 synthetic context sequences (len 200-800, vocab 32000), n-gram n=3, k=10; ~50% seeded with a plantable match. Cumulative NgramProposer.propose() time over the full 5000-seq pass; 5 repeats (gold warmed up once untimed to exclude JIT compile).",
-    "note": "PREFERRED approach: imported the standalone vllm/v1/spec_decode/ngram_proposer.py module directly from each mounted source tree (self-contained, only numpy/numba/typing deps) and timed .propose(). base=pure-python KMP loop; gold=numba @jit(nopython=True) kernels. runs = per-repeat cumulative seconds; speedup_x = mean of per-repeat base/gold ratios. numba not baked in image -> installed at runtime via pip (numba 0.68.1, arm64 wheel); worked.",
+    "workload": "python3 /task/bench.py",
     "reported": {
      "base": 54.3,
-     "patch": 1.9,
-     "scope": "cumulative over a full ShareGPT 5K-request E2E serving run (propose() called once per decode step per request = hundreds of thousands of calls)",
-     "comparable": false,
-     "scale_note": "SAME unit (s) but NOT scale-comparable to our microbench. Our 'base' 0.257s is cumulative over 5000 single-sequence propose() calls; the PR's 54.3s is cumulative over a full ShareGPT 5K-REQUEST serving run (~200x more cumulative work; exact call count not derivable since per-call cost differs between synthetic and real token streams). Direction + ratio (ours 71x vs reported ~29x) are genuine; absolute seconds are not 1:1."
+     "patch": 1.9
     },
     "arms": {
      "base": {
-      "mean": 0.256929,
-      "sd": 0.028241,
-      "runs": [
-       0.229843,
-       0.224256,
-       0.293397,
-       0.251467,
-       0.285683
-      ]
+      "mean": 0.1652,
+      "sd": 0.0022,
+      "n": 5
      },
      "gold": {
-      "mean": 0.003596,
-      "sd": 5e-06,
-      "runs": [
-       0.003587,
-       0.003603,
-       0.003593,
-       0.003598,
-       0.003598
-      ],
-      "speedup_x": 71.454,
-      "speedup_sd": 7.867,
-      "counts": true
+      "mean": 0.0026,
+      "sd": 0.0004,
+      "n": 5
      }
     }
    }
   ],
-  "environment": "docker vllm-cpu-bench:21222 (python:3.12-slim + CPU torch arm64 wheel, numpy 2.5.4), colima arm64 Mac; identical image for both arms, only vllm/ source tree differs. numba NOT baked into image -> installed at runtime with `pip install numba` (numba 0.68.1, arm64 wheel) for the gold arm; base arm is pure-python and needs no numba. gold arm warmed up once (untimed) to exclude numba JIT compile from the steady-state timing.",
-  "ts": "2026-11-04T00:00:00Z"
+  "pr": 13365,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/13365",
+  "title": "[V1][Spec Decode] Optimize N-gram matching with Numba (#13365)",
+  "field": "decoding_tpot",
+  "reported_gain": "30x, 2.5%",
+  "gain_kind": "pct",
+  "base_sha": "c8d70e2437feecdb3762ce17298df33439ae1bd1",
+  "merge_sha": "4c822298981a8f7521492075ff72659985fc4c3f",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.7.3",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "arms": {
+   "base": {
+    "tests": "SKIP",
+    "slug": "base"
+   },
+   "gold": {
+    "tests": "SKIP",
+    "slug": "gold"
+   }
+  },
+  "improved": false,
+  "latency": {
+   "scenarios": {
+    "ngram_match_overhead": {
+     "unit": "s",
+     "base": {
+      "mean": 0.1652,
+      "sd": 0.0022,
+      "n": 5
+     },
+     "gold": {
+      "mean": 0.0026,
+      "sd": 0.0004,
+      "n": 5
+     }
+    }
+   },
+   "pytorch_ref": {}
+  },
+  "logs": {
+   "base": {
+    "workload_runs": 5
+   },
+   "gold": {
+    "workload_runs": 5
+   }
+  },
+  "ts": "2026-11-07T16:18:11Z"
  },
  {
   "pr": 14540,
@@ -358,171 +373,128 @@
   "ts": "2026-11-05T00:00:00Z"
  },
  {
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "get_new_blocks",
+    "unit": "us/op",
+    "workload": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
+    "reported": {
+     "base": 150.0,
+     "patch": 8.0
+    },
+    "arms": {}
+   },
+   {
+    "name": "free_blocks",
+    "unit": "us/op",
+    "workload": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
+    "reported": {
+     "base": 33.0,
+     "patch": 9.0
+    },
+    "arms": {}
+   }
+  ],
   "pr": 21222,
   "pr_url": "https://github.com/vllm-project/vllm/pull/21222",
   "title": "[Core] Introduce popleft_n and append_n in FreeKVCacheBlockQueue to further optimize block_pool (#21222)",
   "field": "kv_cache",
   "reported_gain": "95% (0.15ms\u21920.008ms)",
+  "gain_kind": "unit",
   "base_sha": "10904e6d755051260a7c3ce98659d8907c74caa9",
   "merge_sha": "ed25054577f7abca2aee32a5290200c4a1aed561",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.10.0",
+   "workload_cmd": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
+   "repeats": 5
+  },
   "arms": {
    "base": {
-    "tests": "FAIL"
+    "tests": "FAIL",
+    "slug": "base"
    },
    "gold": {
-    "tests": "PASS"
+    "tests": "FAIL",
+    "slug": "gold"
    }
   },
-  "improved": true,
-  "schema": "experiments_v2",
-  "experiments": [
-   {
-    "name": "get_new_blocks",
-    "unit": "ms/op",
-    "workload": "block_pool sweep 10/50/100/500/1000 blocks, 1000 iters",
-    "note": "runs = per allocate-block size; speedup = mean of per-size base/gold ratios",
-    "reported": {
-     "base": 0.15,
-     "patch": 0.008,
-     "scope": "per-op TRACE in a serving run",
-     "comparable": false,
-     "scale_note": "PR gave TWO measurements from DIFFERENT harnesses: (1) engine 'benchmark scripts' on a GPU box, single aggregate per-op, 0.15ms->0.008ms (~19x, screenshots only); (2) benchmark_block_pool.py, which the author described only as 'cut in half' (~2x, no typed numbers). OUR bench IS benchmark_block_pool.py, so the ~2x claim is the right comparator (measured 1.83x = match). The 19x headline is the engine-script scope where fixed per-call python overhead dominates a GPU-fast path -- NOT reproducible on, nor scale-comparable to, a CPU linked-list microbench. Author never claimed benchmark_block_pool gives 19x."
+  "improved": false,
+  "latency": {
+   "scenarios": {},
+   "pytorch_ref": {}
+  },
+  "logs": {
+   "base": {
+    "tests": {
+     "bytes": 2010,
+     "tail": "r import (BasevLLMParameter,\n/usr/local/lib/python3.10/dist-packages/vllm/model_executor/parameter.py:10: in <module>\n    from vllm.distributed import get_tensor_model_parallel_rank\n/usr/local/lib/python3.10/dist-packages/vllm/distributed/__init__.py:4: in <module>\n    from .communication_op import *\n/usr/local/lib/python3.10/dist-packages/vllm/distributed/communication_op.py:9: in <module>\n    from .parallel_state import get_tp_group\n/usr/local/lib/python3.10/dist-packages/vllm/distributed/parallel_state.py:150: in <module>\n    from vllm.platforms import current_platform\n/usr/local/lib/python3.10/dist-packages/vllm/platforms/__init__.py:12: in <module>\n    from .interface import _Backend  # noqa: F401\n/usr/local/lib/python3.10/dist-packages/vllm/platforms/interface.py:16: in <module>\n    from vllm.inputs import ProcessorInputs, PromptType\n/usr/local/lib/python3.10/dist-packages/vllm/inputs/__init__.py:9: in <module>\n    from .registry import (DummyData, InputContext, InputProcessingContext,\n/usr/local/lib/python3.10/dist-packages/vllm/inputs/registry.py:8: in <module>\n    from transformers import BatchFeature, PretrainedConfig, ProcessorMixin\n/usr/local/lib/python3.10/dist-packages/transformers/utils/import_utils.py:2688: in __getattr__\n    raise ModuleNotFoundError(import_error_message) from e\nE   ModuleNotFoundError: Could not import module 'ProcessorMixin'. Are this object's requirements defined correctly? Set the logging verbosity to DEBUG for the original import error.\n"
     },
-    "arms": {
-     "base": {
-      "mean": 0.150956,
-      "sd": 0.172406,
-      "runs": [
-       0.004424,
-       0.022943,
-       0.043132,
-       0.228052,
-       0.456227
-      ]
-     },
-     "gold": {
-      "mean": 0.087743,
-      "sd": 0.097173,
-      "runs": [
-       0.00268,
-       0.010689,
-       0.020929,
-       0.16115,
-       0.243266
-      ],
-      "speedup_x": 1.83,
-      "speedup_sd": 0.268,
-      "counts": true
-     }
-    }
+    "workload_runs": 1
    },
-   {
-    "name": "free_blocks",
-    "unit": "ms/op",
-    "workload": "block_pool sweep 10/50/100/500/1000 blocks, 1000 iters",
-    "note": "runs = per allocate-block size; speedup = mean of per-size base/gold ratios",
-    "reported": {
-     "base": 0.033,
-     "patch": 0.009,
-     "scope": "per-op TRACE in a serving run",
-     "comparable": false,
-     "scale_note": "Same as get_new_blocks: 33us->9us is the engine-script TRACE aggregate (GPU box), benchmark_block_pool is 'cut in half' ~2x (measured 1.71x = match). Our base free=0.101ms is NOT 3x the author's 33us 'baseline' -- it is the 500-block-size row average; the 33us is a single engine-aggregate per-call figure from a different harness. Harness mismatch, not a scale error. Pure-python linked-list pointer reduction (popleft_n/append_n), no GPU involved in the list logic."
+   "gold": {
+    "tests": {
+     "bytes": 2010,
+     "tail": "r import (BasevLLMParameter,\n/usr/local/lib/python3.10/dist-packages/vllm/model_executor/parameter.py:10: in <module>\n    from vllm.distributed import get_tensor_model_parallel_rank\n/usr/local/lib/python3.10/dist-packages/vllm/distributed/__init__.py:4: in <module>\n    from .communication_op import *\n/usr/local/lib/python3.10/dist-packages/vllm/distributed/communication_op.py:9: in <module>\n    from .parallel_state import get_tp_group\n/usr/local/lib/python3.10/dist-packages/vllm/distributed/parallel_state.py:150: in <module>\n    from vllm.platforms import current_platform\n/usr/local/lib/python3.10/dist-packages/vllm/platforms/__init__.py:12: in <module>\n    from .interface import _Backend  # noqa: F401\n/usr/local/lib/python3.10/dist-packages/vllm/platforms/interface.py:16: in <module>\n    from vllm.inputs import ProcessorInputs, PromptType\n/usr/local/lib/python3.10/dist-packages/vllm/inputs/__init__.py:9: in <module>\n    from .registry import (DummyData, InputContext, InputProcessingContext,\n/usr/local/lib/python3.10/dist-packages/vllm/inputs/registry.py:8: in <module>\n    from transformers import BatchFeature, PretrainedConfig, ProcessorMixin\n/usr/local/lib/python3.10/dist-packages/transformers/utils/import_utils.py:2688: in __getattr__\n    raise ModuleNotFoundError(import_error_message) from e\nE   ModuleNotFoundError: Could not import module 'ProcessorMixin'. Are this object's requirements defined correctly? Set the logging verbosity to DEBUG for the original import error.\n"
     },
-    "arms": {
-     "base": {
-      "mean": 0.100668,
-      "sd": 0.115137,
-      "runs": [
-       0.002991,
-       0.015285,
-       0.028646,
-       0.151623,
-       0.304795
-      ]
-     },
-     "gold": {
-      "mean": 0.059619,
-      "sd": 0.066554,
-      "runs": [
-       0.00204,
-       0.007899,
-       0.015462,
-       0.101475,
-       0.171221
-      ],
-      "speedup_x": 1.706,
-      "speedup_sd": 0.191,
-      "counts": true
-     }
-    }
+    "workload_runs": 1
    }
-  ],
-  "environment": "docker python:3.12-slim, CPU torch (arm64 cpu wheel), colima arm64 Mac; identical image for both arms, only vllm/ source differs",
-  "ts": "2026-11-04T00:00:00Z"
+  },
+  "ts": "2026-11-07T16:05:02Z"
  },
  {
-  "pr": 21281,
-  "pr_url": "https://github.com/vllm-project/vllm/pull/21281",
-  "title": "[Core] Minimize number of dict lookup in _maybe_evict_cached_block (#21281)",
-  "field": "scheduling",
-  "base_sha": "e7b204268132cb775c139574c1ff4ad7e15c8f66",
-  "merge_sha": "af376ca19d4588b1d5ace72ffc0b4bbd778c15f2",
-  "reported_gain": "77% (0.13ms\u21920.03ms)",
-  "arms": {
-   "base": {
-    "tests": "FAIL"
-   },
-   "gold": {
-    "tests": "PASS"
-   }
-  },
-  "improved": true,
   "schema": "experiments_v2",
   "experiments": [
    {
     "name": "allocate_new_block",
-    "unit": "ms/op",
-    "workload": "block_pool sweep 10/50/100/500/1000 blocks, 1000 iters (evict path)",
-    "note": "runs = per allocate-block size, median of 3 reps; speedup = mean of per-size base/gold ratios",
+    "unit": "us/op",
+    "workload": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
     "reported": {
-     "base": 0.13,
-     "patch": 0.03,
-     "scope": "per-call TRACE of allocate_new_block, measured on top of PR #21222",
-     "comparable": false,
-     "workload_invalid": true,
-     "scale_note": "WORKLOAD INVALID (measured 1.007x is meaningless, do not trust). The PR cuts 4->2 dict lookups of the same key in _maybe_evict_cached_block, but that body ONLY runs when block_hash is not None AND block_hash in cached_block_hash_to_block (a cached block being evicted). Our benchmark_block_pool sweep pulls free blocks with block_hash=None, so BOTH arms hit the membership-fail early-out and the 4->2 reduction never executes. FIX NEEDED: enable_caching=True; assign each test block a non-None block_hash; pre-populate cached_block_hash_to_block[block_hash]={block_id:block} so the membership HITS; loop _maybe_evict_cached_block on those cached blocks (re-insert each iter). Only then does base pay 4 same-key hashes vs gold's 2 -> expect ~2x isolated (author's 4.3x is a profiler trace delta on top of #21222, an upper bound incl. surrounding overhead). Author number 0.13->0.03ms published as prose, no input sizes."
+     "base": 130.0,
+     "patch": 30.0
     },
-    "arms": {
-     "base": {
-      "mean": 0.174353,
-      "sd": 0.216158,
-      "runs": [
-       0.003969,
-       0.019962,
-       0.048273,
-       0.221984,
-       0.577576
-      ]
-     },
-     "gold": {
-      "mean": 0.161171,
-      "sd": 0.184676,
-      "runs": [
-       0.003931,
-       0.02218,
-       0.046476,
-       0.246428,
-       0.48684
-      ],
-      "speedup_x": 1.007,
-      "speedup_sd": 0.106,
-      "counts": true
-     }
-    }
+    "arms": {}
    }
   ],
-  "environment": "docker python:3.12-slim cpu colima arm64 \u2014 identical image both arms, only vllm/ differs",
-  "ts": "2026-11-04T00:00:00Z"
+  "pr": 21281,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/21281",
+  "title": "[Core] Minimize number of dict lookup in _maybe_evict_cached_block (#21281)",
+  "field": "scheduling",
+  "reported_gain": "77% (0.13ms\u21920.03ms)",
+  "gain_kind": "unit",
+  "base_sha": "e7b204268132cb775c139574c1ff4ad7e15c8f66",
+  "merge_sha": "af376ca19d4588b1d5ace72ffc0b4bbd778c15f2",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.10.0",
+   "workload_cmd": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
+   "repeats": 5
+  },
+  "arms": {
+   "base": {
+    "tests": "SKIP",
+    "slug": "base"
+   },
+   "gold": {
+    "tests": "SKIP",
+    "slug": "gold"
+   }
+  },
+  "improved": false,
+  "latency": {
+   "scenarios": {},
+   "pytorch_ref": {}
+  },
+  "logs": {
+   "base": {
+    "workload_runs": 1
+   },
+   "gold": {
+    "workload_runs": 1
+   }
+  },
+  "ts": "2026-11-07T16:06:18Z"
  },
  {
   "schema": "experiments_v2",
@@ -539,13 +511,13 @@
     },
     "arms": {
      "base": {
-      "mean": 2270.438,
-      "sd": 12.0601,
+      "mean": 2260.996,
+      "sd": 15.9951,
       "n": 5
      },
      "gold": {
-      "mean": 2279.978,
-      "sd": 15.9962,
+      "mean": 2265.852,
+      "sd": 17.7261,
       "n": 5
      },
      "claude": {
@@ -567,13 +539,13 @@
     "reported": null,
     "arms": {
      "base": {
-      "mean": 26487.506,
-      "sd": 140.8211,
+      "mean": 26377.464,
+      "sd": 186.527,
       "n": 5
      },
      "gold": {
-      "mean": 26598.798,
-      "sd": 186.7255,
+      "mean": 26434.172,
+      "sd": 206.8499,
       "n": 5
      },
      "claude": {
@@ -595,13 +567,13 @@
     "reported": null,
     "arms": {
      "base": {
-      "mean": 30.274,
-      "sd": 0.1613,
+      "mean": 30.146,
+      "sd": 0.213,
       "n": 5
      },
      "gold": {
-      "mean": 30.4,
-      "sd": 0.214,
+      "mean": 30.212,
+      "sd": 0.2366,
       "n": 5
      },
      "claude": {
@@ -655,13 +627,13 @@
     "throughput_output_tok_s": {
      "unit": "tok/s",
      "base": {
-      "mean": 2270.438,
-      "sd": 12.0601,
+      "mean": 2260.996,
+      "sd": 15.9951,
       "n": 5
      },
      "gold": {
-      "mean": 2279.978,
-      "sd": 15.9962,
+      "mean": 2265.852,
+      "sd": 17.7261,
       "n": 5
      },
      "claude": {
@@ -678,13 +650,13 @@
     "throughput_req_s": {
      "unit": "req/s",
      "base": {
-      "mean": 30.274,
-      "sd": 0.1613,
+      "mean": 30.146,
+      "sd": 0.213,
       "n": 5
      },
      "gold": {
-      "mean": 30.4,
-      "sd": 0.214,
+      "mean": 30.212,
+      "sd": 0.2366,
       "n": 5
      },
      "claude": {
@@ -701,13 +673,13 @@
     "throughput_total_tok_s": {
      "unit": "tok/s",
      "base": {
-      "mean": 26487.506,
-      "sd": 140.8211,
+      "mean": 26377.464,
+      "sd": 186.527,
       "n": 5
      },
      "gold": {
-      "mean": 26598.798,
-      "sd": 186.7255,
+      "mean": 26434.172,
+      "sd": 206.8499,
       "n": 5
      },
      "claude": {
@@ -728,14 +700,14 @@
    "base": {
     "tests": {
      "bytes": 727,
-     "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n......                                                                   [100%]\n6 passed in 1.14s\n"
+     "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n......                                                                   [100%]\n6 passed in 1.61s\n"
     },
     "workload_runs": 5
    },
    "gold": {
     "tests": {
      "bytes": 727,
-     "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n......                                                                   [100%]\n6 passed in 1.08s\n"
+     "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n......                                                                   [100%]\n6 passed in 1.11s\n"
     },
     "workload_runs": 5
    },
@@ -764,7 +736,15 @@
     "patch_bytes": 3457
    }
   },
-  "ts": "2026-11-05T14:13:13Z"
+  "ts": "2026-11-07T10:44:17Z",
+  "solver_arms_from": {
+   "ts": "2026-11-05T14:13:13Z",
+   "arms": [
+    "claude",
+    "claude + PR's solution"
+   ],
+   "note": "solver arms recorded by an earlier --run-formula-harnesses run; baseline / PR's solution re-measured by --reproduce"
+  }
  },
  {
   "pr": 23928,
@@ -806,170 +786,261 @@
   "ts": "2026-11-05T00:00:00Z"
  },
  {
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "remove_skipped_blocks",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": 6.3,
+     "patch": 1.6
+    },
+    "arms": {}
+   }
+  ],
+  "pr": 27673,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/27673",
+  "title": "[Core] Early return in SlidingWindowManager.remove_skipped_blocks (#27673)",
+  "field": "scheduling",
+  "reported_gain": "75% (6.3us\u21921.6us)",
+  "gain_kind": "unit",
+  "base_sha": "d3ab240f39219df0175ec662416f630d7bf273d8",
+  "merge_sha": "0b51c9bd8b19cee3a494b0f966a6b0a846a40193",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.11.1",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "arms": {
+   "base": {
+    "tests": "SKIP",
+    "slug": "base"
+   },
+   "gold": {
+    "tests": "SKIP",
+    "slug": "gold"
+   }
+  },
+  "improved": false,
+  "latency": {
+   "scenarios": {},
+   "pytorch_ref": {}
+  },
+  "logs": {
+   "base": {
+    "workload_runs": 1
+   },
+   "gold": {
+    "workload_runs": 1
+   }
+  },
+  "ts": "2026-11-07T16:25:59Z"
+ },
+ {
+  "schema": "experiments_v2",
+  "experiments": [],
   "pr": 27793,
   "pr_url": "https://github.com/vllm-project/vllm/pull/27793",
   "title": "[Core][Observability] Add KV cache residency metrics (#27793)",
   "field": "scheduling",
-  "reported_gain": "N/A (observability feature; author claims <0.1% overhead/request at 1% sampling, not a speedup)",
+  "reported_gain": "N/A (observability feature; <0.1% overhead, not a speedup)",
+  "gain_kind": "pct",
   "base_sha": "ec7035c9d40cda43fa9c3d2d1c148b1382aa04a4",
   "merge_sha": "cabc77cc86586206134a19e3e70aa401ec30b71f",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.12.0",
+   "workload_cmd": "pytest -v tests/v1/core/test_kv_cache_metrics.py",
+   "repeats": 5
+  },
   "arms": {
    "base": {
-    "tests": "FAIL"
+    "tests": "FAIL",
+    "slug": "base"
    },
    "gold": {
-    "tests": "PASS"
+    "tests": "PASS",
+    "slug": "gold"
    }
   },
   "improved": true,
-  "schema": "experiments_v2",
-  "experiments": [],
-  "note": "OBSERVABILITY FEATURE, not a perf optimization. Title: '[Core][Observability] Add KV cache residency metrics'. Adds 3 Prometheus histograms (kv_block_lifetime/idle_before_evict/reuse_gap) behind --kv-cache-metrics flags (default 1% sampling) via new KVCacheMetricsCollector in block_pool hot paths (on_block_allocated/accessed/evicted), each guarded by `if self.metrics_collector:` so disabled=zero cost. The '0.1%' is the author's OVERHEAD ceiling (~365ns/block @1% sampling), NOT a gain. No base-vs-gold speedup exists; correctness-only is correct. If benchmarked, it would measure feature OVERHEAD (lower-is-better, inverted), not improvement.",
-  "environment": "n/a (correctness-only)",
-  "ts": "2026-11-04T00:00:00Z"
+  "latency": {
+   "scenarios": {},
+   "pytorch_ref": {}
+  },
+  "logs": {
+   "base": {
+    "tests": {
+     "bytes": 1919,
+     "tail": "rder to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n\n==================================== ERRORS ====================================\n___________ ERROR collecting tests/v1/core/test_kv_cache_metrics.py ____________\nImportError while importing test module '/t/tests/v1/core/test_kv_cache_metrics.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/usr/lib/python3.10/importlib/__init__.py:126: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntests/v1/core/test_kv_cache_metrics.py:8: in <module>\n    from vllm.v1.core.kv_cache_metrics import (\nE   ModuleNotFoundError: No module named 'vllm.v1.core.kv_cache_metrics'\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nERROR tests/v1/core/test_kv_cache_metrics.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 warning, 1 error in 0.05s\n"
+    },
+    "workload_runs": 1
+   },
+   "gold": {
+    "tests": {
+     "bytes": 1164,
+     "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n................                                                         [100%]\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n16 passed, 1 warning in 1.68s\n"
+    },
+    "workload_runs": 5
+   }
+  },
+  "ts": "2026-11-07T16:33:46Z"
  },
  {
-  "pr": 29499,
-  "pr_url": "https://github.com/vllm-project/vllm/pull/29499",
-  "title": "[EPLB] Optimize EPLB with numpy (#29499)",
-  "field": "parallelism",
-  "reported_gain": "27% (rearrange 1370->1077ms end-to-end); 20-25% per primitive",
-  "base_sha": "0ada960a20766fa1de9063576979f9d807583785",
-  "merge_sha": "6170d47d2220bc464fb561b93caf799a7560e304",
-  "arms": {
-   "base": {
-    "tests": "FAIL"
-   },
-   "gold": {
-    "tests": "PASS"
-   }
-  },
-  "improved": true,
   "schema": "experiments_v2",
   "experiments": [
    {
     "name": "move_from_buffer",
-    "unit": "ms/op",
-    "workload": "per-rank mapping over 16 local experts (2048-slot cluster); 5 repeats x best-of-100",
-    "note": "inline-from-diff: exact duplicate-resolution mapping body copied verbatim from base_sha / merge_sha (tensor .copy_ excluded as arm-identical). per-rank body over num_local_experts=16 rows; numpy overhead dominates at this size so gold is slower. unit ms/op. speedup = mean of per-repeat base/gold ratios",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
     "reported": {
      "base": null,
-     "patch": null,
-     "pct": 0.225,
-     "comparable": false,
-     "scale_note": "NOT CPU-REPRODUCIBLE. Headline is end-to-end rearrange 1370->1077ms (~27%); this primitive is in the separate '20-25% per primitive' claim (pct~0.225), no absolute ms pair. PRECISE mechanism: the numpy rewrite moved only the INDEX/MASK bookkeeping (np.isin/unique/lexsort/searchsorted) off GPU tensors; the tensor .copy_(non_blocking=True) transfers themselves are UNCHANGED across arms. Author's #1 bullet 'removes multiple gpu-cpu transfers in move_from_buffer' + preserve_intragpu_slots avoids memcopies -- a GPU-sync/transfer saving invisible on CPU. On CPU-only our microbench pays the numpy bookkeeping overhead with NO GPU-sync elision to offset it -> gold SLOWER (0.245x). Sub-1x contradicts no published number (author ran no CPU microbench); real gain is on the GPU path."
+     "patch": null
     },
     "arms": {
      "base": {
-      "mean": 0.00181,
-      "sd": 5e-05,
-      "runs": [
-       0.00185,
-       0.001792,
-       0.001866,
-       0.001816,
-       0.001724
-      ]
+      "mean": 0.0015,
+      "sd": 0.0,
+      "n": 5
      },
      "gold": {
-      "mean": 0.008454,
-      "sd": 0.003279,
-      "runs": [
-       0.005669,
-       0.005882,
-       0.012448,
-       0.012491,
-       0.005782
-      ],
-      "speedup_x": 0.245,
-      "speedup_sd": 0.08,
-      "counts": true
+      "mean": 0.004,
+      "sd": 0.0,
+      "n": 5
      }
     }
    },
    {
     "name": "get_ep_ranks_with_expert",
-    "unit": "ms/op",
-    "workload": "128 ranks x 16 local = 2048 physical slots, 256 logical experts; 5 repeats x best-of-100",
-    "note": "isolated import of real function from each tree. base loops get_ep_ranks_with_expert over all unique experts; gold makes one get_ep_ranks_with_experts_batch call. unit ms/op (whole-layer rank-map computation). speedup = mean of per-repeat base/gold ratios",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
     "reported": {
      "base": null,
-     "patch": null,
-     "pct": 0.225,
-     "comparable": false,
-     "scale_note": "PR gives '20-25% on average for each primitive' (pct~0.225), no absolute pair. This is the ONE primitive that is pure-CPU and genuinely batchable: base loops get_ep_ranks_with_expert per-expert, gold does one batched call -> our 8.3x is a real CPU-reproducible win whose DIRECTION agrees with the PR, but the magnitude is not 1:1 with the PR's 20-25% because the PR's percent is diluted across the whole EPLB step (including GPU-transfer primitives). Absolute ms not comparable (no reported pair)."
+     "patch": null
     },
     "arms": {
      "base": {
-      "mean": 24.043582,
-      "sd": 0.559845,
-      "runs": [
-       24.96972,
-       24.388491,
-       23.435503,
-       23.733472,
-       23.690724
-      ]
+      "mean": 16.3273,
+      "sd": 0.1054,
+      "n": 5
      },
      "gold": {
-      "mean": 2.900953,
-      "sd": 0.032188,
-      "runs": [
-       2.862138,
-       2.861013,
-       2.929905,
-       2.92577,
-       2.92594
-      ],
-      "speedup_x": 8.291,
-      "speedup_sd": 0.282,
-      "counts": true
+      "mean": 1.9819,
+      "sd": 0.0036,
+      "n": 5
      }
     }
    },
    {
     "name": "move_to_buffer",
-    "unit": "ms/op",
-    "workload": "per-rank mapping over 16 local experts (2048-slot cluster); 5 repeats x best-of-100",
-    "note": "inline-from-diff: exact index-mapping body copied verbatim from base_sha / merge_sha (P2P + .copy_ excluded as arm-identical). per-rank body over num_local_experts=16 rows; numpy overhead dominates at this size so gold is slower. unit ms/op. speedup = mean of per-repeat base/gold ratios",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
     "reported": {
      "base": null,
-     "patch": null,
-     "pct": 0.225,
-     "comparable": false,
-     "scale_note": "GPU-TRANSFER-BOUND, NOT CPU-REPRODUCIBLE. Same as move_from_buffer: PR's '20-25% per primitive' (pct~0.225) is dominated by eliding GPU P2P + tensor .copy_ round-trips (arm-identical, excluded). The residual numpy index-mapping body over 16 local experts is too small for numpy to win -> gold SLOWER (0.659x) on CPU. Sub-1x is an isolation artifact, not a regression; the PR's real gain lives on the GPU-transfer path we cannot run here."
+     "patch": null
     },
     "arms": {
      "base": {
-      "mean": 0.026854,
-      "sd": 0.000414,
-      "runs": [
-       0.027419,
-       0.02668,
-       0.027144,
-       0.026824,
-       0.026203
-      ]
+      "mean": 0.0228,
+      "sd": 0.0001,
+      "n": 5
      },
      "gold": {
-      "mean": 0.040745,
-      "sd": 0.000316,
-      "runs": [
-       0.040228,
-       0.041051,
-       0.040838,
-       0.041051,
-       0.040555
-      ],
-      "speedup_x": 0.659,
-      "speedup_sd": 0.013,
-      "counts": true
+      "mean": 0.0309,
+      "sd": 0.0005,
+      "n": 5
      }
     }
    }
   ],
-  "environment": "docker vllm-cpu-bench:21222 (python 3.12.16, numpy 2.5.4, torch 2.15.0+cpu), colima arm64 Mac; identical image for both arms, only vllm/ source tree differs (PYTHONPATH). get_ep_ranks_with_expert via isolated import of real function; move_to_buffer/move_from_buffer via inline-from-diff of the exact mapping body the PR changed (multi-rank process group + GPU P2P cannot run in a single CPU container; P2P/.copy_ are arm-identical and excluded)",
-  "ts": "2026-11-04T00:00:00Z"
+  "pr": 29499,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/29499",
+  "title": "[EPLB] Optimize EPLB with numpy (#29499)",
+  "field": "parallelism",
+  "reported_gain": "27% (rearrange 1370->1077ms E2E); 20-25% per primitive",
+  "gain_kind": "pct",
+  "base_sha": "0ada960a20766fa1de9063576979f9d807583785",
+  "merge_sha": "6170d47d2220bc464fb561b93caf799a7560e304",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.14.0",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "arms": {
+   "base": {
+    "tests": "FAIL",
+    "slug": "base"
+   },
+   "gold": {
+    "tests": "PASS",
+    "slug": "gold"
+   }
+  },
+  "improved": true,
+  "latency": {
+   "scenarios": {
+    "get_ep_ranks_with_expert": {
+     "unit": "us",
+     "base": {
+      "mean": 16.3273,
+      "sd": 0.1054,
+      "n": 5
+     },
+     "gold": {
+      "mean": 1.9819,
+      "sd": 0.0036,
+      "n": 5
+     }
+    },
+    "move_from_buffer": {
+     "unit": "us",
+     "base": {
+      "mean": 0.0015,
+      "sd": 0.0,
+      "n": 5
+     },
+     "gold": {
+      "mean": 0.004,
+      "sd": 0.0,
+      "n": 5
+     }
+    },
+    "move_to_buffer": {
+     "unit": "us",
+     "base": {
+      "mean": 0.0228,
+      "sd": 0.0001,
+      "n": 5
+     },
+     "gold": {
+      "mean": 0.0309,
+      "sd": 0.0005,
+      "n": 5
+     }
+    }
+   },
+   "pytorch_ref": {}
+  },
+  "logs": {
+   "base": {
+    "tests": {
+     "bytes": 10581,
+     "tail": "rt\",\n            ),\n        ],\n    )\n    def test_preserve_intragpu_slots(\n        num_ranks: int,\n        slots_per_gpu: int,\n        old_phy2log: torch.Tensor,\n        new_phy2log: torch.Tensor,\n    ):\n        \"\"\"Experts that stay on a GPU keep their old slots; incoming not lost.\"\"\"\n        phy_replicas_idx = _make_phy_replicas_idx_from_phy2log(new_phy2log)\n    \n>       post_phy2log, post_phy_replicas_idx = DefaultEplbPolicy.preserve_intragpu_slots(\n            new_phy2log, phy_replicas_idx, num_ranks, old_phy2log\n        )\nE       AttributeError: type object 'DefaultEplbPolicy' has no attribute 'preserve_intragpu_slots'\n\ntests/distributed/test_eplb_algo.py:436: AttributeError\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED tests/distributed/test_eplb_algo.py::test_preserve_intragpu_slots[simple]\nFAILED tests/distributed/test_eplb_algo.py::test_preserve_intragpu_slots[duplicates]\nFAILED tests/distributed/test_eplb_algo.py::test_preserve_intragpu_slots[skewed_expert]\n3 failed, 11 passed, 11 skipped, 1 warning in 2.34s\n"
+    },
+    "workload_runs": 5
+   },
+   "gold": {
+    "tests": {
+     "bytes": 1176,
+     "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n..............sssssssssss                                                [100%]\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n14 passed, 11 skipped, 1 warning in 2.32s\n"
+    },
+    "workload_runs": 5
+   }
+  },
+  "ts": "2026-11-07T16:42:54Z"
  },
  {
   "pr": 31034,
@@ -1090,19 +1161,19 @@
     },
     "arms": {
      "gold": {
-      "mean": 0.0934,
-      "sd": 0.0289,
-      "n": 10
+      "mean": 0.1094,
+      "sd": 0.0447,
+      "n": 5
+     },
+     "base": {
+      "mean": 1.214,
+      "sd": 0.0195,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.0884,
       "sd": 0.0428,
       "n": 5
-     },
-     "base": {
-      "mean": 1.2221,
-      "sd": 0.0196,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1117,19 +1188,19 @@
     },
     "arms": {
      "gold": {
-      "mean": 0.3141,
-      "sd": 0.0208,
-      "n": 10
+      "mean": 0.3024,
+      "sd": 0.0102,
+      "n": 5
+     },
+     "base": {
+      "mean": 1.2634,
+      "sd": 0.0123,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.2278,
       "sd": 0.0468,
       "n": 5
-     },
-     "base": {
-      "mean": 1.2462,
-      "sd": 0.0183,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1144,19 +1215,19 @@
     },
     "arms": {
      "gold": {
-      "mean": 0.129,
-      "sd": 0.0447,
-      "n": 10
+      "mean": 0.1298,
+      "sd": 0.0277,
+      "n": 5
+     },
+     "base": {
+      "mean": 1.3186,
+      "sd": 0.019,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.1042,
       "sd": 0.0331,
       "n": 5
-     },
-     "base": {
-      "mean": 1.3459,
-      "sd": 0.0972,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1171,19 +1242,19 @@
     },
     "arms": {
      "gold": {
-      "mean": 0.1149,
-      "sd": 0.0423,
-      "n": 10
+      "mean": 0.1246,
+      "sd": 0.0264,
+      "n": 5
+     },
+     "base": {
+      "mean": 1.424,
+      "sd": 0.2419,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.1034,
       "sd": 0.0436,
       "n": 5
-     },
-     "base": {
-      "mean": 1.3431,
-      "sd": 0.0965,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1198,19 +1269,19 @@
     },
     "arms": {
      "gold": {
-      "mean": 0.1025,
-      "sd": 0.0203,
-      "n": 10
+      "mean": 0.0964,
+      "sd": 0.0245,
+      "n": 5
+     },
+     "base": {
+      "mean": 0.2806,
+      "sd": 0.1026,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.0846,
       "sd": 0.0193,
       "n": 5
-     },
-     "base": {
-      "mean": 0.2932,
-      "sd": 0.0971,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1222,19 +1293,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.3133,
-      "sd": 0.0312,
-      "n": 10
+      "mean": 0.3522,
+      "sd": 0.0372,
+      "n": 5
+     },
+     "base": {
+      "mean": 1.4242,
+      "sd": 0.5914,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.2382,
       "sd": 0.0134,
       "n": 5
-     },
-     "base": {
-      "mean": 1.1515,
-      "sd": 0.0144,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1246,19 +1317,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 6.3832,
-      "sd": 0.0596,
-      "n": 10
+      "mean": 6.343,
+      "sd": 0.0094,
+      "n": 5
+     },
+     "base": {
+      "mean": 94.0044,
+      "sd": 0.0329,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 3.1174,
       "sd": 0.0074,
       "n": 5
-     },
-     "base": {
-      "mean": 94.0276,
-      "sd": 0.035,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1270,19 +1341,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.5261,
-      "sd": 0.0031,
-      "n": 10
+      "mean": 0.5264,
+      "sd": 0.0047,
+      "n": 5
+     },
+     "base": {
+      "mean": 5.8774,
+      "sd": 0.0196,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.298,
       "sd": 0.0083,
       "n": 5
-     },
-     "base": {
-      "mean": 5.88,
-      "sd": 0.0088,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1294,19 +1365,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.1707,
-      "sd": 0.0058,
-      "n": 10
+      "mean": 0.1694,
+      "sd": 0.0044,
+      "n": 5
+     },
+     "base": {
+      "mean": 2.108,
+      "sd": 0.0102,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.1326,
       "sd": 0.0139,
       "n": 5
-     },
-     "base": {
-      "mean": 2.1249,
-      "sd": 0.0166,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1318,19 +1389,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.2193,
-      "sd": 0.0049,
-      "n": 10
+      "mean": 0.2208,
+      "sd": 0.0074,
+      "n": 5
+     },
+     "base": {
+      "mean": 0.7746,
+      "sd": 0.0216,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.134,
       "sd": 0.0051,
       "n": 5
-     },
-     "base": {
-      "mean": 0.8006,
-      "sd": 0.0515,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1342,19 +1413,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.1855,
-      "sd": 0.0145,
-      "n": 10
+      "mean": 0.1762,
+      "sd": 0.0085,
+      "n": 5
+     },
+     "base": {
+      "mean": 0.453,
+      "sd": 0.2083,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.0996,
       "sd": 0.0208,
       "n": 5
-     },
-     "base": {
-      "mean": 0.4097,
-      "sd": 0.1132,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1366,19 +1437,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.1107,
-      "sd": 0.029,
-      "n": 10
+      "mean": 0.0996,
+      "sd": 0.0259,
+      "n": 5
+     },
+     "base": {
+      "mean": 0.3742,
+      "sd": 0.1151,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.109,
       "sd": 0.0457,
       "n": 5
-     },
-     "base": {
-      "mean": 0.337,
-      "sd": 0.1059,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1390,19 +1461,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 6.5977,
-      "sd": 0.0292,
-      "n": 10
+      "mean": 6.576,
+      "sd": 0.0137,
+      "n": 5
+     },
+     "base": {
+      "mean": 94.0534,
+      "sd": 0.0417,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 3.7374,
       "sd": 0.0117,
       "n": 5
-     },
-     "base": {
-      "mean": 94.0664,
-      "sd": 0.039,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1414,19 +1485,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 1.9505,
-      "sd": 0.0489,
-      "n": 10
+      "mean": 1.9278,
+      "sd": 0.003,
+      "n": 5
+     },
+     "base": {
+      "mean": 23.1896,
+      "sd": 0.0136,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.8698,
       "sd": 0.0144,
       "n": 5
-     },
-     "base": {
-      "mean": 23.2065,
-      "sd": 0.0149,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1438,19 +1509,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.154,
-      "sd": 0.0037,
-      "n": 10
+      "mean": 0.155,
+      "sd": 0.0031,
+      "n": 5
+     },
+     "base": {
+      "mean": 5.0958,
+      "sd": 0.022,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.1238,
       "sd": 0.0056,
       "n": 5
-     },
-     "base": {
-      "mean": 5.081,
-      "sd": 0.0091,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1462,19 +1533,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.0956,
-      "sd": 0.0283,
-      "n": 10
+      "mean": 0.1032,
+      "sd": 0.0268,
+      "n": 5
+     },
+     "base": {
+      "mean": 1.1536,
+      "sd": 0.0097,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.1078,
       "sd": 0.023,
       "n": 5
-     },
-     "base": {
-      "mean": 1.147,
-      "sd": 0.012,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1486,19 +1557,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.1423,
-      "sd": 0.0134,
-      "n": 10
+      "mean": 0.1324,
+      "sd": 0.0055,
+      "n": 5
+     },
+     "base": {
+      "mean": 0.6004,
+      "sd": 0.0758,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.0916,
       "sd": 0.0133,
       "n": 5
-     },
-     "base": {
-      "mean": 0.5821,
-      "sd": 0.0471,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1510,19 +1581,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.0927,
-      "sd": 0.0295,
-      "n": 10
+      "mean": 0.1322,
+      "sd": 0.0386,
+      "n": 5
+     },
+     "base": {
+      "mean": 1.2356,
+      "sd": 0.0234,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.0886,
       "sd": 0.0274,
       "n": 5
-     },
-     "base": {
-      "mean": 1.2204,
-      "sd": 0.03,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1534,19 +1605,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.0827,
-      "sd": 0.0219,
-      "n": 10
+      "mean": 0.076,
+      "sd": 0.0357,
+      "n": 5
+     },
+     "base": {
+      "mean": 0.3254,
+      "sd": 0.1036,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.0882,
       "sd": 0.0302,
       "n": 5
-     },
-     "base": {
-      "mean": 0.2589,
-      "sd": 0.036,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1558,19 +1629,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.0797,
-      "sd": 0.0306,
-      "n": 10
+      "mean": 0.0728,
+      "sd": 0.0169,
+      "n": 5
+     },
+     "base": {
+      "mean": 0.2328,
+      "sd": 0.0847,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.0852,
       "sd": 0.0225,
       "n": 5
-     },
-     "base": {
-      "mean": 0.2974,
-      "sd": 0.1077,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1582,19 +1653,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 2.1038,
-      "sd": 0.0053,
-      "n": 10
+      "mean": 2.0992,
+      "sd": 0.0108,
+      "n": 5
+     },
+     "base": {
+      "mean": 81.5878,
+      "sd": 0.0288,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 1.5438,
       "sd": 0.0131,
       "n": 5
-     },
-     "base": {
-      "mean": 81.5582,
-      "sd": 0.0266,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1606,19 +1677,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.6475,
-      "sd": 0.0032,
-      "n": 10
+      "mean": 0.6478,
+      "sd": 0.0018,
+      "n": 5
+     },
+     "base": {
+      "mean": 20.4294,
+      "sd": 0.0259,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.3978,
       "sd": 0.0123,
       "n": 5
-     },
-     "base": {
-      "mean": 20.4319,
-      "sd": 0.0215,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1630,19 +1701,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.4224,
-      "sd": 0.0114,
-      "n": 10
+      "mean": 0.4168,
+      "sd": 0.004,
+      "n": 5
+     },
+     "base": {
+      "mean": 5.8824,
+      "sd": 0.0207,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.2252,
       "sd": 0.0011,
       "n": 5
-     },
-     "base": {
-      "mean": 5.8787,
-      "sd": 0.0083,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1654,19 +1725,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.175,
-      "sd": 0.0114,
-      "n": 10
+      "mean": 0.1724,
+      "sd": 0.0104,
+      "n": 5
+     },
+     "base": {
+      "mean": 2.1246,
+      "sd": 0.0217,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.1256,
       "sd": 0.0111,
       "n": 5
-     },
-     "base": {
-      "mean": 2.1223,
-      "sd": 0.0147,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1678,19 +1749,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.1908,
-      "sd": 0.0074,
-      "n": 10
+      "mean": 0.2044,
+      "sd": 0.0269,
+      "n": 5
+     },
+     "base": {
+      "mean": 6.8312,
+      "sd": 0.6445,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.0988,
       "sd": 0.012,
       "n": 5
-     },
-     "base": {
-      "mean": 5.4204,
-      "sd": 1.9086,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1702,19 +1773,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.2041,
-      "sd": 0.0377,
-      "n": 10
+      "mean": 0.186,
+      "sd": 0.019,
+      "n": 5
+     },
+     "base": {
+      "mean": 0.4092,
+      "sd": 0.1075,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.1276,
       "sd": 0.046,
       "n": 5
-     },
-     "base": {
-      "mean": 0.4852,
-      "sd": 0.1143,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1726,19 +1797,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.1067,
-      "sd": 0.0297,
-      "n": 10
+      "mean": 0.0916,
+      "sd": 0.0205,
+      "n": 5
+     },
+     "base": {
+      "mean": 0.3886,
+      "sd": 0.1301,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.1144,
       "sd": 0.0234,
       "n": 5
-     },
-     "base": {
-      "mean": 0.3699,
-      "sd": 0.1408,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1750,19 +1821,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 2.1054,
-      "sd": 0.0099,
-      "n": 10
+      "mean": 2.1006,
+      "sd": 0.0032,
+      "n": 5
+     },
+     "base": {
+      "mean": 23.2102,
+      "sd": 0.0109,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.7928,
       "sd": 0.003,
       "n": 5
-     },
-     "base": {
-      "mean": 23.2145,
-      "sd": 0.009,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1774,19 +1845,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.3078,
-      "sd": 0.0592,
-      "n": 10
+      "mean": 0.288,
+      "sd": 0.0036,
+      "n": 5
+     },
+     "base": {
+      "mean": 5.0866,
+      "sd": 0.0168,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.327,
       "sd": 0.0729,
       "n": 5
-     },
-     "base": {
-      "mean": 5.2143,
-      "sd": 0.4122,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1798,19 +1869,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.1401,
-      "sd": 0.0098,
-      "n": 10
+      "mean": 0.1458,
+      "sd": 0.0089,
+      "n": 5
+     },
+     "base": {
+      "mean": 5.6788,
+      "sd": 1.8976,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.0842,
       "sd": 0.0063,
       "n": 5
-     },
-     "base": {
-      "mean": 4.8427,
-      "sd": 1.889,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1822,19 +1893,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.1348,
-      "sd": 0.009,
-      "n": 10
+      "mean": 0.1326,
+      "sd": 0.005,
+      "n": 5
+     },
+     "base": {
+      "mean": 0.2858,
+      "sd": 0.04,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.1012,
       "sd": 0.0206,
       "n": 5
-     },
-     "base": {
-      "mean": 0.3261,
-      "sd": 0.0932,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1846,19 +1917,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 4.1014,
-      "sd": 0.0296,
-      "n": 10
+      "mean": 4.0892,
+      "sd": 0.0347,
+      "n": 5
+     },
+     "base": {
+      "mean": 81.5694,
+      "sd": 0.0471,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 3.0678,
       "sd": 0.0177,
       "n": 5
-     },
-     "base": {
-      "mean": 81.5991,
-      "sd": 0.0716,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1870,19 +1941,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 1.2609,
-      "sd": 0.002,
-      "n": 10
+      "mean": 1.2596,
+      "sd": 0.0021,
+      "n": 5
+     },
+     "base": {
+      "mean": 20.4296,
+      "sd": 0.0182,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.7636,
       "sd": 0.004,
       "n": 5
-     },
-     "base": {
-      "mean": 20.4298,
-      "sd": 0.0183,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1894,19 +1965,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.3399,
-      "sd": 0.007,
-      "n": 10
+      "mean": 0.3376,
+      "sd": 0.0022,
+      "n": 5
+     },
+     "base": {
+      "mean": 5.558,
+      "sd": 0.015,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.3262,
       "sd": 0.0058,
       "n": 5
-     },
-     "base": {
-      "mean": 5.5748,
-      "sd": 0.0379,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1918,19 +1989,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.3252,
-      "sd": 0.004,
-      "n": 10
+      "mean": 0.333,
+      "sd": 0.0179,
+      "n": 5
+     },
+     "base": {
+      "mean": 1.2398,
+      "sd": 0.0218,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.2398,
       "sd": 0.0073,
       "n": 5
-     },
-     "base": {
-      "mean": 1.2443,
-      "sd": 0.0174,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1942,19 +2013,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.2887,
-      "sd": 0.0124,
-      "n": 10
+      "mean": 0.2944,
+      "sd": 0.0086,
+      "n": 5
+     },
+     "base": {
+      "mean": 0.8884,
+      "sd": 0.0208,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.28,
       "sd": 0.0107,
       "n": 5
-     },
-     "base": {
-      "mean": 0.8778,
-      "sd": 0.0107,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1966,19 +2037,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.3039,
-      "sd": 0.0077,
-      "n": 10
+      "mean": 0.323,
+      "sd": 0.0267,
+      "n": 5
+     },
+     "base": {
+      "mean": 1.2712,
+      "sd": 0.0229,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.2014,
       "sd": 0.0064,
       "n": 5
-     },
-     "base": {
-      "mean": 1.2491,
-      "sd": 0.0205,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -1990,19 +2061,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.0899,
-      "sd": 0.031,
-      "n": 10
+      "mean": 0.097,
+      "sd": 0.0324,
+      "n": 5
+     },
+     "base": {
+      "mean": 0.3266,
+      "sd": 0.1006,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.0872,
       "sd": 0.0376,
       "n": 5
-     },
-     "base": {
-      "mean": 0.3715,
-      "sd": 0.1143,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -2014,19 +2085,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.0738,
-      "sd": 0.0231,
-      "n": 10
+      "mean": 0.0656,
+      "sd": 0.017,
+      "n": 5
+     },
+     "base": {
+      "mean": 0.274,
+      "sd": 0.0865,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.088,
       "sd": 0.0199,
       "n": 5
-     },
-     "base": {
-      "mean": 0.2792,
-      "sd": 0.1052,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -2038,19 +2109,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 4.3698,
-      "sd": 0.028,
-      "n": 10
+      "mean": 4.3616,
+      "sd": 0.0098,
+      "n": 5
+     },
+     "base": {
+      "mean": 89.256,
+      "sd": 0.0318,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 4.0814,
       "sd": 0.0259,
       "n": 5
-     },
-     "base": {
-      "mean": 89.2539,
-      "sd": 0.0275,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -2062,19 +2133,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 4.4934,
-      "sd": 0.0194,
-      "n": 10
+      "mean": 4.5072,
+      "sd": 0.0227,
+      "n": 5
+     },
+     "base": {
+      "mean": 22.0048,
+      "sd": 0.0143,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 2.8658,
       "sd": 0.0095,
       "n": 5
-     },
-     "base": {
-      "mean": 22.0076,
-      "sd": 0.0178,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -2086,19 +2157,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.6381,
-      "sd": 0.0037,
-      "n": 10
+      "mean": 0.6344,
+      "sd": 0.0059,
+      "n": 5
+     },
+     "base": {
+      "mean": 5.56,
+      "sd": 0.0146,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.6264,
       "sd": 0.0103,
       "n": 5
-     },
-     "base": {
-      "mean": 5.5727,
-      "sd": 0.023,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -2110,19 +2181,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.6239,
-      "sd": 0.0141,
-      "n": 10
+      "mean": 0.6216,
+      "sd": 0.0027,
+      "n": 5
+     },
+     "base": {
+      "mean": 1.2364,
+      "sd": 0.0105,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.429,
       "sd": 0.0078,
       "n": 5
-     },
-     "base": {
-      "mean": 1.2355,
-      "sd": 0.0074,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -2134,19 +2205,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.293,
-      "sd": 0.0121,
-      "n": 10
+      "mean": 0.2906,
+      "sd": 0.0131,
+      "n": 5
+     },
+     "base": {
+      "mean": 0.892,
+      "sd": 0.0072,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.2804,
       "sd": 0.008,
       "n": 5
-     },
-     "base": {
-      "mean": 0.8846,
-      "sd": 0.0165,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -2158,19 +2229,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.2658,
-      "sd": 0.019,
-      "n": 10
+      "mean": 0.2716,
+      "sd": 0.0106,
+      "n": 5
+     },
+     "base": {
+      "mean": 0.367,
+      "sd": 0.1129,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.287,
       "sd": 0.0064,
       "n": 5
-     },
-     "base": {
-      "mean": 0.3263,
-      "sd": 0.1034,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -2182,19 +2253,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 0.2964,
-      "sd": 0.0125,
-      "n": 10
+      "mean": 0.2934,
+      "sd": 0.0038,
+      "n": 5
+     },
+     "base": {
+      "mean": 0.323,
+      "sd": 0.1002,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.1946,
       "sd": 0.0065,
       "n": 5
-     },
-     "base": {
-      "mean": 0.2911,
-      "sd": 0.1032,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -2206,19 +2277,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 8.5648,
-      "sd": 0.076,
-      "n": 10
+      "mean": 8.5346,
+      "sd": 0.0689,
+      "n": 5
+     },
+     "base": {
+      "mean": 89.2514,
+      "sd": 0.0549,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 7.9748,
       "sd": 0.0418,
       "n": 5
-     },
-     "base": {
-      "mean": 89.3227,
-      "sd": 0.1171,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -2230,19 +2301,19 @@
     "reported": null,
     "arms": {
      "gold": {
-      "mean": 8.946,
-      "sd": 0.0364,
-      "n": 10
+      "mean": 8.8606,
+      "sd": 0.1151,
+      "n": 5
+     },
+     "base": {
+      "mean": 22.0094,
+      "sd": 0.0118,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 5.6692,
       "sd": 0.0514,
       "n": 5
-     },
-     "base": {
-      "mean": 21.9972,
-      "sd": 0.0166,
-      "n": 10
      }
     },
     "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
@@ -2286,9 +2357,9 @@
     "mixed_partial_b128_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 0.5261,
-      "sd": 0.0031,
-      "n": 10
+      "mean": 0.5264,
+      "sd": 0.0047,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.298,
@@ -2299,9 +2370,9 @@
     "mixed_partial_b128_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 0.1707,
-      "sd": 0.0058,
-      "n": 10
+      "mean": 0.1694,
+      "sd": 0.0044,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.1326,
@@ -2312,9 +2383,9 @@
     "mixed_partial_b16_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 0.2193,
-      "sd": 0.0049,
-      "n": 10
+      "mean": 0.2208,
+      "sd": 0.0074,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.134,
@@ -2325,9 +2396,9 @@
     "mixed_partial_b16_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 0.1149,
-      "sd": 0.0423,
-      "n": 10
+      "mean": 0.1246,
+      "sd": 0.0264,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.1034,
@@ -2338,9 +2409,9 @@
     "mixed_partial_b1_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 0.1855,
-      "sd": 0.0145,
-      "n": 10
+      "mean": 0.1762,
+      "sd": 0.0085,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.0996,
@@ -2351,9 +2422,9 @@
     "mixed_partial_b1_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 0.1107,
-      "sd": 0.029,
-      "n": 10
+      "mean": 0.0996,
+      "sd": 0.0259,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.109,
@@ -2364,9 +2435,9 @@
     "mixed_partial_b2048_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 6.5977,
-      "sd": 0.0292,
-      "n": 10
+      "mean": 6.576,
+      "sd": 0.0137,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 3.7374,
@@ -2377,9 +2448,9 @@
     "mixed_partial_b2048_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 1.9505,
-      "sd": 0.0489,
-      "n": 10
+      "mean": 1.9278,
+      "sd": 0.003,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.8698,
@@ -2390,9 +2461,9 @@
     "topk_partial_b128_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 0.154,
-      "sd": 0.0037,
-      "n": 10
+      "mean": 0.155,
+      "sd": 0.0031,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.1238,
@@ -2403,9 +2474,9 @@
     "topk_partial_b128_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 0.0956,
-      "sd": 0.0283,
-      "n": 10
+      "mean": 0.1032,
+      "sd": 0.0268,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.1078,
@@ -2416,9 +2487,9 @@
     "topk_partial_b16_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 0.1423,
-      "sd": 0.0134,
-      "n": 10
+      "mean": 0.1324,
+      "sd": 0.0055,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.0916,
@@ -2429,9 +2500,9 @@
     "topk_partial_b16_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 0.0927,
-      "sd": 0.0295,
-      "n": 10
+      "mean": 0.1322,
+      "sd": 0.0386,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.0886,
@@ -2442,9 +2513,9 @@
     "topk_partial_b1_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 0.0827,
-      "sd": 0.0219,
-      "n": 10
+      "mean": 0.076,
+      "sd": 0.0357,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.0882,
@@ -2455,9 +2526,9 @@
     "topk_partial_b1_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 0.0797,
-      "sd": 0.0306,
-      "n": 10
+      "mean": 0.0728,
+      "sd": 0.0169,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.0852,
@@ -2468,9 +2539,9 @@
     "topk_partial_b2048_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 2.1038,
-      "sd": 0.0053,
-      "n": 10
+      "mean": 2.0992,
+      "sd": 0.0108,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 1.5438,
@@ -2481,9 +2552,9 @@
     "topk_partial_b2048_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 0.6475,
-      "sd": 0.0032,
-      "n": 10
+      "mean": 0.6478,
+      "sd": 0.0018,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.3978,
@@ -2494,9 +2565,9 @@
     "topk_topp_whole_b128_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 0.4224,
-      "sd": 0.0114,
-      "n": 10
+      "mean": 0.4168,
+      "sd": 0.004,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.2252,
@@ -2507,9 +2578,9 @@
     "topk_topp_whole_b128_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 0.175,
-      "sd": 0.0114,
-      "n": 10
+      "mean": 0.1724,
+      "sd": 0.0104,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.1256,
@@ -2520,9 +2591,9 @@
     "topk_topp_whole_b16_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 0.1908,
-      "sd": 0.0074,
-      "n": 10
+      "mean": 0.2044,
+      "sd": 0.0269,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.0988,
@@ -2533,9 +2604,9 @@
     "topk_topp_whole_b16_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 0.129,
-      "sd": 0.0447,
-      "n": 10
+      "mean": 0.1298,
+      "sd": 0.0277,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.1042,
@@ -2546,9 +2617,9 @@
     "topk_topp_whole_b1_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 0.2041,
-      "sd": 0.0377,
-      "n": 10
+      "mean": 0.186,
+      "sd": 0.019,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.1276,
@@ -2559,9 +2630,9 @@
     "topk_topp_whole_b1_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 0.1067,
-      "sd": 0.0297,
-      "n": 10
+      "mean": 0.0916,
+      "sd": 0.0205,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.1144,
@@ -2572,9 +2643,9 @@
     "topk_topp_whole_b2048_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 6.3832,
-      "sd": 0.0596,
-      "n": 10
+      "mean": 6.343,
+      "sd": 0.0094,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 3.1174,
@@ -2585,9 +2656,9 @@
     "topk_topp_whole_b2048_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 2.1054,
-      "sd": 0.0099,
-      "n": 10
+      "mean": 2.1006,
+      "sd": 0.0032,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.7928,
@@ -2598,9 +2669,9 @@
     "topk_whole_b128_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 0.3078,
-      "sd": 0.0592,
-      "n": 10
+      "mean": 0.288,
+      "sd": 0.0036,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.327,
@@ -2611,9 +2682,9 @@
     "topk_whole_b128_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 0.3133,
-      "sd": 0.0312,
-      "n": 10
+      "mean": 0.3522,
+      "sd": 0.0372,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.2382,
@@ -2624,9 +2695,9 @@
     "topk_whole_b16_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 0.1401,
-      "sd": 0.0098,
-      "n": 10
+      "mean": 0.1458,
+      "sd": 0.0089,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.0842,
@@ -2637,9 +2708,9 @@
     "topk_whole_b16_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 0.0934,
-      "sd": 0.0289,
-      "n": 10
+      "mean": 0.1094,
+      "sd": 0.0447,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.0884,
@@ -2650,9 +2721,9 @@
     "topk_whole_b1_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 0.1348,
-      "sd": 0.009,
-      "n": 10
+      "mean": 0.1326,
+      "sd": 0.005,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.1012,
@@ -2663,9 +2734,9 @@
     "topk_whole_b1_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 0.1025,
-      "sd": 0.0203,
-      "n": 10
+      "mean": 0.0964,
+      "sd": 0.0245,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.0846,
@@ -2676,9 +2747,9 @@
     "topk_whole_b2048_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 4.1014,
-      "sd": 0.0296,
-      "n": 10
+      "mean": 4.0892,
+      "sd": 0.0347,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 3.0678,
@@ -2689,9 +2760,9 @@
     "topk_whole_b2048_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 1.2609,
-      "sd": 0.002,
-      "n": 10
+      "mean": 1.2596,
+      "sd": 0.0021,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.7636,
@@ -2702,9 +2773,9 @@
     "topp_partial_b128_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 0.3399,
-      "sd": 0.007,
-      "n": 10
+      "mean": 0.3376,
+      "sd": 0.0022,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.3262,
@@ -2715,9 +2786,9 @@
     "topp_partial_b128_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 0.3252,
-      "sd": 0.004,
-      "n": 10
+      "mean": 0.333,
+      "sd": 0.0179,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.2398,
@@ -2728,9 +2799,9 @@
     "topp_partial_b16_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 0.2887,
-      "sd": 0.0124,
-      "n": 10
+      "mean": 0.2944,
+      "sd": 0.0086,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.28,
@@ -2741,9 +2812,9 @@
     "topp_partial_b16_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 0.3039,
-      "sd": 0.0077,
-      "n": 10
+      "mean": 0.323,
+      "sd": 0.0267,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.2014,
@@ -2754,9 +2825,9 @@
     "topp_partial_b1_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 0.0899,
-      "sd": 0.031,
-      "n": 10
+      "mean": 0.097,
+      "sd": 0.0324,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.0872,
@@ -2767,9 +2838,9 @@
     "topp_partial_b1_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 0.0738,
-      "sd": 0.0231,
-      "n": 10
+      "mean": 0.0656,
+      "sd": 0.017,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.088,
@@ -2780,9 +2851,9 @@
     "topp_partial_b2048_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 4.3698,
-      "sd": 0.028,
-      "n": 10
+      "mean": 4.3616,
+      "sd": 0.0098,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 4.0814,
@@ -2793,9 +2864,9 @@
     "topp_partial_b2048_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 4.4934,
-      "sd": 0.0194,
-      "n": 10
+      "mean": 4.5072,
+      "sd": 0.0227,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 2.8658,
@@ -2806,9 +2877,9 @@
     "topp_whole_b128_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 0.6381,
-      "sd": 0.0037,
-      "n": 10
+      "mean": 0.6344,
+      "sd": 0.0059,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.6264,
@@ -2819,9 +2890,9 @@
     "topp_whole_b128_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 0.6239,
-      "sd": 0.0141,
-      "n": 10
+      "mean": 0.6216,
+      "sd": 0.0027,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.429,
@@ -2832,9 +2903,9 @@
     "topp_whole_b16_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 0.293,
-      "sd": 0.0121,
-      "n": 10
+      "mean": 0.2906,
+      "sd": 0.0131,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.2804,
@@ -2845,9 +2916,9 @@
     "topp_whole_b16_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 0.3141,
-      "sd": 0.0208,
-      "n": 10
+      "mean": 0.3024,
+      "sd": 0.0102,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.2278,
@@ -2858,9 +2929,9 @@
     "topp_whole_b1_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 0.2658,
-      "sd": 0.019,
-      "n": 10
+      "mean": 0.2716,
+      "sd": 0.0106,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.287,
@@ -2871,9 +2942,9 @@
     "topp_whole_b1_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 0.2964,
-      "sd": 0.0125,
-      "n": 10
+      "mean": 0.2934,
+      "sd": 0.0038,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 0.1946,
@@ -2884,9 +2955,9 @@
     "topp_whole_b2048_v131072": {
      "unit": "ms",
      "gold": {
-      "mean": 8.5648,
-      "sd": 0.076,
-      "n": 10
+      "mean": 8.5346,
+      "sd": 0.0689,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 7.9748,
@@ -2897,9 +2968,9 @@
     "topp_whole_b2048_v32768": {
      "unit": "ms",
      "gold": {
-      "mean": 8.946,
-      "sd": 0.0364,
-      "n": 10
+      "mean": 8.8606,
+      "sd": 0.1151,
+      "n": 5
      },
      "claude + PR's solution": {
       "mean": 5.6692,
@@ -2910,244 +2981,244 @@
    },
    "pytorch_ref": {
     "topk_whole_b1_v32768": {
-     "mean": 0.2932,
-     "sd": 0.0971,
-     "n": 10
+     "mean": 0.2806,
+     "sd": 0.1026,
+     "n": 5
     },
     "topk_partial_b1_v32768": {
-     "mean": 0.2974,
-     "sd": 0.1077,
-     "n": 10
+     "mean": 0.2328,
+     "sd": 0.0847,
+     "n": 5
     },
     "topp_whole_b1_v32768": {
-     "mean": 0.2911,
-     "sd": 0.1032,
-     "n": 10
+     "mean": 0.323,
+     "sd": 0.1002,
+     "n": 5
     },
     "topp_partial_b1_v32768": {
-     "mean": 0.2792,
-     "sd": 0.1052,
-     "n": 10
+     "mean": 0.274,
+     "sd": 0.0865,
+     "n": 5
     },
     "topk_topp_whole_b1_v32768": {
-     "mean": 0.3699,
-     "sd": 0.1408,
-     "n": 10
+     "mean": 0.3886,
+     "sd": 0.1301,
+     "n": 5
     },
     "mixed_partial_b1_v32768": {
-     "mean": 0.337,
-     "sd": 0.1059,
-     "n": 10
+     "mean": 0.3742,
+     "sd": 0.1151,
+     "n": 5
     },
     "topk_whole_b16_v32768": {
-     "mean": 1.2221,
-     "sd": 0.0196,
-     "n": 10
+     "mean": 1.214,
+     "sd": 0.0195,
+     "n": 5
     },
     "topk_partial_b16_v32768": {
-     "mean": 1.2204,
-     "sd": 0.03,
-     "n": 10
+     "mean": 1.2356,
+     "sd": 0.0234,
+     "n": 5
     },
     "topp_whole_b16_v32768": {
-     "mean": 1.2462,
-     "sd": 0.0183,
-     "n": 10
+     "mean": 1.2634,
+     "sd": 0.0123,
+     "n": 5
     },
     "topp_partial_b16_v32768": {
-     "mean": 1.2491,
-     "sd": 0.0205,
-     "n": 10
+     "mean": 1.2712,
+     "sd": 0.0229,
+     "n": 5
     },
     "topk_topp_whole_b16_v32768": {
-     "mean": 1.3459,
-     "sd": 0.0972,
-     "n": 10
+     "mean": 1.3186,
+     "sd": 0.019,
+     "n": 5
     },
     "mixed_partial_b16_v32768": {
-     "mean": 1.3431,
-     "sd": 0.0965,
-     "n": 10
+     "mean": 1.424,
+     "sd": 0.2419,
+     "n": 5
     },
     "topk_whole_b128_v32768": {
-     "mean": 1.1515,
-     "sd": 0.0144,
-     "n": 10
+     "mean": 1.4242,
+     "sd": 0.5914,
+     "n": 5
     },
     "topk_partial_b128_v32768": {
-     "mean": 1.147,
-     "sd": 0.012,
-     "n": 10
+     "mean": 1.1536,
+     "sd": 0.0097,
+     "n": 5
     },
     "topp_whole_b128_v32768": {
-     "mean": 1.2355,
-     "sd": 0.0074,
-     "n": 10
+     "mean": 1.2364,
+     "sd": 0.0105,
+     "n": 5
     },
     "topp_partial_b128_v32768": {
-     "mean": 1.2443,
-     "sd": 0.0174,
-     "n": 10
+     "mean": 1.2398,
+     "sd": 0.0218,
+     "n": 5
     },
     "topk_topp_whole_b128_v32768": {
-     "mean": 2.1223,
-     "sd": 0.0147,
-     "n": 10
+     "mean": 2.1246,
+     "sd": 0.0217,
+     "n": 5
     },
     "mixed_partial_b128_v32768": {
-     "mean": 2.1249,
-     "sd": 0.0166,
-     "n": 10
+     "mean": 2.108,
+     "sd": 0.0102,
+     "n": 5
     },
     "topk_whole_b2048_v32768": {
-     "mean": 20.4298,
-     "sd": 0.0183,
-     "n": 10
+     "mean": 20.4296,
+     "sd": 0.0182,
+     "n": 5
     },
     "topk_partial_b2048_v32768": {
-     "mean": 20.4319,
-     "sd": 0.0215,
-     "n": 10
+     "mean": 20.4294,
+     "sd": 0.0259,
+     "n": 5
     },
     "topp_whole_b2048_v32768": {
-     "mean": 21.9972,
-     "sd": 0.0166,
-     "n": 10
+     "mean": 22.0094,
+     "sd": 0.0118,
+     "n": 5
     },
     "topp_partial_b2048_v32768": {
-     "mean": 22.0076,
-     "sd": 0.0178,
-     "n": 10
+     "mean": 22.0048,
+     "sd": 0.0143,
+     "n": 5
     },
     "topk_topp_whole_b2048_v32768": {
-     "mean": 23.2145,
-     "sd": 0.009,
-     "n": 10
+     "mean": 23.2102,
+     "sd": 0.0109,
+     "n": 5
     },
     "mixed_partial_b2048_v32768": {
-     "mean": 23.2065,
-     "sd": 0.0149,
-     "n": 10
+     "mean": 23.1896,
+     "sd": 0.0136,
+     "n": 5
     },
     "topk_whole_b1_v131072": {
-     "mean": 0.3261,
-     "sd": 0.0932,
-     "n": 10
+     "mean": 0.2858,
+     "sd": 0.04,
+     "n": 5
     },
     "topk_partial_b1_v131072": {
-     "mean": 0.2589,
-     "sd": 0.036,
-     "n": 10
+     "mean": 0.3254,
+     "sd": 0.1036,
+     "n": 5
     },
     "topp_whole_b1_v131072": {
-     "mean": 0.3263,
-     "sd": 0.1034,
-     "n": 10
+     "mean": 0.367,
+     "sd": 0.1129,
+     "n": 5
     },
     "topp_partial_b1_v131072": {
-     "mean": 0.3715,
-     "sd": 0.1143,
-     "n": 10
+     "mean": 0.3266,
+     "sd": 0.1006,
+     "n": 5
     },
     "topk_topp_whole_b1_v131072": {
-     "mean": 0.4852,
-     "sd": 0.1143,
-     "n": 10
+     "mean": 0.4092,
+     "sd": 0.1075,
+     "n": 5
     },
     "mixed_partial_b1_v131072": {
-     "mean": 0.4097,
-     "sd": 0.1132,
-     "n": 10
+     "mean": 0.453,
+     "sd": 0.2083,
+     "n": 5
     },
     "topk_whole_b16_v131072": {
-     "mean": 4.8427,
-     "sd": 1.889,
-     "n": 10
+     "mean": 5.6788,
+     "sd": 1.8976,
+     "n": 5
     },
     "topk_partial_b16_v131072": {
-     "mean": 0.5821,
-     "sd": 0.0471,
-     "n": 10
+     "mean": 0.6004,
+     "sd": 0.0758,
+     "n": 5
     },
     "topp_whole_b16_v131072": {
-     "mean": 0.8846,
-     "sd": 0.0165,
-     "n": 10
+     "mean": 0.892,
+     "sd": 0.0072,
+     "n": 5
     },
     "topp_partial_b16_v131072": {
-     "mean": 0.8778,
-     "sd": 0.0107,
-     "n": 10
+     "mean": 0.8884,
+     "sd": 0.0208,
+     "n": 5
     },
     "topk_topp_whole_b16_v131072": {
-     "mean": 5.4204,
-     "sd": 1.9086,
-     "n": 10
+     "mean": 6.8312,
+     "sd": 0.6445,
+     "n": 5
     },
     "mixed_partial_b16_v131072": {
-     "mean": 0.8006,
-     "sd": 0.0515,
-     "n": 10
+     "mean": 0.7746,
+     "sd": 0.0216,
+     "n": 5
     },
     "topk_whole_b128_v131072": {
-     "mean": 5.2143,
-     "sd": 0.4122,
-     "n": 10
+     "mean": 5.0866,
+     "sd": 0.0168,
+     "n": 5
     },
     "topk_partial_b128_v131072": {
-     "mean": 5.081,
-     "sd": 0.0091,
-     "n": 10
+     "mean": 5.0958,
+     "sd": 0.022,
+     "n": 5
     },
     "topp_whole_b128_v131072": {
-     "mean": 5.5727,
-     "sd": 0.023,
-     "n": 10
+     "mean": 5.56,
+     "sd": 0.0146,
+     "n": 5
     },
     "topp_partial_b128_v131072": {
-     "mean": 5.5748,
-     "sd": 0.0379,
-     "n": 10
+     "mean": 5.558,
+     "sd": 0.015,
+     "n": 5
     },
     "topk_topp_whole_b128_v131072": {
-     "mean": 5.8787,
-     "sd": 0.0083,
-     "n": 10
+     "mean": 5.8824,
+     "sd": 0.0207,
+     "n": 5
     },
     "mixed_partial_b128_v131072": {
-     "mean": 5.88,
-     "sd": 0.0088,
-     "n": 10
+     "mean": 5.8774,
+     "sd": 0.0196,
+     "n": 5
     },
     "topk_whole_b2048_v131072": {
-     "mean": 81.5991,
-     "sd": 0.0716,
-     "n": 10
+     "mean": 81.5694,
+     "sd": 0.0471,
+     "n": 5
     },
     "topk_partial_b2048_v131072": {
-     "mean": 81.5582,
-     "sd": 0.0266,
-     "n": 10
+     "mean": 81.5878,
+     "sd": 0.0288,
+     "n": 5
     },
     "topp_whole_b2048_v131072": {
-     "mean": 89.3227,
-     "sd": 0.1171,
-     "n": 10
+     "mean": 89.2514,
+     "sd": 0.0549,
+     "n": 5
     },
     "topp_partial_b2048_v131072": {
-     "mean": 89.2539,
-     "sd": 0.0275,
-     "n": 10
+     "mean": 89.256,
+     "sd": 0.0318,
+     "n": 5
     },
     "topk_topp_whole_b2048_v131072": {
-     "mean": 94.0276,
-     "sd": 0.035,
-     "n": 10
+     "mean": 94.0044,
+     "sd": 0.0329,
+     "n": 5
     },
     "mixed_partial_b2048_v131072": {
-     "mean": 94.0664,
-     "sd": 0.039,
-     "n": 10
+     "mean": 94.0534,
+     "sd": 0.0417,
+     "n": 5
     }
    }
   },
@@ -3155,16 +3226,16 @@
    "base": {
     "tests": {
      "bytes": 2076,
-     "tail": "precationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n\n==================================== ERRORS ====================================\n__________ ERROR collecting tests/v1/sample/test_topk_topp_sampler.py __________\nImportError while importing test module '/t/tests/v1/sample/test_topk_topp_sampler.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/usr/lib/python3.10/importlib/__init__.py:126: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntests/v1/sample/test_topk_topp_sampler.py:8: in <module>\n    from vllm.v1.sample.ops.topk_topp_sampler import apply_top_k_top_p_pytorch\nE   ImportError: cannot import name 'apply_top_k_top_p_pytorch' from 'vllm.v1.sample.ops.topk_topp_sampler' (/usr/local/lib/python3.10/dist-packages/vllm/v1/sample/ops/topk_topp_sampler.py)\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nERROR tests/v1/sample/test_topk_topp_sampler.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 warning, 1 error in 0.79s\n"
+     "tail": "precationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n\n==================================== ERRORS ====================================\n__________ ERROR collecting tests/v1/sample/test_topk_topp_sampler.py __________\nImportError while importing test module '/t/tests/v1/sample/test_topk_topp_sampler.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/usr/lib/python3.10/importlib/__init__.py:126: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntests/v1/sample/test_topk_topp_sampler.py:8: in <module>\n    from vllm.v1.sample.ops.topk_topp_sampler import apply_top_k_top_p_pytorch\nE   ImportError: cannot import name 'apply_top_k_top_p_pytorch' from 'vllm.v1.sample.ops.topk_topp_sampler' (/usr/local/lib/python3.10/dist-packages/vllm/v1/sample/ops/topk_topp_sampler.py)\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nERROR tests/v1/sample/test_topk_topp_sampler.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 warning, 1 error in 0.95s\n"
     },
     "workload_runs": 1
    },
    "gold": {
     "tests": {
      "bytes": 1256,
-     "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n.s...................................................................... [ 80%]\n..................                                                       [100%]\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n89 passed, 1 skipped, 1 warning in 52.18s\n"
+     "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n.s...................................................................... [ 80%]\n..................                                                       [100%]\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n89 passed, 1 skipped, 1 warning in 51.51s\n"
     },
-    "workload_runs": 10
+    "workload_runs": 5
    },
    "claude": {
     "tests": {
@@ -3191,7 +3262,15 @@
     "patch_bytes": 5430
    }
   },
-  "ts": "2026-11-05T20:24:26Z"
+  "ts": "2026-11-07T10:51:56Z",
+  "solver_arms_from": {
+   "ts": "2026-11-05T20:24:26Z",
+   "arms": [
+    "claude",
+    "claude + PR's solution"
+   ],
+   "note": "solver arms recorded by an earlier --run-formula-harnesses run; baseline / PR's solution re-measured by --reproduce"
+  }
  },
  {
   "pr": 33593,
@@ -3360,13 +3439,13 @@
     },
     "arms": {
      "base": {
-      "mean": 1.2592,
-      "sd": 0.0029,
+      "mean": 1.2552,
+      "sd": 0.0013,
       "n": 5
      },
      "gold": {
-      "mean": 0.9584,
-      "sd": 0.0027,
+      "mean": 0.951,
+      "sd": 0.0024,
       "n": 5
      },
      "claude": {
@@ -3391,13 +3470,13 @@
     },
     "arms": {
      "base": {
-      "mean": 4.0334,
-      "sd": 0.0754,
+      "mean": 4.0678,
+      "sd": 0.145,
       "n": 5
      },
      "gold": {
-      "mean": 3.552,
-      "sd": 0.0169,
+      "mean": 3.5402,
+      "sd": 0.0157,
       "n": 5
      },
      "claude": {
@@ -3422,13 +3501,13 @@
     },
     "arms": {
      "base": {
-      "mean": 2.1084,
-      "sd": 0.0084,
+      "mean": 2.101,
+      "sd": 0.0041,
       "n": 5
      },
      "gold": {
-      "mean": 1.5902,
-      "sd": 0.011,
+      "mean": 1.5766,
+      "sd": 0.0028,
       "n": 5
      },
      "claude": {
@@ -3453,13 +3532,13 @@
     },
     "arms": {
      "base": {
-      "mean": 6.3932,
-      "sd": 0.0175,
+      "mean": 6.3734,
+      "sd": 0.0061,
       "n": 5
      },
      "gold": {
-      "mean": 5.1634,
-      "sd": 0.0231,
+      "mean": 5.1868,
+      "sd": 0.004,
       "n": 5
      },
      "claude": {
@@ -3484,13 +3563,13 @@
     },
     "arms": {
      "base": {
-      "mean": 0.101,
-      "sd": 0.0063,
+      "mean": 0.1018,
+      "sd": 0.0098,
       "n": 5
      },
      "gold": {
-      "mean": 0.1066,
-      "sd": 0.0171,
+      "mean": 0.0848,
+      "sd": 0.0165,
       "n": 5
      },
      "claude": {
@@ -3512,13 +3591,13 @@
     "reported": null,
     "arms": {
      "base": {
-      "mean": 0.5268,
-      "sd": 0.0048,
+      "mean": 0.5292,
+      "sd": 0.0125,
       "n": 5
      },
      "gold": {
-      "mean": 0.5242,
-      "sd": 0.0016,
+      "mean": 0.5302,
+      "sd": 0.0107,
       "n": 5
      },
      "claude": {
@@ -3540,13 +3619,13 @@
     "reported": null,
     "arms": {
      "base": {
-      "mean": 0.1714,
-      "sd": 0.018,
+      "mean": 0.1706,
+      "sd": 0.0075,
       "n": 5
      },
      "gold": {
-      "mean": 0.1654,
-      "sd": 0.0075,
+      "mean": 0.159,
+      "sd": 0.0033,
       "n": 5
      },
      "claude": {
@@ -3568,13 +3647,13 @@
     "reported": null,
     "arms": {
      "base": {
-      "mean": 6.5776,
-      "sd": 0.0092,
+      "mean": 6.578,
+      "sd": 0.0054,
       "n": 5
      },
      "gold": {
-      "mean": 5.9894,
-      "sd": 0.0157,
+      "mean": 5.9778,
+      "sd": 0.0282,
       "n": 5
      },
      "claude": {
@@ -3596,13 +3675,13 @@
     "reported": null,
     "arms": {
      "base": {
-      "mean": 1.9358,
-      "sd": 0.0031,
+      "mean": 1.9384,
+      "sd": 0.0123,
       "n": 5
      },
      "gold": {
-      "mean": 1.597,
-      "sd": 0.0116,
+      "mean": 1.5916,
+      "sd": 0.0068,
       "n": 5
      },
      "claude": {
@@ -3624,13 +3703,13 @@
     "reported": null,
     "arms": {
      "base": {
-      "mean": 0.1534,
-      "sd": 0.0042,
+      "mean": 0.1526,
+      "sd": 0.0068,
       "n": 5
      },
      "gold": {
-      "mean": 0.1352,
-      "sd": 0.0031,
+      "mean": 0.1358,
+      "sd": 0.0026,
       "n": 5
      },
      "claude": {
@@ -3652,13 +3731,13 @@
     "reported": null,
     "arms": {
      "base": {
-      "mean": 0.063,
-      "sd": 0.016,
+      "mean": 0.0832,
+      "sd": 0.025,
       "n": 5
      },
      "gold": {
-      "mean": 0.0834,
-      "sd": 0.0265,
+      "mean": 0.057,
+      "sd": 0.009,
       "n": 5
      },
      "claude": {
@@ -3680,13 +3759,13 @@
     "reported": null,
     "arms": {
      "base": {
-      "mean": 2.0682,
-      "sd": 0.0045,
+      "mean": 2.0676,
+      "sd": 0.0097,
       "n": 5
      },
      "gold": {
-      "mean": 1.8148,
-      "sd": 0.0076,
+      "mean": 1.8274,
+      "sd": 0.0181,
       "n": 5
      },
      "claude": {
@@ -3708,13 +3787,13 @@
     "reported": null,
     "arms": {
      "base": {
-      "mean": 0.648,
-      "sd": 0.0046,
+      "mean": 0.6482,
+      "sd": 0.009,
       "n": 5
      },
      "gold": {
-      "mean": 0.4996,
-      "sd": 0.0087,
+      "mean": 0.49,
+      "sd": 0.0017,
       "n": 5
      },
      "claude": {
@@ -3736,13 +3815,13 @@
     "reported": null,
     "arms": {
      "base": {
-      "mean": 0.559,
-      "sd": 0.0037,
+      "mean": 0.568,
+      "sd": 0.0225,
       "n": 5
      },
      "gold": {
-      "mean": 0.4962,
-      "sd": 0.004,
+      "mean": 0.4998,
+      "sd": 0.0061,
       "n": 5
      },
      "claude": {
@@ -3764,13 +3843,13 @@
     "reported": null,
     "arms": {
      "base": {
-      "mean": 0.239,
-      "sd": 0.1279,
+      "mean": 0.178,
+      "sd": 0.004,
       "n": 5
      },
      "gold": {
       "mean": 0.1474,
-      "sd": 0.0082,
+      "sd": 0.0144,
       "n": 5
      },
      "claude": {
@@ -3792,13 +3871,13 @@
     "reported": null,
     "arms": {
      "base": {
-      "mean": 0.288,
-      "sd": 0.0021,
+      "mean": 0.2842,
+      "sd": 0.0015,
       "n": 5
      },
      "gold": {
-      "mean": 0.2554,
-      "sd": 0.0093,
+      "mean": 0.2556,
+      "sd": 0.0121,
       "n": 5
      },
      "claude": {
@@ -3820,13 +3899,13 @@
     "reported": null,
     "arms": {
      "base": {
-      "mean": 0.3362,
-      "sd": 0.0018,
+      "mean": 0.3376,
+      "sd": 0.0028,
       "n": 5
      },
      "gold": {
-      "mean": 0.3378,
-      "sd": 0.0036,
+      "mean": 0.3394,
+      "sd": 0.0053,
       "n": 5
      },
      "claude": {
@@ -3849,12 +3928,12 @@
     "arms": {
      "base": {
       "mean": 0.3254,
-      "sd": 0.0051,
+      "sd": 0.0047,
       "n": 5
      },
      "gold": {
-      "mean": 0.3226,
-      "sd": 0.0068,
+      "mean": 0.3174,
+      "sd": 0.0046,
       "n": 5
      },
      "claude": {
@@ -3876,13 +3955,13 @@
     "reported": null,
     "arms": {
      "base": {
-      "mean": 4.4416,
-      "sd": 0.0255,
+      "mean": 4.4366,
+      "sd": 0.0086,
       "n": 5
      },
      "gold": {
-      "mean": 4.4472,
-      "sd": 0.0181,
+      "mean": 4.4208,
+      "sd": 0.0251,
       "n": 5
      },
      "claude": {
@@ -3904,13 +3983,13 @@
     "reported": null,
     "arms": {
      "base": {
-      "mean": 4.5358,
-      "sd": 0.0109,
+      "mean": 4.5114,
+      "sd": 0.0128,
       "n": 5
      },
      "gold": {
-      "mean": 4.5092,
-      "sd": 0.0263,
+      "mean": 4.5352,
+      "sd": 0.012,
       "n": 5
      },
      "claude": {
@@ -3932,13 +4011,13 @@
     "reported": null,
     "arms": {
      "base": {
-      "mean": 0.6724,
-      "sd": 0.0732,
+      "mean": 0.642,
+      "sd": 0.0036,
       "n": 5
      },
      "gold": {
-      "mean": 0.6444,
-      "sd": 0.0043,
+      "mean": 0.6742,
+      "sd": 0.0733,
       "n": 5
      },
      "claude": {
@@ -3960,13 +4039,13 @@
     "reported": null,
     "arms": {
      "base": {
-      "mean": 0.6196,
-      "sd": 0.0062,
+      "mean": 0.6164,
+      "sd": 0.0059,
       "n": 5
      },
      "gold": {
-      "mean": 0.6196,
-      "sd": 0.0076,
+      "mean": 0.612,
+      "sd": 0.0029,
       "n": 5
      },
      "claude": {
@@ -3988,13 +4067,13 @@
     "reported": null,
     "arms": {
      "base": {
-      "mean": 8.6832,
-      "sd": 0.0485,
+      "mean": 8.764,
+      "sd": 0.0593,
       "n": 5
      },
      "gold": {
-      "mean": 8.7174,
-      "sd": 0.0342,
+      "mean": 8.7394,
+      "sd": 0.0493,
       "n": 5
      },
      "claude": {
@@ -4016,13 +4095,13 @@
     "reported": null,
     "arms": {
      "base": {
-      "mean": 8.9976,
-      "sd": 0.0591,
+      "mean": 9.01,
+      "sd": 0.0161,
       "n": 5
      },
      "gold": {
-      "mean": 8.9576,
-      "sd": 0.0503,
+      "mean": 8.9258,
+      "sd": 0.0971,
       "n": 5
      },
      "claude": {
@@ -4076,13 +4155,13 @@
     "mixed_partial_b128_v131072": {
      "unit": "ms",
      "base": {
-      "mean": 0.5268,
-      "sd": 0.0048,
+      "mean": 0.5292,
+      "sd": 0.0125,
       "n": 5
      },
      "gold": {
-      "mean": 0.5242,
-      "sd": 0.0016,
+      "mean": 0.5302,
+      "sd": 0.0107,
       "n": 5
      },
      "claude": {
@@ -4099,13 +4178,13 @@
     "mixed_partial_b128_v32768": {
      "unit": "ms",
      "base": {
-      "mean": 0.1714,
-      "sd": 0.018,
+      "mean": 0.1706,
+      "sd": 0.0075,
       "n": 5
      },
      "gold": {
-      "mean": 0.1654,
-      "sd": 0.0075,
+      "mean": 0.159,
+      "sd": 0.0033,
       "n": 5
      },
      "claude": {
@@ -4122,13 +4201,13 @@
     "mixed_partial_b2048_v131072": {
      "unit": "ms",
      "base": {
-      "mean": 6.5776,
-      "sd": 0.0092,
+      "mean": 6.578,
+      "sd": 0.0054,
       "n": 5
      },
      "gold": {
-      "mean": 5.9894,
-      "sd": 0.0157,
+      "mean": 5.9778,
+      "sd": 0.0282,
       "n": 5
      },
      "claude": {
@@ -4145,13 +4224,13 @@
     "mixed_partial_b2048_v32768": {
      "unit": "ms",
      "base": {
-      "mean": 1.9358,
-      "sd": 0.0031,
+      "mean": 1.9384,
+      "sd": 0.0123,
       "n": 5
      },
      "gold": {
-      "mean": 1.597,
-      "sd": 0.0116,
+      "mean": 1.5916,
+      "sd": 0.0068,
       "n": 5
      },
      "claude": {
@@ -4168,13 +4247,13 @@
     "topk_partial_b128_v131072": {
      "unit": "ms",
      "base": {
-      "mean": 0.1534,
-      "sd": 0.0042,
+      "mean": 0.1526,
+      "sd": 0.0068,
       "n": 5
      },
      "gold": {
-      "mean": 0.1352,
-      "sd": 0.0031,
+      "mean": 0.1358,
+      "sd": 0.0026,
       "n": 5
      },
      "claude": {
@@ -4191,13 +4270,13 @@
     "topk_partial_b128_v32768": {
      "unit": "ms",
      "base": {
-      "mean": 0.063,
-      "sd": 0.016,
+      "mean": 0.0832,
+      "sd": 0.025,
       "n": 5
      },
      "gold": {
-      "mean": 0.0834,
-      "sd": 0.0265,
+      "mean": 0.057,
+      "sd": 0.009,
       "n": 5
      },
      "claude": {
@@ -4214,13 +4293,13 @@
     "topk_partial_b2048_v131072": {
      "unit": "ms",
      "base": {
-      "mean": 2.0682,
-      "sd": 0.0045,
+      "mean": 2.0676,
+      "sd": 0.0097,
       "n": 5
      },
      "gold": {
-      "mean": 1.8148,
-      "sd": 0.0076,
+      "mean": 1.8274,
+      "sd": 0.0181,
       "n": 5
      },
      "claude": {
@@ -4237,13 +4316,13 @@
     "topk_partial_b2048_v32768": {
      "unit": "ms",
      "base": {
-      "mean": 0.648,
-      "sd": 0.0046,
+      "mean": 0.6482,
+      "sd": 0.009,
       "n": 5
      },
      "gold": {
-      "mean": 0.4996,
-      "sd": 0.0087,
+      "mean": 0.49,
+      "sd": 0.0017,
       "n": 5
      },
      "claude": {
@@ -4260,13 +4339,13 @@
     "topk_topp_whole_b128_v131072": {
      "unit": "ms",
      "base": {
-      "mean": 0.559,
-      "sd": 0.0037,
+      "mean": 0.568,
+      "sd": 0.0225,
       "n": 5
      },
      "gold": {
-      "mean": 0.4962,
-      "sd": 0.004,
+      "mean": 0.4998,
+      "sd": 0.0061,
       "n": 5
      },
      "claude": {
@@ -4283,13 +4362,13 @@
     "topk_topp_whole_b128_v32768": {
      "unit": "ms",
      "base": {
-      "mean": 0.239,
-      "sd": 0.1279,
+      "mean": 0.178,
+      "sd": 0.004,
       "n": 5
      },
      "gold": {
       "mean": 0.1474,
-      "sd": 0.0082,
+      "sd": 0.0144,
       "n": 5
      },
      "claude": {
@@ -4306,13 +4385,13 @@
     "topk_topp_whole_b2048_v131072": {
      "unit": "ms",
      "base": {
-      "mean": 6.3932,
-      "sd": 0.0175,
+      "mean": 6.3734,
+      "sd": 0.0061,
       "n": 5
      },
      "gold": {
-      "mean": 5.1634,
-      "sd": 0.0231,
+      "mean": 5.1868,
+      "sd": 0.004,
       "n": 5
      },
      "claude": {
@@ -4329,13 +4408,13 @@
     "topk_topp_whole_b2048_v32768": {
      "unit": "ms",
      "base": {
-      "mean": 2.1084,
-      "sd": 0.0084,
+      "mean": 2.101,
+      "sd": 0.0041,
       "n": 5
      },
      "gold": {
-      "mean": 1.5902,
-      "sd": 0.011,
+      "mean": 1.5766,
+      "sd": 0.0028,
       "n": 5
      },
      "claude": {
@@ -4352,13 +4431,13 @@
     "topk_whole_b128_v131072": {
      "unit": "ms",
      "base": {
-      "mean": 0.288,
-      "sd": 0.0021,
+      "mean": 0.2842,
+      "sd": 0.0015,
       "n": 5
      },
      "gold": {
-      "mean": 0.2554,
-      "sd": 0.0093,
+      "mean": 0.2556,
+      "sd": 0.0121,
       "n": 5
      },
      "claude": {
@@ -4375,13 +4454,13 @@
     "topk_whole_b128_v32768": {
      "unit": "ms",
      "base": {
-      "mean": 0.101,
-      "sd": 0.0063,
+      "mean": 0.1018,
+      "sd": 0.0098,
       "n": 5
      },
      "gold": {
-      "mean": 0.1066,
-      "sd": 0.0171,
+      "mean": 0.0848,
+      "sd": 0.0165,
       "n": 5
      },
      "claude": {
@@ -4398,13 +4477,13 @@
     "topk_whole_b2048_v131072": {
      "unit": "ms",
      "base": {
-      "mean": 4.0334,
-      "sd": 0.0754,
+      "mean": 4.0678,
+      "sd": 0.145,
       "n": 5
      },
      "gold": {
-      "mean": 3.552,
-      "sd": 0.0169,
+      "mean": 3.5402,
+      "sd": 0.0157,
       "n": 5
      },
      "claude": {
@@ -4421,13 +4500,13 @@
     "topk_whole_b2048_v32768": {
      "unit": "ms",
      "base": {
-      "mean": 1.2592,
-      "sd": 0.0029,
+      "mean": 1.2552,
+      "sd": 0.0013,
       "n": 5
      },
      "gold": {
-      "mean": 0.9584,
-      "sd": 0.0027,
+      "mean": 0.951,
+      "sd": 0.0024,
       "n": 5
      },
      "claude": {
@@ -4444,13 +4523,13 @@
     "topp_partial_b128_v131072": {
      "unit": "ms",
      "base": {
-      "mean": 0.3362,
-      "sd": 0.0018,
+      "mean": 0.3376,
+      "sd": 0.0028,
       "n": 5
      },
      "gold": {
-      "mean": 0.3378,
-      "sd": 0.0036,
+      "mean": 0.3394,
+      "sd": 0.0053,
       "n": 5
      },
      "claude": {
@@ -4468,12 +4547,12 @@
      "unit": "ms",
      "base": {
       "mean": 0.3254,
-      "sd": 0.0051,
+      "sd": 0.0047,
       "n": 5
      },
      "gold": {
-      "mean": 0.3226,
-      "sd": 0.0068,
+      "mean": 0.3174,
+      "sd": 0.0046,
       "n": 5
      },
      "claude": {
@@ -4490,13 +4569,13 @@
     "topp_partial_b2048_v131072": {
      "unit": "ms",
      "base": {
-      "mean": 4.4416,
-      "sd": 0.0255,
+      "mean": 4.4366,
+      "sd": 0.0086,
       "n": 5
      },
      "gold": {
-      "mean": 4.4472,
-      "sd": 0.0181,
+      "mean": 4.4208,
+      "sd": 0.0251,
       "n": 5
      },
      "claude": {
@@ -4513,13 +4592,13 @@
     "topp_partial_b2048_v32768": {
      "unit": "ms",
      "base": {
-      "mean": 4.5358,
-      "sd": 0.0109,
+      "mean": 4.5114,
+      "sd": 0.0128,
       "n": 5
      },
      "gold": {
-      "mean": 4.5092,
-      "sd": 0.0263,
+      "mean": 4.5352,
+      "sd": 0.012,
       "n": 5
      },
      "claude": {
@@ -4536,13 +4615,13 @@
     "topp_whole_b128_v131072": {
      "unit": "ms",
      "base": {
-      "mean": 0.6724,
-      "sd": 0.0732,
+      "mean": 0.642,
+      "sd": 0.0036,
       "n": 5
      },
      "gold": {
-      "mean": 0.6444,
-      "sd": 0.0043,
+      "mean": 0.6742,
+      "sd": 0.0733,
       "n": 5
      },
      "claude": {
@@ -4559,13 +4638,13 @@
     "topp_whole_b128_v32768": {
      "unit": "ms",
      "base": {
-      "mean": 0.6196,
-      "sd": 0.0062,
+      "mean": 0.6164,
+      "sd": 0.0059,
       "n": 5
      },
      "gold": {
-      "mean": 0.6196,
-      "sd": 0.0076,
+      "mean": 0.612,
+      "sd": 0.0029,
       "n": 5
      },
      "claude": {
@@ -4582,13 +4661,13 @@
     "topp_whole_b2048_v131072": {
      "unit": "ms",
      "base": {
-      "mean": 8.6832,
-      "sd": 0.0485,
+      "mean": 8.764,
+      "sd": 0.0593,
       "n": 5
      },
      "gold": {
-      "mean": 8.7174,
-      "sd": 0.0342,
+      "mean": 8.7394,
+      "sd": 0.0493,
       "n": 5
      },
      "claude": {
@@ -4605,13 +4684,13 @@
     "topp_whole_b2048_v32768": {
      "unit": "ms",
      "base": {
-      "mean": 8.9976,
-      "sd": 0.0591,
+      "mean": 9.01,
+      "sd": 0.0161,
       "n": 5
      },
      "gold": {
-      "mean": 8.9576,
-      "sd": 0.0503,
+      "mean": 8.9258,
+      "sd": 0.0971,
       "n": 5
      },
      "claude": {
@@ -4628,123 +4707,123 @@
    },
    "pytorch_ref": {
     "topk_whole_b128_v32768": {
-     "mean": 1.1394,
-     "sd": 0.009,
+     "mean": 1.1502,
+     "sd": 0.0142,
      "n": 5
     },
     "topk_partial_b128_v32768": {
-     "mean": 1.1428,
-     "sd": 0.0059,
+     "mean": 1.1448,
+     "sd": 0.013,
      "n": 5
     },
     "topp_whole_b128_v32768": {
-     "mean": 1.2456,
-     "sd": 0.0255,
+     "mean": 1.2286,
+     "sd": 0.0105,
      "n": 5
     },
     "topp_partial_b128_v32768": {
-     "mean": 1.2386,
-     "sd": 0.0124,
+     "mean": 1.2288,
+     "sd": 0.0079,
      "n": 5
     },
     "topk_topp_whole_b128_v32768": {
-     "mean": 2.1094,
-     "sd": 0.0127,
+     "mean": 2.1212,
+     "sd": 0.0379,
      "n": 5
     },
     "mixed_partial_b128_v32768": {
-     "mean": 2.1112,
-     "sd": 0.0052,
+     "mean": 2.1064,
+     "sd": 0.0132,
      "n": 5
     },
     "topk_whole_b2048_v32768": {
-     "mean": 20.4386,
-     "sd": 0.0184,
+     "mean": 20.4232,
+     "sd": 0.0245,
      "n": 5
     },
     "topk_partial_b2048_v32768": {
-     "mean": 20.4356,
-     "sd": 0.014,
+     "mean": 20.42,
+     "sd": 0.0217,
      "n": 5
     },
     "topp_whole_b2048_v32768": {
-     "mean": 21.9938,
-     "sd": 0.0288,
+     "mean": 21.9926,
+     "sd": 0.0138,
      "n": 5
     },
     "topp_partial_b2048_v32768": {
-     "mean": 22.0034,
-     "sd": 0.0184,
+     "mean": 21.9926,
+     "sd": 0.0165,
      "n": 5
     },
     "topk_topp_whole_b2048_v32768": {
-     "mean": 23.2136,
-     "sd": 0.0108,
+     "mean": 23.2144,
+     "sd": 0.0151,
      "n": 5
     },
     "mixed_partial_b2048_v32768": {
-     "mean": 23.2092,
-     "sd": 0.0139,
+     "mean": 23.2082,
+     "sd": 0.0171,
      "n": 5
     },
     "topk_whole_b128_v131072": {
-     "mean": 5.0866,
-     "sd": 0.0183,
+     "mean": 5.0814,
+     "sd": 0.0091,
      "n": 5
     },
     "topk_partial_b128_v131072": {
-     "mean": 5.0852,
-     "sd": 0.0127,
+     "mean": 5.0834,
+     "sd": 0.0072,
      "n": 5
     },
     "topp_whole_b128_v131072": {
-     "mean": 6.4532,
-     "sd": 1.9928,
+     "mean": 5.559,
+     "sd": 0.0288,
      "n": 5
     },
     "topp_partial_b128_v131072": {
-     "mean": 5.5416,
-     "sd": 0.0083,
+     "mean": 5.6276,
+     "sd": 0.1203,
      "n": 5
     },
     "topk_topp_whole_b128_v131072": {
-     "mean": 8.4512,
-     "sd": 1.5057,
+     "mean": 8.8504,
+     "sd": 1.6306,
      "n": 5
     },
     "mixed_partial_b128_v131072": {
-     "mean": 5.8898,
-     "sd": 0.0185,
+     "mean": 5.869,
+     "sd": 0.0095,
      "n": 5
     },
     "topk_whole_b2048_v131072": {
-     "mean": 81.569,
-     "sd": 0.0512,
+     "mean": 81.5598,
+     "sd": 0.026,
      "n": 5
     },
     "topk_partial_b2048_v131072": {
-     "mean": 81.567,
-     "sd": 0.0423,
+     "mean": 81.5688,
+     "sd": 0.0292,
      "n": 5
     },
     "topp_whole_b2048_v131072": {
-     "mean": 89.2892,
-     "sd": 0.0371,
+     "mean": 89.2632,
+     "sd": 0.0489,
      "n": 5
     },
     "topp_partial_b2048_v131072": {
-     "mean": 89.4142,
-     "sd": 0.3041,
+     "mean": 89.2728,
+     "sd": 0.0358,
      "n": 5
     },
     "topk_topp_whole_b2048_v131072": {
-     "mean": 93.9794,
-     "sd": 0.0861,
+     "mean": 93.9864,
+     "sd": 0.0317,
      "n": 5
     },
     "mixed_partial_b2048_v131072": {
-     "mean": 94.053,
-     "sd": 0.0651,
+     "mean": 94.0174,
+     "sd": 0.042,
      "n": 5
     }
    }
@@ -4753,14 +4832,14 @@
    "base": {
     "tests": {
      "bytes": 1539,
-     "tail": "/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n.s...................................................................... [ 80%]\n..................                                                       [100%]\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n../usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:362: 14 warnings\n  /usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:362: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n89 passed, 1 skipped, 15 warnings in 59.83s\n"
+     "tail": "/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n.s...................................................................... [ 80%]\n..................                                                       [100%]\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n../usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:362: 14 warnings\n  /usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:362: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n89 passed, 1 skipped, 15 warnings in 55.57s\n"
     },
     "workload_runs": 5
    },
    "gold": {
     "tests": {
      "bytes": 1539,
-     "tail": "/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n.s...................................................................... [ 80%]\n..................                                                       [100%]\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n../usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:362: 14 warnings\n  /usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:362: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n89 passed, 1 skipped, 15 warnings in 58.48s\n"
+     "tail": "/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n.s...................................................................... [ 80%]\n..................                                                       [100%]\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n../usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:362: 14 warnings\n  /usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:362: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n89 passed, 1 skipped, 15 warnings in 56.85s\n"
     },
     "workload_runs": 5
    },
@@ -4789,7 +4868,15 @@
     "patch_bytes": 57784
    }
   },
-  "ts": "2026-11-05T15:24:51Z"
+  "ts": "2026-11-07T11:03:00Z",
+  "solver_arms_from": {
+   "ts": "2026-11-05T15:24:51Z",
+   "arms": [
+    "claude",
+    "claude + PR's solution"
+   ],
+   "note": "solver arms recorded by an earlier --run-formula-harnesses run; baseline / PR's solution re-measured by --reproduce"
+  }
  },
  {
   "pr": 39328,
@@ -4917,13 +5004,13 @@
     },
     "arms": {
      "base": {
-      "mean": 120.196,
-      "sd": 19.679,
+      "mean": 106.044,
+      "sd": 22.9137,
       "n": 5
      },
      "gold": {
-      "mean": 84.442,
-      "sd": 17.2932,
+      "mean": 78.516,
+      "sd": 15.6913,
       "n": 5
      },
      "claude": {
@@ -4977,13 +5064,13 @@
     "allpool_forward_median": {
      "unit": "us",
      "base": {
-      "mean": 120.196,
-      "sd": 19.679,
+      "mean": 106.044,
+      "sd": 22.9137,
       "n": 5
      },
      "gold": {
-      "mean": 84.442,
-      "sd": 17.2932,
+      "mean": 78.516,
+      "sd": 15.6913,
       "n": 5
      },
      "claude": {
@@ -5003,15 +5090,15 @@
   "logs": {
    "base": {
     "tests": {
-     "bytes": 2567,
-     "tail": "/models/language/pooling/test_token_classification.py:72\n  /t/tests/models/language/pooling/test_token_classification.py:72: PytestUnknownMarkWarning: Unknown pytest.mark.flaky - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.flaky(reruns=3)\n\ntests/models/language/pooling/test_token_classification.py: 14 warnings\n  /usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.\n    warnings.warn(\n\ntests/models/language/pooling/test_token_classification.py::test_modernbert_models[float-disham993/electrical-ner-ModernBERT-base]\n  /usr/local/lib/python3.10/dist-packages/torch/_inductor/compile_fx.py:322: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.\n    warnings.warn(\n\ntests/models/language/pooling/test_token_classification.py::test_auto_conversion[float-bd2lcco/Qwen3-0.6B-finetuned]\n  /usr/local/lib/python3.10/dist-packages/huggingface_hub/file_download.py:1727: DeprecationWarning: hf_xet.download_files() is deprecated. Use XetSession().new_file_download_group().start_download_file() instead.\n    xet_get(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n4 passed, 18 warnings in 149.94s (0:02:29)\n"
+     "bytes": 2222,
+     "tail": "================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\ntests/models/language/pooling/test_token_classification.py:72\n  /t/tests/models/language/pooling/test_token_classification.py:72: PytestUnknownMarkWarning: Unknown pytest.mark.flaky - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.flaky(reruns=3)\n\ntests/models/language/pooling/test_token_classification.py: 14 warnings\n  /usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.\n    warnings.warn(\n\ntests/models/language/pooling/test_token_classification.py::test_modernbert_models[float-disham993/electrical-ner-ModernBERT-base]\n  /usr/local/lib/python3.10/dist-packages/torch/_inductor/compile_fx.py:322: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n4 passed, 17 warnings in 100.89s (0:01:40)\n"
     },
     "workload_runs": 5
    },
    "gold": {
     "tests": {
      "bytes": 2221,
-     "tail": "=================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\ntests/models/language/pooling/test_token_classification.py:72\n  /t/tests/models/language/pooling/test_token_classification.py:72: PytestUnknownMarkWarning: Unknown pytest.mark.flaky - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.flaky(reruns=3)\n\ntests/models/language/pooling/test_token_classification.py: 14 warnings\n  /usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.\n    warnings.warn(\n\ntests/models/language/pooling/test_token_classification.py::test_modernbert_models[float-disham993/electrical-ner-ModernBERT-base]\n  /usr/local/lib/python3.10/dist-packages/torch/_inductor/compile_fx.py:322: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n4 passed, 17 warnings in 96.91s (0:01:36)\n"
+     "tail": "=================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\ntests/models/language/pooling/test_token_classification.py:72\n  /t/tests/models/language/pooling/test_token_classification.py:72: PytestUnknownMarkWarning: Unknown pytest.mark.flaky - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.flaky(reruns=3)\n\ntests/models/language/pooling/test_token_classification.py: 14 warnings\n  /usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.\n    warnings.warn(\n\ntests/models/language/pooling/test_token_classification.py::test_modernbert_models[float-disham993/electrical-ner-ModernBERT-base]\n  /usr/local/lib/python3.10/dist-packages/torch/_inductor/compile_fx.py:322: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n4 passed, 17 warnings in 98.57s (0:01:38)\n"
     },
     "workload_runs": 5
    },
@@ -5040,7 +5127,15 @@
     "patch_bytes": 4446
    }
   },
-  "ts": "2026-11-05T13:26:04Z"
+  "ts": "2026-11-07T11:08:37Z",
+  "solver_arms_from": {
+   "ts": "2026-11-05T13:26:04Z",
+   "arms": [
+    "claude",
+    "claude + PR's solution"
+   ],
+   "note": "solver arms recorded by an earlier --run-formula-harnesses run; baseline / PR's solution re-measured by --reproduce"
+  }
  },
  {
   "pr": 4118,
@@ -5325,82 +5420,67 @@
   "ts": "2026-11-05T00:00:00Z"
  },
  {
-  "pr": 6779,
-  "pr_url": "https://github.com/vllm-project/vllm/pull/6779",
-  "title": "[Core] Use array to speedup padding (#6779)",
-  "field": "decoding_tpot",
-  "reported_gain": "18%",
-  "base_sha": "084a01fd3544557990f8af8af6fd3c1185bae848",
-  "merge_sha": "89a84b0bb7b30706a02836234a94493ea8f780bf",
-  "arms": {
-   "base": {
-    "tests": "FAIL"
-   },
-   "gold": {
-    "tests": "PASS"
-   }
-  },
-  "improved": true,
   "schema": "experiments_v2",
   "experiments": [
    {
     "name": "make_tensor_with_pad",
     "unit": "ms",
-    "workload": "SamplingTensors padding-input prep + 2x make_tensor_with_pad (prompt+output), input_len=1024, batch_size=2048, pad=vocab_size(32000), dtype=int64, device=cpu; 1 warmup, 5 timed repeats",
-    "note": "FINDING: PR #6779 does NOT touch make_tensor_with_pad; that fn is BYTE-IDENTICAL at base and gold (already the np.full/make_ndarray_with_pad array path). The real change is the INPUT fed to it inside SamplingTensors.from_sampling_metadata/from_lists: base builds List[List[int]] via list(seq_data.prompt_token_ids) (tuple->list copies); gold passes seq_data.prompt_token_ids_array (array('l')) directly, SequenceData now storing tokens as array. Benchmark loads the REAL unmodified make_tensor_with_pad from each mounted tree by source (vllm import chain needs the absent _custom_ops C ext) and replicates the exact per-arm prep path. speedup_x = mean of per-run base/gold ratios.",
+    "workload": "python3 /task/bench.py",
     "reported": {
      "base": 79.0,
-     "patch": 22.0,
-     "scope": "PR microbench of the FULL from_sampling_metadata / SamplingTensors.from_lists build (NVTX-profiled), input_len=1024 batch=2048 -> 79->22ms (~3.6x)",
-     "comparable": false,
-     "scale_short": "We isolate only the token-store+pad sub-op; author timed the whole metadata build. TO MAKE 1:1: widen our bench to the full from_sampling_metadata build.",
-     "scale_note": "SAME unit (ms) but NOT 1:1. The PR does NOT optimize make_tensor_with_pad (byte-identical across arms); the real change is SequenceData storing tokens as array.array('l') so from_sampling_metadata appends arrays directly instead of list(...) copies. Author's 79->22ms (3.6x) is the WHOLE sampler-metadata build stage; our 54.7->2.7ms (20x) isolates just the token-store+pad sub-op the array change accelerates. TO MAKE SAME ENCLOSING SCOPE: time the full from_sampling_metadata build (not just the pad sub-op) so our ratio converges toward the author's 3.6x. E2E (separate arm) is the headline the author/reviewer agreed on: ~18.9%."
+     "patch": 22.0
     },
-    "arms": {
-     "base": {
-      "mean": 54.6725,
-      "sd": 3.4126,
-      "runs": [
-       61.469011,
-       53.007991,
-       52.754865,
-       53.525083,
-       52.605456
-      ]
-     },
-     "gold": {
-      "mean": 2.725,
-      "sd": 0.2186,
-      "runs": [
-       3.160982,
-       2.601602,
-       2.626848,
-       2.639047,
-       2.596544
-      ],
-      "speedup_x": 20.089,
-      "speedup_sd": 0.335,
-      "counts": true
-     }
-    }
+    "arms": {}
    },
    {
     "name": "e2e_qwen05b",
-    "unit": "it/s",
-    "workload": "end-to-end decode throughput, Qwen2-0.5B",
-    "note": "needs GPU model, reported-only",
+    "unit": "ms",
+    "workload": "python3 /task/bench.py",
     "reported": {
      "base": 24.76,
-     "patch": 29.44,
-     "scope": "E2E Qwen-1.5-0.5B offline throughput (GPU)",
-     "comparable": false,
-     "scale_note": "E2E it/s on GPU (24.76->29.44). NOT run here (CPU arm Mac). Row left as reported-only."
+     "patch": 29.44
     },
     "arms": {}
    }
   ],
-  "environment": "docker vllm-cpu-bench:21222 (CPU torch 2.15.0+cpu, numpy 2.5.4), colima arm64 Mac; identical image for both arms, only vllm/ source tree differs; real make_tensor_with_pad loaded by source from each mounted tree",
-  "ts": "2026-11-04T00:00:00Z"
+  "pr": 6779,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/6779",
+  "title": "[Core] Use array to speedup padding (#6779)",
+  "field": "decoding_tpot",
+  "reported_gain": "18% (e2e 24.76->29.44 it/s)",
+  "gain_kind": "pct",
+  "base_sha": "084a01fd3544557990f8af8af6fd3c1185bae848",
+  "merge_sha": "89a84b0bb7b30706a02836234a94493ea8f780bf",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.5.4",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "arms": {
+   "base": {
+    "tests": "SKIP",
+    "slug": "base"
+   },
+   "gold": {
+    "tests": "SKIP",
+    "slug": "gold"
+   }
+  },
+  "improved": false,
+  "latency": {
+   "scenarios": {},
+   "pytorch_ref": {}
+  },
+  "logs": {
+   "base": {
+    "workload_runs": 1
+   },
+   "gold": {
+    "workload_runs": 1
+   }
+  },
+  "ts": "2026-11-07T16:11:29Z"
  },
  {
   "pr": 6865,

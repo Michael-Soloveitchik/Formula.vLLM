@@ -229,9 +229,9 @@ PY
 python3 record.py "$PR"          # measured baseline / PR-solution numbers are live on the dashboard from here on
 fi  # KEEP_WORK (refs)
 
-# blind objective = problem.md with the "## Expert solution" section removed
+# blind objective = problem.md with the "## PR's solution" section removed
 OBJ_BLIND="$(printf '%s\n' "$OBJ" | awk '
-  /^## Expert solution/{skip=1; next}
+  /^## PR.s solution/{skip=1; next}
   skip && /^## /{skip=0}
   !skip{print}')"
 

@@ -46,7 +46,7 @@ that clear a MAD gate.
 ### GPU box (RTX 5070 Ti, sm_120, wheel mode) — 2026-11-05
 
 Measured in Docker, 5 repeats per arm (mean ± sd), author's own benchmark command.
-`claude` = blind (objective without the expert solution), `claude + PR's solution` = guided.
+`claude` = blind (objective without the PR's solution), `claude + PR's solution` = guided.
 
 | PR | metric | baseline | PR's solution | ours | author | claude | claude + PR's solution |
 |---|---|---|---|---|---|---|---|
@@ -56,9 +56,9 @@ Measured in Docker, 5 repeats per arm (mean ± sd), author's own benchmark comma
 | [#22940](https://github.com/vllm-project/vllm/pull/22940) slot mapping | opt-125m, output tok/s | 2270 ± 12 | 2280 ± 16 | +0.4 % | +2.07 % | 2280, PASS | 2282, PASS |
 
 - #37225: with a 40-minute budget the blind claude arm rewrote the Triton search (611 added
-  lines, kernel file only) and beats the merged PR: 0.839 vs 0.958 ms on top-k, 0.795 vs
+  lines, kernel file only) and beats the PR's solution: 0.839 vs 0.958 ms on top-k, 0.795 vs
   1.590 ms on top-k+top-p; 89 hidden tests pass. With a 15-minute budget it produced nothing.
-- #41163: both claude arms beat the author's patch ~7× by also caching the first-token
+- #41163: both claude arms beat the PR's solution ~7× by also caching the first-token
   indices on the CPU (no device sync at all); hidden pooling test passes.
 - #22940: GPU-bound workload on this box; the slot-mapping CPU gain is inside the noise.
 - #33538 baseline = the script's PyTorch sort path (the PR introduces both kernel and script).

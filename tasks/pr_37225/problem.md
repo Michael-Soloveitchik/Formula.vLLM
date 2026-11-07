@@ -2,8 +2,8 @@
 
 ## Objective
 Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the expert's merged patch (the PR's solution)**.
-You are given the expert's known solution below. You may reproduce it, but you
+workload runs **as fast as or faster than the PR's solution**.
+You are given the PR author's known solution below. You may reproduce it, but you
 are explicitly asked to **try to beat it** — find a faster correct version.
 
 ## The problem (issue)
@@ -12,7 +12,7 @@ The Triton top-k/top-p sampler finds the k-th largest logit per row with a terna
 ### Issue — detailed
 In `vllm/v1/sample/ops/topk_topp_triton.py`, `_topk_topp_kernel` sets `min_larger` from `tl.min(logits_blk2)` (the global tile min) in both the truncated-buffer path and the full-vocab path, instead of the min of values above the pivot. The termination condition therefore cannot converge and the search hits the 18-iteration cap (it should finish in roughly 3–5 iterations). After each search iteration a separate loop re-scans the same data to compute `num_min_larger`, adding one more full pass over the vocab per iteration. Both effects scale with batch size × vocab size, so large-batch, large-vocab top-k (and top-k + top-p) sampling pays 20–30 % extra latency. The top-p-only path is unaffected.
 
-## Expert solution (reference — the merged PR)
+## PR's solution (reference — what was merged)
 **General:** Make `min_larger` the minimum of values strictly above the pivot so the ternary search terminates early, and fuse the count of that minimum into the same pass so each iteration scans the data once instead of twice.
 
 **Detailed:** Added a `@triton.jit` helper `_update_min_larger_stats(data, above_mask, min_larger, num_min_larger, sentinel)` that computes the per-tile min over `above_mask` via `tl.min(tl.where(above_mask, data, sentinel))`, counts tile elements equal to it, and merges into the running `(min_larger, num_min_larger)` with the rule: tile min < running → replace both; equal → accumulate count; greater → keep. Both top-k paths now compute `above_0`/`above_1` masks once per tile, derive the counts above each pivot from `tl.sum(above_*)`, and call the helper to update `min_larger`/`num_min_larger` in that same loop; the redundant second scan loop is deleted. With the correct `min_larger`, the convergence condition fires after ~3–5 iterations.

@@ -1,63 +1,78 @@
 {
- "pr": 13365,
- "pr_url": "https://github.com/vllm-project/vllm/pull/13365",
- "title": "[V1][Spec Decode] Optimize N-gram matching with Numba (#13365)",
- "field": "decoding_tpot",
- "reported_gain": "30x, 2.5%",
- "base_sha": "c8d70e2437feecdb3762ce17298df33439ae1bd1",
- "merge_sha": "4c822298981a8f7521492075ff72659985fc4c3f",
- "arms": {
-  "base": {
-   "tests": "FAIL"
-  },
-  "gold": {
-   "tests": "PASS"
-  }
- },
- "improved": true,
  "schema": "experiments_v2",
  "experiments": [
   {
    "name": "ngram_match_overhead",
    "unit": "s",
-   "workload": "5000 synthetic context sequences (len 200-800, vocab 32000), n-gram n=3, k=10; ~50% seeded with a plantable match. Cumulative NgramProposer.propose() time over the full 5000-seq pass; 5 repeats (gold warmed up once untimed to exclude JIT compile).",
-   "note": "PREFERRED approach: imported the standalone vllm/v1/spec_decode/ngram_proposer.py module directly from each mounted source tree (self-contained, only numpy/numba/typing deps) and timed .propose(). base=pure-python KMP loop; gold=numba @jit(nopython=True) kernels. runs = per-repeat cumulative seconds; speedup_x = mean of per-repeat base/gold ratios. numba not baked in image -> installed at runtime via pip (numba 0.68.1, arm64 wheel); worked.",
+   "workload": "python3 /task/bench.py",
    "reported": {
     "base": 54.3,
-    "patch": 1.9,
-    "scope": "cumulative over a full ShareGPT 5K-request E2E serving run (propose() called once per decode step per request = hundreds of thousands of calls)",
-    "comparable": false,
-    "scale_note": "SAME unit (s) but NOT scale-comparable to our microbench. Our 'base' 0.257s is cumulative over 5000 single-sequence propose() calls; the PR's 54.3s is cumulative over a full ShareGPT 5K-REQUEST serving run (~200x more cumulative work; exact call count not derivable since per-call cost differs between synthetic and real token streams). Direction + ratio (ours 71x vs reported ~29x) are genuine; absolute seconds are not 1:1."
+    "patch": 1.9
    },
    "arms": {
     "base": {
-     "mean": 0.256929,
-     "sd": 0.028241,
-     "runs": [
-      0.229843,
-      0.224256,
-      0.293397,
-      0.251467,
-      0.285683
-     ]
+     "mean": 0.1652,
+     "sd": 0.0022,
+     "n": 5
     },
     "gold": {
-     "mean": 0.003596,
-     "sd": 0.000005,
-     "runs": [
-      0.003587,
-      0.003603,
-      0.003593,
-      0.003598,
-      0.003598
-     ],
-     "speedup_x": 71.454,
-     "speedup_sd": 7.867,
-     "counts": true
+     "mean": 0.0026,
+     "sd": 0.0004,
+     "n": 5
     }
    }
   }
  ],
- "environment": "docker vllm-cpu-bench:21222 (python:3.12-slim + CPU torch arm64 wheel, numpy 2.5.4), colima arm64 Mac; identical image for both arms, only vllm/ source tree differs. numba NOT baked into image -> installed at runtime with `pip install numba` (numba 0.68.1, arm64 wheel) for the gold arm; base arm is pure-python and needs no numba. gold arm warmed up once (untimed) to exclude numba JIT compile from the steady-state timing.",
- "ts": "2026-11-04T00:00:00Z"
+ "pr": 13365,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/13365",
+ "title": "[V1][Spec Decode] Optimize N-gram matching with Numba (#13365)",
+ "field": "decoding_tpot",
+ "reported_gain": "30x, 2.5%",
+ "gain_kind": "pct",
+ "base_sha": "c8d70e2437feecdb3762ce17298df33439ae1bd1",
+ "merge_sha": "4c822298981a8f7521492075ff72659985fc4c3f",
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.7.3",
+  "workload_cmd": "python3 /task/bench.py",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "SKIP",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "SKIP",
+   "slug": "gold"
+  }
+ },
+ "improved": false,
+ "latency": {
+  "scenarios": {
+   "ngram_match_overhead": {
+    "unit": "s",
+    "base": {
+     "mean": 0.1652,
+     "sd": 0.0022,
+     "n": 5
+    },
+    "gold": {
+     "mean": 0.0026,
+     "sd": 0.0004,
+     "n": 5
+    }
+   }
+  },
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {
+   "workload_runs": 5
+  },
+  "gold": {
+   "workload_runs": 5
+  }
+ },
+ "ts": "2026-11-07T16:18:11Z"
 }

@@ -52,5 +52,6 @@
  ],
  "experiments_note": "reported = numbers from the PR body (author's machine)",
  "test_note": "perf-only PR, no test in the diff; v0 sampler, wheel 0.5.4 pins torch 2.4 cu121 (no sm_120 kernels) - the bench execs the source by file and never touches CUDA, so it still measures.",
- "generated_by": "gen_tasks.py"
+ "generated_by": "gen_tasks.py",
+ "extra_pip": "pyairports"
 }

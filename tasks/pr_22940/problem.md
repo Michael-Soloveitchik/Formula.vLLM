@@ -2,8 +2,8 @@
 
 ## Objective
 Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the expert's merged patch (the PR's solution)**.
-You are given the expert's known solution below. You may reproduce it, but you
+workload runs **as fast as or faster than the PR's solution**.
+You are given the PR author's known solution below. You may reproduce it, but you
 are explicitly asked to **try to beat it** — find a faster correct version.
 
 ## The problem (issue)
@@ -12,7 +12,7 @@ Every scheduler step the V1 GPU worker maps each scheduled token position to a K
 ### Issue — detailed
 In `vllm/v1/worker/block_table.py`, `BlockTable.compute_slot_mapping` does `block_table_cpu = self.get_cpu_tensor()` then `block_numbers = block_table_cpu.flatten()[block_table_indices].numpy()`. `flatten()` copies the entire `[max_num_reqs, max_num_blocks_per_req]` table every call, the Torch fancy-index allocates again, and `.numpy()` converts back. Profiling `facebook/opt-125m` (input 800 / output 75) showed `compute_slot_mapping` at 400+ µs per invocation. The same object already holds `self.block_table_np`, the NumPy view of that CPU tensor.
 
-## Expert solution (reference — the merged PR)
+## PR's solution (reference — what was merged)
 **General:** Index the NumPy view of the block table directly; drop the Torch flatten/index/convert round trip.
 
 **Detailed:** Replace the two lines with `block_numbers = self.block_table_np.ravel()[block_table_indices]`. `np.ravel()` returns a view (no copy) for the contiguous table, the NumPy fancy-index produces the needed array directly, and no Torch↔NumPy conversion remains. The rest of the function (`block_offsets`, `np.add(..., out=self.slot_mapping_np[...])`) is unchanged. Only `block_table.py` changes.

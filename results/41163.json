@@ -11,13 +11,13 @@
    },
    "arms": {
     "base": {
-     "mean": 120.196,
-     "sd": 19.679,
+     "mean": 106.044,
+     "sd": 22.9137,
      "n": 5
     },
     "gold": {
-     "mean": 84.442,
-     "sd": 17.2932,
+     "mean": 78.516,
+     "sd": 15.6913,
      "n": 5
     },
     "claude": {
@@ -71,13 +71,13 @@
    "allpool_forward_median": {
     "unit": "us",
     "base": {
-     "mean": 120.196,
-     "sd": 19.679,
+     "mean": 106.044,
+     "sd": 22.9137,
      "n": 5
     },
     "gold": {
-     "mean": 84.442,
-     "sd": 17.2932,
+     "mean": 78.516,
+     "sd": 15.6913,
      "n": 5
     },
     "claude": {
@@ -97,15 +97,15 @@
  "logs": {
   "base": {
    "tests": {
-    "bytes": 2567,
-    "tail": "/models/language/pooling/test_token_classification.py:72\n  /t/tests/models/language/pooling/test_token_classification.py:72: PytestUnknownMarkWarning: Unknown pytest.mark.flaky - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.flaky(reruns=3)\n\ntests/models/language/pooling/test_token_classification.py: 14 warnings\n  /usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.\n    warnings.warn(\n\ntests/models/language/pooling/test_token_classification.py::test_modernbert_models[float-disham993/electrical-ner-ModernBERT-base]\n  /usr/local/lib/python3.10/dist-packages/torch/_inductor/compile_fx.py:322: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.\n    warnings.warn(\n\ntests/models/language/pooling/test_token_classification.py::test_auto_conversion[float-bd2lcco/Qwen3-0.6B-finetuned]\n  /usr/local/lib/python3.10/dist-packages/huggingface_hub/file_download.py:1727: DeprecationWarning: hf_xet.download_files() is deprecated. Use XetSession().new_file_download_group().start_download_file() instead.\n    xet_get(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n4 passed, 18 warnings in 149.94s (0:02:29)\n"
+    "bytes": 2222,
+    "tail": "================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\ntests/models/language/pooling/test_token_classification.py:72\n  /t/tests/models/language/pooling/test_token_classification.py:72: PytestUnknownMarkWarning: Unknown pytest.mark.flaky - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.flaky(reruns=3)\n\ntests/models/language/pooling/test_token_classification.py: 14 warnings\n  /usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.\n    warnings.warn(\n\ntests/models/language/pooling/test_token_classification.py::test_modernbert_models[float-disham993/electrical-ner-ModernBERT-base]\n  /usr/local/lib/python3.10/dist-packages/torch/_inductor/compile_fx.py:322: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n4 passed, 17 warnings in 100.89s (0:01:40)\n"
    },
    "workload_runs": 5
   },
   "gold": {
    "tests": {
     "bytes": 2221,
-    "tail": "=================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\ntests/models/language/pooling/test_token_classification.py:72\n  /t/tests/models/language/pooling/test_token_classification.py:72: PytestUnknownMarkWarning: Unknown pytest.mark.flaky - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.flaky(reruns=3)\n\ntests/models/language/pooling/test_token_classification.py: 14 warnings\n  /usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.\n    warnings.warn(\n\ntests/models/language/pooling/test_token_classification.py::test_modernbert_models[float-disham993/electrical-ner-ModernBERT-base]\n  /usr/local/lib/python3.10/dist-packages/torch/_inductor/compile_fx.py:322: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n4 passed, 17 warnings in 96.91s (0:01:36)\n"
+    "tail": "=================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\ntests/models/language/pooling/test_token_classification.py:72\n  /t/tests/models/language/pooling/test_token_classification.py:72: PytestUnknownMarkWarning: Unknown pytest.mark.flaky - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.flaky(reruns=3)\n\ntests/models/language/pooling/test_token_classification.py: 14 warnings\n  /usr/local/lib/python3.10/dist-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.\n    warnings.warn(\n\ntests/models/language/pooling/test_token_classification.py::test_modernbert_models[float-disham993/electrical-ner-ModernBERT-base]\n  /usr/local/lib/python3.10/dist-packages/torch/_inductor/compile_fx.py:322: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n4 passed, 17 warnings in 98.57s (0:01:38)\n"
    },
    "workload_runs": 5
   },
@@ -134,5 +134,13 @@
    "patch_bytes": 4446
   }
  },
- "ts": "2026-11-05T13:26:04Z"
+ "ts": "2026-11-07T11:08:37Z",
+ "solver_arms_from": {
+  "ts": "2026-11-05T13:26:04Z",
+  "arms": [
+   "claude",
+   "claude + PR's solution"
+  ],
+  "note": "solver arms recorded by an earlier --run-formula-harnesses run; baseline / PR's solution re-measured by --reproduce"
+ }
 }

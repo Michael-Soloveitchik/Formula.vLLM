@@ -1,64 +1,53 @@
 {
- "pr": 21281,
- "pr_url": "https://github.com/vllm-project/vllm/pull/21281",
- "title": "[Core] Minimize number of dict lookup in _maybe_evict_cached_block (#21281)",
- "field": "scheduling",
- "base_sha": "e7b204268132cb775c139574c1ff4ad7e15c8f66",
- "merge_sha": "af376ca19d4588b1d5ace72ffc0b4bbd778c15f2",
- "reported_gain": "77% (0.13ms\u21920.03ms)",
- "arms": {
-  "base": {
-   "tests": "FAIL"
-  },
-  "gold": {
-   "tests": "PASS"
-  }
- },
- "improved": true,
  "schema": "experiments_v2",
  "experiments": [
   {
    "name": "allocate_new_block",
-   "unit": "ms/op",
-   "workload": "block_pool sweep 10/50/100/500/1000 blocks, 1000 iters (evict path)",
-   "note": "runs = per allocate-block size, median of 3 reps; speedup = mean of per-size base/gold ratios",
+   "unit": "us/op",
+   "workload": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
    "reported": {
-    "base": 0.13,
-    "patch": 0.03,
-    "scope": "per-call TRACE of allocate_new_block, measured on top of PR #21222",
-    "comparable": false,
-    "workload_invalid": true,
-    "scale_note": "WORKLOAD INVALID (measured 1.007x is meaningless, do not trust). The PR cuts 4->2 dict lookups of the same key in _maybe_evict_cached_block, but that body ONLY runs when block_hash is not None AND block_hash in cached_block_hash_to_block (a cached block being evicted). Our benchmark_block_pool sweep pulls free blocks with block_hash=None, so BOTH arms hit the membership-fail early-out and the 4->2 reduction never executes. FIX NEEDED: enable_caching=True; assign each test block a non-None block_hash; pre-populate cached_block_hash_to_block[block_hash]={block_id:block} so the membership HITS; loop _maybe_evict_cached_block on those cached blocks (re-insert each iter). Only then does base pay 4 same-key hashes vs gold's 2 -> expect ~2x isolated (author's 4.3x is a profiler trace delta on top of #21222, an upper bound incl. surrounding overhead). Author number 0.13->0.03ms published as prose, no input sizes."
+    "base": 130.0,
+    "patch": 30.0
    },
-   "arms": {
-    "base": {
-     "mean": 0.174353,
-     "sd": 0.216158,
-     "runs": [
-      0.003969,
-      0.019962,
-      0.048273,
-      0.221984,
-      0.577576
-     ]
-    },
-    "gold": {
-     "mean": 0.161171,
-     "sd": 0.184676,
-     "runs": [
-      0.003931,
-      0.02218,
-      0.046476,
-      0.246428,
-      0.48684
-     ],
-     "speedup_x": 1.007,
-     "speedup_sd": 0.106,
-     "counts": true
-    }
-   }
+   "arms": {}
   }
  ],
- "environment": "docker python:3.12-slim cpu colima arm64 \u2014 identical image both arms, only vllm/ differs",
- "ts": "2026-11-04T00:00:00Z"
+ "pr": 21281,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/21281",
+ "title": "[Core] Minimize number of dict lookup in _maybe_evict_cached_block (#21281)",
+ "field": "scheduling",
+ "reported_gain": "77% (0.13ms\u21920.03ms)",
+ "gain_kind": "unit",
+ "base_sha": "e7b204268132cb775c139574c1ff4ad7e15c8f66",
+ "merge_sha": "af376ca19d4588b1d5ace72ffc0b4bbd778c15f2",
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.10.0",
+  "workload_cmd": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "SKIP",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "SKIP",
+   "slug": "gold"
+  }
+ },
+ "improved": false,
+ "latency": {
+  "scenarios": {},
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {
+   "workload_runs": 1
+  },
+  "gold": {
+   "workload_runs": 1
+  }
+ },
+ "ts": "2026-11-07T16:06:18Z"
 }

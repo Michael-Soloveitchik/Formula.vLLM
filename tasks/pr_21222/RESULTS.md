@@ -7,12 +7,12 @@ Unit = **microseconds per queue op**, the PR's own unit. Baseline (denominator) 
 
 ## Results (µs/op, mean ± sd over 5 runs)
 
-Reference = **measured** (our run of the expert patch) = **1.00×**. `vs measured` is each arm's latency ratio to it (>1 faster, <1 slower).
+Reference = **measured** (our run of the PR's solution) = **1.00×**. `vs measured` is each arm's latency ratio to it (>1 faster, <1 slower).
 
 | row | latency (µs/op) | vs measured | note |
 |---|---|---|---|
 | reported | 8.000 | 18.8× vs pre-PR | PR author, from 150 µs (GPU box) |
-| measured | 0.194 ± 0.010 | 1.00× | our run of expert patch — reference |
+| measured | 0.194 ± 0.010 | 1.00× | our run of PR's solution — reference |
 | claude | 0.226 ± 0.033 | 0.86× | counts |
 | codex | 0.235 ± 0.020 | 0.82× | counts |
 
@@ -23,7 +23,7 @@ Reference = **measured** (our run of the expert patch) = **1.00×**. `vs measure
 | arm | µs/op | Advantage |
 |---|---|---|
 | baseline | 0.7467 | — |
-| expert (PR's solution) | 0.1937 | 1.000 |
+| PR's solution | 0.1937 | 1.000 |
 | codex | 0.2350 | 0.925 |
 | claude | 0.2257 | 0.942 |
 

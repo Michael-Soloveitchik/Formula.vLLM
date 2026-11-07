@@ -53,7 +53,7 @@ inside the row label, never plain text.
 
 FORBIDDEN in any rendered/user-facing string: the words **`base`**, **`gold`**,
 **`patch`**. Those are INTERNAL JSON keys only (`arms.base`, `arms.gold`, `reported.patch`).
-Likewise never label one of OUR runs "gold" or "expert patch" — both our runs are
+Likewise never label one of OUR runs "gold" — both our runs are
 "measured", distinguished only by baseline vs PR's author solution.
 
 `baseline (measured by us)` is the 1.00× reference for EVERY `×` and `Δ` column.
@@ -233,7 +233,7 @@ not to force 1:1 agreement; it is to force an EXPLANATION for every divergence.
 - When the author published two metrics, state which is the headline and keep both.
 
 **DON'T**
-- DON'T write `base`, `gold`, `patch` (or "expert patch") in any rendered string.
+- DON'T write `base`, `gold`, `patch` in any rendered string: say "baseline" and "PR's solution".
 - DON'T call one of OUR runs "measured" and the other "gold" — both are "measured".
 - DON'T paste a ratio/percent into an absolute value cell.
 - DON'T mix units within one experiment table.

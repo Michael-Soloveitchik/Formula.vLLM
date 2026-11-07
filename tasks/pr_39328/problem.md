@@ -2,8 +2,8 @@
 
 ## Objective
 Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the expert's merged patch (the PR's solution)**.
-You are given the expert's known solution below. You may reproduce it, but you
+workload runs **as fast as or faster than the PR's solution**.
+You are given the PR author's known solution below. You may reproduce it, but you
 are explicitly asked to **try to beat it** — find a faster correct version.
 
 ## The problem (issue)
@@ -12,7 +12,7 @@ A compilation step computes a unique identifier for each pass by reading and has
 ### Issue — detailed
 InductorPass.hash_source() in vllm/compilation/passes/inductor_pass.py calls inspect.getsource() on each function, type, or object instance passed to it, then feeds the result into a hashlib.sha256 hasher. inspect.getsource() reads and parses source files, which is expensive. This runs on every pass uuid() computation, so the same sources get inspected and hashed repeatedly. Because pass source code is fixed at runtime, this repeated inspection is pure overhead with nothing caching the results.
 
-## Expert solution (reference — the merged PR)
+## PR's solution (reference — what was merged)
 **General:** The hashing work is pulled into a separate helper that remembers its results. The first call for a given input computes the hash; later calls with the same input return the stored result without re-reading source. Object instances are converted to their class first so the inputs form a stable lookup key.
 
 **Detailed:** A new module-level function _hash_source_cached() is added and decorated with @functools.cache; it holds the sha256 loop that calls inspect.getsource() and returns the hex digest, running only on a cache miss. hash_source() no longer hashes inline; it builds a hashable cache_key tuple where each argument passes through if it is a str, type, or FunctionType, else resolves to src.__class__, then delegates to _hash_source_cached(*cache_key). Resolving instances to their class makes the key hashable and lets functools.cache dedupe, so repeated calls with the same resolved key skip inspect.getsource() entirely without changing the produced hash.
