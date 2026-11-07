@@ -4,7 +4,7 @@
 # A line is PR numbers or --next N / --retry-failed. No polling, no pgrep: run.sh's flock already serialises.
 cd "$(dirname "$0")"
 for job in "$@"; do
-  LOG=".work_reproduce_$(echo "$job" | tr -c 'A-Za-z0-9' '_')_$(date +%Y%m%d_%H%M).log"
+  mkdir -p logs; LOG="logs/queue_$(echo "$job" | tr -c 'A-Za-z0-9' '_')_$(date +%Y%m%d_%H%M).log"
   echo "== $(date +%H:%M) start: ./run.sh --reproduce $job  -> $LOG"
   CLEAN_IMAGES=1 ./run.sh --reproduce $job >"$LOG" 2>&1; rc=$?
   echo "== $(date +%H:%M) done rc=$rc: $job"; grep -E "^SKIP|base=|failed rc|timed out" "$LOG" | tail -12 | cut -c1-110

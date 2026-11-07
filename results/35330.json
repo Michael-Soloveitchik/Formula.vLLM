@@ -1,0 +1,299 @@
+{
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "maxsim_64pairs",
+   "unit": "ms",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 3.5022,
+     "sd": 0.5477,
+     "n": 5
+    },
+    "gold": {
+     "mean": 14.661,
+     "sd": 2.3352,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 3.5022,
+     "pr_solution": 14.661,
+     "ratio_sd": 0.053322,
+     "baseline_sd": 0.5477,
+     "pr_solution_sd": 2.3352,
+     "ratio": 0.238879,
+     "pct": -76.11
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "regression"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "serving_request_throughput",
+   "unit": "ms",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": 141.38,
+    "patch": 161.14
+   },
+   "arms": {},
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 141.38,
+     "pr_solution": 161.14,
+     "how": "absolute",
+     "marker": "",
+     "raw": "141.38 -> 161.14 ms",
+     "note": "author gave absolute numbers",
+     "ratio": 0.877374,
+     "pct": -12.26
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "serving_mean_e2el",
+   "unit": "ms",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": 446.27,
+    "patch": 391.46
+   },
+   "arms": {},
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 446.27,
+     "pr_solution": 391.46,
+     "how": "absolute",
+     "marker": "",
+     "raw": "446.27 -> 391.46 ms",
+     "note": "author gave absolute numbers",
+     "ratio": 1.140014,
+     "pct": 14.0
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  }
+ ],
+ "pr": 35330,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/35330",
+ "title": "[Perf] Optimize maxsim scores computation for pooling models, 13.9% E2E throughput improvement (#35330)",
+ "field": "scheduling",
+ "reported_gain": "13.9%",
+ "gain_kind": "pct",
+ "base_sha": "ec8f943db1b8e5f3b32ed2ec29526b8a9a521088",
+ "merge_sha": "99c7892c5bf20afc90e2ef0e1ad0a89637ae67a9",
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.17.0",
+  "workload_cmd": "python3 /task/bench.py",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "FAIL",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "FAIL",
+   "slug": "gold"
+  }
+ },
+ "improved": false,
+ "latency": {
+  "scenarios": {
+   "maxsim_64pairs": {
+    "unit": "ms",
+    "base": {
+     "mean": 3.5022,
+     "sd": 0.5477,
+     "n": 5
+    },
+    "gold": {
+     "mean": 14.661,
+     "sd": 2.3352,
+     "n": 5
+    }
+   }
+  },
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {
+   "tests": {
+    "bytes": 2061,
+    "tail": "s.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n\n==================================== ERRORS ====================================\n________ ERROR collecting tests/entrypoints/pooling/score/test_utils.py ________\nImportError while importing test module '/t/tests/entrypoints/pooling/score/test_utils.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/usr/lib/python3.10/importlib/__init__.py:126: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntests/entrypoints/pooling/score/test_utils.py:11: in <module>\n    from vllm.entrypoints.pooling.score.utils import (\nE   ImportError: cannot import name 'compute_maxsim_scores' from 'vllm.entrypoints.pooling.score.utils' (/usr/local/lib/python3.10/dist-packages/vllm/entrypoints/pooling/score/utils.py)\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nERROR tests/entrypoints/pooling/score/test_utils.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 warning, 1 error in 0.15s\n"
+   },
+   "workload_runs": 5
+  },
+  "gold": {
+   "tests": {
+    "bytes": 18118,
+    "tail": " input_type=ArgsKwargs]\nE           For further information visit https://errors.pydantic.dev/2.14/v/value_error\n\ntests/entrypoints/pooling/score/test_utils.py:38: ValidationError\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nERROR tests/entrypoints/pooling/score/test_utils.py::TestGetScorePrompt::test_tokenization_kwargs_passed_through\nERROR tests/entrypoints/pooling/score/test_utils.py::TestGetScorePrompt::test_model_supports_score_template\nERROR tests/entrypoints/pooling/score/test_utils.py::TestGetScorePrompt::test_model_supports_score_template_but_custom_template_provided\nERROR tests/entrypoints/pooling/score/test_utils.py::TestGetScorePrompt::test_not_using_default_template\nERROR tests/entrypoints/pooling/score/test_utils.py::TestGetScorePrompt::test_fallback_with_sep_token\nERROR tests/entrypoints/pooling/score/test_utils.py::TestGetScorePrompt::test_fallback_without_sep_token\nERROR tests/entrypoints/pooling/score/test_utils.py::TestGetScorePrompt::test_post_process_tokens_called\n1 passed, 1 warning, 7 errors in 6.12s\n"
+   },
+   "workload_runs": 5
+  }
+ },
+ "ts": "2026-11-07T23:00:37Z",
+ "machine": {
+  "ts": "2026-11-07T22:58:43Z",
+  "host": {
+   "hostname": "DESKTOP-michael",
+   "kernel": "6.18.33.2-microsoft-standard-WSL2",
+   "wsl2": true,
+   "os": "Ubuntu 24.04.3 LTS"
+  },
+  "gpu": {
+   "name": "NVIDIA GeForce RTX 5070 Ti",
+   "driver": "591.86",
+   "cuda": "13.1",
+   "sm_mhz": 180.0,
+   "sm_max_mhz": 3090.0,
+   "mem_mhz": 405.0,
+   "mem_max_mhz": 14001.0,
+   "vram_total_mib": 16303.0,
+   "vram_used_mib": 273.0,
+   "util_pct": 0.0,
+   "power_w": 30.24,
+   "power_limit_w": 300.0,
+   "temp_c": 35.0,
+   "pstate": "P8",
+   "throttle_reasons": "0x0000000000000000",
+   "processes": [
+    {
+     "pid": 2903,
+     "name": "python main.py --listen 0.0.0.0 --port 8188",
+     "mem_mib": null
+    }
+   ]
+  },
+  "cpu": {
+   "model": "Intel(R) Core(TM) i7-14700KF",
+   "nproc": 12,
+   "load1": 2.06103515625,
+   "load5": 1.427734375,
+   "load15": 1.30078125,
+   "top_cpu_procs": [
+    {
+     "pid": 948870,
+     "pcpu": 9.0,
+     "comm": "python3"
+    }
+   ]
+  },
+  "ram": {
+   "total_gb": 94.3,
+   "free_gb": 1.2,
+   "available_gb": 89.0
+  },
+  "docker": {
+   "version": "Docker version 29.8.1, build 4a63305",
+   "engine": "docker"
+  }
+ },
+ "summary": {
+  "experiments": 3,
+  "measured": 1,
+  "headline": "maxsim_64pairs",
+  "headline_derived": {
+   "unit": "ms",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": null,
+    "pr_solution": null,
+    "how": null,
+    "marker": "",
+    "raw": "no number in the PR",
+    "note": "",
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced": {
+    "baseline": 3.5022,
+    "pr_solution": 14.661,
+    "ratio_sd": 0.053322,
+    "baseline_sd": 0.5477,
+    "pr_solution_sd": 2.3352,
+    "ratio": 0.238879,
+    "pct": -76.11
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "regression"
+   },
+   "reliability": {
+    "flag": "ok",
+    "note": ""
+   }
+  },
+  "reproduced_ratio_median": 0.2389,
+  "reproduced_ratio_max": 0.2389,
+  "reported_ratio_median": 1.0087,
+  "verdict": "regression",
+  "tests": {
+   "base": "FAIL",
+   "gold": "FAIL"
+  }
+ }
+}

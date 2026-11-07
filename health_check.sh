@@ -6,7 +6,7 @@
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"; cd "$HERE"
 PR="${1:?usage: health_check.sh <pr> [secs]}"; SECS="${2:-180}"
-LOG=".work/health_$PR.log"; mkdir -p .work
+mkdir -p ".work" "logs/pr_$PR"; LOG="logs/pr_$PR/health_$(date +%Y%m%d_%H%M%S).log"
 say(){ echo "[health $PR] $*"; }
 
 if ! python3 requirements.py --quiet --install "$PR" >"$LOG.req" 2>&1; then

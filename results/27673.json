@@ -1,0 +1,128 @@
+{
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "remove_skipped_blocks",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": 6.3,
+    "patch": 1.6
+   },
+   "arms": {},
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 6.3,
+     "pr_solution": 1.6,
+     "how": "absolute",
+     "marker": "",
+     "raw": "6.3 -> 1.6 us",
+     "note": "author gave absolute numbers",
+     "ratio": 3.9375,
+     "pct": 293.75
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  }
+ ],
+ "pr": 27673,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/27673",
+ "title": "[Core] Early return in SlidingWindowManager.remove_skipped_blocks (#27673)",
+ "field": "scheduling",
+ "reported_gain": "75% (6.3us\u21921.6us)",
+ "gain_kind": "unit",
+ "base_sha": "d3ab240f39219df0175ec662416f630d7bf273d8",
+ "merge_sha": "0b51c9bd8b19cee3a494b0f966a6b0a846a40193",
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.11.1",
+  "workload_cmd": "python3 /task/bench.py",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "SKIP",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "SKIP",
+   "slug": "gold"
+  }
+ },
+ "improved": false,
+ "latency": {
+  "scenarios": {},
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {
+   "workload_runs": 1
+  },
+  "gold": {
+   "workload_runs": 1
+  }
+ },
+ "ts": "2026-11-07T16:25:59Z",
+ "summary": {
+  "experiments": 1,
+  "measured": 0,
+  "headline": "remove_skipped_blocks",
+  "headline_derived": {
+   "unit": "us",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": 6.3,
+    "pr_solution": 1.6,
+    "how": "absolute",
+    "marker": "",
+    "raw": "6.3 -> 1.6 us",
+    "note": "author gave absolute numbers",
+    "ratio": 3.9375,
+    "pct": 293.75
+   },
+   "reproduced": {
+    "baseline": null,
+    "pr_solution": null,
+    "ratio_sd": null,
+    "baseline_sd": null,
+    "pr_solution_sd": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "unknown"
+   },
+   "reliability": {
+    "flag": "ok",
+    "note": ""
+   }
+  },
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": 3.9375,
+  "verdict": "unknown",
+  "tests": {
+   "base": "SKIP",
+   "gold": "SKIP"
+  }
+ }
+}

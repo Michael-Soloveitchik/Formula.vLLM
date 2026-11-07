@@ -1,0 +1,356 @@
+{
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "mean_pool_e5base_64x512",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 10089.0876,
+     "sd": 8.3954,
+     "n": 5
+    },
+    "gold": {
+     "mean": 604.4896,
+     "sd": 26.0891,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 10089.0876,
+     "pr_solution": 604.4896,
+     "ratio_sd": 0.720467,
+     "baseline_sd": 8.3954,
+     "pr_solution_sd": 26.0891,
+     "ratio": 16.690258,
+     "pct": 1569.03
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "mean_pool_32x256_h4096",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 2711.1656,
+     "sd": 6.1997,
+     "n": 5
+    },
+    "gold": {
+     "mean": 660.368,
+     "sd": 39.8029,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 2711.1656,
+     "pr_solution": 660.368,
+     "ratio_sd": 0.247634,
+     "baseline_sd": 6.1997,
+     "pr_solution_sd": 39.8029,
+     "ratio": 4.105538,
+     "pct": 310.55
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "serving_request_throughput",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": 238.52,
+    "patch": 252.72
+   },
+   "arms": {},
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 238.52,
+     "pr_solution": 252.72,
+     "how": "absolute",
+     "marker": "",
+     "raw": "238.52 -> 252.72 us",
+     "note": "author gave absolute numbers",
+     "ratio": 0.943811,
+     "pct": -5.62
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "serving_mean_e2el",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": 265.4,
+    "patch": 246.51
+   },
+   "arms": {},
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 265.4,
+     "pr_solution": 246.51,
+     "how": "absolute",
+     "marker": "",
+     "raw": "265.4 -> 246.51 us",
+     "note": "author gave absolute numbers",
+     "ratio": 1.07663,
+     "pct": 7.66
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  }
+ ],
+ "pr": 38559,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/38559",
+ "title": "[Perf] Optimize mean pooling using chunks and index_add, 5.9% E2E throughput improvement (#38559)",
+ "field": "scheduling",
+ "reported_gain": "5.9%",
+ "gain_kind": "pct",
+ "base_sha": "17b72fd1c8052f7a674056b2228a6e7ebfd4f123",
+ "merge_sha": "7b01d97a22c977aaad2f38fa03cd11742d2893e8",
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.19.0",
+  "workload_cmd": "python3 /task/bench.py",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "SKIP",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "SKIP",
+   "slug": "gold"
+  }
+ },
+ "improved": false,
+ "latency": {
+  "scenarios": {
+   "mean_pool_32x256_h4096": {
+    "unit": "us",
+    "base": {
+     "mean": 2711.1656,
+     "sd": 6.1997,
+     "n": 5
+    },
+    "gold": {
+     "mean": 660.368,
+     "sd": 39.8029,
+     "n": 5
+    }
+   },
+   "mean_pool_e5base_64x512": {
+    "unit": "us",
+    "base": {
+     "mean": 10089.0876,
+     "sd": 8.3954,
+     "n": 5
+    },
+    "gold": {
+     "mean": 604.4896,
+     "sd": 26.0891,
+     "n": 5
+    }
+   }
+  },
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {
+   "workload_runs": 5
+  },
+  "gold": {
+   "workload_runs": 5
+  }
+ },
+ "ts": "2026-11-07T22:50:59Z",
+ "machine": {
+  "ts": "2026-11-07T22:49:09Z",
+  "host": {
+   "hostname": "DESKTOP-michael",
+   "kernel": "6.18.33.2-microsoft-standard-WSL2",
+   "wsl2": true,
+   "os": "Ubuntu 24.04.3 LTS"
+  },
+  "gpu": {
+   "name": "NVIDIA GeForce RTX 5070 Ti",
+   "driver": "591.86",
+   "cuda": "13.1",
+   "sm_mhz": 180.0,
+   "sm_max_mhz": 3090.0,
+   "mem_mhz": 405.0,
+   "mem_max_mhz": 14001.0,
+   "vram_total_mib": 16303.0,
+   "vram_used_mib": 275.0,
+   "util_pct": 0.0,
+   "power_w": 30.16,
+   "power_limit_w": 300.0,
+   "temp_c": 36.0,
+   "pstate": "P8",
+   "throttle_reasons": "0x0000000000000000",
+   "processes": [
+    {
+     "pid": 2903,
+     "name": "python main.py --listen 0.0.0.0 --port 8188",
+     "mem_mib": null
+    }
+   ]
+  },
+  "cpu": {
+   "model": "Intel(R) Core(TM) i7-14700KF",
+   "nproc": 12,
+   "load1": 1.7060546875,
+   "load5": 1.37890625,
+   "load15": 1.3330078125,
+   "top_cpu_procs": [
+    {
+     "pid": 939893,
+     "pcpu": 5.8,
+     "comm": "python3"
+    }
+   ]
+  },
+  "ram": {
+   "total_gb": 94.3,
+   "free_gb": 1.3,
+   "available_gb": 89.1
+  },
+  "docker": {
+   "version": "Docker version 29.8.1, build 4a63305",
+   "engine": "docker"
+  }
+ },
+ "summary": {
+  "experiments": 4,
+  "measured": 2,
+  "headline": "mean_pool_e5base_64x512",
+  "headline_derived": {
+   "unit": "us",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": null,
+    "pr_solution": null,
+    "how": null,
+    "marker": "",
+    "raw": "no number in the PR",
+    "note": "",
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced": {
+    "baseline": 10089.0876,
+    "pr_solution": 604.4896,
+    "ratio_sd": 0.720467,
+    "baseline_sd": 8.3954,
+    "pr_solution_sd": 26.0891,
+    "ratio": 16.690258,
+    "pct": 1569.03
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number"
+   },
+   "reliability": {
+    "flag": "ok",
+    "note": ""
+   }
+  },
+  "reproduced_ratio_median": 10.3979,
+  "reproduced_ratio_max": 16.6903,
+  "reported_ratio_median": 1.0102,
+  "verdict": "no_reported_number",
+  "tests": {
+   "base": "SKIP",
+   "gold": "SKIP"
+  }
+ }
+}

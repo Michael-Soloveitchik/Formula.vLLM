@@ -137,9 +137,11 @@ if [ "$REPRODUCE" = 1 ]; then
 fi
 echo "running PRs: $PRS"
 
+# every PR's console output goes to logs/pr_<n>/run_<timestamp>.log (per-arm logs are copied there by run_one.sh)
 for PR in $PRS; do
   echo "================= PR $PR ================="
-  bash "$HERE/run_one.sh" "$PR" || echo "PR $PR failed, continuing"
+  mkdir -p "logs/pr_$PR"
+  bash "$HERE/run_one.sh" "$PR" 2>&1 | tee -a "logs/pr_$PR/run_$(date +%Y%m%d_%H%M%S).log" || echo "PR $PR failed, continuing"
 done
 
 python3 aggregate.py

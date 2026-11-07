@@ -1,0 +1,54 @@
+{
+ "pr": 28280,
+ "title": "[Kernel] Optimization of the mm_k operator. (#28280)",
+ "field": "gpu_kernels",
+ "date": "2025-11-11",
+ "hardware": [
+  "agnostic"
+ ],
+ "url": "https://github.com/vllm-project/vllm/pull/28280",
+ "base_sha": "b06b9470ca881f89feea72e4d89b20c213f360d4",
+ "merge_sha": "40e2eeeb92d926b9773c4ed339375d26b10456e2",
+ "source_files": [
+  "vllm/lora/ops/triton_ops/kernel_utils.py"
+ ],
+ "test_files": [],
+ "wheel": "0.11.1",
+ "wheel_note": "first PyPI release after merge (2025-11-19 > 2025-11-11); picked by gen_tasks.py from PyPI upload dates.",
+ "workload": {
+  "kind": "serving",
+  "script": "benchmarks/benchmark_serving.py",
+  "cmd": "vllm bench serve --num-prompts 100 --dataset-name sharegpt",
+  "unit": "tok/s",
+  "needs": "gpu",
+  "headline": "output_throughput",
+  "note": "Triton matmul (EVEN_K masking). PR gives serving numbers only (C500/H800)."
+ },
+ "perf_gain": {
+  "top_gain": "8%",
+  "gain_kind": "pct",
+  "gain_evidence": "Output token throughput increases by approximately 8%, consistent with the intuition that this change is more friendly to older GPU architectures.*"
+ },
+ "needs": "gpu",
+ "experiments": [
+  {
+   "name": "output_throughput",
+   "unit": "tok/s",
+   "reported": {
+    "base": 267.82,
+    "patch": 296.95
+   }
+  },
+  {
+   "name": "tpot",
+   "unit": "ms",
+   "reported": {
+    "base": 67.93,
+    "patch": 61.74
+   }
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "test_note": "",
+ "generated_by": "gen_tasks.py"
+}

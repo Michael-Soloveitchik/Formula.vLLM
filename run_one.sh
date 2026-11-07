@@ -338,6 +338,14 @@ else say "RUN_SOLVERS=0: refs only"; fi
 
 # 6. results: record.py already wrote results/<pr>.json after refs and after each solver arm
 say "done -> results/$PR.json"
+# per-arm logs + snapshots of this run -> logs/pr_<n>/<timestamp>/ (the .work dir is scratch and gets wiped next run)
+if [ "$DRY_RUN" != 1 ]; then
+  LDIR="$HERE/logs/pr_$PR/$(date +%Y%m%d_%H%M%S)"; mkdir -p "$LDIR"
+  for f in "$WORK"/test_*.log "$WORK"/wl_*.log "$WORK"/solve_*.log "$WORK"/solve_*.patch "$WORK"/machine*.json "$WORK"/contended_*.txt "$WORK"/arms.json "$WORK"/result.json; do
+    [ -e "$f" ] && cp "$f" "$LDIR/"
+  done
+  say "logs -> $LDIR"
+fi
 # CLEAN_IMAGE=1 (run.sh --reproduce sets it when CLEAN_IMAGES=1): drop this PR's image (13-25 GB each)
 # once measured; a later --run-formula-harnesses rebuilds it from the cached wheel layer.
 if [ "${CLEAN_IMAGE:-0}" = 1 ] && [ "$DRY_RUN" != 1 ]; then $ENGINE rmi "$IMG" >/dev/null 2>&1 && say "image $IMG removed (CLEAN_IMAGE=1)"; fi

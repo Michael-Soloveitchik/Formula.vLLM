@@ -1,0 +1,274 @@
+{
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "min_tokens_apply",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 55.6688,
+     "sd": 12.3932,
+     "n": 5
+    },
+    "gold": {
+     "mean": 32.3502,
+     "sd": 8.855,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 55.6688,
+     "pr_solution": 32.3502,
+     "ratio_sd": 0.607148,
+     "baseline_sd": 12.3932,
+     "pr_solution_sd": 8.855,
+     "ratio": 1.720818,
+     "pct": 72.08
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "below_host_floor",
+     "note": "baseline 55.6688 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+    }
+   }
+  },
+  {
+   "name": "min_tokens_apply_after_kernel",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 1547.5568,
+     "sd": 6.7061,
+     "n": 5
+    },
+    "gold": {
+     "mean": 1406.1902,
+     "sd": 0.2803,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 1547.5568,
+     "pr_solution": 1406.1902,
+     "ratio_sd": 0.004774,
+     "baseline_sd": 6.7061,
+     "pr_solution_sd": 0.2803,
+     "ratio": 1.100532,
+     "pct": 10.05
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  }
+ ],
+ "pr": 29826,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/29826",
+ "title": "[Perf] Avoid pageable HtoD transfer in MinTokensLogitsProcessor (#29826)",
+ "field": "decoding_tpot",
+ "reported_gain": "30%",
+ "gain_kind": "pct",
+ "base_sha": "afb1e5b380ff623e478d19a246b42b2903b9331f",
+ "merge_sha": "1528e079e2b2cf8a807e4dce86ef05540e16a430",
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.12.0",
+  "workload_cmd": "python3 /task/bench.py",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "SKIP",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "SKIP",
+   "slug": "gold"
+  }
+ },
+ "improved": false,
+ "latency": {
+  "scenarios": {
+   "min_tokens_apply": {
+    "unit": "us",
+    "base": {
+     "mean": 55.6688,
+     "sd": 12.3932,
+     "n": 5
+    },
+    "gold": {
+     "mean": 32.3502,
+     "sd": 8.855,
+     "n": 5
+    }
+   },
+   "min_tokens_apply_after_kernel": {
+    "unit": "us",
+    "base": {
+     "mean": 1547.5568,
+     "sd": 6.7061,
+     "n": 5
+    },
+    "gold": {
+     "mean": 1406.1902,
+     "sd": 0.2803,
+     "n": 5
+    }
+   }
+  },
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {
+   "workload_runs": 5
+  },
+  "gold": {
+   "workload_runs": 5
+  }
+ },
+ "ts": "2026-11-07T22:41:57Z",
+ "machine": {
+  "ts": "2026-11-07T22:39:46Z",
+  "host": {
+   "hostname": "DESKTOP-michael",
+   "kernel": "6.18.33.2-microsoft-standard-WSL2",
+   "wsl2": true,
+   "os": "Ubuntu 24.04.3 LTS"
+  },
+  "gpu": {
+   "name": "NVIDIA GeForce RTX 5070 Ti",
+   "driver": "591.86",
+   "cuda": "13.1",
+   "sm_mhz": 180.0,
+   "sm_max_mhz": 3090.0,
+   "mem_mhz": 405.0,
+   "mem_max_mhz": 14001.0,
+   "vram_total_mib": 16303.0,
+   "vram_used_mib": 275.0,
+   "util_pct": 0.0,
+   "power_w": 30.09,
+   "power_limit_w": 300.0,
+   "temp_c": 35.0,
+   "pstate": "P8",
+   "throttle_reasons": "0x0000000000000000",
+   "processes": [
+    {
+     "pid": 2903,
+     "name": "python main.py --listen 0.0.0.0 --port 8188",
+     "mem_mib": null
+    }
+   ]
+  },
+  "cpu": {
+   "model": "Intel(R) Core(TM) i7-14700KF",
+   "nproc": 12,
+   "load1": 2.06494140625,
+   "load5": 1.615234375,
+   "load15": 1.3466796875,
+   "top_cpu_procs": [
+    {
+     "pid": 933018,
+     "pcpu": 7.6,
+     "comm": "python3"
+    }
+   ]
+  },
+  "ram": {
+   "total_gb": 94.3,
+   "free_gb": 1.4,
+   "available_gb": 88.5
+  },
+  "docker": {
+   "version": "Docker version 29.8.1, build 4a63305",
+   "engine": "docker"
+  }
+ },
+ "summary": {
+  "experiments": 2,
+  "measured": 2,
+  "headline": "min_tokens_apply",
+  "headline_derived": {
+   "unit": "us",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": null,
+    "pr_solution": null,
+    "how": null,
+    "marker": "",
+    "raw": "no number in the PR",
+    "note": "",
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced": {
+    "baseline": 55.6688,
+    "pr_solution": 32.3502,
+    "ratio_sd": 0.607148,
+    "baseline_sd": 12.3932,
+    "pr_solution_sd": 8.855,
+    "ratio": 1.720818,
+    "pct": 72.08
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number"
+   },
+   "reliability": {
+    "flag": "below_host_floor",
+    "note": "baseline 55.6688 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+   }
+  },
+  "reproduced_ratio_median": 1.4107,
+  "reproduced_ratio_max": 1.7208,
+  "reported_ratio_median": null,
+  "verdict": "no_reported_number",
+  "tests": {
+   "base": "SKIP",
+   "gold": "SKIP"
+  }
+ }
+}
