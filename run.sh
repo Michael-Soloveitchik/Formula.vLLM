@@ -39,6 +39,8 @@
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"; cd "$HERE"
 mkdir -p .work results
+# one benchmark run at a time on this machine (two PRs sharing the GPU = noisy numbers): queued callers block here
+exec 9>".work/run.lock"; flock 9
 
 # flags: --reproduce (refs only, no solvers) | --health-check (with --reproduce) |
 #        --run-formula-harnesses (solver arms only, on already-reproduced PRs)

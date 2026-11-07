@@ -8,11 +8,22 @@ Each workload/ dir gets, idempotently:
   download.sh       - fetch-on-demand, gated; fetches shared weights into
                       ../../../.weights/<cluster> ONLY when run; nothing now
   meta.json         - the resolved {needs, cluster, model, cmd, script} for run.sh
+  workload.json     - CANONICAL, self-contained description of the experiment: image,
+                      exact cmd + env, measurement policy (read from run_one.sh at
+                      generation time, never edited here), metrics, reported numbers
+                      with the author's own hardware/args lines quoted from the PR
+                      body, machine requirements, reproduced numbers (results/<pr>.json
+                      when present) and the BASELINE_GAP.md verdict
+  WORKLOAD.md       - the same data rendered for humans: what is measured, how to
+                      re-run 1:1 without run_one.sh, reported vs reproduced, gap note
 
-Re-runnable: overwrites the three generated files, never touches bench.py/problem.md.
+Re-runnable: overwrites the generated files, never touches bench.py/problem.md.
+No timestamps are written, so a regeneration with unchanged inputs is a no-op diff.
 """
+import glob
 import json
 import os
+import re
 import stat
 
 HERE = os.path.dirname(os.path.abspath(__file__))
