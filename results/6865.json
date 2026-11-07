@@ -39,6 +39,9 @@
      "baseline": 211.18,
      "pr_solution": 522.91,
      "how": "absolute",
+     "marker": "",
+     "raw": "211.18 -> 522.91 req/s",
+     "note": "author gave absolute numbers",
      "ratio": 2.476134,
      "pct": 147.61
     },
@@ -70,6 +73,9 @@
     "baseline": 211.18,
     "pr_solution": 522.91,
     "how": "absolute",
+    "marker": "",
+    "raw": "211.18 -> 522.91 req/s",
+    "note": "author gave absolute numbers",
     "ratio": 2.476134,
     "pct": 147.61
    },

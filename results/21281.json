@@ -17,6 +17,9 @@
      "baseline": 130.0,
      "pr_solution": 30.0,
      "how": "absolute",
+     "marker": "",
+     "raw": "130.0 -> 30.0 us/op",
+     "note": "author gave absolute numbers",
      "ratio": 4.333333,
      "pct": 333.33
     },
@@ -84,6 +87,9 @@
     "baseline": 130.0,
     "pr_solution": 30.0,
     "how": "absolute",
+    "marker": "",
+    "raw": "130.0 -> 30.0 us/op",
+    "note": "author gave absolute numbers",
     "ratio": 4.333333,
     "pct": 333.33
    },

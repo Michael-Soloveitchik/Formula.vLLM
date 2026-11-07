@@ -89,6 +89,9 @@
      "baseline": 0.0034,
      "pr_solution": 1e-06,
      "how": "absolute",
+     "marker": "",
+     "raw": "0.0034 -> 1e-06 s/call",
+     "note": "author gave absolute numbers",
      "ratio": 3400.0,
      "pct": 339900.0
     },
@@ -177,6 +180,9 @@
      "baseline": 0.0056,
      "pr_solution": 0.0047,
      "how": "absolute",
+     "marker": "",
+     "raw": "0.0056 -> 0.0047 s/call",
+     "note": "author gave absolute numbers",
      "ratio": 1.191489,
      "pct": 19.15
     },
@@ -208,6 +214,9 @@
     "baseline": 0.0034,
     "pr_solution": 1e-06,
     "how": "absolute",
+    "marker": "",
+    "raw": "0.0034 -> 1e-06 s/call",
+    "note": "author gave absolute numbers",
     "ratio": 3400.0,
     "pct": 339900.0
    },

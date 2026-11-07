@@ -77,6 +77,9 @@
       "baseline": 2.945735,
       "pr_solution": 2.851607,
       "how": "absolute",
+      "marker": "",
+      "raw": "2.945735 -> 2.851607 s",
+      "note": "author gave absolute numbers",
       "ratio": 1.033009,
       "pct": 3.3
      },
@@ -108,6 +111,9 @@
      "baseline": 2.945735,
      "pr_solution": 2.851607,
      "how": "absolute",
+     "marker": "",
+     "raw": "2.945735 -> 2.851607 s",
+     "note": "author gave absolute numbers",
      "ratio": 1.033009,
      "pct": 3.3
     },
@@ -174,6 +180,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "*",
+      "raw": "10% gain, no baseline number",
+      "note": "author gave a ratio/percentage only; applied to our reproduced baseline",
       "ratio": null,
       "pct": null
      },
@@ -205,6 +214,9 @@
      "baseline": null,
      "pr_solution": null,
      "how": null,
+     "marker": "*",
+     "raw": "10% gain, no baseline number",
+     "note": "author gave a ratio/percentage only; applied to our reproduced baseline",
      "ratio": null,
      "pct": null
     },
@@ -272,6 +284,9 @@
       "baseline": 87.5,
       "pr_solution": 92.0,
       "how": "absolute",
+      "marker": "",
+      "raw": "87.5 -> 92.0 tok/s",
+      "note": "author gave absolute numbers",
       "ratio": 1.051429,
       "pct": 5.14
      },
@@ -303,6 +318,9 @@
      "baseline": 87.5,
      "pr_solution": 92.0,
      "how": "absolute",
+     "marker": "",
+     "raw": "87.5 -> 92.0 tok/s",
+     "note": "author gave absolute numbers",
      "ratio": 1.051429,
      "pct": 5.14
     },
@@ -370,6 +388,9 @@
       "baseline": 55.47,
       "pr_solution": 32.64,
       "how": "absolute",
+      "marker": "",
+      "raw": "55.47 -> 32.64 ms",
+      "note": "author gave absolute numbers",
       "ratio": 1.699449,
       "pct": 69.94
      },
@@ -401,6 +422,9 @@
      "baseline": 55.47,
      "pr_solution": 32.64,
      "how": "absolute",
+     "marker": "",
+     "raw": "55.47 -> 32.64 ms",
+     "note": "author gave absolute numbers",
      "ratio": 1.699449,
      "pct": 69.94
     },
@@ -457,6 +481,9 @@
       "baseline": 54.3,
       "pr_solution": 1.9,
       "how": "absolute",
+      "marker": "",
+      "raw": "54.3 -> 1.9 s",
+      "note": "author gave absolute numbers",
       "ratio": 28.578947,
       "pct": 2757.89
      },
@@ -538,6 +565,9 @@
      "baseline": 54.3,
      "pr_solution": 1.9,
      "how": "absolute",
+     "marker": "",
+     "raw": "54.3 -> 1.9 s",
+     "note": "author gave absolute numbers",
      "ratio": 28.578947,
      "pct": 2757.89
     },
@@ -605,6 +635,9 @@
       "baseline": 527.55,
       "pr_solution": 865.8,
       "how": "absolute",
+      "marker": "",
+      "raw": "527.55 -> 865.8 tok/s",
+      "note": "author gave absolute numbers",
       "ratio": 1.641171,
       "pct": 64.12
      },
@@ -636,6 +669,9 @@
      "baseline": 527.55,
      "pr_solution": 865.8,
      "how": "absolute",
+     "marker": "",
+     "raw": "527.55 -> 865.8 tok/s",
+     "note": "author gave absolute numbers",
      "ratio": 1.641171,
      "pct": 64.12
     },
@@ -703,6 +739,9 @@
       "baseline": 5.0,
       "pr_solution": 3.0,
       "how": "absolute",
+      "marker": "",
+      "raw": "5.0 -> 3.0 ms",
+      "note": "author gave absolute numbers",
       "ratio": 1.666667,
       "pct": 66.67
      },
@@ -734,6 +773,9 @@
      "baseline": 5.0,
      "pr_solution": 3.0,
      "how": "absolute",
+     "marker": "",
+     "raw": "5.0 -> 3.0 ms",
+     "note": "author gave absolute numbers",
      "ratio": 1.666667,
      "pct": 66.67
     },
@@ -801,6 +843,9 @@
       "baseline": 127.0,
       "pr_solution": 23.1,
       "how": "absolute",
+      "marker": "",
+      "raw": "127 -> 23.1 ms",
+      "note": "author gave absolute numbers",
       "ratio": 5.497835,
       "pct": 449.78
      },
@@ -832,6 +877,9 @@
      "baseline": 127.0,
      "pr_solution": 23.1,
      "how": "absolute",
+     "marker": "",
+     "raw": "127 -> 23.1 ms",
+     "note": "author gave absolute numbers",
      "ratio": 5.497835,
      "pct": 449.78
     },
@@ -877,6 +925,9 @@
       "baseline": 150.0,
       "pr_solution": 8.0,
       "how": "absolute",
+      "marker": "",
+      "raw": "150.0 -> 8.0 us/op",
+      "note": "author gave absolute numbers",
       "ratio": 18.75,
       "pct": 1775.0
      },
@@ -910,6 +961,9 @@
       "baseline": 33.0,
       "pr_solution": 9.0,
       "how": "absolute",
+      "marker": "",
+      "raw": "33.0 -> 9.0 us/op",
+      "note": "author gave absolute numbers",
       "ratio": 3.666667,
       "pct": 266.67
      },
@@ -985,6 +1039,9 @@
      "baseline": 150.0,
      "pr_solution": 8.0,
      "how": "absolute",
+     "marker": "",
+     "raw": "150.0 -> 8.0 us/op",
+     "note": "author gave absolute numbers",
      "ratio": 18.75,
      "pct": 1775.0
     },
@@ -1030,6 +1087,9 @@
       "baseline": 130.0,
       "pr_solution": 30.0,
       "how": "absolute",
+      "marker": "",
+      "raw": "130.0 -> 30.0 us/op",
+      "note": "author gave absolute numbers",
       "ratio": 4.333333,
       "pct": 333.33
      },
@@ -1097,6 +1157,9 @@
      "baseline": 130.0,
      "pr_solution": 30.0,
      "how": "absolute",
+     "marker": "",
+     "raw": "130.0 -> 30.0 us/op",
+     "note": "author gave absolute numbers",
      "ratio": 4.333333,
      "pct": 333.33
     },
@@ -1165,6 +1228,9 @@
       "baseline": 2260.996,
       "pr_solution": 2307.798617,
       "how": "our baseline \u00b1 %",
+      "marker": "*",
+      "raw": "2.07% gain, no baseline number",
+      "note": "author gave a ratio/percentage only; applied to our reproduced baseline",
       "ratio": 1.0207,
       "pct": 2.07
      },
@@ -1216,6 +1282,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -1267,6 +1336,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -1452,6 +1524,9 @@
      "baseline": 2260.996,
      "pr_solution": 2307.798617,
      "how": "our baseline \u00b1 %",
+     "marker": "*",
+     "raw": "2.07% gain, no baseline number",
+     "note": "author gave a ratio/percentage only; applied to our reproduced baseline",
      "ratio": 1.0207,
      "pct": 2.07
     },
@@ -1519,6 +1594,9 @@
       "baseline": 20.0,
       "pr_solution": 14.0,
       "how": "absolute",
+      "marker": "",
+      "raw": "20 -> 14 s",
+      "note": "author gave absolute numbers",
       "ratio": 1.428571,
       "pct": 42.86
      },
@@ -1550,6 +1628,9 @@
      "baseline": 20.0,
      "pr_solution": 14.0,
      "how": "absolute",
+     "marker": "",
+     "raw": "20 -> 14 s",
+     "note": "author gave absolute numbers",
      "ratio": 1.428571,
      "pct": 42.86
     },
@@ -1595,6 +1676,9 @@
       "baseline": 6.3,
       "pr_solution": 1.6,
       "how": "absolute",
+      "marker": "",
+      "raw": "6.3 -> 1.6 us",
+      "note": "author gave absolute numbers",
       "ratio": 3.9375,
       "pct": 293.75
      },
@@ -1662,6 +1746,9 @@
      "baseline": 6.3,
      "pr_solution": 1.6,
      "how": "absolute",
+     "marker": "",
+     "raw": "6.3 -> 1.6 us",
+     "note": "author gave absolute numbers",
      "ratio": 3.9375,
      "pct": 293.75
     },
@@ -1782,6 +1869,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -1826,6 +1916,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -1870,6 +1963,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -1985,6 +2081,9 @@
      "baseline": null,
      "pr_solution": null,
      "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
      "ratio": null,
      "pct": null
     },
@@ -2052,6 +2151,9 @@
       "baseline": 83.41,
       "pr_solution": 77.53,
       "how": "absolute",
+      "marker": "",
+      "raw": "83.41 -> 77.53 ms",
+      "note": "author gave absolute numbers",
       "ratio": 1.075842,
       "pct": 7.58
      },
@@ -2083,6 +2185,9 @@
      "baseline": 83.41,
      "pr_solution": 77.53,
      "how": "absolute",
+     "marker": "",
+     "raw": "83.41 -> 77.53 ms",
+     "note": "author gave absolute numbers",
      "ratio": 1.075842,
      "pct": 7.58
     },
@@ -2178,6 +2283,9 @@
       "baseline": 0.03936,
       "pr_solution": 0.02418,
       "how": "absolute",
+      "marker": "",
+      "raw": "0.03936 -> 0.02418 us/tok",
+      "note": "author gave absolute numbers",
       "ratio": 1.627792,
       "pct": 62.78
      },
@@ -2209,6 +2317,9 @@
      "baseline": 0.03936,
      "pr_solution": 0.02418,
      "how": "absolute",
+     "marker": "",
+     "raw": "0.03936 -> 0.02418 us/tok",
+     "note": "author gave absolute numbers",
      "ratio": 1.627792,
      "pct": 62.78
     },
@@ -2271,6 +2382,9 @@
       "baseline": 0.28,
       "pr_solution": 0.067,
       "how": "absolute",
+      "marker": "",
+      "raw": "0.28 -> 0.067 ms",
+      "note": "author gave absolute numbers",
       "ratio": 4.179104,
       "pct": 317.91
      },
@@ -2321,6 +2435,9 @@
       "baseline": 0.361,
       "pr_solution": 0.184,
       "how": "absolute",
+      "marker": "",
+      "raw": "0.361 -> 0.184 ms",
+      "note": "author gave absolute numbers",
       "ratio": 1.961957,
       "pct": 96.2
      },
@@ -2371,6 +2488,9 @@
       "baseline": 0.242,
       "pr_solution": 0.093,
       "how": "absolute",
+      "marker": "",
+      "raw": "0.242 -> 0.093 ms",
+      "note": "author gave absolute numbers",
       "ratio": 2.602151,
       "pct": 160.22
      },
@@ -2421,6 +2541,9 @@
       "baseline": 0.266,
       "pr_solution": 0.205,
       "how": "absolute",
+      "marker": "",
+      "raw": "0.266 -> 0.205 ms",
+      "note": "author gave absolute numbers",
       "ratio": 1.297561,
       "pct": 29.76
      },
@@ -2471,6 +2594,9 @@
       "baseline": 0.101,
       "pr_solution": 0.065,
       "how": "absolute",
+      "marker": "",
+      "raw": "0.101 -> 0.065 ms",
+      "note": "author gave absolute numbers",
       "ratio": 1.553846,
       "pct": 55.38
      },
@@ -2518,6 +2644,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -2565,6 +2694,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -2612,6 +2744,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -2659,6 +2794,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -2706,6 +2844,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -2753,6 +2894,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -2800,6 +2944,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -2847,6 +2994,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -2894,6 +3044,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -2941,6 +3094,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -2988,6 +3144,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -3035,6 +3194,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -3082,6 +3244,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -3129,6 +3294,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -3176,6 +3344,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -3223,6 +3394,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -3270,6 +3444,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -3317,6 +3494,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -3364,6 +3544,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -3411,6 +3594,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -3458,6 +3644,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -3505,6 +3694,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -3552,6 +3744,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -3599,6 +3794,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -3646,6 +3844,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -3693,6 +3894,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -3740,6 +3944,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -3787,6 +3994,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -3834,6 +4044,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -3881,6 +4094,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -3928,6 +4144,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -3975,6 +4194,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -4022,6 +4244,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -4069,6 +4294,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -4116,6 +4344,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -4163,6 +4394,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -4210,6 +4444,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -4257,6 +4494,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -4304,6 +4544,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -4351,6 +4594,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -4398,6 +4644,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -4445,6 +4694,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -4492,6 +4744,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -5473,6 +5728,9 @@
      "baseline": 0.28,
      "pr_solution": 0.067,
      "how": "absolute",
+     "marker": "",
+     "raw": "0.28 -> 0.067 ms",
+     "note": "author gave absolute numbers",
      "ratio": 4.179104,
      "pct": 317.91
     },
@@ -5590,6 +5848,9 @@
       "baseline": 0.0034,
       "pr_solution": 1e-06,
       "how": "absolute",
+      "marker": "",
+      "raw": "0.0034 -> 1e-06 s/call",
+      "note": "author gave absolute numbers",
       "ratio": 3400.0,
       "pct": 339900.0
      },
@@ -5678,6 +5939,9 @@
       "baseline": 0.0056,
       "pr_solution": 0.0047,
       "how": "absolute",
+      "marker": "",
+      "raw": "0.0056 -> 0.0047 s/call",
+      "note": "author gave absolute numbers",
       "ratio": 1.191489,
       "pct": 19.15
      },
@@ -5709,6 +5973,9 @@
      "baseline": 0.0034,
      "pr_solution": 1e-06,
      "how": "absolute",
+     "marker": "",
+     "raw": "0.0034 -> 1e-06 s/call",
+     "note": "author gave absolute numbers",
      "ratio": 3400.0,
      "pct": 339900.0
     },
@@ -5775,6 +6042,9 @@
       "baseline": 0.761,
       "pr_solution": 0.55,
       "how": "absolute",
+      "marker": "",
+      "raw": "0.761 -> 0.55 ms",
+      "note": "author gave absolute numbers",
       "ratio": 1.383636,
       "pct": 38.36
      },
@@ -5829,6 +6099,9 @@
       "baseline": 2.312,
       "pr_solution": 1.891,
       "how": "absolute",
+      "marker": "",
+      "raw": "2.312 -> 1.891 ms",
+      "note": "author gave absolute numbers",
       "ratio": 1.222634,
       "pct": 22.26
      },
@@ -5883,6 +6156,9 @@
       "baseline": 1.211,
       "pr_solution": 0.907,
       "how": "absolute",
+      "marker": "",
+      "raw": "1.211 -> 0.907 ms",
+      "note": "author gave absolute numbers",
       "ratio": 1.335171,
       "pct": 33.52
      },
@@ -5937,6 +6213,9 @@
       "baseline": 3.206,
       "pr_solution": 2.652,
       "how": "absolute",
+      "marker": "",
+      "raw": "3.206 -> 2.652 ms",
+      "note": "author gave absolute numbers",
       "ratio": 1.208899,
       "pct": 20.89
      },
@@ -5991,6 +6270,9 @@
       "baseline": 0.071,
       "pr_solution": 0.056,
       "how": "absolute",
+      "marker": "",
+      "raw": "0.071 -> 0.056 ms",
+      "note": "author gave absolute numbers",
       "ratio": 1.267857,
       "pct": 26.79
      },
@@ -6042,6 +6324,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -6093,6 +6378,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -6144,6 +6432,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -6195,6 +6486,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -6246,6 +6540,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -6297,6 +6594,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -6348,6 +6648,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -6399,6 +6702,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -6450,6 +6756,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -6501,6 +6810,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -6552,6 +6864,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -6603,6 +6918,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -6654,6 +6972,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -6705,6 +7026,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -6756,6 +7080,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -6807,6 +7134,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -6858,6 +7188,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -6909,6 +7242,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -6960,6 +7296,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
       "ratio": null,
       "pct": null
      },
@@ -7749,6 +8088,9 @@
      "baseline": 0.761,
      "pr_solution": 0.55,
      "how": "absolute",
+     "marker": "",
+     "raw": "0.761 -> 0.55 ms",
+     "note": "author gave absolute numbers",
      "ratio": 1.383636,
      "pct": 38.36
     },
@@ -7840,6 +8182,9 @@
       "baseline": 32.5,
       "pr_solution": 11.3,
       "how": "absolute",
+      "marker": "",
+      "raw": "32.5 -> 11.3 ms",
+      "note": "author gave absolute numbers",
       "ratio": 2.876106,
       "pct": 187.61
      },
@@ -7874,6 +8219,9 @@
       "baseline": 34.1,
       "pr_solution": 29.7,
       "how": "absolute",
+      "marker": "",
+      "raw": "34.1 -> 29.7 s",
+      "note": "author gave absolute numbers",
       "ratio": 1.148148,
       "pct": 14.81
      },
@@ -7905,6 +8253,9 @@
      "baseline": 32.5,
      "pr_solution": 11.3,
      "how": "absolute",
+     "marker": "",
+     "raw": "32.5 -> 11.3 ms",
+     "note": "author gave absolute numbers",
      "ratio": 2.876106,
      "pct": 187.61
     },
@@ -7972,6 +8323,9 @@
       "baseline": 2.9004,
       "pr_solution": 2.7343,
       "how": "absolute",
+      "marker": "",
+      "raw": "2.9004 -> 2.7343 s",
+      "note": "author gave absolute numbers",
       "ratio": 1.060747,
       "pct": 6.07
      },
@@ -8003,6 +8357,9 @@
      "baseline": 2.9004,
      "pr_solution": 2.7343,
      "how": "absolute",
+     "marker": "",
+     "raw": "2.9004 -> 2.7343 s",
+     "note": "author gave absolute numbers",
      "ratio": 1.060747,
      "pct": 6.07
     },
@@ -8069,6 +8426,9 @@
       "baseline": 59.89,
       "pr_solution": 39.65,
       "how": "absolute",
+      "marker": "",
+      "raw": "59.89 -> 39.65 us",
+      "note": "author gave absolute numbers",
       "ratio": 1.510467,
       "pct": 51.05
      },
@@ -8208,6 +8568,9 @@
      "baseline": 59.89,
      "pr_solution": 39.65,
      "how": "absolute",
+     "marker": "",
+     "raw": "59.89 -> 39.65 us",
+     "note": "author gave absolute numbers",
      "ratio": 1.510467,
      "pct": 51.05
     },
@@ -8385,6 +8748,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "*",
+      "raw": "9% gain, no baseline number",
+      "note": "author gave a ratio/percentage only; applied to our reproduced baseline",
       "ratio": null,
       "pct": null
      },
@@ -8416,6 +8782,9 @@
      "baseline": null,
      "pr_solution": null,
      "how": null,
+     "marker": "*",
+     "raw": "9% gain, no baseline number",
+     "note": "author gave a ratio/percentage only; applied to our reproduced baseline",
      "ratio": null,
      "pct": null
     },
@@ -8482,6 +8851,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "*",
+      "raw": "15% gain, no baseline number",
+      "note": "author gave a ratio/percentage only; applied to our reproduced baseline",
       "ratio": null,
       "pct": null
      },
@@ -8513,6 +8885,9 @@
      "baseline": null,
      "pr_solution": null,
      "how": null,
+     "marker": "*",
+     "raw": "15% gain, no baseline number",
+     "note": "author gave a ratio/percentage only; applied to our reproduced baseline",
      "ratio": null,
      "pct": null
     },
@@ -8616,6 +8991,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "*",
+      "raw": "5% gain, no baseline number",
+      "note": "author gave a ratio/percentage only; applied to our reproduced baseline",
       "ratio": null,
       "pct": null
      },
@@ -8647,6 +9025,9 @@
      "baseline": null,
      "pr_solution": null,
      "how": null,
+     "marker": "*",
+     "raw": "5% gain, no baseline number",
+     "note": "author gave a ratio/percentage only; applied to our reproduced baseline",
      "ratio": null,
      "pct": null
     },
@@ -8713,6 +9094,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "*",
+      "raw": "25% gain, no baseline number",
+      "note": "author gave a ratio/percentage only; applied to our reproduced baseline",
       "ratio": null,
       "pct": null
      },
@@ -8744,6 +9128,9 @@
      "baseline": null,
      "pr_solution": null,
      "how": null,
+     "marker": "*",
+     "raw": "25% gain, no baseline number",
+     "note": "author gave a ratio/percentage only; applied to our reproduced baseline",
      "ratio": null,
      "pct": null
     },
@@ -8810,6 +9197,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "*",
+      "raw": "5% gain, no baseline number",
+      "note": "author gave a ratio/percentage only; applied to our reproduced baseline",
       "ratio": null,
       "pct": null
      },
@@ -8841,6 +9231,9 @@
      "baseline": null,
      "pr_solution": null,
      "how": null,
+     "marker": "*",
+     "raw": "5% gain, no baseline number",
+     "note": "author gave a ratio/percentage only; applied to our reproduced baseline",
      "ratio": null,
      "pct": null
     },
@@ -8886,6 +9279,9 @@
       "baseline": 79.0,
       "pr_solution": 22.0,
       "how": "absolute",
+      "marker": "",
+      "raw": "79.0 -> 22.0 ms",
+      "note": "author gave absolute numbers",
       "ratio": 3.590909,
       "pct": 259.09
      },
@@ -8919,6 +9315,9 @@
       "baseline": 24.76,
       "pr_solution": 29.44,
       "how": "absolute",
+      "marker": "",
+      "raw": "24.76 -> 29.44 ms",
+      "note": "author gave absolute numbers",
       "ratio": 0.841033,
       "pct": -15.9
      },
@@ -8986,6 +9385,9 @@
      "baseline": 79.0,
      "pr_solution": 22.0,
      "how": "absolute",
+     "marker": "",
+     "raw": "79.0 -> 22.0 ms",
+     "note": "author gave absolute numbers",
      "ratio": 3.590909,
      "pct": 259.09
     },
@@ -9053,6 +9455,9 @@
       "baseline": 211.18,
       "pr_solution": 522.91,
       "how": "absolute",
+      "marker": "",
+      "raw": "211.18 -> 522.91 req/s",
+      "note": "author gave absolute numbers",
       "ratio": 2.476134,
       "pct": 147.61
      },
@@ -9084,6 +9489,9 @@
      "baseline": 211.18,
      "pr_solution": 522.91,
      "how": "absolute",
+     "marker": "",
+     "raw": "211.18 -> 522.91 req/s",
+     "note": "author gave absolute numbers",
      "ratio": 2.476134,
      "pct": 147.61
     },
@@ -9151,6 +9559,9 @@
       "baseline": 24.24,
       "pr_solution": 24.62,
       "how": "absolute",
+      "marker": "",
+      "raw": "24.24 -> 24.62 req/s",
+      "note": "author gave absolute numbers",
       "ratio": 1.015677,
       "pct": 1.57
      },
@@ -9182,6 +9593,9 @@
      "baseline": 24.24,
      "pr_solution": 24.62,
      "how": "absolute",
+     "marker": "",
+     "raw": "24.24 -> 24.62 req/s",
+     "note": "author gave absolute numbers",
      "ratio": 1.015677,
      "pct": 1.57
     },
@@ -9248,6 +9662,9 @@
       "baseline": null,
       "pr_solution": null,
       "how": null,
+      "marker": "*",
+      "raw": "2% gain, no baseline number",
+      "note": "author gave a ratio/percentage only; applied to our reproduced baseline",
       "ratio": null,
       "pct": null
      },
@@ -9279,6 +9696,9 @@
      "baseline": null,
      "pr_solution": null,
      "how": null,
+     "marker": "*",
+     "raw": "2% gain, no baseline number",
+     "note": "author gave a ratio/percentage only; applied to our reproduced baseline",
      "ratio": null,
      "pct": null
     },
@@ -9346,6 +9766,9 @@
       "baseline": 13351.06,
       "pr_solution": 27783.36,
       "how": "absolute",
+      "marker": "",
+      "raw": "13351.06 -> 27783.36 tok/s",
+      "note": "author gave absolute numbers",
       "ratio": 2.080985,
       "pct": 108.1
      },
@@ -9377,6 +9800,9 @@
      "baseline": 13351.06,
      "pr_solution": 27783.36,
      "how": "absolute",
+     "marker": "",
+     "raw": "13351.06 -> 27783.36 tok/s",
+     "note": "author gave absolute numbers",
      "ratio": 2.080985,
      "pct": 108.1
     },
@@ -9444,6 +9870,9 @@
       "baseline": 10681.75,
       "pr_solution": 11181.4,
       "how": "absolute",
+      "marker": "",
+      "raw": "10681.75 -> 11181.4 tok/s",
+      "note": "author gave absolute numbers",
       "ratio": 1.046776,
       "pct": 4.68
      },
@@ -9475,6 +9904,9 @@
      "baseline": 10681.75,
      "pr_solution": 11181.4,
      "how": "absolute",
+     "marker": "",
+     "raw": "10681.75 -> 11181.4 tok/s",
+     "note": "author gave absolute numbers",
      "ratio": 1.046776,
      "pct": 4.68
     },

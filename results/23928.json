@@ -39,6 +39,9 @@
      "baseline": 20.0,
      "pr_solution": 14.0,
      "how": "absolute",
+     "marker": "",
+     "raw": "20 -> 14 s",
+     "note": "author gave absolute numbers",
      "ratio": 1.428571,
      "pct": 42.86
     },
@@ -70,6 +73,9 @@
     "baseline": 20.0,
     "pr_solution": 14.0,
     "how": "absolute",
+    "marker": "",
+    "raw": "20 -> 14 s",
+    "note": "author gave absolute numbers",
     "ratio": 1.428571,
     "pct": 42.86
    },

@@ -67,6 +67,9 @@
      "baseline": 0.03936,
      "pr_solution": 0.02418,
      "how": "absolute",
+     "marker": "",
+     "raw": "0.03936 -> 0.02418 us/tok",
+     "note": "author gave absolute numbers",
      "ratio": 1.627792,
      "pct": 62.78
     },
@@ -98,6 +101,9 @@
     "baseline": 0.03936,
     "pr_solution": 0.02418,
     "how": "absolute",
+    "marker": "",
+    "raw": "0.03936 -> 0.02418 us/tok",
+    "note": "author gave absolute numbers",
     "ratio": 1.627792,
     "pct": 62.78
    },

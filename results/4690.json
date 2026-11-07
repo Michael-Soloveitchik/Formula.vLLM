@@ -38,6 +38,9 @@
      "baseline": null,
      "pr_solution": null,
      "how": null,
+     "marker": "*",
+     "raw": "9% gain, no baseline number",
+     "note": "author gave a ratio/percentage only; applied to our reproduced baseline",
      "ratio": null,
      "pct": null
     },
@@ -69,6 +72,9 @@
     "baseline": null,
     "pr_solution": null,
     "how": null,
+    "marker": "*",
+    "raw": "9% gain, no baseline number",
+    "note": "author gave a ratio/percentage only; applied to our reproduced baseline",
     "ratio": null,
     "pct": null
    },

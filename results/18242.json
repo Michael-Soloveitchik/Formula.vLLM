@@ -39,6 +39,9 @@
      "baseline": 127.0,
      "pr_solution": 23.1,
      "how": "absolute",
+     "marker": "",
+     "raw": "127 -> 23.1 ms",
+     "note": "author gave absolute numbers",
      "ratio": 5.497835,
      "pct": 449.78
     },
@@ -70,6 +73,9 @@
     "baseline": 127.0,
     "pr_solution": 23.1,
     "how": "absolute",
+    "marker": "",
+    "raw": "127 -> 23.1 ms",
+    "note": "author gave absolute numbers",
     "ratio": 5.497835,
     "pct": 449.78
    },

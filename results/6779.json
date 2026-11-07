@@ -17,6 +17,9 @@
      "baseline": 79.0,
      "pr_solution": 22.0,
      "how": "absolute",
+     "marker": "",
+     "raw": "79.0 -> 22.0 ms",
+     "note": "author gave absolute numbers",
      "ratio": 3.590909,
      "pct": 259.09
     },
@@ -50,6 +53,9 @@
      "baseline": 24.76,
      "pr_solution": 29.44,
      "how": "absolute",
+     "marker": "",
+     "raw": "24.76 -> 29.44 ms",
+     "note": "author gave absolute numbers",
      "ratio": 0.841033,
      "pct": -15.9
     },
@@ -117,6 +123,9 @@
     "baseline": 79.0,
     "pr_solution": 22.0,
     "how": "absolute",
+    "marker": "",
+    "raw": "79.0 -> 22.0 ms",
+    "note": "author gave absolute numbers",
     "ratio": 3.590909,
     "pct": 259.09
    },

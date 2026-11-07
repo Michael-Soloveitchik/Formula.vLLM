@@ -27,6 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
+sup.mark{font-weight:700;color:#d97706;margin-left:2px;cursor:help}
  :root{--bg:#fcfdff;--panel:#fff;--panel2:#f8faff;--border:#dde6f5;--border2:#c9d6ec;
   --fg:#172a5c;--mut:#5a6786;--faint:#98a2b8;--acc:#0b8ce8;--acc2:#1aa7ff;--cyan:#1aa7ff;--navy:#172a5c;
   --org:#ff9a1f;--yel:#ffc426;--grn:#1a9c5b;--red:#e5533f;--sel:#e8f3ff;
@@ -468,7 +469,8 @@ function gainVs(val,baseVal,unit){
 function resolveReported(rep,baseV,unit,derived){
  // preferred: numbers pre-computed by derive.py (results/<pr>.json experiments[i].derived); the browser does no math then
  if(derived&&derived.reported&&derived.reported.pr_solution!=null)
-  return {value:+derived.reported.pr_solution, authorBase:derived.reported.baseline!=null?+derived.reported.baseline:null, how:derived.reported.how||'derived'};
+  return {value:+derived.reported.pr_solution, authorBase:derived.reported.baseline!=null?+derived.reported.baseline:null, how:derived.reported.how||'derived',
+          marker:derived.reported.marker||'', raw:derived.reported.raw||'', note:derived.reported.note||''};
  if(!rep) return null;
  const up=higherBetter(unit);
  if(rep.patch!=null) return {value:+rep.patch, authorBase:rep.base!=null?+rep.base:null, how:'absolute'};
@@ -503,7 +505,7 @@ function expTable(exp){
  h+=`<table class="restab exp"><colgroup><col class="c-row"><col class="c-val"><col class="c-d"><col class="c-r"><col class="c-d"><col class="c-r"><col class="c-src"></colgroup>`+
    `<thead><tr><th>row</th><th class="num">value · ${esc(unit)}</th>`+
    `<th class="num r-rep">Δ vs reported</th><th class="num r-rep">× vs reported</th>`+
-   `<th class="num r-meas">Δ vs measured</th><th class="num r-meas">× vs measured</th><th>source</th></tr></thead><tbody>`;
+   `<th class="num r-meas">Δ vs measured</th><th class="num r-meas">× vs measured</th><th>source <span class="muted" title="* = author gave only a ratio/% — applied to our reproduced baseline&#10;+ = author gave only a difference — applied to our reproduced baseline">(<sup class="mark">*</sup> ratio applied, <sup class="mark">+</sup> diff applied to our baseline)</span></th></tr></thead><tbody>`;
  // FOUR rows, two colors, grouped by WHICH-CODE (baselines together, solutions together):
  //   within each pair, reported (orange) comes FIRST, measured (blue) AFTER.
  // row order: baseline(reported) -> baseline(measured) -> solution(reported) -> solution(measured)
@@ -529,8 +531,10 @@ function expTable(exp){
     gcellsMeas(baseV,baseV,unit)+`<td class="src" title="our run of before-merge tree (base_sha) — 1.00× reference">our run of before-merge tree (base_sha) — 1.00× reference</td></tr>`;
  // 3. PR's author solution (reported by PR's author) — author's NEW-code number, or — if absent.
  if(Rr){
-  h+=`<tr class="r-reported"><td>PR's author solution ${SR}</td><td class="num">${num(Rr.value,0)}</td>`+
-     gcellsRep(Rr.value,Rr.authorBase,unit)+`<td class="src">PR author <span class="muted">(${esc(Rr.how)})</span></td></tr>`;
+  // marker: * = ratio/% applied to our baseline, + = delta applied to our baseline (author gave no baseline number)
+  const mk=Rr.marker?`<sup class="mark" title="${esc(Rr.note)}">${Rr.marker}</sup>`:'';
+  h+=`<tr class="r-reported"><td>PR's author solution ${SR}</td><td class="num">${num(Rr.value,0)}${mk}</td>`+
+     gcellsRep(Rr.value,Rr.authorBase,unit)+`<td class="src" title="${esc(Rr.note)}">PR author <span class="muted">(${esc(Rr.how)})${Rr.raw?' — reported: '+esc(Rr.raw):''}</span></td></tr>`;
  }else{
   h+=`<tr class="r-reported"><td>PR's author solution ${SR}</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="src">no number in PR</td></tr>`;}
  // 4. PR's author solution (measured by us) — our run of after-merge tree.

@@ -39,6 +39,9 @@
      "baseline": 87.5,
      "pr_solution": 92.0,
      "how": "absolute",
+     "marker": "",
+     "raw": "87.5 -> 92.0 tok/s",
+     "note": "author gave absolute numbers",
      "ratio": 1.051429,
      "pct": 5.14
     },
@@ -70,6 +73,9 @@
     "baseline": 87.5,
     "pr_solution": 92.0,
     "how": "absolute",
+    "marker": "",
+    "raw": "87.5 -> 92.0 tok/s",
+    "note": "author gave absolute numbers",
     "ratio": 1.051429,
     "pct": 5.14
    },

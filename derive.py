@@ -61,12 +61,29 @@ def derive_experiment(e, pyref=None):
         b = pyref[e["name"]].get("mean")
     g = (a.get("gold") or {}).get("mean")
     rb, rg, how = resolve_reported(e.get("reported"), b, up)
+    rep = e.get("reported") or {}
+    # marker shown next to the reported PR's-solution value when the author gave NO baseline number:
+    #   "*" = a ratio / percentage was applied to OUR reproduced baseline
+    #   "+" = a delta (difference in units) was applied to OUR reproduced baseline
+    #   ""  = author gave absolute numbers (or nothing)
+    marker = "" if (how or "").startswith("absolute") or rep.get("base") is not None else ("*" if rep.get("pct") is not None else "+" if rep.get("delta") is not None else "")
+    if rep.get("patch") is not None:
+        raw = (f"{rep['base']} -> {rep['patch']} {unit}" if rep.get("base") is not None else f"PR's solution {rep['patch']} {unit}, no baseline")
+    elif rep.get("pct") is not None:
+        p = float(rep["pct"]); raw = f"{p if abs(p) > 1 else p * 100:g}% gain" + (f" vs baseline {rep['base']} {unit}" if rep.get("base") is not None else ", no baseline number")
+    elif rep.get("delta") is not None:
+        raw = f"{rep['delta']} {unit} gain" + (f" vs baseline {rep['base']} {unit}" if rep.get("base") is not None else ", no baseline number")
+    else:
+        raw = "no number in the PR"
+    note = {"*": "author gave a ratio/percentage only; applied to our reproduced baseline",
+            "+": "author gave a difference only; applied to our reproduced baseline",
+            "": ("author gave absolute numbers" if rg is not None else "")}[marker]
     rr = ratio(rg, rb, up)
     mr = ratio(g, b, up)
     d = {
         "unit": unit, "higher_is_better": up,
-        "reported": {"baseline": rb, "pr_solution": rg, "how": how, "ratio": rr,
-                     "pct": None if rr is None else round((rr - 1) * 100, 2)},
+        "reported": {"baseline": rb, "pr_solution": rg, "how": how, "marker": marker, "raw": raw, "note": note,
+                     "ratio": rr, "pct": None if rr is None else round((rr - 1) * 100, 2)},
         "reproduced": {"baseline": b, "pr_solution": g,
                        "baseline_sd": (a.get("base") or {}).get("sd"), "pr_solution_sd": (a.get("gold") or {}).get("sd"),
                        "ratio": mr, "pct": None if mr is None else round((mr - 1) * 100, 2)},

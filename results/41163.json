@@ -38,6 +38,9 @@
      "baseline": 59.89,
      "pr_solution": 39.65,
      "how": "absolute",
+     "marker": "",
+     "raw": "59.89 -> 39.65 us",
+     "note": "author gave absolute numbers",
      "ratio": 1.510467,
      "pct": 51.05
     },
@@ -177,6 +180,9 @@
     "baseline": 59.89,
     "pr_solution": 39.65,
     "how": "absolute",
+    "marker": "",
+    "raw": "59.89 -> 39.65 us",
+    "note": "author gave absolute numbers",
     "ratio": 1.510467,
     "pct": 51.05
    },

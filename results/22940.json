@@ -40,6 +40,9 @@
      "baseline": 2260.996,
      "pr_solution": 2307.798617,
      "how": "our baseline \u00b1 %",
+     "marker": "*",
+     "raw": "2.07% gain, no baseline number",
+     "note": "author gave a ratio/percentage only; applied to our reproduced baseline",
      "ratio": 1.0207,
      "pct": 2.07
     },
@@ -91,6 +94,9 @@
      "baseline": null,
      "pr_solution": null,
      "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
      "ratio": null,
      "pct": null
     },
@@ -142,6 +148,9 @@
      "baseline": null,
      "pr_solution": null,
      "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
      "ratio": null,
      "pct": null
     },
@@ -327,6 +336,9 @@
     "baseline": 2260.996,
     "pr_solution": 2307.798617,
     "how": "our baseline \u00b1 %",
+    "marker": "*",
+    "raw": "2.07% gain, no baseline number",
+    "note": "author gave a ratio/percentage only; applied to our reproduced baseline",
     "ratio": 1.0207,
     "pct": 2.07
    },
