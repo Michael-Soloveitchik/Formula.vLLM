@@ -33,6 +33,10 @@ TOPK_ROW = re.compile(
     r"^(\w+?)\s+(\d+)\s+(\d+)\s+(\d+)%\s+([\d.]+|inf)\s+([\d.]+|inf)\s+([\d.]+|inf)x"
 )
 ALLPOOL = re.compile(r"AllPool\.forward median:\s*([\d.]+)\s*us")
+# benchmarks/kv_cache/benchmark_block_pool.py (tabulate grid): | iters | total | alloc | get avg | get max | free avg | free max |
+BLOCKPOOL = re.compile(r"^\|\s*\d+\s*\|\s*\d+\s*\|\s*(\d+)\s*\|\s*([\d.]+)\s*\|\s*[\d.]+\s*\|\s*([\d.]+)\s*\|")
+# vendored tasks/pr_<n>/bench.py: "<metric> [<label>] <number>"  (unit from metadata.json experiments)
+GENERIC = re.compile(r"^([A-Za-z_]\w*)(?:\s+[A-Za-z_][\w.'-]*)?\s+(-?\d+(?:\.\d+)?(?:[eE]-?\d+)?)\s*$")
 THROUGHPUT = re.compile(
     r"Throughput:\s*([\d.]+)\s*requests/s,\s*([\d.]+)\s*total tokens/s,\s*([\d.]+)\s*output tokens/s"
 )
@@ -47,16 +51,38 @@ def stats(xs):
     return {"mean": round(m, 4), "sd": round(sd, 4), "n": len(xs)}
 
 
+def _units_for(path):
+    """units declared in tasks/pr_<n>/metadata.json experiments (for GENERIC lines)"""
+    m = re.search(r"pr_(\d+)", path)
+    try:
+        meta = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "tasks", f"pr_{m.group(1)}", "metadata.json")))
+        return {x["name"]: x.get("unit") or "unit" for x in meta.get("experiments", [])}
+    except Exception:
+        return {}
+
+
 def parse_log(path):
     """-> ({scenario: (value, unit)}, {scenario: pytorch_ms})"""
     vals, pyt = {}, {}
+    units = _units_for(path)
     for ln in open(path, errors="replace"):
         s = ln.strip()
+        if not s or s.startswith("#"):
+            continue
         m = TOPK_ROW.match(s)
         if m:
             name = f"{m.group(1)}_b{m.group(2)}_v{m.group(3)}"
             vals[name] = (float(m.group(5)), "ms")
             pyt[name] = float(m.group(6))
+            continue
+        m = BLOCKPOOL.match(s)
+        if m:
+            vals[f"get_new_blocks_a{m.group(1)}"] = (float(m.group(2)), "ms")
+            vals[f"free_blocks_a{m.group(1)}"] = (float(m.group(3)), "ms")
+            continue
+        m = GENERIC.match(s)
+        if m and (m.group(1) in units or not units):
+            vals[m.group(1)] = (float(m.group(2)), units.get(m.group(1), "unit"))
             continue
         m = ALLPOOL.search(s)
         if m:

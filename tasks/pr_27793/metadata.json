@@ -1,0 +1,47 @@
+{
+ "pr": 27793,
+ "title": "[Core][Observability] Add KV cache residency metrics (#27793)",
+ "field": "scheduling",
+ "date": "2025-12-01",
+ "hardware": [
+  "agnostic"
+ ],
+ "url": "https://github.com/vllm-project/vllm/pull/27793",
+ "base_sha": "ec7035c9d40cda43fa9c3d2d1c148b1382aa04a4",
+ "merge_sha": "cabc77cc86586206134a19e3e70aa401ec30b71f",
+ "source_files": [
+  "vllm/config/observability.py",
+  "vllm/engine/arg_utils.py",
+  "vllm/v1/core/block_pool.py",
+  "vllm/v1/core/kv_cache_coordinator.py",
+  "vllm/v1/core/kv_cache_manager.py",
+  "vllm/v1/core/kv_cache_metrics.py",
+  "vllm/v1/core/sched/scheduler.py",
+  "vllm/v1/metrics/loggers.py",
+  "vllm/v1/metrics/stats.py"
+ ],
+ "test_files": [
+  "tests/v1/core/test_kv_cache_metrics.py"
+ ],
+ "wheel": "0.12.0",
+ "wheel_note": "first PyPI release after merge (2025-12-03 > 2025-12-01); picked by gen_tasks.py from PyPI upload dates.",
+ "workload": {
+  "kind": "pytest_bench",
+  "script": "tests/v1/core/test_kv_cache_metrics.py",
+  "cmd": "pytest -v tests/v1/core/test_kv_cache_metrics.py",
+  "unit": null,
+  "needs": "gpu",
+  "headline": null,
+  "note": "Correctness-only; deterministic fake clock. No timing number (overhead ~48 bytes/block, zero cost when off)."
+ },
+ "perf_gain": {
+  "top_gain": "N/A (observability feature; <0.1% overhead, not a speedup)",
+  "gain_kind": "pct",
+  "gain_evidence": "Assuming typical request latency of 100-500ms, this represents **< 0.1% overhead per request**."
+ },
+ "needs": "gpu",
+ "experiments": [],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "test_note": "correctness-only PR: the oracle test IS the workload (deterministic fake clock), no latency number.",
+ "generated_by": "gen_tasks.py"
+}

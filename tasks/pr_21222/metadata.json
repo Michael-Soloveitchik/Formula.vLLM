@@ -1,46 +1,58 @@
 {
-  "pr": 21222,
-  "title": "[Core] Introduce popleft_n and append_n in FreeKVCacheBlockQueue to further optimize block_pool (#21222)",
-  "field": "kv_cache",
-  "date": "2025-07-22",
-  "hardware": [
-    "agnostic"
-  ],
-  "url": "https://github.com/vllm-project/vllm/pull/21222",
-  "base_sha": "10904e6d755051260a7c3ce98659d8907c74caa9",
-  "base_ref": "ed25054577f7abca2aee32a5290200c4a1aed561^",
-  "branch_point_sha": "cf069aa8aa38a9003c254f8434a29ec6a3070b08",
-  "diff_applies_on_base": true,
-  "merge_sha": "ed25054577f7abca2aee32a5290200c4a1aed561",
-  "merge_date": "2025-07-22T06:17:47-07:00",
-  "span_commits": 2986,
-  "span_days": 141,
-  "source_files": [
-    "vllm/v1/core/block_pool.py",
-    "vllm/v1/core/kv_cache_utils.py"
-  ],
-  "test_files": [
-    "tests/v1/core/test_kv_cache_utils.py"
-  ],
-  "perf_gain": {
-    "top_gain": "95% (0.15ms\u21920.008ms)",
-    "gain_kind": "unit",
-    "gain_evidence": "### benchmark scripts - Get new blocks improved from 0.15ms to 0.008ms - Free new blocks improved from 33us to 9us"
+ "pr": 21222,
+ "title": "[Core] Introduce popleft_n and append_n in FreeKVCacheBlockQueue to further optimize block_pool (#21222)",
+ "field": "kv_cache",
+ "date": "2025-07-22",
+ "hardware": [
+  "agnostic"
+ ],
+ "url": "https://github.com/vllm-project/vllm/pull/21222",
+ "base_sha": "10904e6d755051260a7c3ce98659d8907c74caa9",
+ "merge_sha": "ed25054577f7abca2aee32a5290200c4a1aed561",
+ "source_files": [
+  "vllm/v1/core/block_pool.py",
+  "vllm/v1/core/kv_cache_utils.py"
+ ],
+ "test_files": [
+  "tests/v1/core/test_kv_cache_utils.py"
+ ],
+ "wheel": "0.10.0",
+ "wheel_note": "first PyPI release after merge (2025-07-25 > 2025-07-22); picked by gen_tasks.py from PyPI upload dates.",
+ "workload": {
+  "kind": "repo_benchmark",
+  "script": "benchmarks/kv_cache/benchmark_block_pool.py",
+  "cmd": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
+  "unit": "us/op",
+  "needs": "gpu",
+  "headline": "get_new_blocks",
+  "note": "Pure Python microbench; imports vllm.v1.core.block_pool.BlockPool + vllm.utils, no CUDA. One run prints both ops."
+ },
+ "perf_gain": {
+  "top_gain": "95% (0.15ms→0.008ms)",
+  "gain_kind": "unit",
+  "gain_evidence": "### benchmark scripts - Get new blocks improved from 0.15ms to 0.008ms - Free new blocks improved from 33us to 9us"
+ },
+ "needs": "gpu",
+ "experiments": [
+  {
+   "name": "get_new_blocks",
+   "unit": "us/op",
+   "reported": {
+    "base": 150.0,
+    "patch": 8.0
+   }
   },
-  "workload": {
-    "description": "No model, parallelism, dtype, batch size, or sequence length is specified. The PR targets the KV-cache block pool micro-operations directly and evaluates them via microbenchmarks.",
-    "evidence": "PR evaluated with benchmark scripts and benchmark_blockpool, plus new unit tests for append_n and popleft_n; no serving workload given."
-  },
-  "performance": {
-    "metric": "block_pool get_new_blocks and free_blocks latency from benchmark scripts; benchmark_blockpool get_blocks/free_blocks times",
-    "value": "get_new_blocks 0.15 -> 0.008; free_blocks 33 -> 9",
-    "unit": "ms (get_new_blocks); us (free_blocks)",
-    "evidence": "PR Test Result: get new blocks improved from 0.15ms to 0.008ms, free new blocks from 33us to 9us; benchmark_blockpool reported get_blocks and free_blocks times cut in half."
-  },
-  "issue_general": "A pool of reusable fixed-size memory blocks is kept in a doubly linked list. The system took blocks out one at a time and put them back one at a time. Each single-block operation fixed up neighbor links that were often immediately undone by the next operation, wasting work on a performance-critical path.",
-  "solution_general": "Add bulk operations that pop or append many blocks in one pass. The links between neighboring blocks are set once, and only the endpoint links to the list's head/tail are fixed once at the end instead of once per block. This roughly halves the pointer operations.",
-  "runnable_now": true,
-  "base_src_torchfree": true,
-  "base_missing_files": [],
-  "needs": "cpu"
+  {
+   "name": "free_blocks",
+   "unit": "us/op",
+   "reported": {
+    "base": 33.0,
+    "patch": 9.0
+   }
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "test_note": "",
+ "generated_by": "gen_tasks.py",
+ "torch_fix": "torch==2.7.1 --index-url https://download.pytorch.org/whl/cu128"
 }

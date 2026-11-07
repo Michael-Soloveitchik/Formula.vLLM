@@ -13,6 +13,8 @@
 #                                    # weights, disk...) are checked first; no-sudo software is
 #                                    # installed, unmet hardware -> PR skipped with the reason.
 #                                    # Prints the reported-vs-measured table at the end.
+#                                    # CLEAN_IMAGES=1 ./run.sh --reproduce ...  removes each PR's
+#                                    # image after it is measured (disk: 13-25 GB per image).
 #   ./run.sh --reproduce --health-check <pr>...
 #                                    # same checks, then start the real run for HEALTH_SECS
 #                                    # (default 180) per PR, watch the log, stop it, verdict.
@@ -47,7 +49,7 @@ done
 set -- ${ARGS[@]+"${ARGS[@]}"}
 if [ "$REPRODUCE" = 1 ] && [ "$HARNESSES" = 1 ]; then echo "--reproduce and --run-formula-harnesses are separate runs; pick one" >&2; exit 2; fi
 if [ "$HEALTH" = 1 ] && [ "$REPRODUCE" != 1 ] && [ "$HARNESSES" != 1 ]; then echo "--health-check goes with --reproduce or --run-formula-harnesses" >&2; exit 2; fi
-if [ "$REPRODUCE" = 1 ]; then export RUN_SOLVERS=0 FETCH_SOURCES=1; echo "REPRODUCE: baseline vs PR's solution only, solver arms disabled"; fi
+if [ "$REPRODUCE" = 1 ]; then export RUN_SOLVERS=0 FETCH_SOURCES=1 CLEAN_IMAGE="${CLEAN_IMAGES:-0}"; echo "REPRODUCE: baseline vs PR's solution only, solver arms disabled (CLEAN_IMAGES=${CLEAN_IMAGES:-0})"; fi
 if [ "$HARNESSES" = 1 ]; then
   [ $# -gt 0 ] || { echo "usage: ./run.sh --run-formula-harnesses <pr> [<pr> ...]" >&2; exit 2; }
   export RUN_SOLVERS=1 KEEP_WORK=1

@@ -172,6 +172,7 @@ cp -a /arm/vllm/. "$site/vllm/"
 '
 fi
 PRELUDE="$PRELUDE"'
+ln -sfn /arm /src   # vendored tasks/pr_<n>/bench.py read the arm tree at /src (ARM env = arm name)
 rm -rf /t && mkdir -p /t && cd /gold
 for d in tests benchmarks pyproject.toml conftest.py; do [ -e "$d" ] && cp -a "$d" /t/; done
 cd /t
@@ -183,7 +184,7 @@ cd /t
 # vLLM engine workloads.
 mkdir -p "$HERE/.weights/hf"
 run_in_img() { # run_in_img <tree> <script>
-  $ENGINE run --rm $GPU --shm-size=2g \
+  $ENGINE run --rm $GPU --shm-size=2g ${ARM_ENV:-} \
     -v "$1":/arm:ro -v "$WORK/gold_full":/gold:ro -v "$TASK":/task:ro \
     -v "$HERE/.weights/hf":/root/.cache/huggingface \
     -e HF_HUB_DISABLE_PROGRESS_BARS=1 \
@@ -206,7 +207,7 @@ run_workload() {
   [ -n "$WL_CMD" ] || return 0
   for i in $(seq 1 "$REPEATS"); do
     say "workload $arm run $i/$REPEATS"
-    run_in_img "$tree" "$PRELUDE $WL_CMD" >"$WORK/wl_${arm}_${i}.log" 2>&1 \
+    ARM_ENV="-e ARM=$arm" run_in_img "$tree" "$PRELUDE $WL_CMD" >"$WORK/wl_${arm}_${i}.log" 2>&1 \
       || { say "workload $arm run $i failed (see $WORK/wl_${arm}_${i}.log)"; break; }
   done
 }
@@ -267,3 +268,6 @@ else say "RUN_SOLVERS=0: refs only"; fi
 
 # 6. results: record.py already wrote results/<pr>.json after refs and after each solver arm
 say "done -> results/$PR.json"
+# CLEAN_IMAGE=1 (run.sh --reproduce sets it when CLEAN_IMAGES=1): drop this PR's image (13-25 GB each)
+# once measured; a later --run-formula-harnesses rebuilds it from the cached wheel layer.
+if [ "${CLEAN_IMAGE:-0}" = 1 ] && [ "$DRY_RUN" != 1 ]; then $ENGINE rmi "$IMG" >/dev/null 2>&1 && say "image $IMG removed (CLEAN_IMAGE=1)"; fi

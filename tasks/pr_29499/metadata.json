@@ -1,0 +1,70 @@
+{
+ "pr": 29499,
+ "title": "[EPLB] Optimize EPLB with numpy (#29499)",
+ "field": "parallelism",
+ "date": "2026-01-07",
+ "hardware": [
+  "agnostic"
+ ],
+ "url": "https://github.com/vllm-project/vllm/pull/29499",
+ "base_sha": "0ada960a20766fa1de9063576979f9d807583785",
+ "merge_sha": "6170d47d2220bc464fb561b93caf799a7560e304",
+ "source_files": [
+  "vllm/config/parallel.py",
+  "vllm/distributed/eplb/async_worker.py",
+  "vllm/distributed/eplb/eplb_state.py",
+  "vllm/distributed/eplb/policy/abstract.py",
+  "vllm/distributed/eplb/policy/default.py",
+  "vllm/distributed/eplb/rebalance_execute.py"
+ ],
+ "test_files": [
+  "tests/distributed/test_eplb_algo.py",
+  "tests/distributed/test_eplb_execute.py"
+ ],
+ "wheel": "0.14.0",
+ "wheel_note": "first PyPI release after merge (2026-01-20 > 2026-01-07); picked by gen_tasks.py from PyPI upload dates.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "tasks/pr_29499/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "us",
+  "needs": "gpu",
+  "headline": "move_from_buffer",
+  "note": "EPLB algo on CPU torch tensors. Three primitives rewritten in numpy."
+ },
+ "perf_gain": {
+  "top_gain": "27% (rearrange 1370->1077ms E2E); 20-25% per primitive",
+  "gain_kind": "pct",
+  "gain_evidence": "~27% speedup"
+ },
+ "needs": "gpu",
+ "experiments": [
+  {
+   "name": "move_from_buffer",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "get_ep_ranks_with_expert",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "move_to_buffer",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "test_note": "EPLB numpy rewrite; tests in the diff cover algo + execute.",
+ "generated_by": "gen_tasks.py"
+}

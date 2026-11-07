@@ -237,7 +237,7 @@
     "python3": true,
     "hf_cli": true,
     "hf_token": false,
-    "vllm_wheel": null,
+    "vllm_wheel": "0.5.4",
     "cuda_build": null,
     "models": [
      "Qwen/Qwen2-0.5B"
@@ -245,7 +245,7 @@
     "datasets": [],
     "env": [],
     "needs_server": false,
-    "pipeline": "needs-wheel-task"
+    "pipeline": "wheel"
    }
   }
  },
@@ -694,13 +694,13 @@
     "python3": true,
     "hf_cli": false,
     "hf_token": false,
-    "vllm_wheel": null,
+    "vllm_wheel": "0.7.3",
     "cuda_build": null,
     "models": [],
     "datasets": [],
     "env": [],
     "needs_server": false,
-    "pipeline": "needs-wheel-task"
+    "pipeline": "wheel"
    }
   }
  },
@@ -1139,13 +1139,13 @@
     "python3": true,
     "hf_cli": false,
     "hf_token": false,
-    "vllm_wheel": null,
+    "vllm_wheel": "0.10.0",
     "cuda_build": null,
     "models": [],
     "datasets": [],
     "env": [],
     "needs_server": false,
-    "pipeline": "needs-wheel-task"
+    "pipeline": "wheel"
    }
   }
  },
@@ -1188,13 +1188,13 @@
     "python3": true,
     "hf_cli": false,
     "hf_token": false,
-    "vllm_wheel": null,
+    "vllm_wheel": "0.10.0",
     "cuda_build": null,
     "models": [],
     "datasets": [],
     "env": [],
     "needs_server": false,
-    "pipeline": "needs-wheel-task"
+    "pipeline": "wheel"
    }
   }
  },
@@ -1952,13 +1952,13 @@
     "python3": true,
     "hf_cli": false,
     "hf_token": false,
-    "vllm_wheel": null,
+    "vllm_wheel": "0.11.1",
     "cuda_build": null,
     "models": [],
     "datasets": [],
     "env": [],
     "needs_server": false,
-    "pipeline": "needs-wheel-task"
+    "pipeline": "wheel"
    }
   }
  },
@@ -2001,13 +2001,13 @@
     "python3": true,
     "hf_cli": false,
     "hf_token": false,
-    "vllm_wheel": null,
+    "vllm_wheel": "0.12.0",
     "cuda_build": null,
     "models": [],
     "datasets": [],
     "env": [],
     "needs_server": false,
-    "pipeline": "needs-wheel-task"
+    "pipeline": "wheel"
    }
   }
  },
@@ -2324,13 +2324,13 @@
     "python3": true,
     "hf_cli": false,
     "hf_token": false,
-    "vllm_wheel": null,
+    "vllm_wheel": "0.14.0",
     "cuda_build": null,
     "models": [],
     "datasets": [],
     "env": [],
     "needs_server": false,
-    "pipeline": "needs-wheel-task"
+    "pipeline": "wheel"
    }
   }
  },
@@ -2703,13 +2703,13 @@
     "python3": true,
     "hf_cli": false,
     "hf_token": false,
-    "vllm_wheel": null,
+    "vllm_wheel": "0.16.0",
     "cuda_build": null,
     "models": [],
     "datasets": [],
     "env": [],
     "needs_server": false,
-    "pipeline": "needs-wheel-task"
+    "pipeline": "wheel"
    }
   }
  },
@@ -2831,13 +2831,13 @@
     "python3": true,
     "hf_cli": false,
     "hf_token": false,
-    "vllm_wheel": null,
+    "vllm_wheel": "0.16.0",
     "cuda_build": null,
     "models": [],
     "datasets": [],
     "env": [],
     "needs_server": false,
-    "pipeline": "needs-wheel-task"
+    "pipeline": "wheel"
    }
   }
  },
@@ -3469,13 +3469,13 @@
     "python3": true,
     "hf_cli": false,
     "hf_token": false,
-    "vllm_wheel": null,
+    "vllm_wheel": "0.20.0",
     "cuda_build": null,
     "models": [],
     "datasets": [],
     "env": [],
     "needs_server": false,
-    "pipeline": "needs-wheel-task"
+    "pipeline": "wheel"
    }
   }
  },

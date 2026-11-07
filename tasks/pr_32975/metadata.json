@@ -1,0 +1,47 @@
+{
+ "pr": 32975,
+ "title": "[Perf] Optimize detokenizer python logic (#32975)",
+ "field": "scheduling",
+ "date": "2026-02-10",
+ "hardware": [
+  "agnostic"
+ ],
+ "url": "https://github.com/vllm-project/vllm/pull/32975",
+ "base_sha": "97fa8f65909d4d8f2eb0edc2137fb22f576a5b25",
+ "merge_sha": "e1060a71a1bb96103ce9ca98345184dcdc982467",
+ "source_files": [
+  "vllm/v1/engine/detokenizer.py",
+  "vllm/v1/engine/output_processor.py"
+ ],
+ "test_files": [],
+ "wheel": "0.16.0",
+ "wheel_note": "first PyPI release after merge (2026-02-26 > 2026-02-10); picked by gen_tasks.py from PyPI upload dates.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "tasks/pr_32975/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "us/tok",
+  "needs": "gpu",
+  "headline": "detokenize",
+  "note": "Pure-Python detokenizer change (num_output_tokens avoids slice). 1.628x / 38.57%."
+ },
+ "perf_gain": {
+  "top_gain": "1.628x, 38.57%",
+  "gain_kind": "pct",
+  "gain_evidence": "```bash yewentao256@dgx-b200-02:~/vllm-source$ python benchmarks/overheads/benchmark_detokenizer_min_tokens.py old: 787.270 ms (39.36 ns/token) new: 483.633 ms "
+ },
+ "needs": "gpu",
+ "experiments": [
+  {
+   "name": "detokenize",
+   "unit": "us/tok",
+   "reported": {
+    "base": 1.628,
+    "patch": 1.0
+   }
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "test_note": "perf-only detokenizer change; bench builds the detokenizer against the real gpt2 tokenizer (downloads into the shared HF cache).",
+ "generated_by": "gen_tasks.py"
+}

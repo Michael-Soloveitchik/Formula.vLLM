@@ -6,11 +6,27 @@
   "workload_kind": "repo_benchmark",
   "script": "benchmarks/kv_cache/benchmark_block_pool.py",
   "cmd": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
-  "needs": "cpu",
+  "needs": "gpu",
   "notes": "Pure Python microbench; imports vllm.v1.core.block_pool.BlockPool + vllm.utils, no CUDA. One run prints both ops.",
   "experiments": [
-   {"name": "get_new_blocks", "unit": "us/op", "parse": "get_new_blocks avg", "reported": {"base": 150.0, "patch": 8.0}},
-   {"name": "free_blocks",    "unit": "us/op", "parse": "free_blocks avg",    "reported": {"base": 33.0,  "patch": 9.0}}
+   {
+    "name": "get_new_blocks",
+    "unit": "us/op",
+    "parse": "get_new_blocks avg",
+    "reported": {
+     "base": 150.0,
+     "patch": 8.0
+    }
+   },
+   {
+    "name": "free_blocks",
+    "unit": "us/op",
+    "parse": "free_blocks avg",
+    "reported": {
+     "base": 33.0,
+     "patch": 9.0
+    }
+   }
   ]
  },
  "21281": {
@@ -20,10 +36,18 @@
   "workload_kind": "repo_benchmark",
   "script": "benchmarks/kv_cache/benchmark_block_pool.py",
   "cmd": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
-  "needs": "cpu",
+  "needs": "gpu",
   "notes": "Builds on 21222; same block_pool microbench exercises the evict/allocate path. CPU-only.",
   "experiments": [
-   {"name": "allocate_new_block", "unit": "us/op", "parse": "get_new_blocks avg", "reported": {"base": 130.0, "patch": 30.0}}
+   {
+    "name": "allocate_new_block",
+    "unit": "us/op",
+    "parse": "get_new_blocks avg",
+    "reported": {
+     "base": 130.0,
+     "patch": 30.0
+    }
+   }
   ]
  },
  "9972": {
@@ -36,9 +60,33 @@
   "needs": "gpu",
   "notes": "Offline batching bench; needs model + ShareGPT dataset. GPU serving run. Numbers are cache-enabled (49% hit).",
   "experiments": [
-   {"name": "input_throughput",  "unit": "tok/s", "parse": "input tok/s",  "reported": {"base": 17916.0, "patch": 32258.0}},
-   {"name": "output_throughput", "unit": "tok/s", "parse": "output tok/s", "reported": {"base": 485.0,   "patch": 874.0}},
-   {"name": "cost_time",         "unit": "s",     "parse": "cost time",    "reported": {"base": 8.49,    "patch": 4.83}}
+   {
+    "name": "input_throughput",
+    "unit": "tok/s",
+    "parse": "input tok/s",
+    "reported": {
+     "base": 17916.0,
+     "patch": 32258.0
+    }
+   },
+   {
+    "name": "output_throughput",
+    "unit": "tok/s",
+    "parse": "output tok/s",
+    "reported": {
+     "base": 485.0,
+     "patch": 874.0
+    }
+   },
+   {
+    "name": "cost_time",
+    "unit": "s",
+    "parse": "cost time",
+    "reported": {
+     "base": 8.49,
+     "patch": 4.83
+    }
+   }
   ]
  },
  "22940": {
@@ -51,8 +99,24 @@
   "needs": "gpu",
   "notes": "Throughput bench with facebook/opt-125m. Per-op win in a trace; e2e via benchmark_throughput.",
   "experiments": [
-   {"name": "compute_slot_mapping", "unit": "us/call", "parse": "trace", "reported": {"base": 400.0, "patch": 22.0}},
-   {"name": "throughput",           "unit": "req/s",   "parse": "Throughput req/s", "reported": {"base": 268.45, "patch": 274.01}}
+   {
+    "name": "compute_slot_mapping",
+    "unit": "us/call",
+    "parse": "trace",
+    "reported": {
+     "base": 400.0,
+     "patch": 22.0
+    }
+   },
+   {
+    "name": "throughput",
+    "unit": "req/s",
+    "parse": "Throughput req/s",
+    "reported": {
+     "base": 268.45,
+     "patch": 274.01
+    }
+   }
   ]
  },
  "12583": {
@@ -65,7 +129,15 @@
   "needs": "gpu",
   "notes": "FusedMoE Triton kernel microbench, GPU-only. PR gives no before/after numbers (design doc).",
   "experiments": [
-   {"name": "fused_moe_kernel", "unit": "us", "parse": "kernel us", "reported": {"base": null, "patch": null}}
+   {
+    "name": "fused_moe_kernel",
+    "unit": "us",
+    "parse": "kernel us",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   }
   ]
  },
  "23504": {
@@ -78,8 +150,24 @@
   "needs": "gpu",
   "notes": "W8A8 block FP8 Triton kernel tuning; GPU-only (H200 config).",
   "experiments": [
-   {"name": "serving_throughput", "unit": "tok/s", "parse": "total tok/s", "reported": {"base": 16776.0, "patch": 16872.0}},
-   {"name": "w8a8_kernel",        "unit": "us",    "parse": "kernel us",    "reported": {"base": null,    "patch": null}}
+   {
+    "name": "serving_throughput",
+    "unit": "tok/s",
+    "parse": "total tok/s",
+    "reported": {
+     "base": 16776.0,
+     "patch": 16872.0
+    }
+   },
+   {
+    "name": "w8a8_kernel",
+    "unit": "us",
+    "parse": "kernel us",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   }
   ]
  },
  "16436": {
@@ -92,9 +180,33 @@
   "needs": "gpu",
   "notes": "Removes CUDA sync in apply_penalties; win via GPU serving + trace. ~8% decode for small models.",
   "experiments": [
-   {"name": "tpot",       "unit": "ms",    "parse": "Mean TPOT", "reported": {"base": null, "patch": null}},
-   {"name": "itl",        "unit": "ms",    "parse": "Mean ITL",  "reported": {"base": null, "patch": null}},
-   {"name": "throughput", "unit": "tok/s", "parse": "Output token throughput", "reported": {"base": null, "patch": null}}
+   {
+    "name": "tpot",
+    "unit": "ms",
+    "parse": "Mean TPOT",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "itl",
+    "unit": "ms",
+    "parse": "Mean ITL",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "throughput",
+    "unit": "tok/s",
+    "parse": "Output token throughput",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   }
   ]
  },
  "6779": {
@@ -104,11 +216,27 @@
   "workload_kind": "microbench_in_pr",
   "script": "tasks/pr_6779/bench.py",
   "cmd": "python3 tasks/pr_6779/bench.py",
-  "needs": "cpu",
+  "needs": "gpu",
   "notes": "Microbench pasted in PR body; make_tensor_with_pad over SequenceData, input_len=1024 batch=2048. v0 API.",
   "experiments": [
-   {"name": "make_tensor_with_pad", "unit": "ms", "parse": "latency ms", "reported": {"base": 79.0, "patch": 22.0}},
-   {"name": "e2e_qwen05b",          "unit": "it/s", "parse": "it/s",     "reported": {"base": 24.76, "patch": 29.44}}
+   {
+    "name": "make_tensor_with_pad",
+    "unit": "ms",
+    "parse": "latency ms",
+    "reported": {
+     "base": 79.0,
+     "patch": 22.0
+    }
+   },
+   {
+    "name": "e2e_qwen05b",
+    "unit": "it/s",
+    "parse": "it/s",
+    "reported": {
+     "base": 24.76,
+     "patch": 29.44
+    }
+   }
   ]
  },
  "6442": {
@@ -121,7 +249,15 @@
   "needs": "gpu",
   "notes": "Microbench imports v0 vllm Sampler; large batch, A100. ~50% sampler speedup.",
   "experiments": [
-   {"name": "sampler_latency", "unit": "ms", "parse": "latency ms", "reported": {"base": 2.0, "patch": 1.0}}
+   {
+    "name": "sampler_latency",
+    "unit": "ms",
+    "parse": "latency ms",
+    "reported": {
+     "base": 2.0,
+     "patch": 1.0
+    }
+   }
   ]
  },
  "13365": {
@@ -131,10 +267,18 @@
   "workload_kind": "microbench_in_pr",
   "script": "tasks/pr_13365/bench.py",
   "cmd": "python3 tasks/pr_13365/bench.py",
-  "needs": "cpu",
+  "needs": "gpu",
   "notes": "Numba-JIT N-gram matcher; CPU-only. Driver times NgramProposer.propose over ShareGPT token seqs.",
   "experiments": [
-   {"name": "ngram_match_overhead", "unit": "s", "parse": "cumulative s", "reported": {"base": 54.3, "patch": 1.9}}
+   {
+    "name": "ngram_match_overhead",
+    "unit": "s",
+    "parse": "cumulative s",
+    "reported": {
+     "base": 54.3,
+     "patch": 1.9
+    }
+   }
   ]
  },
  "37225": {
@@ -147,8 +291,24 @@
   "needs": "gpu",
   "notes": "CUDA-only (aborts without torch.cuda). topk_whole b2048/32k 0.761->0.550ms.",
   "experiments": [
-   {"name": "topk",      "unit": "ms", "parse": "topk_whole", "reported": {"base": 0.761, "patch": 0.550}},
-   {"name": "topk_topp", "unit": "ms", "parse": "topk_topp",  "reported": {"base": null,  "patch": null}}
+   {
+    "name": "topk",
+    "unit": "ms",
+    "parse": "topk_whole",
+    "reported": {
+     "base": 0.761,
+     "patch": 0.55
+    }
+   },
+   {
+    "name": "topk_topp",
+    "unit": "ms",
+    "parse": "topk_topp",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   }
   ]
  },
  "33538": {
@@ -161,7 +321,15 @@
   "needs": "gpu",
   "notes": "Adds Triton sampler + bench script. Triton vs PyTorch sort-based. CUDA-only.",
   "experiments": [
-   {"name": "topk_whole_b4_v32k", "unit": "ms", "parse": "topk_whole", "reported": {"base": 0.666, "patch": 0.067}}
+   {
+    "name": "topk_whole_b4_v32k",
+    "unit": "ms",
+    "parse": "topk_whole",
+    "reported": {
+     "base": 0.666,
+     "patch": 0.067
+    }
+   }
   ]
  },
  "41163": {
@@ -174,7 +342,15 @@
   "needs": "gpu",
   "notes": "Self-contained microbench; AllPool.forward, cuda:0, HIDDEN=4096, 64x128 seqs. Wall-clock (host sync).",
   "experiments": [
-   {"name": "allpool_forward", "unit": "us", "parse": "median us", "reported": {"base": 59.89, "patch": 39.65}}
+   {
+    "name": "allpool_forward",
+    "unit": "us",
+    "parse": "median us",
+    "reported": {
+     "base": 59.89,
+     "patch": 39.65
+    }
+   }
   ]
  },
  "33593": {
@@ -184,11 +360,27 @@
   "workload_kind": "microbench_in_pr",
   "script": "tasks/pr_33593/bench.py",
   "cmd": "python3 tasks/pr_33593/bench.py",
-  "needs": "cpu",
+  "needs": "gpu",
   "notes": "Pure-Python microbench, SIZE=2M N=1M R=5; list[:N] vs islice, create + sum.",
   "experiments": [
-   {"name": "create_slice", "unit": "s", "parse": "create best", "reported": {"base": 0.0034, "patch": 0.000001}},
-   {"name": "sum_slice",    "unit": "s", "parse": "sum best",    "reported": {"base": 0.0056, "patch": 0.0047}}
+   {
+    "name": "create_slice",
+    "unit": "s",
+    "parse": "create best",
+    "reported": {
+     "base": 0.0034,
+     "patch": 1e-06
+    }
+   },
+   {
+    "name": "sum_slice",
+    "unit": "s",
+    "parse": "sum best",
+    "reported": {
+     "base": 0.0056,
+     "patch": 0.0047
+    }
+   }
   ]
  },
  "27793": {
@@ -198,7 +390,7 @@
   "workload_kind": "pytest_bench",
   "script": "tests/v1/core/test_kv_cache_metrics.py",
   "cmd": "pytest -v tests/v1/core/test_kv_cache_metrics.py",
-  "needs": "cpu",
+  "needs": "gpu",
   "notes": "Correctness-only; deterministic fake clock. No timing number (overhead ~48 bytes/block, zero cost when off).",
   "experiments": []
  },
@@ -209,11 +401,27 @@
   "workload_kind": "microbench_in_pr",
   "script": "tasks/pr_39328/bench.py",
   "cmd": "python3 tasks/pr_39328/bench.py",
-  "needs": "cpu",
+  "needs": "gpu",
   "notes": "functools.cache over inspect.getsource; CPU-only hashing path.",
   "experiments": [
-   {"name": "cache_lookup",  "unit": "ms", "parse": "lookup ms",  "reported": {"base": 32.50, "patch": 11.30}},
-   {"name": "cold_compile",  "unit": "s",  "parse": "compile s",  "reported": {"base": 34.10, "patch": 29.70}}
+   {
+    "name": "cache_lookup",
+    "unit": "ms",
+    "parse": "lookup ms",
+    "reported": {
+     "base": 32.5,
+     "patch": 11.3
+    }
+   },
+   {
+    "name": "cold_compile",
+    "unit": "s",
+    "parse": "compile s",
+    "reported": {
+     "base": 34.1,
+     "patch": 29.7
+    }
+   }
   ]
  },
  "32975": {
@@ -223,10 +431,18 @@
   "workload_kind": "microbench_in_pr",
   "script": "tasks/pr_32975/bench.py",
   "cmd": "python3 tasks/pr_32975/bench.py",
-  "needs": "cpu",
+  "needs": "gpu",
   "notes": "Pure-Python detokenizer change (num_output_tokens avoids slice). 1.628x / 38.57%.",
   "experiments": [
-   {"name": "detokenize", "unit": "us/tok", "parse": "per tok", "reported": {"base": 1.628, "patch": 1.0}}
+   {
+    "name": "detokenize",
+    "unit": "us/tok",
+    "parse": "per tok",
+    "reported": {
+     "base": 1.628,
+     "patch": 1.0
+    }
+   }
   ]
  },
  "29499": {
@@ -236,12 +452,36 @@
   "workload_kind": "microbench_in_pr",
   "script": "tasks/pr_29499/bench.py",
   "cmd": "python3 tasks/pr_29499/bench.py",
-  "needs": "cpu",
+  "needs": "gpu",
   "notes": "EPLB algo on CPU torch tensors. Three primitives rewritten in numpy.",
   "experiments": [
-   {"name": "move_from_buffer",       "unit": "us", "parse": "move_from_buffer", "reported": {"base": null, "patch": null}},
-   {"name": "get_ep_ranks_with_expert","unit": "us", "parse": "get_ep_ranks",    "reported": {"base": null, "patch": null}},
-   {"name": "move_to_buffer",         "unit": "us", "parse": "move_to_buffer",   "reported": {"base": null, "patch": null}}
+   {
+    "name": "move_from_buffer",
+    "unit": "us",
+    "parse": "move_from_buffer",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "get_ep_ranks_with_expert",
+    "unit": "us",
+    "parse": "get_ep_ranks",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "move_to_buffer",
+    "unit": "us",
+    "parse": "move_to_buffer",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   }
   ]
  },
  "27673": {
@@ -251,10 +491,18 @@
   "workload_kind": "microbench_in_pr",
   "script": "tasks/pr_27673/bench.py",
   "cmd": "python3 tasks/pr_27673/bench.py",
-  "needs": "cpu",
+  "needs": "gpu",
   "notes": "Pure-Python early return; driver times remove_skipped_blocks on the no-op path (CPU).",
   "experiments": [
-   {"name": "remove_skipped_blocks", "unit": "us", "parse": "latency us", "reported": {"base": 6.3, "patch": 1.6}}
+   {
+    "name": "remove_skipped_blocks",
+    "unit": "us",
+    "parse": "latency us",
+    "reported": {
+     "base": 6.3,
+     "patch": 1.6
+    }
+   }
   ]
  },
  "28280": {
@@ -267,8 +515,24 @@
   "needs": "gpu",
   "notes": "Triton matmul (EVEN_K masking). PR gives serving numbers only (C500/H800).",
   "experiments": [
-   {"name": "output_throughput", "unit": "tok/s", "parse": "Output token throughput", "reported": {"base": 267.82, "patch": 296.95}},
-   {"name": "tpot",              "unit": "ms",    "parse": "Mean TPOT",               "reported": {"base": 67.93,  "patch": 61.74}}
+   {
+    "name": "output_throughput",
+    "unit": "tok/s",
+    "parse": "Output token throughput",
+    "reported": {
+     "base": 267.82,
+     "patch": 296.95
+    }
+   },
+   {
+    "name": "tpot",
+    "unit": "ms",
+    "parse": "Mean TPOT",
+    "reported": {
+     "base": 67.93,
+     "patch": 61.74
+    }
+   }
   ]
  }
 }

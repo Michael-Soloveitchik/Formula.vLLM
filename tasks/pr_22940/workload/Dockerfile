@@ -9,7 +9,7 @@ FROM nvidia/cuda:${CUDA_TAG}
 ENV DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 PYTHONDONTWRITEBYTECODE=1
 RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-pip python3-dev git \
  && rm -rf /var/lib/apt/lists/*
-# vLLM wheel: first PyPI release AFTER merge_sha (compiled ops match the gold tree).
+# vLLM wheel: first PyPI release AFTER merge_sha (compiled ops match the PR-solution tree).
 # Empty VLLM_VERSION = latest (pick one and record it in tasks/pr_22940/metadata.json:wheel).
 ARG VLLM_VERSION=0.10.1
 RUN pip install --upgrade pip && pip install "vllm${VLLM_VERSION:+==$VLLM_VERSION}" pytest pytest-asyncio

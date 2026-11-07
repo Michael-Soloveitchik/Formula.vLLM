@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
-# AUTO-GENERATED — PR #21222. Mimic the author's workload for BOTH arms.
-# Mounts: /src = the arm's vllm tree (base or gold). Prints parseable lines.
+# AUTO-GENERATED — PR #21222 (GPU). Author workload: 'python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000'
+# Requires CUDA + (maybe) a model mounted at /weights. run.sh only calls this
+# when a GPU is present; otherwise the row stays reported-only/pending.
 set -euo pipefail
 ARM="${ARM:-unknown}"
+if ! python3 -c "import torch;assert torch.cuda.is_available()" 2>/dev/null; then
+  echo "# pr=21222 arm=$ARM SKIP=no_cuda — GPU workload, run on a CUDA box"
+  exit 0
+fi
 echo "# pr=21222 arm=$ARM cmd='python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000'"
 cd /src
 export PYTHONPATH=/src:${PYTHONPATH:-}

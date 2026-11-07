@@ -1,6 +1,6 @@
 {
  "pr": 6779,
- "needs": "cpu",
+ "needs": "gpu",
  "cluster": "qwen05b",
  "model": "Qwen/Qwen2-0.5B",
  "cmd": "python3 tasks/pr_6779/bench.py",

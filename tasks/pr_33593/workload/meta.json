@@ -1,6 +1,6 @@
 {
  "pr": 33593,
- "needs": "cpu",
+ "needs": "gpu",
  "cluster": "none_cpu",
  "model": null,
  "cmd": "python3 tasks/pr_33593/bench.py",

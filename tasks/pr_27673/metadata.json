@@ -1,0 +1,46 @@
+{
+ "pr": 27673,
+ "title": "[Core] Early return in SlidingWindowManager.remove_skipped_blocks (#27673)",
+ "field": "scheduling",
+ "date": "2025-10-28",
+ "hardware": [
+  "agnostic"
+ ],
+ "url": "https://github.com/vllm-project/vllm/pull/27673",
+ "base_sha": "d3ab240f39219df0175ec662416f630d7bf273d8",
+ "merge_sha": "0b51c9bd8b19cee3a494b0f966a6b0a846a40193",
+ "source_files": [
+  "vllm/v1/core/single_type_kv_cache_manager.py"
+ ],
+ "test_files": [],
+ "wheel": "0.11.1",
+ "wheel_note": "first PyPI release after merge (2025-11-19 > 2025-10-28); picked by gen_tasks.py from PyPI upload dates.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "tasks/pr_27673/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "us",
+  "needs": "gpu",
+  "headline": "remove_skipped_blocks",
+  "note": "Pure-Python early return; driver times remove_skipped_blocks on the no-op path (CPU)."
+ },
+ "perf_gain": {
+  "top_gain": "75% (6.3us→1.6us)",
+  "gain_kind": "unit",
+  "gain_evidence": "When early stop happened, the cost reduced from 6.3us to 1.6us now."
+ },
+ "needs": "gpu",
+ "experiments": [
+  {
+   "name": "remove_skipped_blocks",
+   "unit": "us",
+   "reported": {
+    "base": 6.3,
+    "patch": 1.6
+   }
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "test_note": "perf-only early return; no test in the diff; bench times remove_skipped_blocks on the no-op path.",
+ "generated_by": "gen_tasks.py"
+}

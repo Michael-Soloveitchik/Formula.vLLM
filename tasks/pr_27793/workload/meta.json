@@ -1,6 +1,6 @@
 {
  "pr": 27793,
- "needs": "cpu",
+ "needs": "gpu",
  "cluster": "none_cpu",
  "model": null,
  "cmd": "pytest -v tests/v1/core/test_kv_cache_metrics.py",
