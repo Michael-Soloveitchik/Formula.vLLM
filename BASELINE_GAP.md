@@ -13,7 +13,7 @@ taken 2026-11-07 (`python3 machine.py snapshot`). No workload was re-run for thi
 | OS / CUDA path | **WSL2** (kernel 6.18 microsoft-standard), driver 591.86, CUDA 13.1 via `/dev/dxg` | native Linux |
 | GPU also drives | the Windows desktop (`Disp.A On`, Xwayland) + an idle ComfyUI server (pid 2903, 260 MiB) | nothing |
 | CPU | i7-14700KF hybrid (8 P + 12 E cores), WSL2 sees 12 floating vCPUs | server Xeon/EPYC, all cores equal |
-| GPU idle state | P8, SM 180 MHz, ramps to 3090 MHz under load; `SW Power Capping` counter 1.3 s | datacenter cards sit at base clock |
+| GPU idle state | P8, SM 180 MHz, ramps to 3090 MHz under load; `SW Power Capping` counter 1.3 s | datacenter cards sit at their rated clock |
 | Load at snapshot | load1 1.3 (claude/opencode/node), 0 % GPU util | dedicated |
 
 Two consequences of WSL2 dominate everything launch-bound: (1) every kernel launch and every
@@ -126,7 +126,7 @@ headline, and fix the unit to `ms`. Verdict: workload, not hardware (CPU-only).
 4. **Interleave arms ABBA instead of all-baseline-then-all-PR-solution**: today `run_workload baseline` runs 5×
    then `run_workload PR-solution` 5× (37225: 12:55-12:58 baseline, 12:59-13:03 PR's solution). Drift across those
    8 minutes lands entirely on one arm. Loop `for i in 1..REPEATS: run A; run B; run B;
-   run base` (one extra container start per pair) so every repeat sees the same clock/tenant
+   run A` (one extra container start per pair) so every repeat sees the same clock/tenant
    state. This is the single biggest fix for 41163.
 5. **Priority and CPU placement**: wrap the container in `nice -n -5` (needs `CAP_SYS_NICE`
    /sudo; without root use `nice -n 0` and at least `chrt --other 0`) and pass
