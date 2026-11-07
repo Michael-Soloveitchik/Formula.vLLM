@@ -1,0 +1,268 @@
+{
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "remove_single_request",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 4.2208,
+     "sd": 0.0559,
+     "n": 5
+    },
+    "gold": {
+     "mean": 1.1216,
+     "sd": 0.0133,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 4.2208,
+     "pr_solution": 1.1216,
+     "ratio_sd": 0.066898,
+     "baseline_sd": 0.0559,
+     "pr_solution_sd": 0.0133,
+     "ratio": 3.763195,
+     "pct": 276.32
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "below_host_floor",
+     "note": "baseline 4.2208 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+    }
+   }
+  },
+  {
+   "name": "remove_four_requests",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 6.6415,
+     "sd": 0.1034,
+     "n": 5
+    },
+    "gold": {
+     "mean": 6.6261,
+     "sd": 0.0592,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 6.6415,
+     "pr_solution": 6.6261,
+     "ratio_sd": 0.017992,
+     "baseline_sd": 0.1034,
+     "pr_solution_sd": 0.0592,
+     "ratio": 1.002324,
+     "pct": 0.23
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "below_host_floor",
+     "note": "baseline 6.6415 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+    }
+   }
+  }
+ ],
+ "pr": 21917,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/21917",
+ "title": "[Core] Optimize scheduler request removal for single completions (#21917)",
+ "field": "scheduling",
+ "reported_gain": "64%",
+ "gain_kind": "pct",
+ "base_sha": "c32e6ad1f63631fd8033f0cca3a35d5e48ccfc7f",
+ "merge_sha": "0167efe20d3d2280c3da6aea94a6f59afec5099c",
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.10.2",
+  "workload_cmd": "python3 /task/bench.py",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "SKIP",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "SKIP",
+   "slug": "gold"
+  }
+ },
+ "improved": false,
+ "latency": {
+  "scenarios": {
+   "remove_four_requests": {
+    "unit": "us",
+    "base": {
+     "mean": 6.6415,
+     "sd": 0.1034,
+     "n": 5
+    },
+    "gold": {
+     "mean": 6.6261,
+     "sd": 0.0592,
+     "n": 5
+    }
+   },
+   "remove_single_request": {
+    "unit": "us",
+    "base": {
+     "mean": 4.2208,
+     "sd": 0.0559,
+     "n": 5
+    },
+    "gold": {
+     "mean": 1.1216,
+     "sd": 0.0133,
+     "n": 5
+    }
+   }
+  },
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {
+   "workload_runs": 5
+  },
+  "gold": {
+   "workload_runs": 5
+  }
+ },
+ "ts": "2026-11-07T23:26:03Z",
+ "machine": {
+  "ts": "2026-11-07T23:24:31Z",
+  "host": {
+   "hostname": "DESKTOP-michael",
+   "kernel": "6.18.33.2-microsoft-standard-WSL2",
+   "wsl2": true,
+   "os": "Ubuntu 24.04.3 LTS"
+  },
+  "gpu": {
+   "name": "NVIDIA GeForce RTX 5070 Ti",
+   "driver": "591.86",
+   "cuda": "13.1",
+   "sm_mhz": 180.0,
+   "sm_max_mhz": 3090.0,
+   "mem_mhz": 405.0,
+   "mem_max_mhz": 14001.0,
+   "vram_total_mib": 16303.0,
+   "vram_used_mib": 273.0,
+   "util_pct": 0.0,
+   "power_w": 30.17,
+   "power_limit_w": 300.0,
+   "temp_c": 35.0,
+   "pstate": "P8",
+   "throttle_reasons": "0x0000000000000000",
+   "processes": [
+    {
+     "pid": 2903,
+     "name": "python main.py --listen 0.0.0.0 --port 8188",
+     "mem_mib": null
+    }
+   ]
+  },
+  "cpu": {
+   "model": "Intel(R) Core(TM) i7-14700KF",
+   "nproc": 12,
+   "load1": 2.0361328125,
+   "load5": 1.38916015625,
+   "load15": 1.263671875,
+   "top_cpu_procs": []
+  },
+  "ram": {
+   "total_gb": 94.3,
+   "free_gb": 1.0,
+   "available_gb": 88.9
+  },
+  "docker": {
+   "version": "Docker version 29.8.1, build 4a63305",
+   "engine": "docker"
+  }
+ },
+ "summary": {
+  "experiments": 2,
+  "measured": 2,
+  "headline": "remove_single_request",
+  "headline_derived": {
+   "unit": "us",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": null,
+    "pr_solution": null,
+    "how": null,
+    "marker": "",
+    "raw": "no number in the PR",
+    "note": "",
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced": {
+    "baseline": 4.2208,
+    "pr_solution": 1.1216,
+    "ratio_sd": 0.066898,
+    "baseline_sd": 0.0559,
+    "pr_solution_sd": 0.0133,
+    "ratio": 3.763195,
+    "pct": 276.32
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number"
+   },
+   "reliability": {
+    "flag": "below_host_floor",
+    "note": "baseline 4.2208 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+   }
+  },
+  "reproduced_ratio_median": 2.3828,
+  "reproduced_ratio_max": 3.7632,
+  "reported_ratio_median": null,
+  "verdict": "no_reported_number",
+  "tests": {
+   "base": "SKIP",
+   "gold": "SKIP"
+  }
+ }
+}
