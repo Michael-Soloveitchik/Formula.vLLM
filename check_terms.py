@@ -31,7 +31,7 @@ ALLOWED = [
 ]
 ALLOWED.append(r"""workload (?:base|gold) run""")
 ALLOWED.append(r"""\bbase class\b|\*Base\b|per merged PR""")   # plain English / data-spine wording
-ALLOWED.append(r"""run_workloads_abba base|P8, SM 180""")
+ALLOWED.append(r"""run_workloads_abba base .* gold |P8, SM 180""")
 ALLOWED = [re.compile(p) for p in ALLOWED]
 WORD = re.compile(r"\b(?:base|gold|Base|Gold)\b|[Ee]xpert(?:'s)? (?:solution|patch)|merged PR\b")
 
