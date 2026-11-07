@@ -104,8 +104,8 @@ sup.mark{font-weight:700;color:#d97706;margin-left:2px;cursor:help}
  .empty{color:var(--faint);padding:30px 16px;text-align:center}
  /* ---- LEFT: stats pane + background fold ---- */
  .spane{padding:6px 12px 8px;border-bottom:1px solid var(--border)}
- .spane .stabs{display:flex;gap:4px;margin:4px 0 6px;flex-wrap:wrap}
- .spane .stabs button{flex:1 1 auto;min-width:70px;background:var(--panel);border:1px solid var(--border2);border-radius:10px;padding:4px 6px;font:700 11px var(--ui);color:var(--mut);cursor:pointer;white-space:nowrap}
+ .spane .stabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:4px 0 6px}
+ .spane .stabs button{min-width:0;background:var(--panel);border:1px solid var(--border2);border-radius:10px;padding:4px 4px;font:700 10px var(--ui);overflow:hidden;text-overflow:ellipsis;color:var(--mut);cursor:pointer;white-space:nowrap}
  .spane .stitle{font-size:12px;font-weight:700;color:var(--navy);margin:2px 0 2px}
  .spane .stabs button.on{background:var(--grad);color:#fff;border-color:transparent}
  .spane svg{display:block;width:100%;height:auto;font-family:var(--mono);font-size:9.5px}
@@ -684,7 +684,8 @@ function statRows(){
    verdict:(d.reproduced_vs_reported||{}).verdict||'', rel:(d.reliability||{}).flag||'ok'});}
  return out;
 }
-const TABS=[['gapratio','gap ratio'],['gaps','gaps'],['fgapratio','gap ratio / field'],['fgaps','gaps / field']];
+const TABS=[['gapratio','gap ratio · PR'],['fgapratio','gap ratio · field'],['gaps','gaps · PR'],
+            ['baseratio','baseline · PR'],['fbaseratio','baseline · field'],['fgaps','gaps · field']];
 // gap = PR's solution − baseline. Relative gap = (baseline − PR's solution) ÷ baseline, so a 30 % faster run is +0.30
 // whatever the unit (throughput units: (PR's solution − baseline) ÷ baseline). Gap ratio = reproduced gap ÷ reported gap.
 function gapRows(){
@@ -694,7 +695,8 @@ function gapRows(){
   if(r.repPct!=null) repGap=(r.rep!=null)?(up?r.rep-1:1-1/r.rep):null;   // from the reported ratio (author's %, delta or absolutes, all resolved by derive.py)
   const measGap=(r.meas!=null)?(up?r.meas-1:1-1/r.meas):null;
   const gapRatio=(repGap&&measGap!=null&&repGap!==0)?measGap/repGap:null;
-  return {...r,repGap,measGap,gapRatio};});
+  const baseRatio=(r.repBase&&r.measBase)?r.repBase/r.measBase:null;   // author's baseline ÷ ours (only when the author gave an absolute baseline)
+  return {...r,repGap,measGap,gapRatio,baseRatio};});
 }
 // bar chart: x = categories, y = numeric; series = side-by-side bars per category; log (ratio, ref 1) or linear (ref 0)
 function barChart(el,rows,opts){
@@ -733,14 +735,22 @@ function renderStatsPane(){
  if(STAB==='gapratio'){
   el.innerHTML=tabs+barChart(el,rows,{title:'gap ratio: reproduced gap ÷ reported gap',log:true,ref:1,fmt:x2,series:[{key:'gapRatio',label:'reproduced ÷ reported gap',color:BLUE}],
    hint:`gap = PR's solution − baseline, taken relative to its own baseline so units cancel · 1 = we reproduce exactly the author's gap, 0.5 = half of it, >1 = more · ${withRep.length} of ${n} PRs have a reported number · red-dashed = below host floor`});
+ } else if(STAB==='baseratio'){
+  const have=rows.filter(r=>r.baseRatio!=null).length;
+  el.innerHTML=tabs+barChart(el,rows,{title:'baseline ratio: reported ÷ reproduced',log:true,ref:1,fmt:x2,series:[{key:'baseRatio',label:"author's baseline ÷ our baseline",color:'#2457d8'}],
+   hint:`how much faster the author's machine ran the UNCHANGED code · 1 = same speed, >1 = their machine faster · only PRs whose author gave an absolute baseline (${have} of ${n}); * / + rows have none`});
  } else if(STAB==='gaps'){
   el.innerHTML=tabs+barChart(el,rows,{title:'gaps: reported vs reproduced',log:false,ref:0,fmt:pc,series:[{key:'repGap',label:'reported gap',color:ORG},{key:'measGap',label:'reproduced gap',color:BLUE}],
    hint:`gap relative to baseline: (baseline − PR's solution) ÷ baseline (throughput: (PR's solution − baseline) ÷ baseline) · +30% = PR's solution 30% faster · negative = slower here`});
  } else {
   const F={}; rows.forEach(r=>{(F[r.field]=F[r.field]||[]).push(r);});
   const fr=Object.entries(F).map(([f,rs])=>{const g=medRange(rs.map(r=>r.gapRatio)), rg=medRange(rs.map(r=>r.repGap)), mg=medRange(rs.map(r=>r.measGap));
-    return {pr:f,label:f,head:`${rs.length} PR(s)`,rel:'ok',gapRatio:g.med,gapErr:g.med!=null&&g.n>1?Math.max(g.med-g.lo,g.hi-g.med):0,repGap:rg.med,measGap:mg.med,extra:`gap ratio range ${g.lo!=null?g.lo.toFixed(2):'—'}–${g.hi!=null?g.hi.toFixed(2):'—'} (n=${g.n})`};}).sort((a,b)=>a.label.localeCompare(b.label));
-  if(STAB==='fgapratio') el.innerHTML=tabs+barChart(el,fr,{title:'gap ratio per field (median, whisker = min–max)',log:true,ref:1,fmt:x2,xl:74,series:[{key:'gapRatio',label:'median reproduced ÷ reported gap',color:BLUE,err:'gapErr'}],hint:`1 = exactly the author's gap · grouped by field`});
+    const bq=medRange(rs.map(r=>r.baseRatio));
+    return {pr:f,label:f,head:`${rs.length} PR(s)`,rel:'ok',gapRatio:g.med,gapErr:g.med!=null&&g.n>1?Math.max(g.med-g.lo,g.hi-g.med):0,repGap:rg.med,measGap:mg.med,
+      baseRatio:bq.med,baseErr:bq.med!=null&&bq.n>1?Math.max(bq.med-bq.lo,bq.hi-bq.med):0,
+      extra:`gap ratio range ${g.lo!=null?g.lo.toFixed(2):'—'}–${g.hi!=null?g.hi.toFixed(2):'—'} (n=${g.n}) · baseline ratio range ${bq.lo!=null?bq.lo.toFixed(2):'—'}–${bq.hi!=null?bq.hi.toFixed(2):'—'} (n=${bq.n})`};}).sort((a,b)=>a.label.localeCompare(b.label));
+  if(STAB==='fbaseratio') el.innerHTML=tabs+barChart(el,fr,{title:'baseline ratio per field (median, whisker = min–max)',log:true,ref:1,fmt:x2,xl:74,series:[{key:'baseRatio',label:"median author's baseline ÷ our baseline",color:'#2457d8',err:'baseErr'}],hint:`1 = same machine speed on the unchanged code · grouped by field`});
+  else if(STAB==='fgapratio') el.innerHTML=tabs+barChart(el,fr,{title:'gap ratio per field (median, whisker = min–max)',log:true,ref:1,fmt:x2,xl:74,series:[{key:'gapRatio',label:'median reproduced ÷ reported gap',color:BLUE,err:'gapErr'}],hint:`1 = exactly the author's gap · grouped by field`});
   else el.innerHTML=tabs+barChart(el,fr,{title:'gaps per field (median)',log:false,ref:0,fmt:pc,xl:74,series:[{key:'repGap',label:'reported gap',color:ORG},{key:'measGap',label:'reproduced gap',color:BLUE}],hint:`median relative gap per field · reported vs reproduced`});
  }
 }
