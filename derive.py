@@ -33,6 +33,16 @@ def ratio(val, bl, up):
     return (val / bl) if up else (bl / val)
 
 
+def ratio_sd(b, g, sb, sg, r):
+    """sd of the ratio from the two arms' sd (first-order propagation): r * sqrt((sb/b)^2 + (sg/g)^2)"""
+    try:
+        if not r or not b or not g or sb is None or sg is None:
+            return None
+        return round(r * ((sb / b) ** 2 + (sg / g) ** 2) ** 0.5, 6)
+    except Exception:
+        return None
+
+
 def resolve_reported(rep, our_base, up):
     """-> (baseline, pr_solution, how) in the task unit, or (None, None, None)"""
     if not rep:
@@ -84,7 +94,7 @@ def derive_experiment(e, pyref=None):
         "unit": unit, "higher_is_better": up,
         "reported": {"baseline": rb, "pr_solution": rg, "how": how, "marker": marker, "raw": raw, "note": note,
                      "ratio": rr, "pct": None if rr is None else round((rr - 1) * 100, 2)},
-        "reproduced": {"baseline": b, "pr_solution": g,
+        "reproduced": {"baseline": b, "pr_solution": g, "ratio_sd": ratio_sd(b, g, (a.get("base") or {}).get("sd"), (a.get("gold") or {}).get("sd"), mr),
                        "baseline_sd": (a.get("base") or {}).get("sd"), "pr_solution_sd": (a.get("gold") or {}).get("sd"),
                        "ratio": mr, "pct": None if mr is None else round((mr - 1) * 100, 2)},
     }

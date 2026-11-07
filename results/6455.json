@@ -47,6 +47,7 @@
     "reproduced": {
      "baseline": null,
      "pr_solution": null,
+     "ratio_sd": null,
      "baseline_sd": null,
      "pr_solution_sd": null,
      "ratio": null,
@@ -85,6 +86,7 @@
    "reproduced": {
     "baseline": null,
     "pr_solution": null,
+    "ratio_sd": null,
     "baseline_sd": null,
     "pr_solution_sd": null,
     "ratio": null,

@@ -76,6 +76,7 @@
     "reproduced": {
      "baseline": 1.330579,
      "pr_solution": 0.117099,
+     "ratio_sd": 0.110437,
      "baseline_sd": 0.012124,
      "pr_solution_sd": 0.000396,
      "ratio": 11.362855,
@@ -114,6 +115,7 @@
    "reproduced": {
     "baseline": 1.330579,
     "pr_solution": 0.117099,
+    "ratio_sd": 0.110437,
     "baseline_sd": 0.012124,
     "pr_solution_sd": 0.000396,
     "ratio": 11.362855,

@@ -49,6 +49,7 @@
     "reproduced": {
      "baseline": 2260.996,
      "pr_solution": 2265.852,
+     "ratio_sd": 0.01057,
      "baseline_sd": 15.9951,
      "pr_solution_sd": 17.7261,
      "ratio": 1.002148,
@@ -107,6 +108,7 @@
     "reproduced": {
      "baseline": 26377.464,
      "pr_solution": 26434.172,
+     "ratio_sd": 0.01057,
      "baseline_sd": 186.527,
      "pr_solution_sd": 206.8499,
      "ratio": 1.00215,
@@ -165,6 +167,7 @@
     "reproduced": {
      "baseline": 30.146,
      "pr_solution": 30.212,
+     "ratio_sd": 0.010571,
      "baseline_sd": 0.213,
      "pr_solution_sd": 0.2366,
      "ratio": 1.002189,
@@ -357,6 +360,7 @@
    "reproduced": {
     "baseline": 2260.996,
     "pr_solution": 2265.852,
+    "ratio_sd": 0.01057,
     "baseline_sd": 15.9951,
     "pr_solution_sd": 17.7261,
     "ratio": 1.002148,

@@ -37,6 +37,7 @@
     "reproduced": {
      "baseline": 0.0015,
      "pr_solution": 0.004,
+     "ratio_sd": 0.0,
      "baseline_sd": 0.0,
      "pr_solution_sd": 0.0,
      "ratio": 0.375,
@@ -88,6 +89,7 @@
     "reproduced": {
      "baseline": 16.3273,
      "pr_solution": 1.9819,
+     "ratio_sd": 0.055247,
      "baseline_sd": 0.1054,
      "pr_solution_sd": 0.0036,
      "ratio": 8.238206,
@@ -139,6 +141,7 @@
     "reproduced": {
      "baseline": 0.0228,
      "pr_solution": 0.0309,
+     "ratio_sd": 0.01237,
      "baseline_sd": 0.0001,
      "pr_solution_sd": 0.0005,
      "ratio": 0.737864,
@@ -261,6 +264,7 @@
    "reproduced": {
     "baseline": 0.0015,
     "pr_solution": 0.004,
+    "ratio_sd": 0.0,
     "baseline_sd": 0.0,
     "pr_solution_sd": 0.0,
     "ratio": 0.375,
