@@ -13,3 +13,4 @@ vllm/
 .serve.log
 results/.lock
 results/.tmp-*
+logs/
