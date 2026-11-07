@@ -25,15 +25,74 @@
    "note": "Diff flips use_per_token_if_dynamic from False to self.cutlass_fp8_supported in Fp8LinearMethod.apply (fp8.py), enabling fused amax+quantization. Number source: PR body H100 Llama2-7B throughput 10681.75 -> 11181.40 tok/s (~4.68%).",
    "reported": {
     "base": 10681.75,
-    "patch": 11181.40,
+    "patch": 11181.4,
     "comparable": false,
     "scope": "end-to-end H100 Llama2-7B serving throughput over the whole model, not the isolated apply() call the diff touches",
     "scale_short": "Author's number is full-model E2E serving throughput; the diff only changes one quant flag in the fp8 linear apply path. TO MAKE 1:1: run an isolated fp8 cutlass gemm+quant microbench on the changed apply() call, not whole-model serving.",
     "scale_note": "SAME unit (tok/s) but the 10681.75 -> 11181.40 figure is whole-model H100 Llama2-7B serving throughput, diluted by attention, KV cache and all non-fp8 work; the diff only fuses amax+quantization inside the cutlass fp8 gemm path. Direction genuine; absolute magnitude not 1:1 with an isolated-op bench."
    },
-   "arms": {}
+   "arms": {},
+   "derived": {
+    "unit": "tok/s",
+    "higher_is_better": true,
+    "reported": {
+     "baseline": 10681.75,
+     "pr_solution": 11181.4,
+     "how": "absolute",
+     "ratio": 1.046776,
+     "pct": 4.68
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    }
+   }
   }
  ],
  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
- "ts": "2026-11-05T00:00:00Z"
+ "ts": "2026-11-05T00:00:00Z",
+ "summary": {
+  "experiments": 1,
+  "measured": 0,
+  "headline": "fp8_per_token_apply",
+  "headline_derived": {
+   "unit": "tok/s",
+   "higher_is_better": true,
+   "reported": {
+    "baseline": 10681.75,
+    "pr_solution": 11181.4,
+    "how": "absolute",
+    "ratio": 1.046776,
+    "pct": 4.68
+   },
+   "reproduced": {
+    "baseline": null,
+    "pr_solution": null,
+    "baseline_sd": null,
+    "pr_solution_sd": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "unknown"
+   }
+  },
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": 1.0468,
+  "verdict": "unknown",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
+ }
 }

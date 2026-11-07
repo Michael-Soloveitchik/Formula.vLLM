@@ -19,5 +19,19 @@
  "note": "Initial FP8 (dynamic per-tensor scaling) enablement: loads FP16/BF16 checkpoints, quantizes weights to FP8 post-load, computes activation scales each forward pass. Enabled via --quantization fp8. The author's own measurements show FP8 is currently SLOWER than BF16 (Mistral-7B 1xH100: BF16 1.47s vs FP8 1.66s; comaniac's run: FP16 TTFT 28.8ms / ITL 8.5ms vs FP8 38.8ms / 10.2ms) because activation quantization adds large overhead. The author explicitly states 'we haven't achieved a decent performance with this FP8 support' and merges it to unblock follow-up optimizations. There is therefore no speedup gain to record; the eventual 2x-class FP8 wins land in later kernel PRs, not here. No timing experiment.",
  "experiments": [],
  "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
- "ts": "2026-11-05T00:00:00Z"
+ "ts": "2026-11-05T00:00:00Z",
+ "summary": {
+  "experiments": 0,
+  "measured": 0,
+  "headline": null,
+  "headline_derived": null,
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": null,
+  "verdict": "unknown",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
+ }
 }

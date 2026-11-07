@@ -31,9 +31,68 @@
     "scale_short": "Author compares a 2-GPU disaggregated topology against a 1-GPU aggregated one. TO MAKE 1:1: stand up the full 1P1D xPyD proxy + two A800 instances and a matched single-instance baseline, then run the serving benchmark measuring ITL P99.",
     "scale_note": "Multi-GPU disaggregated serving topology (proxy/router + P instance + D instance over NCCL); not reproducible on a single CPU/arm box. The 82% ITL drop is paid for by higher TTFT (160->227ms) and extra hardware (2x A800). Direction (lower ITL) is genuine for the disagg setup."
    },
-   "arms": {}
+   "arms": {},
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 127.0,
+     "pr_solution": 23.1,
+     "how": "absolute",
+     "ratio": 5.497835,
+     "pct": 449.78
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    }
+   }
   }
  ],
  "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
- "ts": "2026-11-05T00:00:00Z"
+ "ts": "2026-11-05T00:00:00Z",
+ "summary": {
+  "experiments": 1,
+  "measured": 0,
+  "headline": "intertoken_latency_p99",
+  "headline_derived": {
+   "unit": "ms",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": 127.0,
+    "pr_solution": 23.1,
+    "how": "absolute",
+    "ratio": 5.497835,
+    "pct": 449.78
+   },
+   "reproduced": {
+    "baseline": null,
+    "pr_solution": null,
+    "baseline_sd": null,
+    "pr_solution_sd": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "unknown"
+   }
+  },
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": 5.4978,
+  "verdict": "unknown",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
+ }
 }

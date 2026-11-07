@@ -30,9 +30,68 @@
     "scale_short": "Author published only a 5-15% E2E range (no absolute numbers) on FP8 Llama-3-8B; the kernel is CUTLASS fp8 GEMM which needs an fp8-capable GPU and cannot run on CPU. TO MAKE 1:1: run the FP8 model e2e on an fp8-capable GPU (e.g. H100) and compare tok/s with torch._scaled_mm vs cutlass_scaled_mm_dq.",
     "scale_note": "The win is a GPU fp8 GEMM kernel swap; magnitude varies with GEMM shape (per the linked spreadsheet and PR #5144 size sweep), so the 5-15% is an e2e range rather than a single isolated-op ratio. Recorded at the top of the author's range; there is no absolute baseline to anchor and no CPU path to time."
    },
-   "arms": {}
+   "arms": {},
+   "derived": {
+    "unit": "pct",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    }
+   }
   }
  ],
  "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
- "ts": "2026-11-05T00:00:00Z"
+ "ts": "2026-11-05T00:00:00Z",
+ "summary": {
+  "experiments": 1,
+  "measured": 0,
+  "headline": "fp8_cutlass_scaled_mm",
+  "headline_derived": {
+   "unit": "pct",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": null,
+    "pr_solution": null,
+    "how": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced": {
+    "baseline": null,
+    "pr_solution": null,
+    "baseline_sd": null,
+    "pr_solution_sd": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "unknown"
+   }
+  },
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": null,
+  "verdict": "unknown",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
+ }
 }

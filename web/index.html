@@ -465,7 +465,10 @@ function gainVs(val,baseVal,unit){
 //   {pct,   base?} -> a fractional improvement;         value = baseline*(1±pct)
 // baseline defaults to OUR measured baseline when the author gave none.
 // sign direction-aware: throughput improves UP, time improves DOWN.
-function resolveReported(rep,baseV,unit){
+function resolveReported(rep,baseV,unit,derived){
+ // preferred: numbers pre-computed by derive.py (results/<pr>.json experiments[i].derived); the browser does no math then
+ if(derived&&derived.reported&&derived.reported.pr_solution!=null)
+  return {value:+derived.reported.pr_solution, authorBase:derived.reported.baseline!=null?+derived.reported.baseline:null, how:derived.reported.how||'derived'};
  if(!rep) return null;
  const up=higherBetter(unit);
  if(rep.patch!=null) return {value:+rep.patch, authorBase:rep.base!=null?+rep.base:null, how:'absolute'};
@@ -509,7 +512,7 @@ function expTable(exp){
  const rep=exp.reported||null;
  const authorHasBase = !!(rep && rep.base!=null);
  const repB = authorHasBase ? +rep.base : null;   // author's OWN reported baseline (null if none)
- const Rr=resolveReported(rep,baseV,unit);
+ const Rr=resolveReported(rep,baseV,unit,exp.derived);
  const goldV=(a.gold||{}).mean;
  const SM='<span class="tag-m">(measured by us)</span>', SR='<span class="tag-r">(reported by author)</span>';
  // 1. baseline (reported by PR's author) — author's OLD-code number, or — if absent.

@@ -30,9 +30,68 @@
     "scale_short": "Author gave only a ratio (up to 3x) for unspecified 'large' lists, no absolute us/ms and no list size. TO MAKE 1:1: microbench _compute_slot_mapping_numpy vs _compute_slot_mapping_python at a fixed numel (e.g. 4096) and report the measured ratio in the same regime.",
     "scale_note": "This is a pure CPU list-building helper, so it is reproducible off-GPU, but the author published only a qualitative '3x' upper bound. pct is stored as 2.0 (3x = +200%) per the ratio shape; the author baseline renders as none and the solution is reconstructed from our measured baseline. Gain shrinks toward 1x as numel approaches the 256 switch threshold and the python path is slower only above it."
    },
-   "arms": {}
+   "arms": {},
+   "derived": {
+    "unit": "x",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    }
+   }
   }
  ],
  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
- "ts": "2026-11-05T00:00:00Z"
+ "ts": "2026-11-05T00:00:00Z",
+ "summary": {
+  "experiments": 1,
+  "measured": 0,
+  "headline": "compute_slot_mapping",
+  "headline_derived": {
+   "unit": "x",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": null,
+    "pr_solution": null,
+    "how": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced": {
+    "baseline": null,
+    "pr_solution": null,
+    "baseline_sd": null,
+    "pr_solution_sd": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "unknown"
+   }
+  },
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": null,
+  "verdict": "unknown",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
+ }
 }

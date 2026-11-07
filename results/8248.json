@@ -31,9 +31,68 @@
     "scale_short": "Author's 13351->27783 tok/s is whole-pipeline serving throughput on GPU; our microbench isolates only awq_dequantize/awq_gemm and cannot run Triton CUDA kernels on CPU. TO MAKE 1:1: on a CUDA box, time just awq_dequantize_kernel + awq_gemm_kernel on a fixed weight tile and report kernel tok/s or us/call, isolating them from the rest of the serving loop.",
     "scale_note": "The ~2x is real for the AWQ Triton path and even overtakes the hand-written AWQ CUDA kernel, but it is reported as E2E serving throughput, so the isolated-kernel ratio will differ. The kernels are Triton/CUDA-only and not reproducible on our arm CPU microbench; direction and rough magnitude are genuine."
    },
-   "arms": {}
+   "arms": {},
+   "derived": {
+    "unit": "tok/s",
+    "higher_is_better": true,
+    "reported": {
+     "baseline": 13351.06,
+     "pr_solution": 27783.36,
+     "how": "absolute",
+     "ratio": 2.080985,
+     "pct": 108.1
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    }
+   }
   }
  ],
  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
- "ts": "2026-11-05T00:00:00Z"
+ "ts": "2026-11-05T00:00:00Z",
+ "summary": {
+  "experiments": 1,
+  "measured": 0,
+  "headline": "awq_triton_dequantize_gemm",
+  "headline_derived": {
+   "unit": "tok/s",
+   "higher_is_better": true,
+   "reported": {
+    "baseline": 13351.06,
+    "pr_solution": 27783.36,
+    "how": "absolute",
+    "ratio": 2.080985,
+    "pct": 108.1
+   },
+   "reproduced": {
+    "baseline": null,
+    "pr_solution": null,
+    "baseline_sd": null,
+    "pr_solution_sd": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "unknown"
+   }
+  },
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": 2.081,
+  "verdict": "unknown",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
+ }
 }

@@ -19,5 +19,19 @@
  "note": "Model-enablement PR: adds Phi-3-mini (4k / 128k) support via a pure-PyTorch Phi3SuScaledRotaryEmbedding layer plus more robust llama layer-name mapping. The author explicitly says 'This is a pure Pytorch implementation. Optimizations may come in the future.' The '2-5x' the author mentions in a comment is a hypothetical for a FUTURE torch.compile of the rotary layer ('someone with more compile experience can add this feature later'); this PR does NOT add torch.compile and publishes no before/after benchmark for the merged code. No speedup experiment applies, so experiments is empty.",
  "experiments": [],
  "environment": "reported-only: no author speedup numbers (feature PR); no measured arm applicable",
- "ts": "2026-11-05T00:00:00Z"
+ "ts": "2026-11-05T00:00:00Z",
+ "summary": {
+  "experiments": 0,
+  "measured": 0,
+  "headline": null,
+  "headline_derived": null,
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": null,
+  "verdict": "unknown",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
+ }
 }

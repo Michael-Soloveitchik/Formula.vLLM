@@ -32,6 +32,29 @@
      "sd": 7.1671,
      "n": 5
     }
+   },
+   "derived": {
+    "unit": "tok/s",
+    "higher_is_better": true,
+    "reported": {
+     "baseline": 2260.996,
+     "pr_solution": 2307.798617,
+     "how": "our baseline \u00b1 %",
+     "ratio": 1.0207,
+     "pct": 2.07
+    },
+    "reproduced": {
+     "baseline": 2260.996,
+     "pr_solution": 2265.852,
+     "baseline_sd": 15.9951,
+     "pr_solution_sd": 17.7261,
+     "ratio": 1.002148,
+     "pct": 0.21
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": 0.982,
+     "verdict": "reproduced"
+    }
    }
   },
   {
@@ -60,6 +83,29 @@
      "sd": 83.4941,
      "n": 5
     }
+   },
+   "derived": {
+    "unit": "tok/s",
+    "higher_is_better": true,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 26377.464,
+     "pr_solution": 26434.172,
+     "baseline_sd": 186.527,
+     "pr_solution_sd": 206.8499,
+     "ratio": 1.00215,
+     "pct": 0.21
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
    }
   },
   {
@@ -87,6 +133,29 @@
      "mean": 30.426,
      "sd": 0.0974,
      "n": 5
+    }
+   },
+   "derived": {
+    "unit": "req/s",
+    "higher_is_better": true,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 30.146,
+     "pr_solution": 30.212,
+     "baseline_sd": 0.213,
+     "pr_solution_sd": 0.2366,
+     "ratio": 1.002189,
+     "pct": 0.22
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
     }
    }
   }
@@ -246,5 +315,41 @@
    "claude + PR's solution"
   ],
   "note": "solver arms recorded by an earlier --run-formula-harnesses run; baseline / PR's solution re-measured by --reproduce"
+ },
+ "summary": {
+  "experiments": 3,
+  "measured": 3,
+  "headline": "throughput_output_tok_s",
+  "headline_derived": {
+   "unit": "tok/s",
+   "higher_is_better": true,
+   "reported": {
+    "baseline": 2260.996,
+    "pr_solution": 2307.798617,
+    "how": "our baseline \u00b1 %",
+    "ratio": 1.0207,
+    "pct": 2.07
+   },
+   "reproduced": {
+    "baseline": 2260.996,
+    "pr_solution": 2265.852,
+    "baseline_sd": 15.9951,
+    "pr_solution_sd": 17.7261,
+    "ratio": 1.002148,
+    "pct": 0.21
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": 0.982,
+    "verdict": "reproduced"
+   }
+  },
+  "reproduced_ratio_median": 1.0022,
+  "reproduced_ratio_max": 1.0022,
+  "reported_ratio_median": 1.0207,
+  "verdict": "reproduced",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
  }
 }

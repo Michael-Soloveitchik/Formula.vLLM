@@ -20,6 +20,29 @@
      "sd": 0.0,
      "n": 5
     }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 0.0015,
+     "pr_solution": 0.004,
+     "baseline_sd": 0.0,
+     "pr_solution_sd": 0.0,
+     "ratio": 0.375,
+     "pct": -62.5
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "regression"
+    }
    }
   },
   {
@@ -41,6 +64,29 @@
      "sd": 0.0036,
      "n": 5
     }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 16.3273,
+     "pr_solution": 1.9819,
+     "baseline_sd": 0.1054,
+     "pr_solution_sd": 0.0036,
+     "ratio": 8.238206,
+     "pct": 723.82
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
    }
   },
   {
@@ -61,6 +107,29 @@
      "mean": 0.0309,
      "sd": 0.0005,
      "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 0.0228,
+     "pr_solution": 0.0309,
+     "baseline_sd": 0.0001,
+     "pr_solution_sd": 0.0005,
+     "ratio": 0.737864,
+     "pct": -26.21
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "regression"
     }
    }
   }
@@ -150,5 +219,41 @@
    "workload_runs": 5
   }
  },
- "ts": "2026-11-07T16:42:54Z"
+ "ts": "2026-11-07T16:42:54Z",
+ "summary": {
+  "experiments": 3,
+  "measured": 3,
+  "headline": "move_from_buffer",
+  "headline_derived": {
+   "unit": "us",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": null,
+    "pr_solution": null,
+    "how": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced": {
+    "baseline": 0.0015,
+    "pr_solution": 0.004,
+    "baseline_sd": 0.0,
+    "pr_solution_sd": 0.0,
+    "ratio": 0.375,
+    "pct": -62.5
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "regression"
+   }
+  },
+  "reproduced_ratio_median": 0.7379,
+  "reproduced_ratio_max": 8.2382,
+  "reported_ratio_median": null,
+  "verdict": "regression",
+  "tests": {
+   "base": "FAIL",
+   "gold": "PASS"
+  }
+ }
 }

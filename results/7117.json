@@ -31,9 +31,68 @@
     "scale_short": "Author's req/s is whole-model Llama-3-8B serving; the diff only shortcuts the CPU output-processing path. TO MAKE 1:1: microbench _process_sequence_group_outputs alone for the n==1 non-beam case, general path vs shortcut, on CPU.",
     "scale_note": "SAME unit (req/s) but 24.24 -> 24.62 is GPU-bound E2E Llama-3-8B throughput; the output-processing shortcut is a CPU-path win nearly hidden by model compute, hence only ~1.5%. Isolated on CPU the relative savings of skipping the child-seq/beam machinery is larger. Direction genuine; magnitude diluted by GPU work."
    },
-   "arms": {}
+   "arms": {},
+   "derived": {
+    "unit": "req/s",
+    "higher_is_better": true,
+    "reported": {
+     "baseline": 24.24,
+     "pr_solution": 24.62,
+     "how": "absolute",
+     "ratio": 1.015677,
+     "pct": 1.57
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    }
+   }
   }
  ],
  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
- "ts": "2026-11-05T00:00:00Z"
+ "ts": "2026-11-05T00:00:00Z",
+ "summary": {
+  "experiments": 1,
+  "measured": 0,
+  "headline": "output_processing_shortcut_throughput",
+  "headline_derived": {
+   "unit": "req/s",
+   "higher_is_better": true,
+   "reported": {
+    "baseline": 24.24,
+    "pr_solution": 24.62,
+    "how": "absolute",
+    "ratio": 1.015677,
+    "pct": 1.57
+   },
+   "reproduced": {
+    "baseline": null,
+    "pr_solution": null,
+    "baseline_sd": null,
+    "pr_solution_sd": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "unknown"
+   }
+  },
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": 1.0157,
+  "verdict": "unknown",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
+ }
 }

@@ -9,7 +9,30 @@
     "base": 79.0,
     "patch": 22.0
    },
-   "arms": {}
+   "arms": {},
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 79.0,
+     "pr_solution": 22.0,
+     "how": "absolute",
+     "ratio": 3.590909,
+     "pct": 259.09
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    }
+   }
   },
   {
    "name": "e2e_qwen05b",
@@ -19,7 +42,30 @@
     "base": 24.76,
     "patch": 29.44
    },
-   "arms": {}
+   "arms": {},
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 24.76,
+     "pr_solution": 29.44,
+     "how": "absolute",
+     "ratio": 0.841033,
+     "pct": -15.9
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    }
+   }
   }
  ],
  "pr": 6779,
@@ -59,5 +105,41 @@
    "workload_runs": 1
   }
  },
- "ts": "2026-11-07T16:11:29Z"
+ "ts": "2026-11-07T16:11:29Z",
+ "summary": {
+  "experiments": 2,
+  "measured": 0,
+  "headline": "make_tensor_with_pad",
+  "headline_derived": {
+   "unit": "ms",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": 79.0,
+    "pr_solution": 22.0,
+    "how": "absolute",
+    "ratio": 3.590909,
+    "pct": 259.09
+   },
+   "reproduced": {
+    "baseline": null,
+    "pr_solution": null,
+    "baseline_sd": null,
+    "pr_solution_sd": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "unknown"
+   }
+  },
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": 2.216,
+  "verdict": "unknown",
+  "tests": {
+   "base": "SKIP",
+   "gold": "SKIP"
+  }
+ }
 }

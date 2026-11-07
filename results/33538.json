@@ -26,7 +26,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 0.28,
+     "pr_solution": 0.067,
+     "how": "absolute",
+     "ratio": 4.179104,
+     "pct": 317.91
+    },
+    "reproduced": {
+     "baseline": 1.214,
+     "pr_solution": 0.1094,
+     "baseline_sd": 0.0195,
+     "pr_solution_sd": 0.0447,
+     "ratio": 11.096892,
+     "pct": 1009.69
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": 2.655,
+     "verdict": "reproduced"
+    }
+   }
   },
   {
    "name": "topp_whole_b16_v32768",
@@ -53,7 +76,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 0.361,
+     "pr_solution": 0.184,
+     "how": "absolute",
+     "ratio": 1.961957,
+     "pct": 96.2
+    },
+    "reproduced": {
+     "baseline": 1.2634,
+     "pr_solution": 0.3024,
+     "baseline_sd": 0.0123,
+     "pr_solution_sd": 0.0102,
+     "ratio": 4.17791,
+     "pct": 317.79
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": 2.129,
+     "verdict": "reproduced"
+    }
+   }
   },
   {
    "name": "topk_topp_whole_b16_v32768",
@@ -80,7 +126,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 0.242,
+     "pr_solution": 0.093,
+     "how": "absolute",
+     "ratio": 2.602151,
+     "pct": 160.22
+    },
+    "reproduced": {
+     "baseline": 1.3186,
+     "pr_solution": 0.1298,
+     "baseline_sd": 0.019,
+     "pr_solution_sd": 0.0277,
+     "ratio": 10.158706,
+     "pct": 915.87
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": 3.904,
+     "verdict": "reproduced"
+    }
+   }
   },
   {
    "name": "mixed_partial_b16_v32768",
@@ -107,7 +176,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 0.266,
+     "pr_solution": 0.205,
+     "how": "absolute",
+     "ratio": 1.297561,
+     "pct": 29.76
+    },
+    "reproduced": {
+     "baseline": 1.424,
+     "pr_solution": 0.1246,
+     "baseline_sd": 0.2419,
+     "pr_solution_sd": 0.0264,
+     "ratio": 11.428571,
+     "pct": 1042.86
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": 8.808,
+     "verdict": "reproduced"
+    }
+   }
   },
   {
    "name": "topk_whole_b1_v32768",
@@ -134,7 +226,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 0.101,
+     "pr_solution": 0.065,
+     "how": "absolute",
+     "ratio": 1.553846,
+     "pct": 55.38
+    },
+    "reproduced": {
+     "baseline": 0.2806,
+     "pr_solution": 0.0964,
+     "baseline_sd": 0.1026,
+     "pr_solution_sd": 0.0245,
+     "ratio": 2.910788,
+     "pct": 191.08
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": 1.873,
+     "verdict": "reproduced"
+    }
+   }
   },
   {
    "name": "topk_whole_b128_v32768",
@@ -158,7 +273,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 1.4242,
+     "pr_solution": 0.3522,
+     "baseline_sd": 0.5914,
+     "pr_solution_sd": 0.0372,
+     "ratio": 4.043725,
+     "pct": 304.37
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topk_topp_whole_b2048_v131072",
@@ -182,7 +320,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 94.0044,
+     "pr_solution": 6.343,
+     "baseline_sd": 0.0329,
+     "pr_solution_sd": 0.0094,
+     "ratio": 14.82018,
+     "pct": 1382.02
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "mixed_partial_b128_v131072",
@@ -206,7 +367,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 5.8774,
+     "pr_solution": 0.5264,
+     "baseline_sd": 0.0196,
+     "pr_solution_sd": 0.0047,
+     "ratio": 11.165274,
+     "pct": 1016.53
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "mixed_partial_b128_v32768",
@@ -230,7 +414,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 2.108,
+     "pr_solution": 0.1694,
+     "baseline_sd": 0.0102,
+     "pr_solution_sd": 0.0044,
+     "ratio": 12.44392,
+     "pct": 1144.39
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "mixed_partial_b16_v131072",
@@ -254,7 +461,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 0.7746,
+     "pr_solution": 0.2208,
+     "baseline_sd": 0.0216,
+     "pr_solution_sd": 0.0074,
+     "ratio": 3.508152,
+     "pct": 250.82
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "mixed_partial_b1_v131072",
@@ -278,7 +508,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 0.453,
+     "pr_solution": 0.1762,
+     "baseline_sd": 0.2083,
+     "pr_solution_sd": 0.0085,
+     "ratio": 2.570942,
+     "pct": 157.09
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "mixed_partial_b1_v32768",
@@ -302,7 +555,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 0.3742,
+     "pr_solution": 0.0996,
+     "baseline_sd": 0.1151,
+     "pr_solution_sd": 0.0259,
+     "ratio": 3.757028,
+     "pct": 275.7
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "mixed_partial_b2048_v131072",
@@ -326,7 +602,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 94.0534,
+     "pr_solution": 6.576,
+     "baseline_sd": 0.0417,
+     "pr_solution_sd": 0.0137,
+     "ratio": 14.302524,
+     "pct": 1330.25
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "mixed_partial_b2048_v32768",
@@ -350,7 +649,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 23.1896,
+     "pr_solution": 1.9278,
+     "baseline_sd": 0.0136,
+     "pr_solution_sd": 0.003,
+     "ratio": 12.029049,
+     "pct": 1102.9
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topk_partial_b128_v131072",
@@ -374,7 +696,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 5.0958,
+     "pr_solution": 0.155,
+     "baseline_sd": 0.022,
+     "pr_solution_sd": 0.0031,
+     "ratio": 32.876129,
+     "pct": 3187.61
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topk_partial_b128_v32768",
@@ -398,7 +743,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 1.1536,
+     "pr_solution": 0.1032,
+     "baseline_sd": 0.0097,
+     "pr_solution_sd": 0.0268,
+     "ratio": 11.178295,
+     "pct": 1017.83
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topk_partial_b16_v131072",
@@ -422,7 +790,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 0.6004,
+     "pr_solution": 0.1324,
+     "baseline_sd": 0.0758,
+     "pr_solution_sd": 0.0055,
+     "ratio": 4.534743,
+     "pct": 353.47
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topk_partial_b16_v32768",
@@ -446,7 +837,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 1.2356,
+     "pr_solution": 0.1322,
+     "baseline_sd": 0.0234,
+     "pr_solution_sd": 0.0386,
+     "ratio": 9.346445,
+     "pct": 834.64
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topk_partial_b1_v131072",
@@ -470,7 +884,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 0.3254,
+     "pr_solution": 0.076,
+     "baseline_sd": 0.1036,
+     "pr_solution_sd": 0.0357,
+     "ratio": 4.281579,
+     "pct": 328.16
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topk_partial_b1_v32768",
@@ -494,7 +931,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 0.2328,
+     "pr_solution": 0.0728,
+     "baseline_sd": 0.0847,
+     "pr_solution_sd": 0.0169,
+     "ratio": 3.197802,
+     "pct": 219.78
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topk_partial_b2048_v131072",
@@ -518,7 +978,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 81.5878,
+     "pr_solution": 2.0992,
+     "baseline_sd": 0.0288,
+     "pr_solution_sd": 0.0108,
+     "ratio": 38.866139,
+     "pct": 3786.61
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topk_partial_b2048_v32768",
@@ -542,7 +1025,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 20.4294,
+     "pr_solution": 0.6478,
+     "baseline_sd": 0.0259,
+     "pr_solution_sd": 0.0018,
+     "ratio": 31.536585,
+     "pct": 3053.66
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topk_topp_whole_b128_v131072",
@@ -566,7 +1072,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 5.8824,
+     "pr_solution": 0.4168,
+     "baseline_sd": 0.0207,
+     "pr_solution_sd": 0.004,
+     "ratio": 14.113244,
+     "pct": 1311.32
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topk_topp_whole_b128_v32768",
@@ -590,7 +1119,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 2.1246,
+     "pr_solution": 0.1724,
+     "baseline_sd": 0.0217,
+     "pr_solution_sd": 0.0104,
+     "ratio": 12.323666,
+     "pct": 1132.37
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topk_topp_whole_b16_v131072",
@@ -614,7 +1166,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 6.8312,
+     "pr_solution": 0.2044,
+     "baseline_sd": 0.6445,
+     "pr_solution_sd": 0.0269,
+     "ratio": 33.420744,
+     "pct": 3242.07
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topk_topp_whole_b1_v131072",
@@ -638,7 +1213,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 0.4092,
+     "pr_solution": 0.186,
+     "baseline_sd": 0.1075,
+     "pr_solution_sd": 0.019,
+     "ratio": 2.2,
+     "pct": 120.0
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topk_topp_whole_b1_v32768",
@@ -662,7 +1260,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 0.3886,
+     "pr_solution": 0.0916,
+     "baseline_sd": 0.1301,
+     "pr_solution_sd": 0.0205,
+     "ratio": 4.242358,
+     "pct": 324.24
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topk_topp_whole_b2048_v32768",
@@ -686,7 +1307,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 23.2102,
+     "pr_solution": 2.1006,
+     "baseline_sd": 0.0109,
+     "pr_solution_sd": 0.0032,
+     "ratio": 11.049319,
+     "pct": 1004.93
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topk_whole_b128_v131072",
@@ -710,7 +1354,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 5.0866,
+     "pr_solution": 0.288,
+     "baseline_sd": 0.0168,
+     "pr_solution_sd": 0.0036,
+     "ratio": 17.661806,
+     "pct": 1666.18
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topk_whole_b16_v131072",
@@ -734,7 +1401,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 5.6788,
+     "pr_solution": 0.1458,
+     "baseline_sd": 1.8976,
+     "pr_solution_sd": 0.0089,
+     "ratio": 38.949246,
+     "pct": 3794.92
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topk_whole_b1_v131072",
@@ -758,7 +1448,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 0.2858,
+     "pr_solution": 0.1326,
+     "baseline_sd": 0.04,
+     "pr_solution_sd": 0.005,
+     "ratio": 2.155354,
+     "pct": 115.54
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topk_whole_b2048_v131072",
@@ -782,7 +1495,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 81.5694,
+     "pr_solution": 4.0892,
+     "baseline_sd": 0.0471,
+     "pr_solution_sd": 0.0347,
+     "ratio": 19.94752,
+     "pct": 1894.75
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topk_whole_b2048_v32768",
@@ -806,7 +1542,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 20.4296,
+     "pr_solution": 1.2596,
+     "baseline_sd": 0.0182,
+     "pr_solution_sd": 0.0021,
+     "ratio": 16.219117,
+     "pct": 1521.91
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topp_partial_b128_v131072",
@@ -830,7 +1589,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 5.558,
+     "pr_solution": 0.3376,
+     "baseline_sd": 0.015,
+     "pr_solution_sd": 0.0022,
+     "ratio": 16.46327,
+     "pct": 1546.33
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topp_partial_b128_v32768",
@@ -854,7 +1636,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 1.2398,
+     "pr_solution": 0.333,
+     "baseline_sd": 0.0218,
+     "pr_solution_sd": 0.0179,
+     "ratio": 3.723123,
+     "pct": 272.31
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topp_partial_b16_v131072",
@@ -878,7 +1683,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 0.8884,
+     "pr_solution": 0.2944,
+     "baseline_sd": 0.0208,
+     "pr_solution_sd": 0.0086,
+     "ratio": 3.017663,
+     "pct": 201.77
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topp_partial_b16_v32768",
@@ -902,7 +1730,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 1.2712,
+     "pr_solution": 0.323,
+     "baseline_sd": 0.0229,
+     "pr_solution_sd": 0.0267,
+     "ratio": 3.935604,
+     "pct": 293.56
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topp_partial_b1_v131072",
@@ -926,7 +1777,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 0.3266,
+     "pr_solution": 0.097,
+     "baseline_sd": 0.1006,
+     "pr_solution_sd": 0.0324,
+     "ratio": 3.36701,
+     "pct": 236.7
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topp_partial_b1_v32768",
@@ -950,7 +1824,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 0.274,
+     "pr_solution": 0.0656,
+     "baseline_sd": 0.0865,
+     "pr_solution_sd": 0.017,
+     "ratio": 4.176829,
+     "pct": 317.68
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topp_partial_b2048_v131072",
@@ -974,7 +1871,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 89.256,
+     "pr_solution": 4.3616,
+     "baseline_sd": 0.0318,
+     "pr_solution_sd": 0.0098,
+     "ratio": 20.46405,
+     "pct": 1946.4
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topp_partial_b2048_v32768",
@@ -998,7 +1918,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 22.0048,
+     "pr_solution": 4.5072,
+     "baseline_sd": 0.0143,
+     "pr_solution_sd": 0.0227,
+     "ratio": 4.882144,
+     "pct": 388.21
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topp_whole_b128_v131072",
@@ -1022,7 +1965,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 5.56,
+     "pr_solution": 0.6344,
+     "baseline_sd": 0.0146,
+     "pr_solution_sd": 0.0059,
+     "ratio": 8.764187,
+     "pct": 776.42
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topp_whole_b128_v32768",
@@ -1046,7 +2012,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 1.2364,
+     "pr_solution": 0.6216,
+     "baseline_sd": 0.0105,
+     "pr_solution_sd": 0.0027,
+     "ratio": 1.98906,
+     "pct": 98.91
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topp_whole_b16_v131072",
@@ -1070,7 +2059,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 0.892,
+     "pr_solution": 0.2906,
+     "baseline_sd": 0.0072,
+     "pr_solution_sd": 0.0131,
+     "ratio": 3.069511,
+     "pct": 206.95
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topp_whole_b1_v131072",
@@ -1094,7 +2106,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 0.367,
+     "pr_solution": 0.2716,
+     "baseline_sd": 0.1129,
+     "pr_solution_sd": 0.0106,
+     "ratio": 1.351252,
+     "pct": 35.13
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topp_whole_b1_v32768",
@@ -1118,7 +2153,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 0.323,
+     "pr_solution": 0.2934,
+     "baseline_sd": 0.1002,
+     "pr_solution_sd": 0.0038,
+     "ratio": 1.100886,
+     "pct": 10.09
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topp_whole_b2048_v131072",
@@ -1142,7 +2200,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 89.2514,
+     "pr_solution": 8.5346,
+     "baseline_sd": 0.0549,
+     "pr_solution_sd": 0.0689,
+     "ratio": 10.457596,
+     "pct": 945.76
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   },
   {
    "name": "topp_whole_b2048_v32768",
@@ -1166,7 +2247,30 @@
      "n": 5
     }
    },
-   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number."
+   "note": "The benchmark script and the Triton kernel are both introduced by this PR. The base tree has no Triton implementation, so the base arm cannot run the script; the script's own 'PyTorch (ms)' column (the pre-PR sort-based sampler, run in the same process) is the base number.",
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 22.0094,
+     "pr_solution": 8.8606,
+     "baseline_sd": 0.0118,
+     "pr_solution_sd": 0.1151,
+     "ratio": 2.483963,
+     "pct": 148.4
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    }
+   }
   }
  ],
  "pr": 33538,
@@ -2120,5 +3224,41 @@
    "claude + PR's solution"
   ],
   "note": "solver arms recorded by an earlier --run-formula-harnesses run; baseline / PR's solution re-measured by --reproduce"
+ },
+ "summary": {
+  "experiments": 48,
+  "measured": 48,
+  "headline": "topk_whole_b16_v32768",
+  "headline_derived": {
+   "unit": "ms",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": 0.28,
+    "pr_solution": 0.067,
+    "how": "absolute",
+    "ratio": 4.179104,
+    "pct": 317.91
+   },
+   "reproduced": {
+    "baseline": 1.214,
+    "pr_solution": 0.1094,
+    "baseline_sd": 0.0195,
+    "pr_solution_sd": 0.0447,
+    "ratio": 11.096892,
+    "pct": 1009.69
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": 2.655,
+    "verdict": "reproduced"
+   }
+  },
+  "reproduced_ratio_median": 9.0553,
+  "reproduced_ratio_max": 38.9492,
+  "reported_ratio_median": 1.962,
+  "verdict": "reproduced",
+  "tests": {
+   "base": "FAIL",
+   "gold": "PASS"
+  }
  }
 }

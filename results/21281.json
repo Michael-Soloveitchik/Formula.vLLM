@@ -9,7 +9,30 @@
     "base": 130.0,
     "patch": 30.0
    },
-   "arms": {}
+   "arms": {},
+   "derived": {
+    "unit": "us/op",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 130.0,
+     "pr_solution": 30.0,
+     "how": "absolute",
+     "ratio": 4.333333,
+     "pct": 333.33
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    }
+   }
   }
  ],
  "pr": 21281,
@@ -49,5 +72,41 @@
    "workload_runs": 1
   }
  },
- "ts": "2026-11-07T16:06:18Z"
+ "ts": "2026-11-07T16:06:18Z",
+ "summary": {
+  "experiments": 1,
+  "measured": 0,
+  "headline": "allocate_new_block",
+  "headline_derived": {
+   "unit": "us/op",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": 130.0,
+    "pr_solution": 30.0,
+    "how": "absolute",
+    "ratio": 4.333333,
+    "pct": 333.33
+   },
+   "reproduced": {
+    "baseline": null,
+    "pr_solution": null,
+    "baseline_sd": null,
+    "pr_solution_sd": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "unknown"
+   }
+  },
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": 4.3333,
+  "verdict": "unknown",
+  "tests": {
+   "base": "SKIP",
+   "gold": "SKIP"
+  }
+ }
 }

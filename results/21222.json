@@ -9,7 +9,30 @@
     "base": 150.0,
     "patch": 8.0
    },
-   "arms": {}
+   "arms": {},
+   "derived": {
+    "unit": "us/op",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 150.0,
+     "pr_solution": 8.0,
+     "how": "absolute",
+     "ratio": 18.75,
+     "pct": 1775.0
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    }
+   }
   },
   {
    "name": "free_blocks",
@@ -19,7 +42,30 @@
     "base": 33.0,
     "patch": 9.0
    },
-   "arms": {}
+   "arms": {},
+   "derived": {
+    "unit": "us/op",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 33.0,
+     "pr_solution": 9.0,
+     "how": "absolute",
+     "ratio": 3.666667,
+     "pct": 266.67
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    }
+   }
   }
  ],
  "pr": 21222,
@@ -67,5 +113,41 @@
    "workload_runs": 1
   }
  },
- "ts": "2026-11-07T16:05:02Z"
+ "ts": "2026-11-07T16:05:02Z",
+ "summary": {
+  "experiments": 2,
+  "measured": 0,
+  "headline": "get_new_blocks",
+  "headline_derived": {
+   "unit": "us/op",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": 150.0,
+    "pr_solution": 8.0,
+    "how": "absolute",
+    "ratio": 18.75,
+    "pct": 1775.0
+   },
+   "reproduced": {
+    "baseline": null,
+    "pr_solution": null,
+    "baseline_sd": null,
+    "pr_solution_sd": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "unknown"
+   }
+  },
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": 11.2083,
+  "verdict": "unknown",
+  "tests": {
+   "base": "FAIL",
+   "gold": "FAIL"
+  }
+ }
 }

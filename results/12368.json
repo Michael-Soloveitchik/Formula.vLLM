@@ -24,15 +24,74 @@
    "needs": "gpu",
    "note": "Diff adds env var VLLM_LOGITS_PROCESSOR_THREADS (envs.py) and a ThreadPoolExecutor in logits_processor.py that fans the per-sequence logits-processor calls across threads. Number is the author's qualitative '~10% improvement in tok/s and req/s'; author explicitly could not share raw numbers or traces.",
    "reported": {
-    "pct": 0.10,
+    "pct": 0.1,
     "comparable": false,
     "scope": "end-to-end GPU serving tok/s & req/s with a proprietary custom logits processor at concurrency ~50 and threadpool size 50 (author's internal workload, no in-tree LP shown to benefit)",
     "scale_short": "Author's 10% is whole-run E2E with a private logits processor we cannot run; the feature is also off by default and no in-tree LP (e.g. xgrammar) was shown to benefit. TO MAKE 1:1: stand up GPU serving with a CUDA-launching or GIL-releasing custom LP at concurrency 50, set VLLM_LOGITS_PROCESSOR_THREADS=50, and compare steady-state tok/s on vs off.",
     "scale_note": "The gain requires a logits processor that either launches extra CUDA kernels or does CPU-bound work while releasing the GIL; the author even added a CUDA sync so threaded LPs don't block each other on the cudaMemcpy lock. With no benefiting in-tree processor and only a published percentage, there is no isolated micro-op to time and no absolute baseline to anchor."
    },
-   "arms": {}
+   "arms": {},
+   "derived": {
+    "unit": "tok/s",
+    "higher_is_better": true,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    }
+   }
   }
  ],
  "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
- "ts": "2026-11-05T00:00:00Z"
+ "ts": "2026-11-05T00:00:00Z",
+ "summary": {
+  "experiments": 1,
+  "measured": 0,
+  "headline": "logits_processor_threadpool",
+  "headline_derived": {
+   "unit": "tok/s",
+   "higher_is_better": true,
+   "reported": {
+    "baseline": null,
+    "pr_solution": null,
+    "how": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced": {
+    "baseline": null,
+    "pr_solution": null,
+    "baseline_sd": null,
+    "pr_solution_sd": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "unknown"
+   }
+  },
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": null,
+  "verdict": "unknown",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
+ }
 }

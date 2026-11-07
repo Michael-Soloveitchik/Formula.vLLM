@@ -135,6 +135,9 @@ def main():
         old_p = os.path.join(HERE, "results", f"{pr}.json")
         if os.path.exists(old_p):
             carry_over_solver_arms(out, json.load(open(old_p)))
+    # derived numbers (reported vs reproduced, ratios, verdict) are computed HERE and dumped; the web only displays
+    from derive import derive_pr
+    derive_pr(out, (meta.get("workload") or {}).get("headline"))
     tmp = os.path.join(work, "result.json")
     json.dump(out, open(tmp, "w"), indent=1)
     subprocess.run([sys.executable, os.path.join(HERE, "aggregate.py"), "--write", str(pr), tmp], check=True)

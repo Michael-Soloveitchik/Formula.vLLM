@@ -31,9 +31,68 @@
     "scale_short": "Author's latency is the whole command-r decode step; the diff only compiles the layernorm function. TO MAKE 1:1: microbench the isolated layer_norm_func on a command-r-shaped hidden-state tensor, base eager vs compiled.",
     "scale_note": "SAME unit (s) but 2.9004 -> 2.7343 s is the whole-model avg decode latency (tp=4, batch=8), dominated by attention and MLP; the ~5% reflects the layernorm compile win diluted across the full step. Direction genuine; absolute seconds are whole-step, not the isolated layernorm op."
    },
-   "arms": {}
+   "arms": {},
+   "derived": {
+    "unit": "s",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 2.9004,
+     "pr_solution": 2.7343,
+     "how": "absolute",
+     "ratio": 1.060747,
+     "pct": 6.07
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    }
+   }
   }
  ],
  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
- "ts": "2026-11-05T00:00:00Z"
+ "ts": "2026-11-05T00:00:00Z",
+ "summary": {
+  "experiments": 1,
+  "measured": 0,
+  "headline": "commandr_layernorm_latency",
+  "headline_derived": {
+   "unit": "s",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": 2.9004,
+    "pr_solution": 2.7343,
+    "how": "absolute",
+    "ratio": 1.060747,
+    "pct": 6.07
+   },
+   "reproduced": {
+    "baseline": null,
+    "pr_solution": null,
+    "baseline_sd": null,
+    "pr_solution_sd": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "unknown"
+   }
+  },
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": 1.0607,
+  "verdict": "unknown",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
+ }
 }

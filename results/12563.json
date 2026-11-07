@@ -31,9 +31,68 @@
     "scale_short": "Author's number is full E2E single-request decode tok/s on an H100; the win is a GPU async-copy / kernel-pre-launch effect not reproducible on CPU. TO MAKE 1:1: run Llama 3.1 8B with xgrammar guided decoding single-request on a CUDA device and measure decode tok/s with the bitmask copy blocking vs non_blocking=True.",
     "scale_note": "The speedup comes from hiding a blocking H2D bitmask transfer behind sampler-kernel launches (nsys traces in the PR body). It only manifests under real CUDA stream overlap; an isolated CPU timing of the .to() call cannot exercise the stream-synchronize that the fix elides, so the ~5% E2E figure is not 1:1 with any CPU microbench."
    },
-   "arms": {}
+   "arms": {},
+   "derived": {
+    "unit": "tok/s",
+    "higher_is_better": true,
+    "reported": {
+     "baseline": 87.5,
+     "pr_solution": 92.0,
+     "how": "absolute",
+     "ratio": 1.051429,
+     "pct": 5.14
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    }
+   }
   }
  ],
  "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
- "ts": "2026-11-05T00:00:00Z"
+ "ts": "2026-11-05T00:00:00Z",
+ "summary": {
+  "experiments": 1,
+  "measured": 0,
+  "headline": "guided_decode_bitmask_async_copy",
+  "headline_derived": {
+   "unit": "tok/s",
+   "higher_is_better": true,
+   "reported": {
+    "baseline": 87.5,
+    "pr_solution": 92.0,
+    "how": "absolute",
+    "ratio": 1.051429,
+    "pct": 5.14
+   },
+   "reproduced": {
+    "baseline": null,
+    "pr_solution": null,
+    "baseline_sd": null,
+    "pr_solution_sd": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "unknown"
+   }
+  },
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": 1.0514,
+  "verdict": "unknown",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
+ }
 }

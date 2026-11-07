@@ -31,9 +31,68 @@
     "scale_short": "Author's number is whole-model E2E serving TPOT on 8x H200 with DeepSeek-R1; it is a system-level spec-decode win driven by token-acceptance, not a reproducible micro-op. Only QPS<=4 gains; QPS>=6 regresses. TO MAKE 1:1: serve DeepSeek-R1 TP=8 on 8x H200 with --num-speculative-tokens 1, drive QPS=1, and measure mean TPOT baseline vs MTP.",
     "scale_note": "TPOT improvement comes from ~81-82% MTP draft acceptance shrinking decode steps; it depends on QPS, concurrency, and draft TP and cannot be isolated on a single CPU/GPU op. The table also shows the effect inverting (<1.0x) at QPS 6-8 as batching saturates, so the headline 1.69x is a low-load best case, not a uniform speedup."
    },
-   "arms": {}
+   "arms": {},
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 55.47,
+     "pr_solution": 32.64,
+     "how": "absolute",
+     "ratio": 1.699449,
+     "pct": 69.94
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    }
+   }
   }
  ],
  "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
- "ts": "2026-11-05T00:00:00Z"
+ "ts": "2026-11-05T00:00:00Z",
+ "summary": {
+  "experiments": 1,
+  "measured": 0,
+  "headline": "deepseek_mtp_spec_decode_tpot",
+  "headline_derived": {
+   "unit": "ms",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": 55.47,
+    "pr_solution": 32.64,
+    "how": "absolute",
+    "ratio": 1.699449,
+    "pct": 69.94
+   },
+   "reproduced": {
+    "baseline": null,
+    "pr_solution": null,
+    "baseline_sd": null,
+    "pr_solution_sd": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "unknown"
+   }
+  },
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": 1.6994,
+  "verdict": "unknown",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
+ }
 }

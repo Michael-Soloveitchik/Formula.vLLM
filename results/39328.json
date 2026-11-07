@@ -55,6 +55,29 @@
      "speedup_sd": 256.867,
      "counts": true
     }
+   },
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 32.5,
+     "pr_solution": 11.3,
+     "how": "absolute",
+     "ratio": 2.876106,
+     "pct": 187.61
+    },
+    "reproduced": {
+     "baseline": 0.354834,
+     "pr_solution": 0.001002,
+     "baseline_sd": 0.030611,
+     "pr_solution_sd": 0.000985,
+     "ratio": 354.125749,
+     "pct": 35312.57
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": 123.127,
+     "verdict": "reproduced"
+    }
    }
   },
   {
@@ -66,9 +89,68 @@
     "base": 34.1,
     "patch": 29.7
    },
-   "arms": {}
+   "arms": {},
+   "derived": {
+    "unit": "s",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 34.1,
+     "pr_solution": 29.7,
+     "how": "absolute",
+     "ratio": 1.148148,
+     "pct": 14.81
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    }
+   }
   }
  ],
  "environment": "docker python:3.12-slim cpu colima arm64",
- "ts": "2026-11-04T00:00:00Z"
+ "ts": "2026-11-04T00:00:00Z",
+ "summary": {
+  "experiments": 2,
+  "measured": 1,
+  "headline": "cache_lookup",
+  "headline_derived": {
+   "unit": "ms",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": 32.5,
+    "pr_solution": 11.3,
+    "how": "absolute",
+    "ratio": 2.876106,
+    "pct": 187.61
+   },
+   "reproduced": {
+    "baseline": 0.354834,
+    "pr_solution": 0.001002,
+    "baseline_sd": 0.030611,
+    "pr_solution_sd": 0.000985,
+    "ratio": 354.125749,
+    "pct": 35312.57
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": 123.127,
+    "verdict": "reproduced"
+   }
+  },
+  "reproduced_ratio_median": 354.1257,
+  "reproduced_ratio_max": 354.1257,
+  "reported_ratio_median": 2.0121,
+  "verdict": "reproduced",
+  "tests": {
+   "base": "FAIL",
+   "gold": "PASS"
+  }
+ }
 }

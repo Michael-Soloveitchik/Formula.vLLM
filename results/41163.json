@@ -30,6 +30,29 @@
      "sd": 0.1139,
      "n": 5
     }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 59.89,
+     "pr_solution": 39.65,
+     "how": "absolute",
+     "ratio": 1.510467,
+     "pct": 51.05
+    },
+    "reproduced": {
+     "baseline": 106.044,
+     "pr_solution": 78.516,
+     "baseline_sd": 22.9137,
+     "pr_solution_sd": 15.6913,
+     "ratio": 1.350604,
+     "pct": 35.06
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": 0.894,
+     "verdict": "reproduced"
+    }
    }
   }
  ],
@@ -142,5 +165,41 @@
    "claude + PR's solution"
   ],
   "note": "solver arms recorded by an earlier --run-formula-harnesses run; baseline / PR's solution re-measured by --reproduce"
+ },
+ "summary": {
+  "experiments": 1,
+  "measured": 1,
+  "headline": "allpool_forward_median",
+  "headline_derived": {
+   "unit": "us",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": 59.89,
+    "pr_solution": 39.65,
+    "how": "absolute",
+    "ratio": 1.510467,
+    "pct": 51.05
+   },
+   "reproduced": {
+    "baseline": 106.044,
+    "pr_solution": 78.516,
+    "baseline_sd": 22.9137,
+    "pr_solution_sd": 15.6913,
+    "ratio": 1.350604,
+    "pct": 35.06
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": 0.894,
+    "verdict": "reproduced"
+   }
+  },
+  "reproduced_ratio_median": 1.3506,
+  "reproduced_ratio_max": 1.3506,
+  "reported_ratio_median": 1.5105,
+  "verdict": "reproduced",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
  }
 }

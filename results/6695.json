@@ -30,9 +30,68 @@
     "scale_short": "Author's ~5% is whole-run serving throughput for a 405B model over PP+TP on real interconnect, shown only as a plot with no absolute numbers; it is a distributed-comm effect, not CPU-reproducible. TO MAKE 1:1: on a multi-GPU box with PP>1 and TP>1, benchmark serving tok/s with and without all_gather_group on send/recv_tensor_dict, isolating the partial-send + all-gather path.",
     "scale_note": "The optimization shrinks each PP send to a 1/TP slice and rebuilds the tensor with a TP all-gather, trading send bandwidth for an all-gather; the benefit depends on PP/TP sizes and interconnect, and the author noted they tested few scenarios and saw no regressions. No absolute throughput published (plot only), and the path only exercises across real parallel ranks, so magnitude is not reproducible on our single-host CPU bench."
    },
-   "arms": {}
+   "arms": {},
+   "derived": {
+    "unit": "pct",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    }
+   }
   }
  ],
  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
- "ts": "2026-11-05T00:00:00Z"
+ "ts": "2026-11-05T00:00:00Z",
+ "summary": {
+  "experiments": 1,
+  "measured": 0,
+  "headline": "pp_send_partial_allgather",
+  "headline_derived": {
+   "unit": "pct",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": null,
+    "pr_solution": null,
+    "how": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced": {
+    "baseline": null,
+    "pr_solution": null,
+    "baseline_sd": null,
+    "pr_solution_sd": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "unknown"
+   }
+  },
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": null,
+  "verdict": "unknown",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
+ }
 }

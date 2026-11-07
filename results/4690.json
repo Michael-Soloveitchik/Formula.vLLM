@@ -30,9 +30,68 @@
     "scale_short": "Author gave a 10x load-time ratio for Arctic at 8x TP from NVMe, no absolute seconds. TO MAKE 1:1: time ShardedStateLoader vs default loader on the same large multi-shard checkpoint at matching TP on an NVMe box, recording absolute load seconds.",
     "scale_note": "Author published only a ratio (~10x faster NVMe load with 8x TP on Arctic, a very large MoE model), reconstructed here as pct=9.0 against our baseline. The win scales with checkpoint size and TP degree; a small single-worker load will show far less because the whole-checkpoint read it eliminates is small. Direction genuine; magnitude is model/TP/storage dependent."
    },
-   "arms": {}
+   "arms": {},
+   "derived": {
+    "unit": "s",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    }
+   }
   }
  ],
  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
- "ts": "2026-11-05T00:00:00Z"
+ "ts": "2026-11-05T00:00:00Z",
+ "summary": {
+  "experiments": 1,
+  "measured": 0,
+  "headline": "sharded_state_model_load",
+  "headline_derived": {
+   "unit": "s",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": null,
+    "pr_solution": null,
+    "how": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced": {
+    "baseline": null,
+    "pr_solution": null,
+    "baseline_sd": null,
+    "pr_solution_sd": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "unknown"
+   }
+  },
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": null,
+  "verdict": "unknown",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
+ }
 }

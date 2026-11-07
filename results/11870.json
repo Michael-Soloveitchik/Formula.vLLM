@@ -31,9 +31,68 @@
     "scale_short": "Author's number is whole-run E2E latency (~3%); our isolated op is just the stream lookup. TO MAKE 1:1: microbench the current_stream() call path (cached vs torch.cuda.current_stream()) in isolation, or reproduce the full 70B tp=4 benchmark_latency run on 4 GPUs.",
     "scale_note": "Requires 4 GPUs and NCCL; the 3% is diluted across the entire decode loop, so an isolated stream-lookup microbench will show a far larger ratio on the op itself but a negligible absolute delta. Direction (lower latency) is genuine."
    },
-   "arms": {}
+   "arms": {},
+   "derived": {
+    "unit": "s",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 2.945735,
+     "pr_solution": 2.851607,
+     "how": "absolute",
+     "ratio": 1.033009,
+     "pct": 3.3
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    }
+   }
   }
  ],
  "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
- "ts": "2026-11-05T00:00:00Z"
+ "ts": "2026-11-05T00:00:00Z",
+ "summary": {
+  "experiments": 1,
+  "measured": 0,
+  "headline": "current_stream_lookup",
+  "headline_derived": {
+   "unit": "s",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": 2.945735,
+    "pr_solution": 2.851607,
+    "how": "absolute",
+    "ratio": 1.033009,
+    "pct": 3.3
+   },
+   "reproduced": {
+    "baseline": null,
+    "pr_solution": null,
+    "baseline_sd": null,
+    "pr_solution_sd": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "unknown"
+   }
+  },
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": 1.033,
+  "verdict": "unknown",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
+ }
 }

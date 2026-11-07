@@ -30,9 +30,68 @@
     "scale_short": "Author's ~25% is a per-rank MEMORY saving under 8-way PP, measured as a fraction with no absolute GB; it is a distributed multi-GPU effect, not CPU-reproducible and not a speed gain. TO MAKE 1:1: on an 8-GPU box run Llama-3-70B with --pipeline-parallel-size 8 and compare per-rank allocated memory before/after, confirming the drop equals the embedding/lm-head tensor size.",
     "scale_note": "This is a memory-footprint optimization that only indirectly helps throughput (freed memory can hold more KV cache). The 25% is a reported fraction, not an absolute, and only manifests across real PP ranks on multiple GPUs, so it cannot be reproduced on our single-host CPU microbench. Because vLLM takes the min number of blocks across ranks, the effective win is bounded by the per-rank saving the maintainer described."
    },
-   "arms": {}
+   "arms": {},
+   "derived": {
+    "unit": "pct",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    }
+   }
   }
  ],
  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
- "ts": "2026-11-05T00:00:00Z"
+ "ts": "2026-11-05T00:00:00Z",
+ "summary": {
+  "experiments": 1,
+  "measured": 0,
+  "headline": "pp_rank_embedding_lm_head_elision",
+  "headline_derived": {
+   "unit": "pct",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": null,
+    "pr_solution": null,
+    "how": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced": {
+    "baseline": null,
+    "pr_solution": null,
+    "baseline_sd": null,
+    "pr_solution_sd": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "unknown"
+   }
+  },
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": null,
+  "verdict": "unknown",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
+ }
 }

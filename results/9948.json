@@ -19,5 +19,19 @@
  "experiments": [],
  "note": "Diff generalizes adjust_bitsandbytes_4bit_shard (renames qkv_offsets->shard_offsets) and adds fused-on-disk BNB weight sharding in linear.py + loader.py so QKV/MergedColumn fused BNB weights shard correctly under tensor parallel. This is a CORRECTNESS bugfix (FIX #9937) enabling Phi-3.5-mini BNB with TP=2, not a performance optimization. The index's '0.8%, 0.0%' derives from the author's TP=2 demo log (Avg generation throughput ~28.7 tok/s) which merely shows the previously-broken configuration now running; there is no before/after speedup baseline, so no timing experiment applies.",
  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
- "ts": "2026-11-05T00:00:00Z"
+ "ts": "2026-11-05T00:00:00Z",
+ "summary": {
+  "experiments": 0,
+  "measured": 0,
+  "headline": null,
+  "headline_derived": null,
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": null,
+  "verdict": "unknown",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
+ }
 }

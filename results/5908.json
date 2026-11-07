@@ -19,5 +19,19 @@
  "experiments": [],
  "note": "This is a MODEL-ENABLEMENT PR adding the Gemma 2 architecture, not a performance optimization. It introduces the Gemma2 model class and config; it does NOT optimize any existing op. The PR even temporarily DROPS features for correctness/compat (removes attention logit soft-capping as a workaround, truncates max length to 4K for sliding-window layers). The author publishes NO speedup numbers. The '2x' token in the task hint traces to an unrelated Reddit link in a comment about finetuning, not to any vLLM benchmark in this PR. There is no timing experiment to run; reported_gain is N/A.",
  "environment": "reported-only: no author perf numbers; new-model enablement PR, no measurable op",
- "ts": "2026-11-05T00:00:00Z"
+ "ts": "2026-11-05T00:00:00Z",
+ "summary": {
+  "experiments": 0,
+  "measured": 0,
+  "headline": null,
+  "headline_derived": null,
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": null,
+  "verdict": "unknown",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
+ }
 }

@@ -59,9 +59,68 @@
      "speedup_sd": 0.093282,
      "counts": true
     }
+   },
+   "derived": {
+    "unit": "us/tok",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 0.03936,
+     "pr_solution": 0.02418,
+     "how": "absolute",
+     "ratio": 1.627792,
+     "pct": 62.78
+    },
+    "reproduced": {
+     "baseline": 1.330579,
+     "pr_solution": 0.117099,
+     "baseline_sd": 0.012124,
+     "pr_solution_sd": 0.000396,
+     "ratio": 11.362855,
+     "pct": 1036.29
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": 6.981,
+     "verdict": "reproduced"
+    }
    }
   }
  ],
  "environment": "docker vllm-cpu-bench:32975 (python:3.12-slim + CPU torch + transformers + gguf), PYTHONPATH=/src with per-arm vllm source tree mounted ro; colima arm64 Mac (aarch64), py 3.12.16; identical image for both arms, only vllm/ source differs",
- "ts": "2026-11-04T00:00:00Z"
+ "ts": "2026-11-04T00:00:00Z",
+ "summary": {
+  "experiments": 1,
+  "measured": 1,
+  "headline": "detokenize",
+  "headline_derived": {
+   "unit": "us/tok",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": 0.03936,
+    "pr_solution": 0.02418,
+    "how": "absolute",
+    "ratio": 1.627792,
+    "pct": 62.78
+   },
+   "reproduced": {
+    "baseline": 1.330579,
+    "pr_solution": 0.117099,
+    "baseline_sd": 0.012124,
+    "pr_solution_sd": 0.000396,
+    "ratio": 11.362855,
+    "pct": 1036.29
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": 6.981,
+    "verdict": "reproduced"
+   }
+  },
+  "reproduced_ratio_median": 11.3629,
+  "reproduced_ratio_max": 11.3629,
+  "reported_ratio_median": 1.6278,
+  "verdict": "reproduced",
+  "tests": {
+   "base": "FAIL",
+   "gold": "PASS"
+  }
+ }
 }

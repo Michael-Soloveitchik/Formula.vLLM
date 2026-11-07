@@ -19,5 +19,19 @@
  "note": "diff bumps requirements-common.txt lm-format-enforcer 0.9.3->0.9.8 and expands the guided-decoding-backend CLI help with doc links (arg_utils.py). No vLLM source-logic change on a hot path. The claimed '2x in many cases' is the upstream library's self-reported JSONSchemaParser speedup, not a number vLLM measured; the versions have no API changes and mostly fix bugs. There is no author benchmark, no absolute pair, and no isolated vLLM op to time. No timing experiment.",
  "experiments": [],
  "environment": "reported-only: author's published GPU numbers; measured arms pending on GPU box",
- "ts": "2026-11-05T00:00:00Z"
+ "ts": "2026-11-05T00:00:00Z",
+ "summary": {
+  "experiments": 0,
+  "measured": 0,
+  "headline": null,
+  "headline_derived": null,
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": null,
+  "verdict": "unknown",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
+ }
 }

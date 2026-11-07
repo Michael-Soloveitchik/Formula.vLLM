@@ -31,9 +31,68 @@
     "scale_short": "Author's req/s is whole-engine offline-batch throughput with a 100k-prompt backlog; the diff speeds up one scheduler scan. TO MAKE 1:1: microbench free_finished_seq_groups alone with a large running+waiting queue, old full-queue scan vs running-only scan.",
     "scale_note": "SAME unit (req/s) but 211.18 -> 522.91 is end-to-end benchmark_throughput on opt-125m with 100k prompts, where the scheduler's per-step full-queue scan dominated; on small backlogs the gain vanishes. The headline '40%' is the reduced slowdown going 10k->100k prompts, not a flat per-call ratio. Direction genuine; magnitude is backlog-size dependent."
    },
-   "arms": {}
+   "arms": {},
+   "derived": {
+    "unit": "req/s",
+    "higher_is_better": true,
+    "reported": {
+     "baseline": 211.18,
+     "pr_solution": 522.91,
+     "how": "absolute",
+     "ratio": 2.476134,
+     "pct": 147.61
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    }
+   }
   }
  ],
  "environment": "reported-only: author's published numbers; measured arms pending on GPU box",
- "ts": "2026-11-05T00:00:00Z"
+ "ts": "2026-11-05T00:00:00Z",
+ "summary": {
+  "experiments": 1,
+  "measured": 0,
+  "headline": "free_finished_seq_groups_throughput",
+  "headline_derived": {
+   "unit": "req/s",
+   "higher_is_better": true,
+   "reported": {
+    "baseline": 211.18,
+    "pr_solution": 522.91,
+    "how": "absolute",
+    "ratio": 2.476134,
+    "pct": 147.61
+   },
+   "reproduced": {
+    "baseline": null,
+    "pr_solution": null,
+    "baseline_sd": null,
+    "pr_solution_sd": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "unknown"
+   }
+  },
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": 2.4761,
+  "verdict": "unknown",
+  "tests": {
+   "base": "PASS",
+   "gold": "PASS"
+  }
+ }
 }

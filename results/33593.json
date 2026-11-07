@@ -81,6 +81,29 @@
      "speedup_sd": 0.2775,
      "counts": true
     }
+   },
+   "derived": {
+    "unit": "s/call",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 0.0034,
+     "pr_solution": 1e-06,
+     "how": "absolute",
+     "ratio": 3400.0,
+     "pct": 339900.0
+    },
+    "reproduced": {
+     "baseline": 0.000359,
+     "pr_solution": 0.000155,
+     "baseline_sd": 4.7e-05,
+     "pr_solution_sd": 1.1e-05,
+     "ratio": 2.310765,
+     "pct": 131.08
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": 0.001,
+     "verdict": "not_reproduced"
+    }
    }
   },
   {
@@ -146,9 +169,68 @@
      "speedup_sd": 0.3093,
      "counts": true
     }
+   },
+   "derived": {
+    "unit": "s/call",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 0.0056,
+     "pr_solution": 0.0047,
+     "how": "absolute",
+     "ratio": 1.191489,
+     "pct": 19.15
+    },
+    "reproduced": {
+     "baseline": 0.001291,
+     "pr_solution": 0.001658,
+     "baseline_sd": 0.000529,
+     "pr_solution_sd": 0.000148,
+     "ratio": 0.778691,
+     "pct": -22.13
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": 0.654,
+     "verdict": "regression"
+    }
    }
   }
  ],
  "environment": "docker python:3.12-slim cpu, colima arm64",
- "ts": "2026-11-04T00:00:00Z"
+ "ts": "2026-11-04T00:00:00Z",
+ "summary": {
+  "experiments": 2,
+  "measured": 2,
+  "headline": "membership_present",
+  "headline_derived": {
+   "unit": "s/call",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": 0.0034,
+    "pr_solution": 1e-06,
+    "how": "absolute",
+    "ratio": 3400.0,
+    "pct": 339900.0
+   },
+   "reproduced": {
+    "baseline": 0.000359,
+    "pr_solution": 0.000155,
+    "baseline_sd": 4.7e-05,
+    "pr_solution_sd": 1.1e-05,
+    "ratio": 2.310765,
+    "pct": 131.08
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": 0.001,
+    "verdict": "not_reproduced"
+   }
+  },
+  "reproduced_ratio_median": 1.5447,
+  "reproduced_ratio_max": 2.3108,
+  "reported_ratio_median": 1700.5957,
+  "verdict": "not_reproduced",
+  "tests": {
+   "base": "FAIL",
+   "gold": "PASS"
+  }
+ }
 }
