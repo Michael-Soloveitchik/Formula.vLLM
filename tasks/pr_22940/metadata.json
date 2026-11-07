@@ -20,12 +20,12 @@
  "workload": {
   "kind": "serving",
   "script": "benchmarks/benchmark_throughput.py",
-  "cmd": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 2000 --dtype float16",
+  "cmd": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 30000 --dtype float16 --max-num-seqs 1024 --max-num-batched-tokens 16384",
   "unit": "tok/s",
   "needs": "gpu",
   "model": "facebook/opt-125m",
   "headline": "throughput_output_tok_s",
-  "note": "Author ran --num-prompts 30000 (opt-125m, in 800 / out 75). We run 2000 prompts per repeat so 5 repeats x 4 arms fit in a session; same per-step hot path (compute_slot_mapping runs every step), throughput ratio comparable, absolute tok/s not 1:1 (different GPU, shorter run). Weights come from the HF cache mounted at /root/.cache/huggingface (.weights/hf on the host)."
+  "note": "Author ran --num-prompts 30000 (opt-125m, in 800 / out 75). We run 2000 prompts per repeat so 5 repeats x 4 arms fit in a session; same per-step hot path (compute_slot_mapping runs every step), throughput ratio comparable, absolute tok/s not 1:1 (different GPU, shorter run). Weights come from the HF cache mounted at /root/.cache/huggingface (.weights/hf on the host). Args match the author: vllm 0.10.1 gives >=70 GiB GPUs max_num_seqs=1024/max_num_batched_tokens=16384 by default, we must pass them; 30000 prompts ~16 min/run so repeats=1."
  },
  "perf_gain": {
   "top_gain": "2.07%",
@@ -58,5 +58,6 @@
  "extra_pip": "transformers==4.56.2 pandas datasets",
  "extra_pip_note": "vllm 0.10.1 only lower-bounds transformers; pip resolved 5.x which breaks ProcessorMixin. 4.56.2 is the contemporary release (Aug 2025). pandas/datasets: benchmark_dataset.py imports.",
  "swap": "files",
- "swap_note": "whole-tree swap fails: the Aug-15 tree registers _C::aqlm_gemm fake impls that the 0.10.1 wheel (post AQLM removal) lacks. files mode overlays only block_table.py (base vs merge) on the wheel's own tree."
+ "swap_note": "whole-tree swap fails: the Aug-15 tree registers _C::aqlm_gemm fake impls that the 0.10.1 wheel (post AQLM removal) lacks. files mode overlays only block_table.py (base vs merge) on the wheel's own tree.",
+ "repeats": 1
 }

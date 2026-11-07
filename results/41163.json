@@ -55,6 +55,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": 0.894,
      "verdict": "reproduced"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   }
@@ -197,6 +201,10 @@
    "reproduced_vs_reported": {
     "ratio_of_ratios": 0.894,
     "verdict": "reproduced"
+   },
+   "reliability": {
+    "flag": "ok",
+    "note": ""
    }
   },
   "reproduced_ratio_median": 1.3506,

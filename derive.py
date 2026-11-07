@@ -96,6 +96,13 @@ def derive_experiment(e, pyref=None):
         rr2 = mr / rr
         v = "regression" if mr < 1 else ("reproduced" if rr2 >= 0.8 else "partial" if rr2 >= 0.3 else "not_reproduced")
     d["reproduced_vs_reported"] = {"ratio_of_ratios": None if rr2 is None else round(rr2, 3), "verdict": v}
+    # BASELINE_GAP.md: on this WSL2 box anything under ~100 us per call sits on the host launch/sync floor;
+    # the ratio is then unreliable and the absolute value meaningless. Flag it instead of pretending.
+    us = {"us": 1, "µs": 1, "ms": 1000, "s": 1e6}.get(unit)
+    if us and b is not None and (b * us) < 100:
+        d["reliability"] = {"flag": "below_host_floor", "note": f"baseline {b:g} {unit} < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"}
+    else:
+        d["reliability"] = {"flag": "ok", "note": ""}
     for k in ("reported", "reproduced"):
         for kk, vv in d[k].items():
             if isinstance(vv, float):

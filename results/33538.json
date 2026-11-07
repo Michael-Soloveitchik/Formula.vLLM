@@ -51,6 +51,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": 2.655,
      "verdict": "reproduced"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -104,6 +108,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": 2.129,
      "verdict": "reproduced"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -157,6 +165,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": 3.904,
      "verdict": "reproduced"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -210,6 +222,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": 8.808,
      "verdict": "reproduced"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -263,6 +279,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": 1.873,
      "verdict": "reproduced"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -313,6 +333,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -363,6 +387,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -413,6 +441,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -463,6 +495,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -513,6 +549,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -563,6 +603,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -613,6 +657,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -663,6 +711,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -713,6 +765,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -763,6 +819,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -813,6 +873,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -863,6 +927,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -913,6 +981,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -963,6 +1035,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -1013,6 +1089,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -1063,6 +1143,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -1113,6 +1197,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -1163,6 +1251,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -1213,6 +1305,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -1263,6 +1359,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -1313,6 +1413,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -1363,6 +1467,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -1413,6 +1521,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -1463,6 +1575,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -1513,6 +1629,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -1563,6 +1683,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -1613,6 +1737,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -1663,6 +1791,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -1713,6 +1845,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -1763,6 +1899,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -1813,6 +1953,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -1863,6 +2007,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -1913,6 +2061,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -1963,6 +2115,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -2013,6 +2169,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -2063,6 +2223,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -2113,6 +2277,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -2163,6 +2331,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -2213,6 +2385,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -2263,6 +2439,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -2313,6 +2493,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -2363,6 +2547,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -2413,6 +2601,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   }
@@ -3397,6 +3589,10 @@
    "reproduced_vs_reported": {
     "ratio_of_ratios": 2.655,
     "verdict": "reproduced"
+   },
+   "reliability": {
+    "flag": "ok",
+    "note": ""
    }
   },
   "reproduced_ratio_median": 9.0553,

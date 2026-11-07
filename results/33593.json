@@ -106,6 +106,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": 0.001,
      "verdict": "not_reproduced"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -197,6 +201,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": 0.654,
      "verdict": "regression"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   }
@@ -231,6 +239,10 @@
    "reproduced_vs_reported": {
     "ratio_of_ratios": 0.001,
     "verdict": "not_reproduced"
+   },
+   "reliability": {
+    "flag": "ok",
+    "note": ""
    }
   },
   "reproduced_ratio_median": 1.5447,

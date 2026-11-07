@@ -94,6 +94,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -128,6 +132,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -197,6 +205,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -231,6 +243,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -301,6 +317,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -335,6 +355,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -405,6 +429,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -439,6 +467,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -498,6 +530,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": 2.223,
       "verdict": "reproduced"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -582,6 +618,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": 2.223,
      "verdict": "reproduced"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": 63.5385,
@@ -652,6 +692,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -686,6 +730,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -756,6 +804,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -790,6 +842,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -860,6 +916,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -894,6 +954,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -942,6 +1006,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -978,6 +1046,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -1056,6 +1128,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -1104,6 +1180,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -1174,6 +1254,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -1245,6 +1329,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": 0.982,
       "verdict": "reproduced"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -1299,6 +1387,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -1353,6 +1445,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -1541,6 +1637,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": 0.982,
      "verdict": "reproduced"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": 1.0022,
@@ -1611,6 +1711,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -1645,6 +1749,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -1693,6 +1801,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -1763,6 +1875,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -1886,6 +2002,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "regression"
+     },
+     "reliability": {
+      "flag": "below_host_floor",
+      "note": "baseline 0.0015 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
      }
     }
    },
@@ -1933,6 +2053,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "below_host_floor",
+      "note": "baseline 16.3273 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
      }
     }
    },
@@ -1980,6 +2104,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "regression"
+     },
+     "reliability": {
+      "flag": "below_host_floor",
+      "note": "baseline 0.0228 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
      }
     }
    }
@@ -2098,6 +2226,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "regression"
+    },
+    "reliability": {
+     "flag": "below_host_floor",
+     "note": "baseline 0.0015 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
     }
    },
    "reproduced_ratio_median": 0.7379,
@@ -2168,6 +2300,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -2202,6 +2338,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -2300,6 +2440,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": 6.981,
       "verdict": "reproduced"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -2334,6 +2478,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": 6.981,
      "verdict": "reproduced"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": 11.3629,
@@ -2399,6 +2547,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": 2.655,
       "verdict": "reproduced"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -2452,6 +2604,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": 2.129,
       "verdict": "reproduced"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -2505,6 +2661,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": 3.904,
       "verdict": "reproduced"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -2558,6 +2718,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": 8.808,
       "verdict": "reproduced"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -2611,6 +2775,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": 1.873,
       "verdict": "reproduced"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -2661,6 +2829,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -2711,6 +2883,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -2761,6 +2937,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -2811,6 +2991,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -2861,6 +3045,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -2911,6 +3099,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -2961,6 +3153,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -3011,6 +3207,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -3061,6 +3261,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -3111,6 +3315,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -3161,6 +3369,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -3211,6 +3423,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -3261,6 +3477,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -3311,6 +3531,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -3361,6 +3585,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -3411,6 +3639,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -3461,6 +3693,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -3511,6 +3747,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -3561,6 +3801,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -3611,6 +3855,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -3661,6 +3909,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -3711,6 +3963,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -3761,6 +4017,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -3811,6 +4071,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -3861,6 +4125,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -3911,6 +4179,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -3961,6 +4233,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -4011,6 +4287,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -4061,6 +4341,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -4111,6 +4395,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -4161,6 +4449,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -4211,6 +4503,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -4261,6 +4557,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -4311,6 +4611,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -4361,6 +4665,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -4411,6 +4719,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -4461,6 +4773,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -4511,6 +4827,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -4561,6 +4881,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -4611,6 +4935,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -4661,6 +4989,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -4711,6 +5043,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -4761,6 +5097,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -5745,6 +6085,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": 2.655,
      "verdict": "reproduced"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": 9.0553,
@@ -5865,6 +6209,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": 0.001,
       "verdict": "not_reproduced"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -5956,6 +6304,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": 0.654,
       "verdict": "regression"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -5990,6 +6342,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": 0.001,
      "verdict": "not_reproduced"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": 1.5447,
@@ -6059,6 +6415,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": 0.954,
       "verdict": "reproduced"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -6116,6 +6476,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": 0.94,
       "verdict": "reproduced"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -6173,6 +6537,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": 0.998,
       "verdict": "reproduced"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -6230,6 +6598,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": 1.016,
       "verdict": "reproduced"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -6287,6 +6659,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": 0.947,
       "verdict": "reproduced"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -6341,6 +6717,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "regression"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -6395,6 +6775,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -6449,6 +6833,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -6503,6 +6891,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -6557,6 +6949,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -6611,6 +7007,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "below_host_floor",
+      "note": "baseline 0.0832 ms < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
      }
     }
    },
@@ -6665,6 +7065,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -6719,6 +7123,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -6773,6 +7181,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -6827,6 +7239,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -6881,6 +7297,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -6935,6 +7355,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "regression"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -6989,6 +7413,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -7043,6 +7471,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -7097,6 +7529,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "regression"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -7151,6 +7587,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "regression"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -7205,6 +7645,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -7259,6 +7703,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -7313,6 +7761,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -8105,6 +8557,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": 0.954,
      "verdict": "reproduced"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": 1.1178,
@@ -8199,6 +8655,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": 123.127,
       "verdict": "reproduced"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -8236,6 +8696,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -8270,6 +8734,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": 123.127,
      "verdict": "reproduced"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": 354.1257,
@@ -8340,6 +8808,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -8374,6 +8846,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -8443,6 +8919,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": 0.894,
       "verdict": "reproduced"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -8585,6 +9065,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": 0.894,
      "verdict": "reproduced"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": 1.3506,
@@ -8765,6 +9249,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -8799,6 +9287,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -8868,6 +9360,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -8902,6 +9398,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -9008,6 +9508,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -9042,6 +9546,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -9111,6 +9619,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -9145,6 +9657,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -9214,6 +9730,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -9248,6 +9768,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -9296,6 +9820,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    },
@@ -9332,6 +9860,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -9402,6 +9934,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -9472,6 +10008,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -9506,6 +10046,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -9576,6 +10120,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -9610,6 +10158,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -9679,6 +10231,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -9713,6 +10269,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -9783,6 +10343,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -9817,6 +10381,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,
@@ -9887,6 +10455,10 @@
      "reproduced_vs_reported": {
       "ratio_of_ratios": null,
       "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
      }
     }
    }
@@ -9921,6 +10493,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    },
    "reproduced_ratio_median": null,

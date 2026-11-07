@@ -57,6 +57,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": 0.982,
      "verdict": "reproduced"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -111,6 +115,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   },
@@ -165,6 +173,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
     }
    }
   }
@@ -353,6 +365,10 @@
    "reproduced_vs_reported": {
     "ratio_of_ratios": 0.982,
     "verdict": "reproduced"
+   },
+   "reliability": {
+    "flag": "ok",
+    "note": ""
    }
   },
   "reproduced_ratio_median": 1.0022,

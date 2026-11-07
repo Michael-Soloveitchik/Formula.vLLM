@@ -135,6 +135,15 @@ def main():
             out["machine"] = json.load(open(mp))
         except Exception:
             pass
+    # per-run snapshots + contention flags (run_one.sh run_workload_once) -> which runs were disturbed
+    runs = {}
+    for f in sorted(os.listdir(work)):
+        if f.startswith("contended_") and f.endswith(".txt"):
+            runs[f[len("contended_"):-4]] = open(os.path.join(work, f)).read().strip()
+    if runs:
+        out["contended_runs"] = runs
+        for k, v in arms.items():
+            v["contended_runs"] = sum(1 for r in runs if r.startswith(v.get("slug", k) + "_"))
     # reproduce runs (RUN_SOLVERS=0) re-measure only baseline / PR's solution: keep the solver
     # arms an earlier (token-paid) run already recorded in results/<pr>.json instead of dropping them.
     if os.environ.get("RUN_SOLVERS", "1") == "0":

@@ -29,10 +29,11 @@ DRY_RUN="${DRY_RUN:-0}"
 VLLM_GIT="${VLLM_GIT:-$(python3 conf.py get paths.vllm_git)}"
 [[ "$VLLM_GIT" = /* ]] || VLLM_GIT="$HERE/$VLLM_GIT"
 ENGINE="${CONTAINER_ENGINE:-docker}"
-GPU="${GPU_FLAG:---gpus all}"
+GPU="${GPU_FLAG:---gpus device=0}"      # pin one GPU; CUDA_VISIBLE_DEVICES=0 inside (BASELINE_GAP.md)
 WORK="$HERE/.work/pr_${PR}"
 TASK="$HERE/tasks/pr_${PR}"
 REPEATS="${REPEATS:-$(python3 conf.py get measure.repeats)}"; REPEATS="${REPEATS:-5}"
+# a task may pin its own repeat count (metadata.json "repeats", e.g. 1 for a 16-minute throughput run)
 SOLVER_TIMEOUT="${SOLVER_TIMEOUT:-15m}"   # hard cap per solver arm (claude -p / codex exec)
 KEEP_WORK="${KEEP_WORK:-0}"             # 1 = reuse existing .work/pr_<n> refs (baseline / PR-solution logs), run solvers only
 # RUN_SOLVERS=0 -> measure baseline / PR solution only (fast numbers first); run solvers later with KEEP_WORK=1
@@ -60,6 +61,7 @@ WHEEL="$(meta wheel)"
 SWAP="$(meta swap)"; SWAP="${SWAP:-tree}"      # tree = whole vllm/ .py tree per arm; files = only source_files
 SRC_FILES="$(meta source_files)"
 WL_CMD="$(meta workload.cmd)"
+TASK_REPEATS="$(meta repeats)"; [ -n "$TASK_REPEATS" ] && [ -z "${REPEATS_FORCED:-}" ] && REPEATS="$TASK_REPEATS"
 OBJ="$(cat "$TASK/problem.md" 2>/dev/null || echo "Optimize PR #$PR; make the hidden tests pass.")"
 IMG="vllm-task:${PR}"
 MODE=$([ -n "$WHEEL" ] && echo wheel || echo source)
@@ -175,6 +177,14 @@ cp -a /arm/vllm/. "$site/vllm/"
 fi
 PRELUDE="$PRELUDE"'
 ln -sfn /arm /src   # vendored tasks/pr_<n>/bench.py read the arm tree at /src (ARM env = arm name)
+# ~2 s GPU warm-up so the first timed iteration is not on a P8/180 MHz card (BASELINE_GAP.md rec. 6)
+python3 - <<"WARM" 2>/dev/null || true
+import torch, time
+if torch.cuda.is_available():
+    x = torch.randn(4096, 4096, device="cuda", dtype=torch.float16); t = time.time()
+    while time.time() - t < 2.0: x = x @ x; x = x / x.norm()
+    torch.cuda.synchronize()
+WARM
 rm -rf /t && mkdir -p /t && cd /gold
 for d in tests benchmarks pyproject.toml conftest.py; do [ -e "$d" ] && cp -a "$d" /t/; done
 cd /t
@@ -192,13 +202,41 @@ run_in_img() { # run_in_img <tree> <script>   (TIMED=1 -> capped by WL_TIMEOUT)
   [ "${TIMED:-0}" = 1 ] && { timeout -k 20s "$WL_TIMEOUT" "$ENGINE" run --rm --name "$cname" $GPU --shm-size=2g ${ARM_ENV:-} \
     -v "$1":/arm:ro -v "$WORK/gold_full":/gold:ro -v "$TASK":/task:ro \
     -v "$HERE/.weights/hf":/root/.cache/huggingface \
-    -e HF_HUB_DISABLE_PROGRESS_BARS=1 \
+    -e HF_HUB_DISABLE_PROGRESS_BARS=1 -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID \
     "$IMG" -lc "$2"; local rc=$?; [ $rc = 124 ] && { $ENGINE kill "$cname" >/dev/null 2>&1; say "workload run hit WL_TIMEOUT=$WL_TIMEOUT -> killed"; }; return $rc; }
   $ENGINE run --rm $GPU --shm-size=2g ${ARM_ENV:-} \
     -v "$1":/arm:ro -v "$WORK/gold_full":/gold:ro -v "$TASK":/task:ro \
     -v "$HERE/.weights/hf":/root/.cache/huggingface \
-    -e HF_HUB_DISABLE_PROGRESS_BARS=1 \
+    -e HF_HUB_DISABLE_PROGRESS_BARS=1 -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID \
     "$IMG" -lc "$2"
+}
+
+# contention gate (BASELINE_GAP.md rec. 3): wait up to CONTENTION_WAIT (default 10m) while another tenant uses
+# the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2); then run anyway, flagged.
+CONTENTION_WAIT="${CONTENTION_WAIT:-600}"
+contended() { python3 - <<'PY'
+import json, os, subprocess, sys
+try:
+    u = subprocess.run("nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits", shell=True, capture_output=True, text=True, timeout=10).stdout.strip().splitlines()[0]
+    apps = subprocess.run("nvidia-smi --query-compute-apps=pid,used_memory --format=csv,noheader,nounits", shell=True, capture_output=True, text=True, timeout=10).stdout.strip().splitlines()
+    big = [a for a in apps if a.strip() and a.split(",")[1].strip().isdigit() and int(a.split(",")[1]) > 1024]
+    load1 = os.getloadavg()[0]; n = os.cpu_count() or 1
+    why = []
+    if int(float(u or 0)) > 5: why.append(f"gpu util {u}%")
+    if big: why.append(f"{len(big)} foreign gpu proc >1GiB")
+    if load1 > n / 2: why.append(f"load1 {load1:.1f} > {n/2:.0f}")
+    print(";".join(why))
+except Exception as e:
+    print("")
+PY
+}
+wait_for_quiet() { # -> sets CONTENDED="" or the reason
+  local waited=0 why
+  while why="$(contended)"; [ -n "$why" ] && [ "$waited" -lt "$CONTENTION_WAIT" ]; do
+    [ "$waited" = 0 ] && say "contention: $why — waiting up to ${CONTENTION_WAIT}s"
+    sleep 30; waited=$((waited+30))
+  done
+  CONTENDED="$why"; [ -n "$why" ] && say "still contended ($why) — running anyway, flagged"
 }
 
 # 3+4. isolate an arm's .py tree in the same image, run the oracle -> PASS/FAIL
@@ -211,15 +249,35 @@ run_arm() {
   ' 2>"$WORK/test_${arm}.log"
 }
 
-# 6. workload: run the author's bench cmd `REPEATS` times per arm, same image
-run_workload() {
+# 6. workload: one run = one `docker run` of the author's bench cmd. Repeats are INTERLEAVED ABBA across
+# arms (A,B,B,A,A,B,...) so clock/thermal/tenant drift lands on both arms equally
+# (BASELINE_GAP.md rec. 4). A machine snapshot + contention flag is stored next to every run.
+run_workload_once() { # <arm> <tree> <i>
+  local arm="$1" tree="$2" i="$3"
+  wait_for_quiet
+  [ -f "$HERE/machine.py" ] && python3 "$HERE/machine.py" snapshot >"$WORK/machine_${arm}_${i}.json" 2>/dev/null || true
+  [ -n "$CONTENDED" ] && echo "$CONTENDED" >"$WORK/contended_${arm}_${i}.txt"
+  say "workload $arm run $i/$REPEATS${CONTENDED:+ (contended: $CONTENDED)}"
+  TIMED=1 ARM_ENV="-e ARM=$arm" run_in_img "$tree" "$PRELUDE $WL_CMD" >"$WORK/wl_${arm}_${i}.log" 2>&1 \
+    || { say "workload $arm run $i failed (see $WORK/wl_${arm}_${i}.log)"; return 1; }
+}
+run_workloads_abba() { # <armA> <treeA> <armB> <treeB>
+  [ -n "$WL_CMD" ] || return 0
+  local i failA=0 failB=0
+  for i in $(seq 1 "$REPEATS"); do
+    if [ $((i % 2)) = 1 ]; then
+      [ $failA = 1 ] || run_workload_once "$1" "$2" "$i" || failA=1
+      [ $failB = 1 ] || run_workload_once "$3" "$4" "$i" || failB=1
+    else
+      [ $failB = 1 ] || run_workload_once "$3" "$4" "$i" || failB=1
+      [ $failA = 1 ] || run_workload_once "$1" "$2" "$i" || failA=1
+    fi
+  done
+}
+run_workload() { # single-arm (solver arms): plain repeats
   local arm="$1" tree="$2" i
   [ -n "$WL_CMD" ] || return 0
-  for i in $(seq 1 "$REPEATS"); do
-    say "workload $arm run $i/$REPEATS"
-    TIMED=1 ARM_ENV="-e ARM=$arm" run_in_img "$tree" "$PRELUDE $WL_CMD" >"$WORK/wl_${arm}_${i}.log" 2>&1 \
-      || { say "workload $arm run $i failed (see $WORK/wl_${arm}_${i}.log)"; break; }
-  done
+  for i in $(seq 1 "$REPEATS"); do run_workload_once "$arm" "$tree" "$i" || break; done
 }
 
 if [ "$KEEP_WORK" = 1 ] && [ -f "$WORK/arms.json" ]; then
@@ -229,8 +287,7 @@ say "tests: ${TESTS:-<none-known>}"
 BASE_RES=$(run_arm base "$WORK/base_full" || echo FAIL)
 GOLD_RES=$(run_arm gold "$WORK/gold_full" || echo FAIL)
 say "base=$BASE_RES gold=$GOLD_RES"
-run_workload base "$WORK/base_full"
-run_workload gold "$WORK/gold_full"
+run_workloads_abba base "$WORK/base_full" gold "$WORK/gold_full"
 # arms.json is the running ledger record.py folds into results/<pr>.json
 python3 - "$WORK/arms.json" "$BASE_RES" "$GOLD_RES" <<'PY'
 import json,sys

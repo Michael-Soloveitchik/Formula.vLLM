@@ -45,6 +45,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "regression"
+    },
+    "reliability": {
+     "flag": "below_host_floor",
+     "note": "baseline 0.0015 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
     }
    }
   },
@@ -92,6 +96,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "below_host_floor",
+     "note": "baseline 16.3273 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
     }
    }
   },
@@ -139,6 +147,10 @@
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
      "verdict": "regression"
+    },
+    "reliability": {
+     "flag": "below_host_floor",
+     "note": "baseline 0.0228 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
     }
    }
   }
@@ -257,6 +269,10 @@
    "reproduced_vs_reported": {
     "ratio_of_ratios": null,
     "verdict": "regression"
+   },
+   "reliability": {
+    "flag": "below_host_floor",
+    "note": "baseline 0.0015 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
    }
   },
   "reproduced_ratio_median": 0.7379,
