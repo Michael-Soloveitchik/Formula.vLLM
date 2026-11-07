@@ -295,5 +295,6 @@
    "base": "FAIL",
    "gold": "FAIL"
   }
- }
+ },
+ "hw_slug": "rtx5070ti"
 }

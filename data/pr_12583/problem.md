@@ -40,6 +40,7 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Reported numbers (PR author)
 - gain: 30% (pct)
 - evidence: I noticed that after enabling EP on a 16-card setup, the time taken for the all-reduce kernel has doubled, and the throughput has dropped by 30%.
+- reported = numbers from the PR body (author's machine)
 
 ## Rules
 - Edit only files under `./vllm`.

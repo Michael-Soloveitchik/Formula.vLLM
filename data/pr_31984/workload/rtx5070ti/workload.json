@@ -225,7 +225,186 @@
    "pipeline": "wheel"
   }
  },
- "reproduced": null,
+ "reproduced": {
+  "source": "data/pr_31984/results.rtx5070ti.json",
+  "hw_slug": "rtx5070ti",
+  "ts": "2026-11-07T23:34:15Z",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.14.0",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "tests": {
+   "base": "SKIP",
+   "gold": "SKIP"
+  },
+  "verdict": "regression",
+  "reproduced_ratio_median": 0.8599,
+  "reported_ratio_median": null,
+  "machine": {
+   "ts": "2026-11-07T23:32:47Z",
+   "host": {
+    "hostname": "DESKTOP-michael",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "wsl2": true,
+    "os": "Ubuntu 24.04.3 LTS"
+   },
+   "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Ti",
+    "driver": "591.86",
+    "cuda": "13.1",
+    "sm_mhz": 180.0,
+    "sm_max_mhz": 3090.0,
+    "mem_mhz": 405.0,
+    "mem_max_mhz": 14001.0,
+    "vram_total_mib": 16303.0,
+    "vram_used_mib": 276.0,
+    "util_pct": 0.0,
+    "power_w": 30.65,
+    "power_limit_w": 300.0,
+    "temp_c": 35.0,
+    "pstate": "P8",
+    "throttle_reasons": "0x0000000000000000",
+    "processes": [
+     {
+      "pid": 2903,
+      "name": "python main.py --listen 0.0.0.0 --port 8188",
+      "mem_mib": null
+     }
+    ]
+   },
+   "cpu": {
+    "model": "Intel(R) Core(TM) i7-14700KF",
+    "nproc": 12,
+    "load1": 1.95703125,
+    "load5": 1.35791015625,
+    "load15": 1.248046875,
+    "top_cpu_procs": [
+     {
+      "pid": 983951,
+      "pcpu": 5.2,
+      "comm": "python3"
+     }
+    ]
+   },
+   "ram": {
+    "total_gb": 94.3,
+    "free_gb": 0.9,
+    "available_gb": 88.7
+   },
+   "docker": {
+    "version": "Docker version 29.8.1, build 4a63305",
+    "engine": "docker"
+   }
+  },
+  "experiments": [
+   {
+    "name": "sw128_decode_b1_kv4096",
+    "unit": "us",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 74.693,
+    "baseline_sd": 13.7356,
+    "pr_solution": 87.136,
+    "pr_solution_sd": 17.6492,
+    "n": 5,
+    "ratio": 0.8572,
+    "ratio_of_ratios": null,
+    "verdict": "regression",
+    "reliability": {
+     "flag": "below_host_floor",
+     "note": "baseline 74.693 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+    }
+   },
+   {
+    "name": "sw128_decode_b1_kv8192",
+    "unit": "us",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 62.7542,
+    "baseline_sd": 4.2957,
+    "pr_solution": 96.7002,
+    "pr_solution_sd": 20.1937,
+    "n": 5,
+    "ratio": 0.648956,
+    "ratio_of_ratios": null,
+    "verdict": "regression",
+    "reliability": {
+     "flag": "below_host_floor",
+     "note": "baseline 62.7542 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+    }
+   },
+   {
+    "name": "sw128_decode_b1_kv16384",
+    "unit": "us",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 67.0264,
+    "baseline_sd": 11.5929,
+    "pr_solution": 77.7038,
+    "pr_solution_sd": 26.6978,
+    "n": 5,
+    "ratio": 0.862588,
+    "ratio_of_ratios": null,
+    "verdict": "regression",
+    "reliability": {
+     "flag": "below_host_floor",
+     "note": "baseline 67.0264 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+    }
+   },
+   {
+    "name": "sw128_decode_b8_kv8192",
+    "unit": "us",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 175.5768,
+    "baseline_sd": 1.6248,
+    "pr_solution": 80.8822,
+    "pr_solution_sd": 20.6591,
+    "n": 5,
+    "ratio": 2.170772,
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  ]
+ },
  "gap": {
   "verdict": "not analysed",
   "note": null,

@@ -2,108 +2,26 @@
  "schema": "experiments_v2",
  "experiments": [
   {
-   "name": "rmsnorm_gated_16k",
+   "name": "fused_recurrent_b32_tp2",
    "unit": "us",
    "workload": "python3 /task/bench.py",
    "reported": {
-    "base": null,
-    "patch": null
+    "base": 30.14,
+    "patch": 20.29
    },
    "arms": {},
    "derived": {
     "unit": "us",
     "higher_is_better": false,
     "reported": {
-     "baseline": null,
-     "pr_solution": null,
-     "how": null,
-     "marker": "",
-     "raw": "no number in the PR",
-     "note": "",
-     "ratio": null,
-     "pct": null
-    },
-    "reproduced": {
-     "baseline": null,
-     "pr_solution": null,
-     "ratio_sd": null,
-     "baseline_sd": null,
-     "pr_solution_sd": null,
-     "ratio": null,
-     "pct": null
-    },
-    "reproduced_vs_reported": {
-     "ratio_of_ratios": null,
-     "verdict": "unknown"
-    },
-    "reliability": {
-     "flag": "ok",
-     "note": ""
-    }
-   }
-  },
-  {
-   "name": "rmsnorm_gated_32k",
-   "unit": "us",
-   "workload": "python3 /task/bench.py",
-   "reported": {
-    "base": null,
-    "patch": null
-   },
-   "arms": {},
-   "derived": {
-    "unit": "us",
-    "higher_is_better": false,
-    "reported": {
-     "baseline": null,
-     "pr_solution": null,
-     "how": null,
-     "marker": "",
-     "raw": "no number in the PR",
-     "note": "",
-     "ratio": null,
-     "pct": null
-    },
-    "reproduced": {
-     "baseline": null,
-     "pr_solution": null,
-     "ratio_sd": null,
-     "baseline_sd": null,
-     "pr_solution_sd": null,
-     "ratio": null,
-     "pct": null
-    },
-    "reproduced_vs_reported": {
-     "ratio_of_ratios": null,
-     "verdict": "unknown"
-    },
-    "reliability": {
-     "flag": "ok",
-     "note": ""
-    }
-   }
-  },
-  {
-   "name": "latency_16k",
-   "unit": "us",
-   "workload": "python3 /task/bench.py",
-   "reported": {
-    "base": 0.6323,
-    "patch": 0.5812
-   },
-   "arms": {},
-   "derived": {
-    "unit": "us",
-    "higher_is_better": false,
-    "reported": {
-     "baseline": 0.6323,
-     "pr_solution": 0.5812,
+     "baseline": 30.14,
+     "pr_solution": 20.29,
      "how": "absolute",
      "marker": "",
-     "raw": "0.6323 -> 0.5812 us",
+     "raw": "30.14 -> 20.29 us",
      "note": "author gave absolute numbers",
-     "ratio": 1.087922,
-     "pct": 8.79
+     "ratio": 1.485461,
+     "pct": 48.55
     },
     "reproduced": {
      "baseline": null,
@@ -125,26 +43,149 @@
    }
   },
   {
-   "name": "latency_32k",
+   "name": "fused_recurrent_b128_tp2",
    "unit": "us",
    "workload": "python3 /task/bench.py",
    "reported": {
-    "base": 1.2799,
-    "patch": 1.1791
+    "base": 93.38,
+    "patch": 59.17
    },
    "arms": {},
    "derived": {
     "unit": "us",
     "higher_is_better": false,
     "reported": {
-     "baseline": 1.2799,
-     "pr_solution": 1.1791,
+     "baseline": 93.38,
+     "pr_solution": 59.17,
      "how": "absolute",
      "marker": "",
-     "raw": "1.2799 -> 1.1791 us",
+     "raw": "93.38 -> 59.17 us",
      "note": "author gave absolute numbers",
-     "ratio": 1.085489,
-     "pct": 8.55
+     "ratio": 1.578165,
+     "pct": 57.82
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "fused_recurrent_b512_tp2",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": 341.63,
+    "patch": 212.7
+   },
+   "arms": {},
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 341.63,
+     "pr_solution": 212.7,
+     "how": "absolute",
+     "marker": "",
+     "raw": "341.63 -> 212.7 us",
+     "note": "author gave absolute numbers",
+     "ratio": 1.606159,
+     "pct": 60.62
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "fused_recurrent_b128_tp4",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": 52.06,
+    "patch": 33.76
+   },
+   "arms": {},
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 52.06,
+     "pr_solution": 33.76,
+     "how": "absolute",
+     "marker": "",
+     "raw": "52.06 -> 33.76 us",
+     "note": "author gave absolute numbers",
+     "ratio": 1.542062,
+     "pct": 54.21
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "decode_output_throughput",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": 23891.0,
+    "patch": 27904.0
+   },
+   "arms": {},
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 23891.0,
+     "pr_solution": 27904.0,
+     "how": "absolute",
+     "marker": "",
+     "raw": "23891.0 -> 27904.0 us",
+     "note": "author gave absolute numbers",
+     "ratio": 0.856185,
+     "pct": -14.38
     },
     "reproduced": {
      "baseline": null,
@@ -166,17 +207,17 @@
    }
   }
  ],
- "pr": 20839,
- "pr_url": "https://github.com/vllm-project/vllm/pull/20839",
- "title": "[Model] Replace Mamba2 RMSNorm Gated with Fused Triton Kernel (#20839)",
- "field": "gpu_kernels",
- "reported_gain": "9%",
+ "pr": 31722,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/31722",
+ "title": "[PERF] Speed-up of GDN attention decode part (Qwen3-Next) (#31722)",
+ "field": "attention",
+ "reported_gain": "16.8%",
  "gain_kind": "pct",
- "base_sha": "9fe98d42508f9a67d5b1c491a4a306966ded3976",
- "merge_sha": "eab2f3980cd30132dd99e23ea8d6fc0274365757",
+ "base_sha": "4c73be14e0397e99162ca13a8b559670c5abd3b0",
+ "merge_sha": "22dffca9822987f0e912bfd9635e94bbdd05def3",
  "image": {
   "mode": "wheel",
-  "wheel": "0.10.1",
+  "wheel": "0.14.0",
   "workload_cmd": "python3 /task/bench.py",
   "repeats": 5
  },
@@ -199,9 +240,9 @@
   "base": {},
   "gold": {}
  },
- "ts": "2026-11-07T22:32:33Z",
+ "ts": "2026-11-07T22:22:45Z",
  "machine": {
-  "ts": "2026-11-07T22:32:21Z",
+  "ts": "2026-11-07T22:22:28Z",
   "host": {
    "hostname": "DESKTOP-michael",
    "kernel": "6.18.33.2-microsoft-standard-WSL2",
@@ -217,9 +258,9 @@
    "mem_mhz": 405.0,
    "mem_max_mhz": 14001.0,
    "vram_total_mib": 16303.0,
-   "vram_used_mib": 275.0,
+   "vram_used_mib": 273.0,
    "util_pct": 0.0,
-   "power_w": 30.32,
+   "power_w": 30.24,
    "power_limit_w": 300.0,
    "temp_c": 35.0,
    "pstate": "P8",
@@ -235,21 +276,21 @@
   "cpu": {
    "model": "Intel(R) Core(TM) i7-14700KF",
    "nproc": 12,
-   "load1": 2.73779296875,
-   "load5": 1.5595703125,
-   "load15": 1.24267578125,
+   "load1": 1.92822265625,
+   "load5": 1.501953125,
+   "load15": 1.236328125,
    "top_cpu_procs": [
     {
-     "pid": 928906,
-     "pcpu": 11.1,
+     "pid": 924441,
+     "pcpu": 6.6,
      "comm": "python3"
     }
    ]
   },
   "ram": {
    "total_gb": 94.3,
-   "free_gb": 1.6,
-   "available_gb": 89.5
+   "free_gb": 20.3,
+   "available_gb": 88.5
   },
   "docker": {
    "version": "Docker version 29.8.1, build 4a63305",
@@ -257,21 +298,21 @@
   }
  },
  "summary": {
-  "experiments": 4,
+  "experiments": 5,
   "measured": 0,
-  "headline": "rmsnorm_gated_16k",
+  "headline": "fused_recurrent_b32_tp2",
   "headline_derived": {
    "unit": "us",
    "higher_is_better": false,
    "reported": {
-    "baseline": null,
-    "pr_solution": null,
-    "how": null,
+    "baseline": 30.14,
+    "pr_solution": 20.29,
+    "how": "absolute",
     "marker": "",
-    "raw": "no number in the PR",
-    "note": "",
-    "ratio": null,
-    "pct": null
+    "raw": "30.14 -> 20.29 us",
+    "note": "author gave absolute numbers",
+    "ratio": 1.485461,
+    "pct": 48.55
    },
    "reproduced": {
     "baseline": null,
@@ -293,11 +334,12 @@
   },
   "reproduced_ratio_median": null,
   "reproduced_ratio_max": null,
-  "reported_ratio_median": 1.0867,
+  "reported_ratio_median": 1.5421,
   "verdict": "unknown",
   "tests": {
    "base": "SKIP",
    "gold": "SKIP"
   }
- }
+ },
+ "hw_slug": "rtx5070ti"
 }

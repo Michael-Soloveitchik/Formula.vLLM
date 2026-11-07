@@ -37,6 +37,7 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Reported numbers (PR author)
 - gain: 3x (pct)
 - evidence: It is ~3x faster than list matching.
+- reported = numbers from the PR body (author's machine)
 
 ## Rules
 - Edit only files under `./vllm`.

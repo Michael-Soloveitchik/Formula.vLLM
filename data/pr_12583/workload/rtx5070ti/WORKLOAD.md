@@ -12,11 +12,12 @@ No `hardware_overrides[rtx5070ti]` in task.json: identical to `workload/default/
 
 | metric | unit | better | headline | reported baseline → PR's solution | parse |
 |---|---|---|---|---|---|
-| `fused_moe_kernel` | us | lower |  | — | kernel us |
+| `fused_moe_kernel` | us | lower | yes | — | GENERIC line 'fused_moe_kernel [label] <number>' (us) |
 
 ## Reported by the author
 
 - gain: **30%** (pct) — I noticed that after enabling EP on a 16-card setup, the time taken for the all-reduce kernel has doubled, and the throughput has dropped by 30%.
+- reported = numbers from the PR body (author's machine)
 - the PR body (`data/pr_12583/pr.md`) names no hardware or command line
 
 ## Reproduced here
@@ -38,7 +39,7 @@ No `hardware_overrides[rtx5070ti]` in task.json: identical to `workload/default/
 ## Re-run 1:1 without run_one.sh
 
 ```bash
-# image: wheel (UNPINNED: no task.json:wheel) — Dockerfile data/pr_12583/workload/rtx5070ti/Dockerfile (template templates/Dockerfile.gpu-wheel)
+# image: wheel, vLLM wheel 0.8.0 — Dockerfile data/pr_12583/workload/rtx5070ti/Dockerfile (template templates/Dockerfile.gpu-wheel)
 docker build -t vllm-task:12583 data/pr_12583/workload/rtx5070ti
 # baseline arm
 docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_12583:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:12583 -lc 'A=/base; site=$(python3 -c "import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))"); find "$site/vllm" -name "*.py" -delete; cp -a $A/vllm/. "$site/vllm/"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e "$d" ] && cp -a "$d" /t/; done; cd /t; python3 benchmarks/kernels/benchmark_moe.py --model mistralai/Mixtral-8x7B-Instruct-v0.1 --tp-size 2 --dtype auto --seed 0'
@@ -46,9 +47,9 @@ docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_
 docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_12583:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:12583 -lc 'A=/gold; site=$(python3 -c "import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))"); find "$site/vllm" -name "*.py" -delete; cp -a $A/vllm/. "$site/vllm/"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e "$d" ] && cp -a "$d" /t/; done; cd /t; python3 benchmarks/kernels/benchmark_moe.py --model mistralai/Mixtral-8x7B-Instruct-v0.1 --tp-size 2 --dtype auto --seed 0'
 ```
 
-The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/). NOT PINNED: task.json has no `wheel` yet, so the Dockerfile installs the latest PyPI vLLM (compiled ops may not match either tree) and run_one.sh refuses to run it. `python3 gen/gen_tasks.py <pr>` picks the first PyPI release after merge_sha.
+The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/).
 
 ## Machine requirements
 
 - GPU: yes ×2 ≥48 GB VRAM, compute capability ≥7.0 (Mixtral-8x7B TP=2); RAM 8 GB; disk 120.0 GB
-- software: docker=True nvidia-container-runtime=True vllm_wheel=None pipeline=needs-wheel-task models=['mistralai/Mixtral-8x7B-Instruct-v0.1'] datasets=[] hf_token=True needs_server=False
+- software: docker=True nvidia-container-runtime=True vllm_wheel=0.8.0 pipeline=wheel models=['mistralai/Mixtral-8x7B-Instruct-v0.1'] datasets=[] hf_token=True needs_server=False

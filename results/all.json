@@ -379,6 +379,310 @@
   "schema": "experiments_v2",
   "experiments": [
    {
+    "name": "rmsnorm_gated_16k",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": null,
+     "patch": null
+    },
+    "arms": {},
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced": {
+      "baseline": null,
+      "pr_solution": null,
+      "ratio_sd": null,
+      "baseline_sd": null,
+      "pr_solution_sd": null,
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   },
+   {
+    "name": "rmsnorm_gated_32k",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": null,
+     "patch": null
+    },
+    "arms": {},
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced": {
+      "baseline": null,
+      "pr_solution": null,
+      "ratio_sd": null,
+      "baseline_sd": null,
+      "pr_solution_sd": null,
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   },
+   {
+    "name": "latency_16k",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": 0.6323,
+     "patch": 0.5812
+    },
+    "arms": {},
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": 0.6323,
+      "pr_solution": 0.5812,
+      "how": "absolute",
+      "marker": "",
+      "raw": "0.6323 -> 0.5812 us",
+      "note": "author gave absolute numbers",
+      "ratio": 1.087922,
+      "pct": 8.79
+     },
+     "reproduced": {
+      "baseline": null,
+      "pr_solution": null,
+      "ratio_sd": null,
+      "baseline_sd": null,
+      "pr_solution_sd": null,
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   },
+   {
+    "name": "latency_32k",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": 1.2799,
+     "patch": 1.1791
+    },
+    "arms": {},
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": 1.2799,
+      "pr_solution": 1.1791,
+      "how": "absolute",
+      "marker": "",
+      "raw": "1.2799 -> 1.1791 us",
+      "note": "author gave absolute numbers",
+      "ratio": 1.085489,
+      "pct": 8.55
+     },
+     "reproduced": {
+      "baseline": null,
+      "pr_solution": null,
+      "ratio_sd": null,
+      "baseline_sd": null,
+      "pr_solution_sd": null,
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   }
+  ],
+  "pr": 20839,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/20839",
+  "title": "[Model] Replace Mamba2 RMSNorm Gated with Fused Triton Kernel (#20839)",
+  "field": "gpu_kernels",
+  "reported_gain": "9%",
+  "gain_kind": "pct",
+  "base_sha": "9fe98d42508f9a67d5b1c491a4a306966ded3976",
+  "merge_sha": "eab2f3980cd30132dd99e23ea8d6fc0274365757",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.10.1",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "arms": {
+   "base": {
+    "tests": "SKIP",
+    "slug": "base"
+   },
+   "gold": {
+    "tests": "SKIP",
+    "slug": "gold"
+   }
+  },
+  "improved": false,
+  "latency": {
+   "scenarios": {},
+   "pytorch_ref": {}
+  },
+  "logs": {
+   "base": {},
+   "gold": {}
+  },
+  "ts": "2026-11-07T22:32:33Z",
+  "machine": {
+   "ts": "2026-11-07T22:32:21Z",
+   "host": {
+    "hostname": "DESKTOP-michael",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "wsl2": true,
+    "os": "Ubuntu 24.04.3 LTS"
+   },
+   "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Ti",
+    "driver": "591.86",
+    "cuda": "13.1",
+    "sm_mhz": 180.0,
+    "sm_max_mhz": 3090.0,
+    "mem_mhz": 405.0,
+    "mem_max_mhz": 14001.0,
+    "vram_total_mib": 16303.0,
+    "vram_used_mib": 275.0,
+    "util_pct": 0.0,
+    "power_w": 30.32,
+    "power_limit_w": 300.0,
+    "temp_c": 35.0,
+    "pstate": "P8",
+    "throttle_reasons": "0x0000000000000000",
+    "processes": [
+     {
+      "pid": 2903,
+      "name": "python main.py --listen 0.0.0.0 --port 8188",
+      "mem_mib": null
+     }
+    ]
+   },
+   "cpu": {
+    "model": "Intel(R) Core(TM) i7-14700KF",
+    "nproc": 12,
+    "load1": 2.73779296875,
+    "load5": 1.5595703125,
+    "load15": 1.24267578125,
+    "top_cpu_procs": [
+     {
+      "pid": 928906,
+      "pcpu": 11.1,
+      "comm": "python3"
+     }
+    ]
+   },
+   "ram": {
+    "total_gb": 94.3,
+    "free_gb": 1.6,
+    "available_gb": 89.5
+   },
+   "docker": {
+    "version": "Docker version 29.8.1, build 4a63305",
+    "engine": "docker"
+   }
+  },
+  "summary": {
+   "experiments": 4,
+   "measured": 0,
+   "headline": "rmsnorm_gated_16k",
+   "headline_derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   "reproduced_ratio_median": null,
+   "reproduced_ratio_max": null,
+   "reported_ratio_median": 1.0867,
+   "verdict": "unknown",
+   "tests": {
+    "base": "SKIP",
+    "gold": "SKIP"
+   }
+  },
+  "hw_slug": "rtx5070ti"
+ },
+ {
+  "schema": "experiments_v2",
+  "experiments": [
+   {
     "name": "get_new_blocks",
     "unit": "us/op",
     "workload": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
@@ -786,6 +1090,275 @@
   "schema": "experiments_v2",
   "experiments": [
    {
+    "name": "remove_single_request",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": null,
+     "patch": null
+    },
+    "arms": {
+     "base": {
+      "mean": 4.2208,
+      "sd": 0.0559,
+      "n": 5
+     },
+     "gold": {
+      "mean": 1.1216,
+      "sd": 0.0133,
+      "n": 5
+     }
+    },
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced": {
+      "baseline": 4.2208,
+      "pr_solution": 1.1216,
+      "ratio_sd": 0.066898,
+      "baseline_sd": 0.0559,
+      "pr_solution_sd": 0.0133,
+      "ratio": 3.763195,
+      "pct": 276.32
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "below_host_floor",
+      "note": "baseline 4.2208 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+     }
+    }
+   },
+   {
+    "name": "remove_four_requests",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": null,
+     "patch": null
+    },
+    "arms": {
+     "base": {
+      "mean": 6.6415,
+      "sd": 0.1034,
+      "n": 5
+     },
+     "gold": {
+      "mean": 6.6261,
+      "sd": 0.0592,
+      "n": 5
+     }
+    },
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced": {
+      "baseline": 6.6415,
+      "pr_solution": 6.6261,
+      "ratio_sd": 0.017992,
+      "baseline_sd": 0.1034,
+      "pr_solution_sd": 0.0592,
+      "ratio": 1.002324,
+      "pct": 0.23
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "below_host_floor",
+      "note": "baseline 6.6415 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+     }
+    }
+   }
+  ],
+  "pr": 21917,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/21917",
+  "title": "[Core] Optimize scheduler request removal for single completions (#21917)",
+  "field": "scheduling",
+  "reported_gain": "64%",
+  "gain_kind": "pct",
+  "base_sha": "c32e6ad1f63631fd8033f0cca3a35d5e48ccfc7f",
+  "merge_sha": "0167efe20d3d2280c3da6aea94a6f59afec5099c",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.10.2",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "arms": {
+   "base": {
+    "tests": "SKIP",
+    "slug": "base"
+   },
+   "gold": {
+    "tests": "SKIP",
+    "slug": "gold"
+   }
+  },
+  "improved": false,
+  "latency": {
+   "scenarios": {
+    "remove_four_requests": {
+     "unit": "us",
+     "base": {
+      "mean": 6.6415,
+      "sd": 0.1034,
+      "n": 5
+     },
+     "gold": {
+      "mean": 6.6261,
+      "sd": 0.0592,
+      "n": 5
+     }
+    },
+    "remove_single_request": {
+     "unit": "us",
+     "base": {
+      "mean": 4.2208,
+      "sd": 0.0559,
+      "n": 5
+     },
+     "gold": {
+      "mean": 1.1216,
+      "sd": 0.0133,
+      "n": 5
+     }
+    }
+   },
+   "pytorch_ref": {}
+  },
+  "logs": {
+   "base": {
+    "workload_runs": 5
+   },
+   "gold": {
+    "workload_runs": 5
+   }
+  },
+  "ts": "2026-11-07T23:26:03Z",
+  "machine": {
+   "ts": "2026-11-07T23:24:31Z",
+   "host": {
+    "hostname": "DESKTOP-michael",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "wsl2": true,
+    "os": "Ubuntu 24.04.3 LTS"
+   },
+   "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Ti",
+    "driver": "591.86",
+    "cuda": "13.1",
+    "sm_mhz": 180.0,
+    "sm_max_mhz": 3090.0,
+    "mem_mhz": 405.0,
+    "mem_max_mhz": 14001.0,
+    "vram_total_mib": 16303.0,
+    "vram_used_mib": 273.0,
+    "util_pct": 0.0,
+    "power_w": 30.17,
+    "power_limit_w": 300.0,
+    "temp_c": 35.0,
+    "pstate": "P8",
+    "throttle_reasons": "0x0000000000000000",
+    "processes": [
+     {
+      "pid": 2903,
+      "name": "python main.py --listen 0.0.0.0 --port 8188",
+      "mem_mib": null
+     }
+    ]
+   },
+   "cpu": {
+    "model": "Intel(R) Core(TM) i7-14700KF",
+    "nproc": 12,
+    "load1": 2.0361328125,
+    "load5": 1.38916015625,
+    "load15": 1.263671875,
+    "top_cpu_procs": []
+   },
+   "ram": {
+    "total_gb": 94.3,
+    "free_gb": 1.0,
+    "available_gb": 88.9
+   },
+   "docker": {
+    "version": "Docker version 29.8.1, build 4a63305",
+    "engine": "docker"
+   }
+  },
+  "summary": {
+   "experiments": 2,
+   "measured": 2,
+   "headline": "remove_single_request",
+   "headline_derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 4.2208,
+     "pr_solution": 1.1216,
+     "ratio_sd": 0.066898,
+     "baseline_sd": 0.0559,
+     "pr_solution_sd": 0.0133,
+     "ratio": 3.763195,
+     "pct": 276.32
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "below_host_floor",
+     "note": "baseline 4.2208 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+    }
+   },
+   "reproduced_ratio_median": 2.3828,
+   "reproduced_ratio_max": 3.7632,
+   "reported_ratio_median": null,
+   "verdict": "no_reported_number",
+   "tests": {
+    "base": "SKIP",
+    "gold": "SKIP"
+   }
+  },
+  "hw_slug": "rtx5070ti"
+ },
+ {
+  "schema": "experiments_v2",
+  "experiments": [
+   {
     "name": "throughput_output_tok_s",
     "unit": "tok/s",
     "workload": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 2000 --dtype float16",
@@ -1172,6 +1745,135 @@
  },
  {
   "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "remove_skipped_blocks",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": 6.3,
+     "patch": 1.6
+    },
+    "arms": {},
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": 6.3,
+      "pr_solution": 1.6,
+      "how": "absolute",
+      "marker": "",
+      "raw": "6.3 -> 1.6 us",
+      "note": "author gave absolute numbers",
+      "ratio": 3.9375,
+      "pct": 293.75
+     },
+     "reproduced": {
+      "baseline": null,
+      "pr_solution": null,
+      "ratio_sd": null,
+      "baseline_sd": null,
+      "pr_solution_sd": null,
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   }
+  ],
+  "pr": 27673,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/27673",
+  "title": "[Core] Early return in SlidingWindowManager.remove_skipped_blocks (#27673)",
+  "field": "scheduling",
+  "reported_gain": "75% (6.3us\u21921.6us)",
+  "gain_kind": "unit",
+  "base_sha": "d3ab240f39219df0175ec662416f630d7bf273d8",
+  "merge_sha": "0b51c9bd8b19cee3a494b0f966a6b0a846a40193",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.11.1",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "arms": {
+   "base": {
+    "tests": "SKIP",
+    "slug": "base"
+   },
+   "gold": {
+    "tests": "SKIP",
+    "slug": "gold"
+   }
+  },
+  "improved": false,
+  "latency": {
+   "scenarios": {},
+   "pytorch_ref": {}
+  },
+  "logs": {
+   "base": {
+    "workload_runs": 1
+   },
+   "gold": {
+    "workload_runs": 1
+   }
+  },
+  "ts": "2026-11-07T16:25:59Z",
+  "summary": {
+   "experiments": 1,
+   "measured": 0,
+   "headline": "remove_skipped_blocks",
+   "headline_derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 6.3,
+     "pr_solution": 1.6,
+     "how": "absolute",
+     "marker": "",
+     "raw": "6.3 -> 1.6 us",
+     "note": "author gave absolute numbers",
+     "ratio": 3.9375,
+     "pct": 293.75
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   "reproduced_ratio_median": null,
+   "reproduced_ratio_max": null,
+   "reported_ratio_median": 3.9375,
+   "verdict": "unknown",
+   "tests": {
+    "base": "SKIP",
+    "gold": "SKIP"
+   }
+  },
+  "hw_slug": "rtx5070ti"
+ },
+ {
+  "schema": "experiments_v2",
   "experiments": [],
   "pr": 27793,
   "pr_url": "https://github.com/vllm-project/vllm/pull/27793",
@@ -1523,6 +2225,1031 @@
    "tests": {
     "base": "FAIL",
     "gold": "PASS"
+   }
+  },
+  "hw_slug": "rtx5070ti"
+ },
+ {
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "min_tokens_apply",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": null,
+     "patch": null
+    },
+    "arms": {
+     "base": {
+      "mean": 55.6688,
+      "sd": 12.3932,
+      "n": 5
+     },
+     "gold": {
+      "mean": 32.3502,
+      "sd": 8.855,
+      "n": 5
+     }
+    },
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced": {
+      "baseline": 55.6688,
+      "pr_solution": 32.3502,
+      "ratio_sd": 0.607148,
+      "baseline_sd": 12.3932,
+      "pr_solution_sd": 8.855,
+      "ratio": 1.720818,
+      "pct": 72.08
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "below_host_floor",
+      "note": "baseline 55.6688 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+     }
+    }
+   },
+   {
+    "name": "min_tokens_apply_after_kernel",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": null,
+     "patch": null
+    },
+    "arms": {
+     "base": {
+      "mean": 1547.5568,
+      "sd": 6.7061,
+      "n": 5
+     },
+     "gold": {
+      "mean": 1406.1902,
+      "sd": 0.2803,
+      "n": 5
+     }
+    },
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced": {
+      "baseline": 1547.5568,
+      "pr_solution": 1406.1902,
+      "ratio_sd": 0.004774,
+      "baseline_sd": 6.7061,
+      "pr_solution_sd": 0.2803,
+      "ratio": 1.100532,
+      "pct": 10.05
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   }
+  ],
+  "pr": 29826,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/29826",
+  "title": "[Perf] Avoid pageable HtoD transfer in MinTokensLogitsProcessor (#29826)",
+  "field": "decoding_tpot",
+  "reported_gain": "30%",
+  "gain_kind": "pct",
+  "base_sha": "afb1e5b380ff623e478d19a246b42b2903b9331f",
+  "merge_sha": "1528e079e2b2cf8a807e4dce86ef05540e16a430",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.12.0",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "arms": {
+   "base": {
+    "tests": "SKIP",
+    "slug": "base"
+   },
+   "gold": {
+    "tests": "SKIP",
+    "slug": "gold"
+   }
+  },
+  "improved": false,
+  "latency": {
+   "scenarios": {
+    "min_tokens_apply": {
+     "unit": "us",
+     "base": {
+      "mean": 55.6688,
+      "sd": 12.3932,
+      "n": 5
+     },
+     "gold": {
+      "mean": 32.3502,
+      "sd": 8.855,
+      "n": 5
+     }
+    },
+    "min_tokens_apply_after_kernel": {
+     "unit": "us",
+     "base": {
+      "mean": 1547.5568,
+      "sd": 6.7061,
+      "n": 5
+     },
+     "gold": {
+      "mean": 1406.1902,
+      "sd": 0.2803,
+      "n": 5
+     }
+    }
+   },
+   "pytorch_ref": {}
+  },
+  "logs": {
+   "base": {
+    "workload_runs": 5
+   },
+   "gold": {
+    "workload_runs": 5
+   }
+  },
+  "ts": "2026-11-07T22:41:57Z",
+  "machine": {
+   "ts": "2026-11-07T22:39:46Z",
+   "host": {
+    "hostname": "DESKTOP-michael",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "wsl2": true,
+    "os": "Ubuntu 24.04.3 LTS"
+   },
+   "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Ti",
+    "driver": "591.86",
+    "cuda": "13.1",
+    "sm_mhz": 180.0,
+    "sm_max_mhz": 3090.0,
+    "mem_mhz": 405.0,
+    "mem_max_mhz": 14001.0,
+    "vram_total_mib": 16303.0,
+    "vram_used_mib": 275.0,
+    "util_pct": 0.0,
+    "power_w": 30.09,
+    "power_limit_w": 300.0,
+    "temp_c": 35.0,
+    "pstate": "P8",
+    "throttle_reasons": "0x0000000000000000",
+    "processes": [
+     {
+      "pid": 2903,
+      "name": "python main.py --listen 0.0.0.0 --port 8188",
+      "mem_mib": null
+     }
+    ]
+   },
+   "cpu": {
+    "model": "Intel(R) Core(TM) i7-14700KF",
+    "nproc": 12,
+    "load1": 2.06494140625,
+    "load5": 1.615234375,
+    "load15": 1.3466796875,
+    "top_cpu_procs": [
+     {
+      "pid": 933018,
+      "pcpu": 7.6,
+      "comm": "python3"
+     }
+    ]
+   },
+   "ram": {
+    "total_gb": 94.3,
+    "free_gb": 1.4,
+    "available_gb": 88.5
+   },
+   "docker": {
+    "version": "Docker version 29.8.1, build 4a63305",
+    "engine": "docker"
+   }
+  },
+  "summary": {
+   "experiments": 2,
+   "measured": 2,
+   "headline": "min_tokens_apply",
+   "headline_derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 55.6688,
+     "pr_solution": 32.3502,
+     "ratio_sd": 0.607148,
+     "baseline_sd": 12.3932,
+     "pr_solution_sd": 8.855,
+     "ratio": 1.720818,
+     "pct": 72.08
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "below_host_floor",
+     "note": "baseline 55.6688 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+    }
+   },
+   "reproduced_ratio_median": 1.4107,
+   "reproduced_ratio_max": 1.7208,
+   "reported_ratio_median": null,
+   "verdict": "no_reported_number",
+   "tests": {
+    "base": "SKIP",
+    "gold": "SKIP"
+   }
+  },
+  "hw_slug": "rtx5070ti"
+ },
+ {
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "fused_recurrent_b32_tp2",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": 30.14,
+     "patch": 20.29
+    },
+    "arms": {},
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": 30.14,
+      "pr_solution": 20.29,
+      "how": "absolute",
+      "marker": "",
+      "raw": "30.14 -> 20.29 us",
+      "note": "author gave absolute numbers",
+      "ratio": 1.485461,
+      "pct": 48.55
+     },
+     "reproduced": {
+      "baseline": null,
+      "pr_solution": null,
+      "ratio_sd": null,
+      "baseline_sd": null,
+      "pr_solution_sd": null,
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   },
+   {
+    "name": "fused_recurrent_b128_tp2",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": 93.38,
+     "patch": 59.17
+    },
+    "arms": {},
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": 93.38,
+      "pr_solution": 59.17,
+      "how": "absolute",
+      "marker": "",
+      "raw": "93.38 -> 59.17 us",
+      "note": "author gave absolute numbers",
+      "ratio": 1.578165,
+      "pct": 57.82
+     },
+     "reproduced": {
+      "baseline": null,
+      "pr_solution": null,
+      "ratio_sd": null,
+      "baseline_sd": null,
+      "pr_solution_sd": null,
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   },
+   {
+    "name": "fused_recurrent_b512_tp2",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": 341.63,
+     "patch": 212.7
+    },
+    "arms": {},
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": 341.63,
+      "pr_solution": 212.7,
+      "how": "absolute",
+      "marker": "",
+      "raw": "341.63 -> 212.7 us",
+      "note": "author gave absolute numbers",
+      "ratio": 1.606159,
+      "pct": 60.62
+     },
+     "reproduced": {
+      "baseline": null,
+      "pr_solution": null,
+      "ratio_sd": null,
+      "baseline_sd": null,
+      "pr_solution_sd": null,
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   },
+   {
+    "name": "fused_recurrent_b128_tp4",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": 52.06,
+     "patch": 33.76
+    },
+    "arms": {},
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": 52.06,
+      "pr_solution": 33.76,
+      "how": "absolute",
+      "marker": "",
+      "raw": "52.06 -> 33.76 us",
+      "note": "author gave absolute numbers",
+      "ratio": 1.542062,
+      "pct": 54.21
+     },
+     "reproduced": {
+      "baseline": null,
+      "pr_solution": null,
+      "ratio_sd": null,
+      "baseline_sd": null,
+      "pr_solution_sd": null,
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   },
+   {
+    "name": "decode_output_throughput",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": 23891.0,
+     "patch": 27904.0
+    },
+    "arms": {},
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": 23891.0,
+      "pr_solution": 27904.0,
+      "how": "absolute",
+      "marker": "",
+      "raw": "23891.0 -> 27904.0 us",
+      "note": "author gave absolute numbers",
+      "ratio": 0.856185,
+      "pct": -14.38
+     },
+     "reproduced": {
+      "baseline": null,
+      "pr_solution": null,
+      "ratio_sd": null,
+      "baseline_sd": null,
+      "pr_solution_sd": null,
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   }
+  ],
+  "pr": 31722,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/31722",
+  "title": "[PERF] Speed-up of GDN attention decode part (Qwen3-Next) (#31722)",
+  "field": "attention",
+  "reported_gain": "16.8%",
+  "gain_kind": "pct",
+  "base_sha": "4c73be14e0397e99162ca13a8b559670c5abd3b0",
+  "merge_sha": "22dffca9822987f0e912bfd9635e94bbdd05def3",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.14.0",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "arms": {
+   "base": {
+    "tests": "SKIP",
+    "slug": "base"
+   },
+   "gold": {
+    "tests": "SKIP",
+    "slug": "gold"
+   }
+  },
+  "improved": false,
+  "latency": {
+   "scenarios": {},
+   "pytorch_ref": {}
+  },
+  "logs": {
+   "base": {},
+   "gold": {}
+  },
+  "ts": "2026-11-07T22:22:45Z",
+  "machine": {
+   "ts": "2026-11-07T22:22:28Z",
+   "host": {
+    "hostname": "DESKTOP-michael",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "wsl2": true,
+    "os": "Ubuntu 24.04.3 LTS"
+   },
+   "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Ti",
+    "driver": "591.86",
+    "cuda": "13.1",
+    "sm_mhz": 180.0,
+    "sm_max_mhz": 3090.0,
+    "mem_mhz": 405.0,
+    "mem_max_mhz": 14001.0,
+    "vram_total_mib": 16303.0,
+    "vram_used_mib": 273.0,
+    "util_pct": 0.0,
+    "power_w": 30.24,
+    "power_limit_w": 300.0,
+    "temp_c": 35.0,
+    "pstate": "P8",
+    "throttle_reasons": "0x0000000000000000",
+    "processes": [
+     {
+      "pid": 2903,
+      "name": "python main.py --listen 0.0.0.0 --port 8188",
+      "mem_mib": null
+     }
+    ]
+   },
+   "cpu": {
+    "model": "Intel(R) Core(TM) i7-14700KF",
+    "nproc": 12,
+    "load1": 1.92822265625,
+    "load5": 1.501953125,
+    "load15": 1.236328125,
+    "top_cpu_procs": [
+     {
+      "pid": 924441,
+      "pcpu": 6.6,
+      "comm": "python3"
+     }
+    ]
+   },
+   "ram": {
+    "total_gb": 94.3,
+    "free_gb": 20.3,
+    "available_gb": 88.5
+   },
+   "docker": {
+    "version": "Docker version 29.8.1, build 4a63305",
+    "engine": "docker"
+   }
+  },
+  "summary": {
+   "experiments": 5,
+   "measured": 0,
+   "headline": "fused_recurrent_b32_tp2",
+   "headline_derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 30.14,
+     "pr_solution": 20.29,
+     "how": "absolute",
+     "marker": "",
+     "raw": "30.14 -> 20.29 us",
+     "note": "author gave absolute numbers",
+     "ratio": 1.485461,
+     "pct": 48.55
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   "reproduced_ratio_median": null,
+   "reproduced_ratio_max": null,
+   "reported_ratio_median": 1.5421,
+   "verdict": "unknown",
+   "tests": {
+    "base": "SKIP",
+    "gold": "SKIP"
+   }
+  },
+  "hw_slug": "rtx5070ti"
+ },
+ {
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "sw128_decode_b1_kv4096",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": null,
+     "patch": null
+    },
+    "arms": {
+     "base": {
+      "mean": 74.693,
+      "sd": 13.7356,
+      "n": 5
+     },
+     "gold": {
+      "mean": 87.136,
+      "sd": 17.6492,
+      "n": 5
+     }
+    },
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced": {
+      "baseline": 74.693,
+      "pr_solution": 87.136,
+      "ratio_sd": 0.234508,
+      "baseline_sd": 13.7356,
+      "pr_solution_sd": 17.6492,
+      "ratio": 0.8572,
+      "pct": -14.28
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "regression"
+     },
+     "reliability": {
+      "flag": "below_host_floor",
+      "note": "baseline 74.693 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+     }
+    }
+   },
+   {
+    "name": "sw128_decode_b1_kv8192",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": null,
+     "patch": null
+    },
+    "arms": {
+     "base": {
+      "mean": 62.7542,
+      "sd": 4.2957,
+      "n": 5
+     },
+     "gold": {
+      "mean": 96.7002,
+      "sd": 20.1937,
+      "n": 5
+     }
+    },
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced": {
+      "baseline": 62.7542,
+      "pr_solution": 96.7002,
+      "ratio_sd": 0.142615,
+      "baseline_sd": 4.2957,
+      "pr_solution_sd": 20.1937,
+      "ratio": 0.648956,
+      "pct": -35.1
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "regression"
+     },
+     "reliability": {
+      "flag": "below_host_floor",
+      "note": "baseline 62.7542 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+     }
+    }
+   },
+   {
+    "name": "sw128_decode_b1_kv16384",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": null,
+     "patch": null
+    },
+    "arms": {
+     "base": {
+      "mean": 67.0264,
+      "sd": 11.5929,
+      "n": 5
+     },
+     "gold": {
+      "mean": 77.7038,
+      "sd": 26.6978,
+      "n": 5
+     }
+    },
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced": {
+      "baseline": 67.0264,
+      "pr_solution": 77.7038,
+      "ratio_sd": 0.331806,
+      "baseline_sd": 11.5929,
+      "pr_solution_sd": 26.6978,
+      "ratio": 0.862588,
+      "pct": -13.74
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "regression"
+     },
+     "reliability": {
+      "flag": "below_host_floor",
+      "note": "baseline 67.0264 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+     }
+    }
+   },
+   {
+    "name": "sw128_decode_b8_kv8192",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": null,
+     "patch": null
+    },
+    "arms": {
+     "base": {
+      "mean": 175.5768,
+      "sd": 1.6248,
+      "n": 5
+     },
+     "gold": {
+      "mean": 80.8822,
+      "sd": 20.6591,
+      "n": 5
+     }
+    },
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced": {
+      "baseline": 175.5768,
+      "pr_solution": 80.8822,
+      "ratio_sd": 0.554827,
+      "baseline_sd": 1.6248,
+      "pr_solution_sd": 20.6591,
+      "ratio": 2.170772,
+      "pct": 117.08
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   }
+  ],
+  "pr": 31984,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/31984",
+  "title": "[Kernel] Optimize Sliding Window Attention in 3D Triton Kernel (#31984)",
+  "field": "gpu_kernels",
+  "reported_gain": "4%",
+  "gain_kind": "pct",
+  "base_sha": "e6c6f2c79d2c1e0765d17b4dec83a4a8283342e4",
+  "merge_sha": "b8bf5c45bbbb1249bd1656557603da71e9d4c3b9",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.14.0",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "arms": {
+   "base": {
+    "tests": "SKIP",
+    "slug": "base"
+   },
+   "gold": {
+    "tests": "SKIP",
+    "slug": "gold"
+   }
+  },
+  "improved": false,
+  "latency": {
+   "scenarios": {
+    "sw128_decode_b1_kv16384": {
+     "unit": "us",
+     "base": {
+      "mean": 67.0264,
+      "sd": 11.5929,
+      "n": 5
+     },
+     "gold": {
+      "mean": 77.7038,
+      "sd": 26.6978,
+      "n": 5
+     }
+    },
+    "sw128_decode_b1_kv4096": {
+     "unit": "us",
+     "base": {
+      "mean": 74.693,
+      "sd": 13.7356,
+      "n": 5
+     },
+     "gold": {
+      "mean": 87.136,
+      "sd": 17.6492,
+      "n": 5
+     }
+    },
+    "sw128_decode_b1_kv8192": {
+     "unit": "us",
+     "base": {
+      "mean": 62.7542,
+      "sd": 4.2957,
+      "n": 5
+     },
+     "gold": {
+      "mean": 96.7002,
+      "sd": 20.1937,
+      "n": 5
+     }
+    },
+    "sw128_decode_b8_kv8192": {
+     "unit": "us",
+     "base": {
+      "mean": 175.5768,
+      "sd": 1.6248,
+      "n": 5
+     },
+     "gold": {
+      "mean": 80.8822,
+      "sd": 20.6591,
+      "n": 5
+     }
+    }
+   },
+   "pytorch_ref": {}
+  },
+  "logs": {
+   "base": {
+    "workload_runs": 5
+   },
+   "gold": {
+    "workload_runs": 5
+   }
+  },
+  "ts": "2026-11-07T23:34:15Z",
+  "machine": {
+   "ts": "2026-11-07T23:32:47Z",
+   "host": {
+    "hostname": "DESKTOP-michael",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "wsl2": true,
+    "os": "Ubuntu 24.04.3 LTS"
+   },
+   "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Ti",
+    "driver": "591.86",
+    "cuda": "13.1",
+    "sm_mhz": 180.0,
+    "sm_max_mhz": 3090.0,
+    "mem_mhz": 405.0,
+    "mem_max_mhz": 14001.0,
+    "vram_total_mib": 16303.0,
+    "vram_used_mib": 276.0,
+    "util_pct": 0.0,
+    "power_w": 30.65,
+    "power_limit_w": 300.0,
+    "temp_c": 35.0,
+    "pstate": "P8",
+    "throttle_reasons": "0x0000000000000000",
+    "processes": [
+     {
+      "pid": 2903,
+      "name": "python main.py --listen 0.0.0.0 --port 8188",
+      "mem_mib": null
+     }
+    ]
+   },
+   "cpu": {
+    "model": "Intel(R) Core(TM) i7-14700KF",
+    "nproc": 12,
+    "load1": 1.95703125,
+    "load5": 1.35791015625,
+    "load15": 1.248046875,
+    "top_cpu_procs": [
+     {
+      "pid": 983951,
+      "pcpu": 5.2,
+      "comm": "python3"
+     }
+    ]
+   },
+   "ram": {
+    "total_gb": 94.3,
+    "free_gb": 0.9,
+    "available_gb": 88.7
+   },
+   "docker": {
+    "version": "Docker version 29.8.1, build 4a63305",
+    "engine": "docker"
+   }
+  },
+  "summary": {
+   "experiments": 4,
+   "measured": 4,
+   "headline": "sw128_decode_b1_kv4096",
+   "headline_derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 74.693,
+     "pr_solution": 87.136,
+     "ratio_sd": 0.234508,
+     "baseline_sd": 13.7356,
+     "pr_solution_sd": 17.6492,
+     "ratio": 0.8572,
+     "pct": -14.28
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "regression"
+    },
+    "reliability": {
+     "flag": "below_host_floor",
+     "note": "baseline 74.693 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+    }
+   },
+   "reproduced_ratio_median": 0.8599,
+   "reproduced_ratio_max": 2.1708,
+   "reported_ratio_median": null,
+   "verdict": "regression",
+   "tests": {
+    "base": "SKIP",
+    "gold": "SKIP"
    }
   },
   "hw_slug": "rtx5070ti"
@@ -5562,6 +7289,306 @@
   "schema": "experiments_v2",
   "experiments": [
    {
+    "name": "maxsim_64pairs",
+    "unit": "ms",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": null,
+     "patch": null
+    },
+    "arms": {
+     "base": {
+      "mean": 3.5022,
+      "sd": 0.5477,
+      "n": 5
+     },
+     "gold": {
+      "mean": 14.661,
+      "sd": 2.3352,
+      "n": 5
+     }
+    },
+    "derived": {
+     "unit": "ms",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced": {
+      "baseline": 3.5022,
+      "pr_solution": 14.661,
+      "ratio_sd": 0.053322,
+      "baseline_sd": 0.5477,
+      "pr_solution_sd": 2.3352,
+      "ratio": 0.238879,
+      "pct": -76.11
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "regression"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   },
+   {
+    "name": "serving_request_throughput",
+    "unit": "ms",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": 141.38,
+     "patch": 161.14
+    },
+    "arms": {},
+    "derived": {
+     "unit": "ms",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": 141.38,
+      "pr_solution": 161.14,
+      "how": "absolute",
+      "marker": "",
+      "raw": "141.38 -> 161.14 ms",
+      "note": "author gave absolute numbers",
+      "ratio": 0.877374,
+      "pct": -12.26
+     },
+     "reproduced": {
+      "baseline": null,
+      "pr_solution": null,
+      "ratio_sd": null,
+      "baseline_sd": null,
+      "pr_solution_sd": null,
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   },
+   {
+    "name": "serving_mean_e2el",
+    "unit": "ms",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": 446.27,
+     "patch": 391.46
+    },
+    "arms": {},
+    "derived": {
+     "unit": "ms",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": 446.27,
+      "pr_solution": 391.46,
+      "how": "absolute",
+      "marker": "",
+      "raw": "446.27 -> 391.46 ms",
+      "note": "author gave absolute numbers",
+      "ratio": 1.140014,
+      "pct": 14.0
+     },
+     "reproduced": {
+      "baseline": null,
+      "pr_solution": null,
+      "ratio_sd": null,
+      "baseline_sd": null,
+      "pr_solution_sd": null,
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   }
+  ],
+  "pr": 35330,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/35330",
+  "title": "[Perf] Optimize maxsim scores computation for pooling models, 13.9% E2E throughput improvement (#35330)",
+  "field": "scheduling",
+  "reported_gain": "13.9%",
+  "gain_kind": "pct",
+  "base_sha": "ec8f943db1b8e5f3b32ed2ec29526b8a9a521088",
+  "merge_sha": "99c7892c5bf20afc90e2ef0e1ad0a89637ae67a9",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.17.0",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "arms": {
+   "base": {
+    "tests": "FAIL",
+    "slug": "base"
+   },
+   "gold": {
+    "tests": "FAIL",
+    "slug": "gold"
+   }
+  },
+  "improved": false,
+  "latency": {
+   "scenarios": {
+    "maxsim_64pairs": {
+     "unit": "ms",
+     "base": {
+      "mean": 3.5022,
+      "sd": 0.5477,
+      "n": 5
+     },
+     "gold": {
+      "mean": 14.661,
+      "sd": 2.3352,
+      "n": 5
+     }
+    }
+   },
+   "pytorch_ref": {}
+  },
+  "logs": {
+   "base": {
+    "tests": {
+     "bytes": 2061,
+     "tail": "s.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n\n==================================== ERRORS ====================================\n________ ERROR collecting tests/entrypoints/pooling/score/test_utils.py ________\nImportError while importing test module '/t/tests/entrypoints/pooling/score/test_utils.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/usr/lib/python3.10/importlib/__init__.py:126: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntests/entrypoints/pooling/score/test_utils.py:11: in <module>\n    from vllm.entrypoints.pooling.score.utils import (\nE   ImportError: cannot import name 'compute_maxsim_scores' from 'vllm.entrypoints.pooling.score.utils' (/usr/local/lib/python3.10/dist-packages/vllm/entrypoints/pooling/score/utils.py)\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nERROR tests/entrypoints/pooling/score/test_utils.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 warning, 1 error in 0.15s\n"
+    },
+    "workload_runs": 5
+   },
+   "gold": {
+    "tests": {
+     "bytes": 18118,
+     "tail": " input_type=ArgsKwargs]\nE           For further information visit https://errors.pydantic.dev/2.14/v/value_error\n\ntests/entrypoints/pooling/score/test_utils.py:38: ValidationError\n=============================== warnings summary ===============================\n../usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7\n  /usr/local/lib/python3.10/dist-packages/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\n  No module named 'vllm._version'\n    from .version import __version__, __version_tuple__  # isort:skip\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nERROR tests/entrypoints/pooling/score/test_utils.py::TestGetScorePrompt::test_tokenization_kwargs_passed_through\nERROR tests/entrypoints/pooling/score/test_utils.py::TestGetScorePrompt::test_model_supports_score_template\nERROR tests/entrypoints/pooling/score/test_utils.py::TestGetScorePrompt::test_model_supports_score_template_but_custom_template_provided\nERROR tests/entrypoints/pooling/score/test_utils.py::TestGetScorePrompt::test_not_using_default_template\nERROR tests/entrypoints/pooling/score/test_utils.py::TestGetScorePrompt::test_fallback_with_sep_token\nERROR tests/entrypoints/pooling/score/test_utils.py::TestGetScorePrompt::test_fallback_without_sep_token\nERROR tests/entrypoints/pooling/score/test_utils.py::TestGetScorePrompt::test_post_process_tokens_called\n1 passed, 1 warning, 7 errors in 6.12s\n"
+    },
+    "workload_runs": 5
+   }
+  },
+  "ts": "2026-11-07T23:00:37Z",
+  "machine": {
+   "ts": "2026-11-07T22:58:43Z",
+   "host": {
+    "hostname": "DESKTOP-michael",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "wsl2": true,
+    "os": "Ubuntu 24.04.3 LTS"
+   },
+   "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Ti",
+    "driver": "591.86",
+    "cuda": "13.1",
+    "sm_mhz": 180.0,
+    "sm_max_mhz": 3090.0,
+    "mem_mhz": 405.0,
+    "mem_max_mhz": 14001.0,
+    "vram_total_mib": 16303.0,
+    "vram_used_mib": 273.0,
+    "util_pct": 0.0,
+    "power_w": 30.24,
+    "power_limit_w": 300.0,
+    "temp_c": 35.0,
+    "pstate": "P8",
+    "throttle_reasons": "0x0000000000000000",
+    "processes": [
+     {
+      "pid": 2903,
+      "name": "python main.py --listen 0.0.0.0 --port 8188",
+      "mem_mib": null
+     }
+    ]
+   },
+   "cpu": {
+    "model": "Intel(R) Core(TM) i7-14700KF",
+    "nproc": 12,
+    "load1": 2.06103515625,
+    "load5": 1.427734375,
+    "load15": 1.30078125,
+    "top_cpu_procs": [
+     {
+      "pid": 948870,
+      "pcpu": 9.0,
+      "comm": "python3"
+     }
+    ]
+   },
+   "ram": {
+    "total_gb": 94.3,
+    "free_gb": 1.2,
+    "available_gb": 89.0
+   },
+   "docker": {
+    "version": "Docker version 29.8.1, build 4a63305",
+    "engine": "docker"
+   }
+  },
+  "summary": {
+   "experiments": 3,
+   "measured": 1,
+   "headline": "maxsim_64pairs",
+   "headline_derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 3.5022,
+     "pr_solution": 14.661,
+     "ratio_sd": 0.053322,
+     "baseline_sd": 0.5477,
+     "pr_solution_sd": 2.3352,
+     "ratio": 0.238879,
+     "pct": -76.11
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "regression"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   "reproduced_ratio_median": 0.2389,
+   "reproduced_ratio_max": 0.2389,
+   "reported_ratio_median": 1.0087,
+   "verdict": "regression",
+   "tests": {
+    "base": "FAIL",
+    "gold": "FAIL"
+   }
+  },
+  "hw_slug": "rtx5070ti"
+ },
+ {
+  "schema": "experiments_v2",
+  "experiments": [
+   {
     "name": "topk_whole_b2048_v32768",
     "unit": "ms",
     "workload": "python3 benchmarks/benchmark_topk_topp.py --batch-sizes 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
@@ -7803,6 +9830,363 @@
   "schema": "experiments_v2",
   "experiments": [
    {
+    "name": "mean_pool_e5base_64x512",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": null,
+     "patch": null
+    },
+    "arms": {
+     "base": {
+      "mean": 10089.0876,
+      "sd": 8.3954,
+      "n": 5
+     },
+     "gold": {
+      "mean": 604.4896,
+      "sd": 26.0891,
+      "n": 5
+     }
+    },
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced": {
+      "baseline": 10089.0876,
+      "pr_solution": 604.4896,
+      "ratio_sd": 0.720467,
+      "baseline_sd": 8.3954,
+      "pr_solution_sd": 26.0891,
+      "ratio": 16.690258,
+      "pct": 1569.03
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   },
+   {
+    "name": "mean_pool_32x256_h4096",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": null,
+     "patch": null
+    },
+    "arms": {
+     "base": {
+      "mean": 2711.1656,
+      "sd": 6.1997,
+      "n": 5
+     },
+     "gold": {
+      "mean": 660.368,
+      "sd": 39.8029,
+      "n": 5
+     }
+    },
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced": {
+      "baseline": 2711.1656,
+      "pr_solution": 660.368,
+      "ratio_sd": 0.247634,
+      "baseline_sd": 6.1997,
+      "pr_solution_sd": 39.8029,
+      "ratio": 4.105538,
+      "pct": 310.55
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   },
+   {
+    "name": "serving_request_throughput",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": 238.52,
+     "patch": 252.72
+    },
+    "arms": {},
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": 238.52,
+      "pr_solution": 252.72,
+      "how": "absolute",
+      "marker": "",
+      "raw": "238.52 -> 252.72 us",
+      "note": "author gave absolute numbers",
+      "ratio": 0.943811,
+      "pct": -5.62
+     },
+     "reproduced": {
+      "baseline": null,
+      "pr_solution": null,
+      "ratio_sd": null,
+      "baseline_sd": null,
+      "pr_solution_sd": null,
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   },
+   {
+    "name": "serving_mean_e2el",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": 265.4,
+     "patch": 246.51
+    },
+    "arms": {},
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": 265.4,
+      "pr_solution": 246.51,
+      "how": "absolute",
+      "marker": "",
+      "raw": "265.4 -> 246.51 us",
+      "note": "author gave absolute numbers",
+      "ratio": 1.07663,
+      "pct": 7.66
+     },
+     "reproduced": {
+      "baseline": null,
+      "pr_solution": null,
+      "ratio_sd": null,
+      "baseline_sd": null,
+      "pr_solution_sd": null,
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   }
+  ],
+  "pr": 38559,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/38559",
+  "title": "[Perf] Optimize mean pooling using chunks and index_add, 5.9% E2E throughput improvement (#38559)",
+  "field": "scheduling",
+  "reported_gain": "5.9%",
+  "gain_kind": "pct",
+  "base_sha": "17b72fd1c8052f7a674056b2228a6e7ebfd4f123",
+  "merge_sha": "7b01d97a22c977aaad2f38fa03cd11742d2893e8",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.19.0",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "arms": {
+   "base": {
+    "tests": "SKIP",
+    "slug": "base"
+   },
+   "gold": {
+    "tests": "SKIP",
+    "slug": "gold"
+   }
+  },
+  "improved": false,
+  "latency": {
+   "scenarios": {
+    "mean_pool_32x256_h4096": {
+     "unit": "us",
+     "base": {
+      "mean": 2711.1656,
+      "sd": 6.1997,
+      "n": 5
+     },
+     "gold": {
+      "mean": 660.368,
+      "sd": 39.8029,
+      "n": 5
+     }
+    },
+    "mean_pool_e5base_64x512": {
+     "unit": "us",
+     "base": {
+      "mean": 10089.0876,
+      "sd": 8.3954,
+      "n": 5
+     },
+     "gold": {
+      "mean": 604.4896,
+      "sd": 26.0891,
+      "n": 5
+     }
+    }
+   },
+   "pytorch_ref": {}
+  },
+  "logs": {
+   "base": {
+    "workload_runs": 5
+   },
+   "gold": {
+    "workload_runs": 5
+   }
+  },
+  "ts": "2026-11-07T22:50:59Z",
+  "machine": {
+   "ts": "2026-11-07T22:49:09Z",
+   "host": {
+    "hostname": "DESKTOP-michael",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "wsl2": true,
+    "os": "Ubuntu 24.04.3 LTS"
+   },
+   "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Ti",
+    "driver": "591.86",
+    "cuda": "13.1",
+    "sm_mhz": 180.0,
+    "sm_max_mhz": 3090.0,
+    "mem_mhz": 405.0,
+    "mem_max_mhz": 14001.0,
+    "vram_total_mib": 16303.0,
+    "vram_used_mib": 275.0,
+    "util_pct": 0.0,
+    "power_w": 30.16,
+    "power_limit_w": 300.0,
+    "temp_c": 36.0,
+    "pstate": "P8",
+    "throttle_reasons": "0x0000000000000000",
+    "processes": [
+     {
+      "pid": 2903,
+      "name": "python main.py --listen 0.0.0.0 --port 8188",
+      "mem_mib": null
+     }
+    ]
+   },
+   "cpu": {
+    "model": "Intel(R) Core(TM) i7-14700KF",
+    "nproc": 12,
+    "load1": 1.7060546875,
+    "load5": 1.37890625,
+    "load15": 1.3330078125,
+    "top_cpu_procs": [
+     {
+      "pid": 939893,
+      "pcpu": 5.8,
+      "comm": "python3"
+     }
+    ]
+   },
+   "ram": {
+    "total_gb": 94.3,
+    "free_gb": 1.3,
+    "available_gb": 89.1
+   },
+   "docker": {
+    "version": "Docker version 29.8.1, build 4a63305",
+    "engine": "docker"
+   }
+  },
+  "summary": {
+   "experiments": 4,
+   "measured": 2,
+   "headline": "mean_pool_e5base_64x512",
+   "headline_derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 10089.0876,
+     "pr_solution": 604.4896,
+     "ratio_sd": 0.720467,
+     "baseline_sd": 8.3954,
+     "pr_solution_sd": 26.0891,
+     "ratio": 16.690258,
+     "pct": 1569.03
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   "reproduced_ratio_median": 10.3979,
+   "reproduced_ratio_max": 16.6903,
+   "reported_ratio_median": 1.0102,
+   "verdict": "no_reported_number",
+   "tests": {
+    "base": "SKIP",
+    "gold": "SKIP"
+   }
+  },
+  "hw_slug": "rtx5070ti"
+ },
+ {
+  "schema": "experiments_v2",
+  "experiments": [
+   {
     "name": "cache_lookup",
     "unit": "ms",
     "workload": "python3 /task/bench.py",
@@ -8054,6 +10438,363 @@
   "schema": "experiments_v2",
   "experiments": [
    {
+    "name": "prepare_next_token_ids_b16",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": null,
+     "patch": null
+    },
+    "arms": {
+     "base": {
+      "mean": 51.6412,
+      "sd": 19.2731,
+      "n": 5
+     },
+     "gold": {
+      "mean": 50.0606,
+      "sd": 17.552,
+      "n": 5
+     }
+    },
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced": {
+      "baseline": 51.6412,
+      "pr_solution": 50.0606,
+      "ratio_sd": 0.52824,
+      "baseline_sd": 19.2731,
+      "pr_solution_sd": 17.552,
+      "ratio": 1.031574,
+      "pct": 3.16
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "below_host_floor",
+      "note": "baseline 51.6412 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+     }
+    }
+   },
+   {
+    "name": "prepare_next_token_ids_b256",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": null,
+     "patch": null
+    },
+    "arms": {
+     "base": {
+      "mean": 92.1228,
+      "sd": 20.7005,
+      "n": 5
+     },
+     "gold": {
+      "mean": 88.8728,
+      "sd": 19.0185,
+      "n": 5
+     }
+    },
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced": {
+      "baseline": 92.1228,
+      "pr_solution": 88.8728,
+      "ratio_sd": 0.321649,
+      "baseline_sd": 20.7005,
+      "pr_solution_sd": 19.0185,
+      "ratio": 1.036569,
+      "pct": 3.66
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "no_reported_number"
+     },
+     "reliability": {
+      "flag": "below_host_floor",
+      "note": "baseline 92.1228 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+     }
+    }
+   },
+   {
+    "name": "mean_tpot",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": 2.6,
+     "patch": 2.58
+    },
+    "arms": {},
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": 2.6,
+      "pr_solution": 2.58,
+      "how": "absolute",
+      "marker": "",
+      "raw": "2.6 -> 2.58 us",
+      "note": "author gave absolute numbers",
+      "ratio": 1.007752,
+      "pct": 0.78
+     },
+     "reproduced": {
+      "baseline": null,
+      "pr_solution": null,
+      "ratio_sd": null,
+      "baseline_sd": null,
+      "pr_solution_sd": null,
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   },
+   {
+    "name": "p99_tpot",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": 3.24,
+     "patch": 2.94
+    },
+    "arms": {},
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": 3.24,
+      "pr_solution": 2.94,
+      "how": "absolute",
+      "marker": "",
+      "raw": "3.24 -> 2.94 us",
+      "note": "author gave absolute numbers",
+      "ratio": 1.102041,
+      "pct": 10.2
+     },
+     "reproduced": {
+      "baseline": null,
+      "pr_solution": null,
+      "ratio_sd": null,
+      "baseline_sd": null,
+      "pr_solution_sd": null,
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   }
+  ],
+  "pr": 41043,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/41043",
+  "title": "[Perf][Spec Decode] Avoid per-step numpy allocation in prepare_next_t\u2026 (#41043)",
+  "field": "decoding_tpot",
+  "reported_gain": "0.8%, 9.3%",
+  "gain_kind": "pct",
+  "base_sha": "1628239eb234739646e21c4053e3fa652058e245",
+  "merge_sha": "b58669cb427effa49928b7be5b6e0f4fd707bce5",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.20.1",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "arms": {
+   "base": {
+    "tests": "SKIP",
+    "slug": "base"
+   },
+   "gold": {
+    "tests": "SKIP",
+    "slug": "gold"
+   }
+  },
+  "improved": false,
+  "latency": {
+   "scenarios": {
+    "prepare_next_token_ids_b16": {
+     "unit": "us",
+     "base": {
+      "mean": 51.6412,
+      "sd": 19.2731,
+      "n": 5
+     },
+     "gold": {
+      "mean": 50.0606,
+      "sd": 17.552,
+      "n": 5
+     }
+    },
+    "prepare_next_token_ids_b256": {
+     "unit": "us",
+     "base": {
+      "mean": 92.1228,
+      "sd": 20.7005,
+      "n": 5
+     },
+     "gold": {
+      "mean": 88.8728,
+      "sd": 19.0185,
+      "n": 5
+     }
+    }
+   },
+   "pytorch_ref": {}
+  },
+  "logs": {
+   "base": {
+    "workload_runs": 5
+   },
+   "gold": {
+    "workload_runs": 5
+   }
+  },
+  "ts": "2026-11-07T23:17:15Z",
+  "machine": {
+   "ts": "2026-11-07T23:15:28Z",
+   "host": {
+    "hostname": "DESKTOP-michael",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "wsl2": true,
+    "os": "Ubuntu 24.04.3 LTS"
+   },
+   "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Ti",
+    "driver": "591.86",
+    "cuda": "13.1",
+    "sm_mhz": 180.0,
+    "sm_max_mhz": 3090.0,
+    "mem_mhz": 405.0,
+    "mem_max_mhz": 14001.0,
+    "vram_total_mib": 16303.0,
+    "vram_used_mib": 273.0,
+    "util_pct": 0.0,
+    "power_w": 30.31,
+    "power_limit_w": 300.0,
+    "temp_c": 36.0,
+    "pstate": "P8",
+    "throttle_reasons": "0x0000000000000000",
+    "processes": [
+     {
+      "pid": 2903,
+      "name": "python main.py --listen 0.0.0.0 --port 8188",
+      "mem_mib": null
+     }
+    ]
+   },
+   "cpu": {
+    "model": "Intel(R) Core(TM) i7-14700KF",
+    "nproc": 12,
+    "load1": 1.95947265625,
+    "load5": 1.40380859375,
+    "load15": 1.27734375,
+    "top_cpu_procs": [
+     {
+      "pid": 967628,
+      "pcpu": 6.6,
+      "comm": "python3"
+     }
+    ]
+   },
+   "ram": {
+    "total_gb": 94.3,
+    "free_gb": 10.2,
+    "available_gb": 88.7
+   },
+   "docker": {
+    "version": "Docker version 29.8.1, build 4a63305",
+    "engine": "docker"
+   }
+  },
+  "summary": {
+   "experiments": 4,
+   "measured": 2,
+   "headline": "prepare_next_token_ids_b16",
+   "headline_derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 51.6412,
+     "pr_solution": 50.0606,
+     "ratio_sd": 0.52824,
+     "baseline_sd": 19.2731,
+     "pr_solution_sd": 17.552,
+     "ratio": 1.031574,
+     "pct": 3.16
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "below_host_floor",
+     "note": "baseline 51.6412 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+    }
+   },
+   "reproduced_ratio_median": 1.0341,
+   "reproduced_ratio_max": 1.0366,
+   "reported_ratio_median": 1.0549,
+   "verdict": "no_reported_number",
+   "tests": {
+    "base": "SKIP",
+    "gold": "SKIP"
+   }
+  },
+  "hw_slug": "rtx5070ti"
+ },
+ {
+  "schema": "experiments_v2",
+  "experiments": [
+   {
     "name": "allpool_forward_median",
     "unit": "us",
     "workload": "python3 /task/bench.py",
@@ -8268,6 +11009,298 @@
    "tests": {
     "base": "PASS",
     "gold": "PASS"
+   }
+  },
+  "hw_slug": "rtx5070ti"
+ },
+ {
+  "schema": "experiments_v2",
+  "experiments": [
+   {
+    "name": "gdn_output_projection",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": null,
+     "patch": null
+    },
+    "arms": {
+     "base": {
+      "mean": 161.9812,
+      "sd": 32.09,
+      "n": 5
+     },
+     "gold": {
+      "mean": 163.2656,
+      "sd": 32.8228,
+      "n": 5
+     }
+    },
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced": {
+      "baseline": 161.9812,
+      "pr_solution": 163.2656,
+      "ratio_sd": 0.280028,
+      "baseline_sd": 32.09,
+      "pr_solution_sd": 32.8228,
+      "ratio": 0.992133,
+      "pct": -0.79
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "regression"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   },
+   {
+    "name": "merge_heads_op",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": 23.261,
+     "patch": 2.828
+    },
+    "arms": {},
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": 23.261,
+      "pr_solution": 2.828,
+      "how": "absolute",
+      "marker": "",
+      "raw": "23.261 -> 2.828 us",
+      "note": "author gave absolute numbers",
+      "ratio": 8.225248,
+      "pct": 722.52
+     },
+     "reproduced": {
+      "baseline": null,
+      "pr_solution": null,
+      "ratio_sd": null,
+      "baseline_sd": null,
+      "pr_solution_sd": null,
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   },
+   {
+    "name": "serving_mean_tpot",
+    "unit": "us",
+    "workload": "python3 /task/bench.py",
+    "reported": {
+     "base": 88.38,
+     "patch": 67.59
+    },
+    "arms": {},
+    "derived": {
+     "unit": "us",
+     "higher_is_better": false,
+     "reported": {
+      "baseline": 88.38,
+      "pr_solution": 67.59,
+      "how": "absolute",
+      "marker": "",
+      "raw": "88.38 -> 67.59 us",
+      "note": "author gave absolute numbers",
+      "ratio": 1.30759,
+      "pct": 30.76
+     },
+     "reproduced": {
+      "baseline": null,
+      "pr_solution": null,
+      "ratio_sd": null,
+      "baseline_sd": null,
+      "pr_solution_sd": null,
+      "ratio": null,
+      "pct": null
+     },
+     "reproduced_vs_reported": {
+      "ratio_of_ratios": null,
+      "verdict": "unknown"
+     },
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   }
+  ],
+  "pr": 42311,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/42311",
+  "title": "[Model] [Perf] Use flatten for Qwen3.5's GDN output projection (#42311)",
+  "field": "attention",
+  "reported_gain": "21.41x",
+  "gain_kind": "pct",
+  "base_sha": "7d5b033782681acee274f4f379c9fadc557fd7e8",
+  "merge_sha": "5ab6d1b3fd407404cd78488bf6f4cbcde6d912b7",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.22.0",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "arms": {
+   "base": {
+    "tests": "SKIP",
+    "slug": "base"
+   },
+   "gold": {
+    "tests": "SKIP",
+    "slug": "gold"
+   }
+  },
+  "improved": false,
+  "latency": {
+   "scenarios": {
+    "gdn_output_projection": {
+     "unit": "us",
+     "base": {
+      "mean": 161.9812,
+      "sd": 32.09,
+      "n": 5
+     },
+     "gold": {
+      "mean": 163.2656,
+      "sd": 32.8228,
+      "n": 5
+     }
+    }
+   },
+   "pytorch_ref": {}
+  },
+  "logs": {
+   "base": {
+    "workload_runs": 5
+   },
+   "gold": {
+    "workload_runs": 5
+   }
+  },
+  "ts": "2026-11-07T23:09:28Z",
+  "machine": {
+   "ts": "2026-11-07T23:07:41Z",
+   "host": {
+    "hostname": "DESKTOP-michael",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "wsl2": true,
+    "os": "Ubuntu 24.04.3 LTS"
+   },
+   "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Ti",
+    "driver": "591.86",
+    "cuda": "13.1",
+    "sm_mhz": 180.0,
+    "sm_max_mhz": 3090.0,
+    "mem_mhz": 405.0,
+    "mem_max_mhz": 14001.0,
+    "vram_total_mib": 16303.0,
+    "vram_used_mib": 285.0,
+    "util_pct": 0.0,
+    "power_w": 30.66,
+    "power_limit_w": 300.0,
+    "temp_c": 35.0,
+    "pstate": "P8",
+    "throttle_reasons": "0x0000000000000000",
+    "processes": [
+     {
+      "pid": 2903,
+      "name": "python main.py --listen 0.0.0.0 --port 8188",
+      "mem_mib": null
+     }
+    ]
+   },
+   "cpu": {
+    "model": "Intel(R) Core(TM) i7-14700KF",
+    "nproc": 12,
+    "load1": 2.40869140625,
+    "load5": 1.43115234375,
+    "load15": 1.2822265625,
+    "top_cpu_procs": [
+     {
+      "pid": 957834,
+      "pcpu": 5.8,
+      "comm": "python3"
+     }
+    ]
+   },
+   "ram": {
+    "total_gb": 94.3,
+    "free_gb": 5.5,
+    "available_gb": 88.9
+   },
+   "docker": {
+    "version": "Docker version 29.8.1, build 4a63305",
+    "engine": "docker"
+   }
+  },
+  "summary": {
+   "experiments": 3,
+   "measured": 1,
+   "headline": "gdn_output_projection",
+   "headline_derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 161.9812,
+     "pr_solution": 163.2656,
+     "ratio_sd": 0.280028,
+     "baseline_sd": 32.09,
+     "pr_solution_sd": 32.8228,
+     "ratio": 0.992133,
+     "pct": -0.79
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "regression"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   "reproduced_ratio_median": 0.9921,
+   "reproduced_ratio_max": 0.9921,
+   "reported_ratio_median": 4.7664,
+   "verdict": "regression",
+   "tests": {
+    "base": "SKIP",
+    "gold": "SKIP"
    }
   },
   "hw_slug": "rtx5070ti"

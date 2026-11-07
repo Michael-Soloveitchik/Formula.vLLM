@@ -14,19 +14,26 @@
  "reported_gain": "8%",
  "gain_kind": "pct",
  "gain_evidence": "By refactoring the code to avoid the indexing, we can remove the sync and allow much more of the sampling phase CPU work to overlap with the forward pass on the",
+ "source_files": [
+  "vllm/model_executor/layers/utils.py"
+ ],
+ "test_files": [],
+ "wheel": "0.8.5",
+ "wheel_note": "first PyPI release after merge (2025-04-28 > 2025-04-21); picked by gen_tasks.py from PyPI upload dates.",
+ "test_note": "",
  "workload": {
   "kind": "serving",
   "script": "benchmarks/benchmark_serving.py",
   "cmd": "python3 benchmarks/benchmark_serving.py --backend vllm --model facebook/opt-125m --dataset-name random --random-input-len 1000 --random-output-len 100 --num-prompts 100",
   "unit": "ms",
   "needs": "gpu",
+  "headline": "tpot",
   "note": "Removes CUDA sync in apply_penalties; win via GPU serving + trace. ~8% decode for small models."
  },
  "experiments": [
   {
    "name": "tpot",
    "unit": "ms",
-   "parse": "Mean TPOT",
    "reported": {
     "base": null,
     "patch": null
@@ -35,7 +42,6 @@
   {
    "name": "itl",
    "unit": "ms",
-   "parse": "Mean ITL",
    "reported": {
     "base": null,
     "patch": null
@@ -44,13 +50,13 @@
   {
    "name": "throughput",
    "unit": "tok/s",
-   "parse": "Output token throughput",
    "reported": {
     "base": null,
     "patch": null
    }
   }
  ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
  "hardware_overrides": {},
  "requirements": {
   "hardware": {
@@ -70,14 +76,14 @@
    "python3": true,
    "hf_cli": true,
    "hf_token": false,
-   "vllm_wheel": null,
+   "vllm_wheel": "0.8.5",
    "models": [
     "facebook/opt-125m"
    ],
    "datasets": [],
    "env": [],
    "needs_server": true,
-   "pipeline": "needs-wheel-task"
+   "pipeline": "wheel"
   }
  }
 }

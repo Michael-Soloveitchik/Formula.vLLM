@@ -34,6 +34,7 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Reported numbers (PR author)
 - gain: 1.6x (pct)
 - evidence: The initial throughput number looked too good (1.6x speedup with tuning).
+- reported = numbers from the PR body (author's machine)
 
 ## Rules
 - Edit only files under `./vllm`.

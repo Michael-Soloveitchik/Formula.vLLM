@@ -10,15 +10,15 @@
  "hw_override": null,
  "base_sha": "47455c424f62a20b75a7cfd872e17c5ba11c9f3a",
  "merge_sha": "504d91431499e302bbd5a3d8a1432cd427ec8d5d",
- "source_files": null,
- "test_files": null,
+ "source_files": [],
+ "test_files": [],
  "image": {
-  "mode": "wheel (UNPINNED: no task.json:wheel)",
+  "mode": "wheel",
   "tag": "vllm-task:23504",
   "dockerfile": "data/pr_23504/workload/rtx5070ti/Dockerfile",
   "template": "templates/Dockerfile.gpu-wheel",
-  "wheel": null,
-  "wheel_note": null,
+  "wheel": "0.10.2",
+  "wheel_note": "first PyPI release after merge (2025-09-13 > 2025-08-24); picked by gen_tasks.py from PyPI upload dates.",
   "torch_fix": null,
   "extra_pip": null,
   "swap": "tree",
@@ -91,8 +91,8 @@
    "name": "serving_throughput",
    "unit": "tok/s",
    "higher_is_better": true,
-   "headline": false,
-   "parse": "total tok/s",
+   "headline": true,
+   "parse": "GENERIC line 'serving_throughput [label] <number>' (tok/s)",
    "reported": {
     "baseline": 16776.0,
     "pr_solution": 16872.0
@@ -104,7 +104,7 @@
    "unit": "us",
    "higher_is_better": false,
    "headline": false,
-   "parse": "kernel us",
+   "parse": "GENERIC line 'w8a8_kernel [label] <number>' (us)",
    "reported": {
     "baseline": null,
     "pr_solution": null
@@ -112,12 +112,12 @@
    "note": null
   }
  ],
- "headline": null,
+ "headline": "serving_throughput",
  "reported": {
   "gain": "1.6x",
   "gain_kind": "pct",
   "gain_evidence": "The initial throughput number looked too good (1.6x speedup with tuning).",
-  "experiments_note": null,
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
   "author_hardware_args": [
    {
     "line": 17,
@@ -187,12 +187,12 @@
    "python3": true,
    "hf_cli": false,
    "hf_token": false,
-   "vllm_wheel": null,
+   "vllm_wheel": "0.10.2",
    "models": [],
    "datasets": [],
    "env": [],
    "needs_server": false,
-   "pipeline": "needs-wheel-task"
+   "pipeline": "wheel"
   }
  },
  "reproduced": null,
@@ -205,7 +205,7 @@
   "build": "docker build -t vllm-task:23504 data/pr_23504/workload/rtx5070ti",
   "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_23504:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:23504 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 benchmarks/kernels/benchmark_w8a8_block_fp8.py --tp-size 8 --input-type fp8 --out-dtype float16 --block-n 128 --block-k 128'",
   "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_23504:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:23504 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 benchmarks/kernels/benchmark_w8a8_block_fp8.py --tp-size 8 --input-type fp8 --out-dtype float16 --block-n 128 --block-k 128'",
-  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/). NOT PINNED: task.json has no `wheel` yet, so the Dockerfile installs the latest PyPI vLLM (compiled ops may not match either tree) and run_one.sh refuses to run it. `python3 gen/gen_tasks.py <pr>` picks the first PyPI release after merge_sha."
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
  },
- "test_note": null
+ "test_note": ""
 }

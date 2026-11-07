@@ -176,7 +176,162 @@
    "pipeline": "wheel"
   }
  },
- "reproduced": null,
+ "reproduced": {
+  "rtx5070ti": {
+   "source": "data/pr_35330/results.rtx5070ti.json",
+   "hw_slug": "rtx5070ti",
+   "ts": "2026-11-07T23:00:37Z",
+   "image": {
+    "mode": "wheel",
+    "wheel": "0.17.0",
+    "workload_cmd": "python3 /task/bench.py",
+    "repeats": 5
+   },
+   "tests": {
+    "base": "FAIL",
+    "gold": "FAIL"
+   },
+   "verdict": "regression",
+   "reproduced_ratio_median": 0.2389,
+   "reported_ratio_median": 1.0087,
+   "machine": {
+    "ts": "2026-11-07T22:58:43Z",
+    "host": {
+     "hostname": "DESKTOP-michael",
+     "kernel": "6.18.33.2-microsoft-standard-WSL2",
+     "wsl2": true,
+     "os": "Ubuntu 24.04.3 LTS"
+    },
+    "gpu": {
+     "name": "NVIDIA GeForce RTX 5070 Ti",
+     "driver": "591.86",
+     "cuda": "13.1",
+     "sm_mhz": 180.0,
+     "sm_max_mhz": 3090.0,
+     "mem_mhz": 405.0,
+     "mem_max_mhz": 14001.0,
+     "vram_total_mib": 16303.0,
+     "vram_used_mib": 273.0,
+     "util_pct": 0.0,
+     "power_w": 30.24,
+     "power_limit_w": 300.0,
+     "temp_c": 35.0,
+     "pstate": "P8",
+     "throttle_reasons": "0x0000000000000000",
+     "processes": [
+      {
+       "pid": 2903,
+       "name": "python main.py --listen 0.0.0.0 --port 8188",
+       "mem_mib": null
+      }
+     ]
+    },
+    "cpu": {
+     "model": "Intel(R) Core(TM) i7-14700KF",
+     "nproc": 12,
+     "load1": 2.06103515625,
+     "load5": 1.427734375,
+     "load15": 1.30078125,
+     "top_cpu_procs": [
+      {
+       "pid": 948870,
+       "pcpu": 9.0,
+       "comm": "python3"
+      }
+     ]
+    },
+    "ram": {
+     "total_gb": 94.3,
+     "free_gb": 1.2,
+     "available_gb": 89.0
+    },
+    "docker": {
+     "version": "Docker version 29.8.1, build 4a63305",
+     "engine": "docker"
+    }
+   },
+   "experiments": [
+    {
+     "name": "maxsim_64pairs",
+     "unit": "ms",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 3.5022,
+     "baseline_sd": 0.5477,
+     "pr_solution": 14.661,
+     "pr_solution_sd": 2.3352,
+     "n": 5,
+     "ratio": 0.238879,
+     "ratio_of_ratios": null,
+     "verdict": "regression",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "serving_request_throughput",
+     "unit": "ms",
+     "reported": {
+      "baseline": 141.38,
+      "pr_solution": 161.14,
+      "how": "absolute",
+      "marker": "",
+      "raw": "141.38 -> 161.14 ms",
+      "note": "author gave absolute numbers",
+      "ratio": 0.877374,
+      "pct": -12.26
+     },
+     "baseline": null,
+     "baseline_sd": null,
+     "pr_solution": null,
+     "pr_solution_sd": null,
+     "n": null,
+     "ratio": null,
+     "ratio_of_ratios": null,
+     "verdict": "unknown",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "serving_mean_e2el",
+     "unit": "ms",
+     "reported": {
+      "baseline": 446.27,
+      "pr_solution": 391.46,
+      "how": "absolute",
+      "marker": "",
+      "raw": "446.27 -> 391.46 ms",
+      "note": "author gave absolute numbers",
+      "ratio": 1.140014,
+      "pct": 14.0
+     },
+     "baseline": null,
+     "baseline_sd": null,
+     "pr_solution": null,
+     "pr_solution_sd": null,
+     "n": null,
+     "ratio": null,
+     "ratio_of_ratios": null,
+     "verdict": "unknown",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   ]
+  }
+ },
  "gap": {
   "verdict": "not analysed",
   "note": null,

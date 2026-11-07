@@ -14,25 +14,51 @@
  "reported_gain": "30%",
  "gain_kind": "pct",
  "gain_evidence": "I noticed that after enabling EP on a 16-card setup, the time taken for the all-reduce kernel has doubled, and the throughput has dropped by 30%.",
+ "source_files": [
+  "vllm/config.py",
+  "vllm/envs.py",
+  "vllm/model_executor/layers/fused_moe/fused_moe.py",
+  "vllm/model_executor/layers/fused_moe/layer.py",
+  "vllm/model_executor/layers/fused_moe/moe_torch_iterative.py",
+  "vllm/model_executor/layers/quantization/awq_marlin.py",
+  "vllm/model_executor/layers/quantization/compressed_tensors/compressed_tensors_moe.py",
+  "vllm/model_executor/layers/quantization/experts_int8.py",
+  "vllm/model_executor/layers/quantization/fp8.py",
+  "vllm/model_executor/layers/quantization/gptq_marlin.py",
+  "vllm/model_executor/layers/quantization/moe_wna16.py",
+  "vllm/model_executor/layers/quantization/quark/quark_moe.py",
+  "vllm/model_executor/models/deepseek_v2.py"
+ ],
+ "test_files": [
+  "tests/distributed/test_expert_parallel.py",
+  "tests/kernels/test_awq_marlin.py",
+  "tests/kernels/test_moe.py",
+  "tests/kernels/utils.py",
+  "tests/utils.py"
+ ],
+ "wheel": "0.8.0",
+ "wheel_note": "first PyPI release after merge (2025-03-18 > 2025-02-24); picked by gen_tasks.py from PyPI upload dates.",
+ "test_note": "",
  "workload": {
   "kind": "repo_benchmark",
   "script": "benchmarks/kernels/benchmark_moe.py",
   "cmd": "python3 benchmarks/kernels/benchmark_moe.py --model mistralai/Mixtral-8x7B-Instruct-v0.1 --tp-size 2 --dtype auto --seed 0",
   "unit": "us",
   "needs": "gpu",
+  "headline": "fused_moe_kernel",
   "note": "FusedMoE Triton kernel microbench, GPU-only. PR gives no before/after numbers (design doc)."
  },
  "experiments": [
   {
    "name": "fused_moe_kernel",
    "unit": "us",
-   "parse": "kernel us",
    "reported": {
     "base": null,
     "patch": null
    }
   }
  ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
  "hardware_overrides": {},
  "requirements": {
   "hardware": {
@@ -52,7 +78,7 @@
    "python3": true,
    "hf_cli": true,
    "hf_token": true,
-   "vllm_wheel": null,
+   "vllm_wheel": "0.8.0",
    "models": [
     "mistralai/Mixtral-8x7B-Instruct-v0.1"
    ],
@@ -61,7 +87,7 @@
     "ALLOW_MIXTRAL"
    ],
    "needs_server": false,
-   "pipeline": "needs-wheel-task"
+   "pipeline": "wheel"
   }
  }
 }

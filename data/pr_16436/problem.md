@@ -35,6 +35,7 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Reported numbers (PR author)
 - gain: 8% (pct)
 - evidence: By refactoring the code to avoid the indexing, we can remove the sync and allow much more of the sampling phase CPU work to overlap with the forward pass on the
+- reported = numbers from the PR body (author's machine)
 
 ## Rules
 - Edit only files under `./vllm`.

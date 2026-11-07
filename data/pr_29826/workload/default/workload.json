@@ -157,7 +157,136 @@
    "pipeline": "wheel"
   }
  },
- "reproduced": null,
+ "reproduced": {
+  "rtx5070ti": {
+   "source": "data/pr_29826/results.rtx5070ti.json",
+   "hw_slug": "rtx5070ti",
+   "ts": "2026-11-07T22:41:57Z",
+   "image": {
+    "mode": "wheel",
+    "wheel": "0.12.0",
+    "workload_cmd": "python3 /task/bench.py",
+    "repeats": 5
+   },
+   "tests": {
+    "base": "SKIP",
+    "gold": "SKIP"
+   },
+   "verdict": "no_reported_number",
+   "reproduced_ratio_median": 1.4107,
+   "reported_ratio_median": null,
+   "machine": {
+    "ts": "2026-11-07T22:39:46Z",
+    "host": {
+     "hostname": "DESKTOP-michael",
+     "kernel": "6.18.33.2-microsoft-standard-WSL2",
+     "wsl2": true,
+     "os": "Ubuntu 24.04.3 LTS"
+    },
+    "gpu": {
+     "name": "NVIDIA GeForce RTX 5070 Ti",
+     "driver": "591.86",
+     "cuda": "13.1",
+     "sm_mhz": 180.0,
+     "sm_max_mhz": 3090.0,
+     "mem_mhz": 405.0,
+     "mem_max_mhz": 14001.0,
+     "vram_total_mib": 16303.0,
+     "vram_used_mib": 275.0,
+     "util_pct": 0.0,
+     "power_w": 30.09,
+     "power_limit_w": 300.0,
+     "temp_c": 35.0,
+     "pstate": "P8",
+     "throttle_reasons": "0x0000000000000000",
+     "processes": [
+      {
+       "pid": 2903,
+       "name": "python main.py --listen 0.0.0.0 --port 8188",
+       "mem_mib": null
+      }
+     ]
+    },
+    "cpu": {
+     "model": "Intel(R) Core(TM) i7-14700KF",
+     "nproc": 12,
+     "load1": 2.06494140625,
+     "load5": 1.615234375,
+     "load15": 1.3466796875,
+     "top_cpu_procs": [
+      {
+       "pid": 933018,
+       "pcpu": 7.6,
+       "comm": "python3"
+      }
+     ]
+    },
+    "ram": {
+     "total_gb": 94.3,
+     "free_gb": 1.4,
+     "available_gb": 88.5
+    },
+    "docker": {
+     "version": "Docker version 29.8.1, build 4a63305",
+     "engine": "docker"
+    }
+   },
+   "experiments": [
+    {
+     "name": "min_tokens_apply",
+     "unit": "us",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 55.6688,
+     "baseline_sd": 12.3932,
+     "pr_solution": 32.3502,
+     "pr_solution_sd": 8.855,
+     "n": 5,
+     "ratio": 1.720818,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "below_host_floor",
+      "note": "baseline 55.6688 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+     }
+    },
+    {
+     "name": "min_tokens_apply_after_kernel",
+     "unit": "us",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": 1547.5568,
+     "baseline_sd": 6.7061,
+     "pr_solution": 1406.1902,
+     "pr_solution_sd": 0.2803,
+     "n": 5,
+     "ratio": 1.100532,
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   ]
+  }
+ },
  "gap": {
   "verdict": "not analysed",
   "note": null,

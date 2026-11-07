@@ -10,15 +10,17 @@
  "hw_override": null,
  "base_sha": "f728ab8e3578c22b42ed53e51b5e8ec35328d8b9",
  "merge_sha": "299ebb62b269ce167eb1c71b5e39a1dc1f65ce1c",
- "source_files": null,
- "test_files": null,
+ "source_files": [
+  "vllm/model_executor/layers/utils.py"
+ ],
+ "test_files": [],
  "image": {
-  "mode": "wheel (UNPINNED: no task.json:wheel)",
+  "mode": "wheel",
   "tag": "vllm-task:16436",
   "dockerfile": "data/pr_16436/workload/default/Dockerfile",
   "template": "templates/Dockerfile.gpu-wheel",
-  "wheel": null,
-  "wheel_note": null,
+  "wheel": "0.8.5",
+  "wheel_note": "first PyPI release after merge (2025-04-28 > 2025-04-21); picked by gen_tasks.py from PyPI upload dates.",
   "torch_fix": null,
   "extra_pip": null,
   "swap": "tree",
@@ -91,8 +93,8 @@
    "name": "tpot",
    "unit": "ms",
    "higher_is_better": false,
-   "headline": false,
-   "parse": "Mean TPOT",
+   "headline": true,
+   "parse": "GENERIC line 'tpot [label] <number>' (ms)",
    "reported": {
     "baseline": null,
     "pr_solution": null
@@ -104,7 +106,7 @@
    "unit": "ms",
    "higher_is_better": false,
    "headline": false,
-   "parse": "Mean ITL",
+   "parse": "GENERIC line 'itl [label] <number>' (ms)",
    "reported": {
     "baseline": null,
     "pr_solution": null
@@ -116,7 +118,7 @@
    "unit": "tok/s",
    "higher_is_better": true,
    "headline": false,
-   "parse": "Output token throughput",
+   "parse": "GENERIC line 'throughput [label] <number>' (tok/s)",
    "reported": {
     "baseline": null,
     "pr_solution": null
@@ -124,12 +126,12 @@
    "note": null
   }
  ],
- "headline": null,
+ "headline": "tpot",
  "reported": {
   "gain": "8%",
   "gain_kind": "pct",
   "gain_evidence": "By refactoring the code to avoid the indexing, we can remove the sync and allow much more of the sampling phase CPU work to overlap with the forward pass on the",
-  "experiments_note": null,
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
   "author_hardware_args": [
    {
     "line": 18,
@@ -199,14 +201,14 @@
    "python3": true,
    "hf_cli": true,
    "hf_token": false,
-   "vllm_wheel": null,
+   "vllm_wheel": "0.8.5",
    "models": [
     "facebook/opt-125m"
    ],
    "datasets": [],
    "env": [],
    "needs_server": true,
-   "pipeline": "needs-wheel-task"
+   "pipeline": "wheel"
   }
  },
  "reproduced": null,
@@ -219,7 +221,7 @@
   "build": "docker build -t vllm-task:16436 data/pr_16436/workload/default",
   "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_16436:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:16436 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 benchmarks/benchmark_serving.py --backend vllm --model facebook/opt-125m --dataset-name random --random-input-len 1000 --random-output-len 100 --num-prompts 100'",
   "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_16436:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:16436 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 benchmarks/benchmark_serving.py --backend vllm --model facebook/opt-125m --dataset-name random --random-input-len 1000 --random-output-len 100 --num-prompts 100'",
-  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/). NOT PINNED: task.json has no `wheel` yet, so the Dockerfile installs the latest PyPI vLLM (compiled ops may not match either tree) and run_one.sh refuses to run it. `python3 gen/gen_tasks.py <pr>` picks the first PyPI release after merge_sha."
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
  },
- "test_note": null
+ "test_note": ""
 }

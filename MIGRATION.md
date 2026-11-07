@@ -42,3 +42,247 @@ The target layout and the owner of every file is the first section of README.md.
 
 - moved: 3 · merged: 0 · dropped: 0 · task.json written: 0
 - #28687 lived under a dot-directory (data/prs/gpu_kernels/.buildkite/) the first pass did not walk into
+
+## Run 3
+
+- moved: 186 · merged: 31 · dropped: 31 · task.json written: 5
+- note: data/pr_6779/results.rtx5070ti.json already exists; results/6779.json left in place
+- note: data/pr_13365/results.rtx5070ti.json already exists; results/13365.json left in place
+- note: data/pr_21222/results.rtx5070ti.json already exists; results/21222.json left in place
+- note: data/pr_21281/results.rtx5070ti.json already exists; results/21281.json left in place
+- note: data/pr_22940/results.rtx5070ti.json already exists; results/22940.json left in place
+- note: data/pr_27793/results.rtx5070ti.json already exists; results/27793.json left in place
+- note: data/pr_29499/results.rtx5070ti.json already exists; results/29499.json left in place
+- note: data/pr_32975/results.rtx5070ti.json already exists; results/32975.json left in place
+- note: data/pr_33538/results.rtx5070ti.json already exists; results/33538.json left in place
+- note: data/pr_33593/results.rtx5070ti.json already exists; results/33593.json left in place
+- note: data/pr_37225/results.rtx5070ti.json already exists; results/37225.json left in place
+- note: data/pr_39328/results.rtx5070ti.json already exists; results/39328.json left in place
+- note: data/pr_41163/results.rtx5070ti.json already exists; results/41163.json left in place
+
+<details><summary>moves</summary>
+
+- `.work/derive_3985.json` -> `data/pr_3985/work/derive.json` (scratch)
+- `.work/derive_4118.json` -> `data/pr_4118/work/derive.json` (scratch)
+- `.work/derive_4222.json` -> `data/pr_4222/work/derive.json` (scratch)
+- `.work/derive_4298.json` -> `data/pr_4298/work/derive.json` (scratch)
+- `.work/derive_4690.json` -> `data/pr_4690/work/derive.json` (scratch)
+- `.work/derive_5183.json` -> `data/pr_5183/work/derive.json` (scratch)
+- `.work/derive_5908.json` -> `data/pr_5908/work/derive.json` (scratch)
+- `.work/derive_6210.json` -> `data/pr_6210/work/derive.json` (scratch)
+- `tasks/pr_6442/__pycache__` -> `data/pr_6442/__pycache__` (unclassified task file)
+- `.work/unmet_6442.txt` -> `data/pr_6442/work/unmet.txt` (scratch)
+- `.work/req_6442.txt` -> `data/pr_6442/work/req.txt` (scratch)
+- `.work/derive_6455.json` -> `data/pr_6455/work/derive.json` (scratch)
+- `.work/derive_6695.json` -> `data/pr_6695/work/derive.json` (scratch)
+- `results/6779.json` -> `data/pr_6779/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_6779` -> `data/pr_6779/work` (scratch)
+- `.work/req_6779.txt` -> `data/pr_6779/work/req.txt` (scratch)
+- `.work/derive_6779.json` -> `data/pr_6779/work/derive.json` (scratch)
+- `.work/derive_6865.json` -> `data/pr_6865/work/derive.json` (scratch)
+- `.work/derive_7117.json` -> `data/pr_7117/work/derive.json` (scratch)
+- `.work/derive_7377.json` -> `data/pr_7377/work/derive.json` (scratch)
+- `.work/derive_8248.json` -> `data/pr_8248/work/derive.json` (scratch)
+- `.work/derive_8651.json` -> `data/pr_8651/work/derive.json` (scratch)
+- `.work/derive_9948.json` -> `data/pr_9948/work/derive.json` (scratch)
+- `.work/unmet_9972.txt` -> `data/pr_9972/work/unmet.txt` (scratch)
+- `.work/req_9972.txt` -> `data/pr_9972/work/req.txt` (scratch)
+- `.work/derive_10980.json` -> `data/pr_10980/work/derive.json` (scratch)
+- `.work/derive_11870.json` -> `data/pr_11870/work/derive.json` (scratch)
+- `.work/derive_12368.json` -> `data/pr_12368/work/derive.json` (scratch)
+- `.work/derive_12563.json` -> `data/pr_12563/work/derive.json` (scratch)
+- `.work/req_12583.txt` -> `data/pr_12583/work/req.txt` (scratch)
+- `.work/unmet_12583.txt` -> `data/pr_12583/work/unmet.txt` (scratch)
+- `.work/derive_12755.json` -> `data/pr_12755/work/derive.json` (scratch)
+- `tasks/pr_13365/__pycache__` -> `data/pr_13365/__pycache__` (unclassified task file)
+- `results/13365.json` -> `data/pr_13365/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_13365` -> `data/pr_13365/work` (scratch)
+- `.work/req_13365.txt` -> `data/pr_13365/work/req.txt` (scratch)
+- `.work/derive_13365.json` -> `data/pr_13365/work/derive.json` (scratch)
+- `logs/pr_13365` -> `data/pr_13365/logs/rtx5070ti` (logs)
+- `.work/derive_14540.json` -> `data/pr_14540/work/derive.json` (scratch)
+- `.work/derive_14778.json` -> `data/pr_14778/work/derive.json` (scratch)
+- `.work/req_16436.txt` -> `data/pr_16436/work/req.txt` (scratch)
+- `.work/unmet_16436.txt` -> `data/pr_16436/work/unmet.txt` (scratch)
+- `.work/derive_18242.json` -> `data/pr_18242/work/derive.json` (scratch)
+- `tasks/pr_20308/__pycache__` -> `data/pr_20308/__pycache__` (unclassified task file)
+- `tasks/pr_20839/__pycache__` -> `data/pr_20839/__pycache__` (unclassified task file)
+- `results/20839.json` -> `data/pr_20839/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_20839` -> `data/pr_20839/work` (scratch)
+- `.work/req_20839.txt` -> `data/pr_20839/work/req.txt` (scratch)
+- `results/21222.json` -> `data/pr_21222/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_21222` -> `data/pr_21222/work` (scratch)
+- `.work/derive_21222.json` -> `data/pr_21222/work/derive.json` (scratch)
+- `.work/req_21222.txt` -> `data/pr_21222/work/req.txt` (scratch)
+- `logs/pr_21222` -> `data/pr_21222/logs/rtx5070ti` (logs)
+- `results/21281.json` -> `data/pr_21281/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_21281` -> `data/pr_21281/work` (scratch)
+- `.work/req_21281.txt` -> `data/pr_21281/work/req.txt` (scratch)
+- `.work/derive_21281.json` -> `data/pr_21281/work/derive.json` (scratch)
+- `tasks/pr_21917/__pycache__` -> `data/pr_21917/__pycache__` (unclassified task file)
+- `results/21917.json` -> `data/pr_21917/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_21917` -> `data/pr_21917/work` (scratch)
+- `.work/req_21917.txt` -> `data/pr_21917/work/req.txt` (scratch)
+- `logs/pr_21917` -> `data/pr_21917/logs/rtx5070ti` (logs)
+- `tasks/pr_22940/tests` -> `data/pr_22940/tests` (hand-written tests)
+- `tasks/pr_22940/tests/__pycache__` -> `data/pr_22940/tests/__pycache__` (hand-written tests)
+- `results/22940.json` -> `data/pr_22940/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_22940` -> `data/pr_22940/work` (scratch)
+- `.work/derive_22940.json` -> `data/pr_22940/work/derive.json` (scratch)
+- `.work/old_22940.json` -> `data/pr_22940/work/old.json` (scratch)
+- `.work/req_22940.txt` -> `data/pr_22940/work/req.txt` (scratch)
+- `.work/carry_22940.json` -> `data/pr_22940/work/carry.json` (scratch)
+- `logs/pr_22940` -> `data/pr_22940/logs/rtx5070ti` (logs)
+- `.work/unmet_23504.txt` -> `data/pr_23504/work/unmet.txt` (scratch)
+- `.work/req_23504.txt` -> `data/pr_23504/work/req.txt` (scratch)
+- `tasks/pr_23928/__pycache__` -> `data/pr_23928/__pycache__` (unclassified task file)
+- `.work/derive_23928.json` -> `data/pr_23928/work/derive.json` (scratch)
+- `tasks/pr_24573/__pycache__` -> `data/pr_24573/__pycache__` (unclassified task file)
+- `.work/req_24573.txt` -> `data/pr_24573/work/req.txt` (scratch)
+- `tasks/pr_26437/__pycache__` -> `data/pr_26437/__pycache__` (unclassified task file)
+- `tasks/pr_27402/__pycache__` -> `data/pr_27402/__pycache__` (unclassified task file)
+- `tasks/pr_27673/__pycache__` -> `data/pr_27673/__pycache__` (unclassified task file)
+- `results/27673.json` -> `data/pr_27673/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_27673` -> `data/pr_27673/work` (scratch)
+- `.work/derive_27673.json` -> `data/pr_27673/work/derive.json` (scratch)
+- `.work/req_27673.txt` -> `data/pr_27673/work/req.txt` (scratch)
+- `logs/pr_27673` -> `data/pr_27673/logs/rtx5070ti` (logs)
+- `results/27793.json` -> `data/pr_27793/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_27793` -> `data/pr_27793/work` (scratch)
+- `.work/req_27793.txt` -> `data/pr_27793/work/req.txt` (scratch)
+- `.work/derive_27793.json` -> `data/pr_27793/work/derive.json` (scratch)
+- `logs/pr_27793` -> `data/pr_27793/logs/rtx5070ti` (logs)
+- `.work/req_28280.txt` -> `data/pr_28280/work/req.txt` (scratch)
+- `.work/unmet_28280.txt` -> `data/pr_28280/work/unmet.txt` (scratch)
+- `tasks/pr_29354/__pycache__` -> `data/pr_29354/__pycache__` (unclassified task file)
+- `.work/req_29354.txt` -> `data/pr_29354/work/req.txt` (scratch)
+- `tasks/pr_29499/__pycache__` -> `data/pr_29499/__pycache__` (unclassified task file)
+- `results/29499.json` -> `data/pr_29499/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_29499` -> `data/pr_29499/work` (scratch)
+- `.work/req_29499.txt` -> `data/pr_29499/work/req.txt` (scratch)
+- `.work/derive_29499.json` -> `data/pr_29499/work/derive.json` (scratch)
+- `logs/pr_29499` -> `data/pr_29499/logs/rtx5070ti` (logs)
+- `tasks/pr_29826/__pycache__` -> `data/pr_29826/__pycache__` (unclassified task file)
+- `results/29826.json` -> `data/pr_29826/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_29826` -> `data/pr_29826/work` (scratch)
+- `.work/req_29826.txt` -> `data/pr_29826/work/req.txt` (scratch)
+- `logs/pr_29826` -> `data/pr_29826/logs/rtx5070ti` (logs)
+- `.work/derive_31034.json` -> `data/pr_31034/work/derive.json` (scratch)
+- `tasks/pr_31722/__pycache__` -> `data/pr_31722/__pycache__` (unclassified task file)
+- `results/31722.json` -> `data/pr_31722/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_31722` -> `data/pr_31722/work` (scratch)
+- `.work/req_31722.txt` -> `data/pr_31722/work/req.txt` (scratch)
+- `tasks/pr_31984/__pycache__` -> `data/pr_31984/__pycache__` (unclassified task file)
+- `results/31984.json` -> `data/pr_31984/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_31984` -> `data/pr_31984/work` (scratch)
+- `.work/req_31984.txt` -> `data/pr_31984/work/req.txt` (scratch)
+- `logs/pr_31984` -> `data/pr_31984/logs/rtx5070ti` (logs)
+- `tasks/pr_32403/__pycache__` -> `data/pr_32403/__pycache__` (unclassified task file)
+- `.work/pr_32403` -> `data/pr_32403/work` (scratch)
+- `.work/req_32403.txt` -> `data/pr_32403/work/req.txt` (scratch)
+- `tasks/pr_32425/__pycache__` -> `data/pr_32425/__pycache__` (unclassified task file)
+- `.work/req_32425.txt` -> `data/pr_32425/work/req.txt` (scratch)
+- `tasks/pr_32975/__pycache__` -> `data/pr_32975/__pycache__` (unclassified task file)
+- `results/32975.json` -> `data/pr_32975/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_32975` -> `data/pr_32975/work` (scratch)
+- `.work/derive_32975.json` -> `data/pr_32975/work/derive.json` (scratch)
+- `.work/req_32975.txt` -> `data/pr_32975/work/req.txt` (scratch)
+- `logs/pr_32975` -> `data/pr_32975/logs/rtx5070ti` (logs)
+- `tasks/pr_33529/__pycache__` -> `data/pr_33529/__pycache__` (unclassified task file)
+- `results/33538.json` -> `data/pr_33538/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_33538` -> `data/pr_33538/work` (scratch)
+- `.work/req_33538.txt` -> `data/pr_33538/work/req.txt` (scratch)
+- `.work/carry_33538.json` -> `data/pr_33538/work/carry.json` (scratch)
+- `.work/derive_33538.json` -> `data/pr_33538/work/derive.json` (scratch)
+- `.work/old_33538.json` -> `data/pr_33538/work/old.json` (scratch)
+- `logs/pr_33538` -> `data/pr_33538/logs/rtx5070ti` (logs)
+- `tasks/pr_33593/__pycache__` -> `data/pr_33593/__pycache__` (unclassified task file)
+- `results/33593.json` -> `data/pr_33593/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_33593` -> `data/pr_33593/work` (scratch)
+- `.work/derive_33593.json` -> `data/pr_33593/work/derive.json` (scratch)
+- `.work/req_33593.txt` -> `data/pr_33593/work/req.txt` (scratch)
+- `logs/pr_33593` -> `data/pr_33593/logs/rtx5070ti` (logs)
+- `tasks/pr_34846/__pycache__` -> `data/pr_34846/__pycache__` (unclassified task file)
+- `.work/req_34846.txt` -> `data/pr_34846/work/req.txt` (scratch)
+- `tasks/pr_35330/__pycache__` -> `data/pr_35330/__pycache__` (unclassified task file)
+- `results/35330.json` -> `data/pr_35330/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_35330` -> `data/pr_35330/work` (scratch)
+- `.work/req_35330.txt` -> `data/pr_35330/work/req.txt` (scratch)
+- `results/37225.json` -> `data/pr_37225/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_37225` -> `data/pr_37225/work` (scratch)
+- `.work/req_37225.txt` -> `data/pr_37225/work/req.txt` (scratch)
+- `.work/health_37225.log.req` -> `data/pr_37225/work/health.log.req` (scratch)
+- `.work/health_37225.out` -> `data/pr_37225/work/health.out` (scratch)
+- `.work/health_37225.log` -> `data/pr_37225/work/health.log` (scratch)
+- `.work/carry_37225.json` -> `data/pr_37225/work/carry.json` (scratch)
+- `.work/old_37225.json` -> `data/pr_37225/work/old.json` (scratch)
+- `.work/derive_37225.json` -> `data/pr_37225/work/derive.json` (scratch)
+- `logs/pr_37225` -> `data/pr_37225/logs/rtx5070ti` (logs)
+- `tasks/pr_37347/__pycache__` -> `data/pr_37347/__pycache__` (unclassified task file)
+- `tasks/pr_38559/__pycache__` -> `data/pr_38559/__pycache__` (unclassified task file)
+- `results/38559.json` -> `data/pr_38559/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_38559` -> `data/pr_38559/work` (scratch)
+- `.work/req_38559.txt` -> `data/pr_38559/work/req.txt` (scratch)
+- `logs/pr_38559` -> `data/pr_38559/logs/rtx5070ti` (logs)
+- `tasks/pr_39328/__pycache__` -> `data/pr_39328/__pycache__` (unclassified task file)
+- `results/39328.json` -> `data/pr_39328/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_39328` -> `data/pr_39328/work` (scratch)
+- `.work/derive_39328.json` -> `data/pr_39328/work/derive.json` (scratch)
+- `.work/req_39328.txt` -> `data/pr_39328/work/req.txt` (scratch)
+- `logs/pr_39328` -> `data/pr_39328/logs/rtx5070ti` (logs)
+- `tasks/pr_41043/__pycache__` -> `data/pr_41043/__pycache__` (unclassified task file)
+- `results/41043.json` -> `data/pr_41043/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_41043` -> `data/pr_41043/work` (scratch)
+- `.work/req_41043.txt` -> `data/pr_41043/work/req.txt` (scratch)
+- `logs/pr_41043` -> `data/pr_41043/logs/rtx5070ti` (logs)
+- `tasks/pr_41163/__pycache__` -> `data/pr_41163/__pycache__` (unclassified task file)
+- `results/41163.json` -> `data/pr_41163/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_41163` -> `data/pr_41163/work` (scratch)
+- `.work/old_41163.json` -> `data/pr_41163/work/old.json` (scratch)
+- `.work/req_41163.txt` -> `data/pr_41163/work/req.txt` (scratch)
+- `.work/carry_41163.json` -> `data/pr_41163/work/carry.json` (scratch)
+- `.work/derive_41163.json` -> `data/pr_41163/work/derive.json` (scratch)
+- `logs/pr_41163` -> `data/pr_41163/logs/rtx5070ti` (logs)
+- `tasks/pr_42311/__pycache__` -> `data/pr_42311/__pycache__` (unclassified task file)
+- `results/42311.json` -> `data/pr_42311/results.rtx5070ti.json` (measured run -> hw slug rtx5070ti)
+- `.work/pr_42311` -> `data/pr_42311/work` (scratch)
+- `.work/req_42311.txt` -> `data/pr_42311/work/req.txt` (scratch)
+- `logs/pr_42311` -> `data/pr_42311/logs/rtx5070ti` (logs)
+
+</details>
+
+<details><summary>drops</summary>
+
+- `results/3985.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `results/4118.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `results/4222.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `results/4298.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `results/4690.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `results/5183.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `results/5908.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `results/6210.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `results/6455.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `results/6695.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `results/6865.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `results/7117.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `results/7377.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `results/8248.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `results/8651.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `results/9948.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `tasks/pr_9972/metadata.json`: merged into task.json
+- `results/10980.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `results/11870.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `results/12368.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `results/12563.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `tasks/pr_12583/metadata.json`: merged into task.json
+- `results/12755.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `results/14540.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `results/14778.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `tasks/pr_16436/metadata.json`: merged into task.json
+- `results/18242.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `tasks/pr_23504/metadata.json`: merged into task.json
+- `results/23928.json`: reported-only scaffold (never a run): its experiments live in task.json
+- `tasks/pr_28280/metadata.json`: merged into task.json
+- `results/31034.json`: reported-only scaffold (never a run): its experiments live in task.json
+
+</details>

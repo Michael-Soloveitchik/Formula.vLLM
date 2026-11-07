@@ -12,13 +12,14 @@ No `hardware_overrides[rtx5070ti]` in task.json: identical to `workload/default/
 
 | metric | unit | better | headline | reported baseline → PR's solution | parse |
 |---|---|---|---|---|---|
-| `input_throughput` | tok/s | higher |  | 1.792e+04 → 3.226e+04 | input tok/s |
-| `output_throughput` | tok/s | higher |  | 485 → 874 | output tok/s |
-| `cost_time` | s | lower |  | 8.49 → 4.83 | cost time |
+| `input_throughput` | tok/s | higher | yes | 1.792e+04 → 3.226e+04 | GENERIC line 'input_throughput [label] <number>' (tok/s) |
+| `output_throughput` | tok/s | higher |  | 485 → 874 | GENERIC line 'output_throughput [label] <number>' (tok/s) |
+| `cost_time` | s | lower |  | 8.49 → 4.83 | GENERIC line 'cost_time [label] <number>' (s) |
 
 ## Reported by the author
 
 - gain: **3x** (pct) — It is ~3x faster than list matching.
+- reported = numbers from the PR body (author's machine)
 - hardware / args as written in the PR body (`data/pr_9972/pr.md`, quoted verbatim):
 
 > L21: `VLLM_USE_V1=1 python3 benchmarks/benchmark_prefix_caching.py \`
@@ -53,7 +54,7 @@ No `hardware_overrides[rtx5070ti]` in task.json: identical to `workload/default/
 ## Re-run 1:1 without run_one.sh
 
 ```bash
-# image: wheel (UNPINNED: no task.json:wheel) — Dockerfile data/pr_9972/workload/rtx5070ti/Dockerfile (template templates/Dockerfile.gpu-wheel)
+# image: wheel, vLLM wheel 0.6.4 — Dockerfile data/pr_9972/workload/rtx5070ti/Dockerfile (template templates/Dockerfile.gpu-wheel)
 docker build -t vllm-task:9972 data/pr_9972/workload/rtx5070ti
 # baseline arm
 docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_9972:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:9972 -lc 'A=/base; site=$(python3 -c "import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))"); find "$site/vllm" -name "*.py" -delete; cp -a $A/vllm/. "$site/vllm/"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e "$d" ] && cp -a "$d" /t/; done; cd /t; VLLM_USE_V1=1 python3 benchmarks/benchmark_prefix_caching.py --model neuralmagic/Meta-Llama-3-8B-Instruct-FP8 --num-prompts 200 --repeat-count 2 --input-length-range 256:512 --dataset-path ./ShareGPT_V3_unfiltered_cleaned_split.json --seed 0 --enable-prefix-caching'
@@ -61,9 +62,9 @@ docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_
 docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_9972:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:9972 -lc 'A=/gold; site=$(python3 -c "import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))"); find "$site/vllm" -name "*.py" -delete; cp -a $A/vllm/. "$site/vllm/"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e "$d" ] && cp -a "$d" /t/; done; cd /t; VLLM_USE_V1=1 python3 benchmarks/benchmark_prefix_caching.py --model neuralmagic/Meta-Llama-3-8B-Instruct-FP8 --num-prompts 200 --repeat-count 2 --input-length-range 256:512 --dataset-path ./ShareGPT_V3_unfiltered_cleaned_split.json --seed 0 --enable-prefix-caching'
 ```
 
-The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/). NOT PINNED: task.json has no `wheel` yet, so the Dockerfile installs the latest PyPI vLLM (compiled ops may not match either tree) and run_one.sh refuses to run it. `python3 gen/gen_tasks.py <pr>` picks the first PyPI release after merge_sha.
+The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/).
 
 ## Machine requirements
 
 - GPU: yes ×1 ≥16 GB VRAM, compute capability ≥8.9 (FP8 model (Ada/Hopper+)); RAM 8 GB; disk 39.234765625 GB
-- software: docker=True nvidia-container-runtime=True vllm_wheel=None pipeline=needs-wheel-task models=['neuralmagic/Meta-Llama-3-8B-Instruct-FP8'] datasets=['ShareGPT_V3_unfiltered_cleaned_split.json'] hf_token=False needs_server=False
+- software: docker=True nvidia-container-runtime=True vllm_wheel=0.6.4 pipeline=wheel models=['neuralmagic/Meta-Llama-3-8B-Instruct-FP8'] datasets=['ShareGPT_V3_unfiltered_cleaned_split.json'] hf_token=False needs_server=False

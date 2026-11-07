@@ -264,5 +264,6 @@
    "base": "SKIP",
    "gold": "SKIP"
   }
- }
+ },
+ "hw_slug": "rtx5070ti"
 }

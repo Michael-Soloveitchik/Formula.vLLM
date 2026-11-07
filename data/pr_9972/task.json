@@ -14,19 +14,31 @@
  "reported_gain": "3x",
  "gain_kind": "pct",
  "gain_evidence": "It is ~3x faster than list matching.",
+ "source_files": [
+  "vllm/v1/core/kv_cache_manager.py",
+  "vllm/v1/core/kv_cache_utils.py",
+  "vllm/v1/core/scheduler.py",
+  "vllm/v1/engine/llm_engine.py"
+ ],
+ "test_files": [
+  "tests/v1/core/test_prefix_caching.py"
+ ],
+ "wheel": "0.6.4",
+ "wheel_note": "first PyPI release after merge (2024-11-15 > 2024-11-07); picked by gen_tasks.py from PyPI upload dates.",
+ "test_note": "",
  "workload": {
   "kind": "serving",
   "script": "benchmarks/benchmark_prefix_caching.py",
   "cmd": "VLLM_USE_V1=1 python3 benchmarks/benchmark_prefix_caching.py --model neuralmagic/Meta-Llama-3-8B-Instruct-FP8 --num-prompts 200 --repeat-count 2 --input-length-range 256:512 --dataset-path ./ShareGPT_V3_unfiltered_cleaned_split.json --seed 0 --enable-prefix-caching",
   "unit": "tok/s",
   "needs": "gpu",
+  "headline": "input_throughput",
   "note": "Offline batching bench; needs model + ShareGPT dataset. GPU serving run. Numbers are cache-enabled (49% hit)."
  },
  "experiments": [
   {
    "name": "input_throughput",
    "unit": "tok/s",
-   "parse": "input tok/s",
    "reported": {
     "base": 17916.0,
     "patch": 32258.0
@@ -35,7 +47,6 @@
   {
    "name": "output_throughput",
    "unit": "tok/s",
-   "parse": "output tok/s",
    "reported": {
     "base": 485.0,
     "patch": 874.0
@@ -44,13 +55,13 @@
   {
    "name": "cost_time",
    "unit": "s",
-   "parse": "cost time",
    "reported": {
     "base": 8.49,
     "patch": 4.83
    }
   }
  ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
  "hardware_overrides": {},
  "requirements": {
   "hardware": {
@@ -70,7 +81,7 @@
    "python3": true,
    "hf_cli": true,
    "hf_token": false,
-   "vllm_wheel": null,
+   "vllm_wheel": "0.6.4",
    "models": [
     "neuralmagic/Meta-Llama-3-8B-Instruct-FP8"
    ],
@@ -79,7 +90,7 @@
    ],
    "env": [],
    "needs_server": false,
-   "pipeline": "needs-wheel-task"
+   "pipeline": "wheel"
   }
  }
 }

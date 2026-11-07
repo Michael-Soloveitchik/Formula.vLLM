@@ -258,7 +258,188 @@
    "pipeline": "wheel"
   }
  },
- "reproduced": null,
+ "reproduced": {
+  "rtx5070ti": {
+   "source": "data/pr_20839/results.rtx5070ti.json",
+   "hw_slug": "rtx5070ti",
+   "ts": "2026-11-07T22:32:33Z",
+   "image": {
+    "mode": "wheel",
+    "wheel": "0.10.1",
+    "workload_cmd": "python3 /task/bench.py",
+    "repeats": 5
+   },
+   "tests": {
+    "base": "SKIP",
+    "gold": "SKIP"
+   },
+   "verdict": "unknown",
+   "reproduced_ratio_median": null,
+   "reported_ratio_median": 1.0867,
+   "machine": {
+    "ts": "2026-11-07T22:32:21Z",
+    "host": {
+     "hostname": "DESKTOP-michael",
+     "kernel": "6.18.33.2-microsoft-standard-WSL2",
+     "wsl2": true,
+     "os": "Ubuntu 24.04.3 LTS"
+    },
+    "gpu": {
+     "name": "NVIDIA GeForce RTX 5070 Ti",
+     "driver": "591.86",
+     "cuda": "13.1",
+     "sm_mhz": 180.0,
+     "sm_max_mhz": 3090.0,
+     "mem_mhz": 405.0,
+     "mem_max_mhz": 14001.0,
+     "vram_total_mib": 16303.0,
+     "vram_used_mib": 275.0,
+     "util_pct": 0.0,
+     "power_w": 30.32,
+     "power_limit_w": 300.0,
+     "temp_c": 35.0,
+     "pstate": "P8",
+     "throttle_reasons": "0x0000000000000000",
+     "processes": [
+      {
+       "pid": 2903,
+       "name": "python main.py --listen 0.0.0.0 --port 8188",
+       "mem_mib": null
+      }
+     ]
+    },
+    "cpu": {
+     "model": "Intel(R) Core(TM) i7-14700KF",
+     "nproc": 12,
+     "load1": 2.73779296875,
+     "load5": 1.5595703125,
+     "load15": 1.24267578125,
+     "top_cpu_procs": [
+      {
+       "pid": 928906,
+       "pcpu": 11.1,
+       "comm": "python3"
+      }
+     ]
+    },
+    "ram": {
+     "total_gb": 94.3,
+     "free_gb": 1.6,
+     "available_gb": 89.5
+    },
+    "docker": {
+     "version": "Docker version 29.8.1, build 4a63305",
+     "engine": "docker"
+    }
+   },
+   "experiments": [
+    {
+     "name": "rmsnorm_gated_16k",
+     "unit": "us",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": null,
+     "baseline_sd": null,
+     "pr_solution": null,
+     "pr_solution_sd": null,
+     "n": null,
+     "ratio": null,
+     "ratio_of_ratios": null,
+     "verdict": "unknown",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "rmsnorm_gated_32k",
+     "unit": "us",
+     "reported": {
+      "baseline": null,
+      "pr_solution": null,
+      "how": null,
+      "marker": "",
+      "raw": "no number in the PR",
+      "note": "",
+      "ratio": null,
+      "pct": null
+     },
+     "baseline": null,
+     "baseline_sd": null,
+     "pr_solution": null,
+     "pr_solution_sd": null,
+     "n": null,
+     "ratio": null,
+     "ratio_of_ratios": null,
+     "verdict": "unknown",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "latency_16k",
+     "unit": "us",
+     "reported": {
+      "baseline": 0.6323,
+      "pr_solution": 0.5812,
+      "how": "absolute",
+      "marker": "",
+      "raw": "0.6323 -> 0.5812 us",
+      "note": "author gave absolute numbers",
+      "ratio": 1.087922,
+      "pct": 8.79
+     },
+     "baseline": null,
+     "baseline_sd": null,
+     "pr_solution": null,
+     "pr_solution_sd": null,
+     "n": null,
+     "ratio": null,
+     "ratio_of_ratios": null,
+     "verdict": "unknown",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    },
+    {
+     "name": "latency_32k",
+     "unit": "us",
+     "reported": {
+      "baseline": 1.2799,
+      "pr_solution": 1.1791,
+      "how": "absolute",
+      "marker": "",
+      "raw": "1.2799 -> 1.1791 us",
+      "note": "author gave absolute numbers",
+      "ratio": 1.085489,
+      "pct": 8.55
+     },
+     "baseline": null,
+     "baseline_sd": null,
+     "pr_solution": null,
+     "pr_solution_sd": null,
+     "n": null,
+     "ratio": null,
+     "ratio_of_ratios": null,
+     "verdict": "unknown",
+     "reliability": {
+      "flag": "ok",
+      "note": ""
+     }
+    }
+   ]
+  }
+ },
  "gap": {
   "verdict": "not analysed",
   "note": null,

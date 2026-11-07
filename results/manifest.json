@@ -3,17 +3,27 @@
  "prs": [
   6779,
   13365,
+  20839,
   21222,
   21281,
+  21917,
   22940,
+  27673,
   27793,
   29499,
+  29826,
+  31722,
+  31984,
   32975,
   33538,
   33593,
+  35330,
   37225,
+  38559,
   39328,
-  41163
+  41043,
+  41163,
+  42311
  ],
  "slugs": {
   "6779": [
@@ -22,19 +32,37 @@
   "13365": [
    "rtx5070ti"
   ],
+  "20839": [
+   "rtx5070ti"
+  ],
   "21222": [
    "rtx5070ti"
   ],
   "21281": [
    "rtx5070ti"
   ],
+  "21917": [
+   "rtx5070ti"
+  ],
   "22940": [
+   "rtx5070ti"
+  ],
+  "27673": [
    "rtx5070ti"
   ],
   "27793": [
    "rtx5070ti"
   ],
   "29499": [
+   "rtx5070ti"
+  ],
+  "29826": [
+   "rtx5070ti"
+  ],
+  "31722": [
+   "rtx5070ti"
+  ],
+  "31984": [
    "rtx5070ti"
   ],
   "32975": [
@@ -46,13 +74,25 @@
   "33593": [
    "rtx5070ti"
   ],
+  "35330": [
+   "rtx5070ti"
+  ],
   "37225": [
+   "rtx5070ti"
+  ],
+  "38559": [
    "rtx5070ti"
   ],
   "39328": [
    "rtx5070ti"
   ],
+  "41043": [
+   "rtx5070ti"
+  ],
   "41163": [
+   "rtx5070ti"
+  ],
+  "42311": [
    "rtx5070ti"
   ]
  },
@@ -63,20 +103,38 @@
   "13365": {
    "rtx5070ti": "data/pr_13365/results.rtx5070ti.json"
   },
+  "20839": {
+   "rtx5070ti": "data/pr_20839/results.rtx5070ti.json"
+  },
   "21222": {
    "rtx5070ti": "data/pr_21222/results.rtx5070ti.json"
   },
   "21281": {
    "rtx5070ti": "data/pr_21281/results.rtx5070ti.json"
   },
+  "21917": {
+   "rtx5070ti": "data/pr_21917/results.rtx5070ti.json"
+  },
   "22940": {
    "rtx5070ti": "data/pr_22940/results.rtx5070ti.json"
+  },
+  "27673": {
+   "rtx5070ti": "data/pr_27673/results.rtx5070ti.json"
   },
   "27793": {
    "rtx5070ti": "data/pr_27793/results.rtx5070ti.json"
   },
   "29499": {
    "rtx5070ti": "data/pr_29499/results.rtx5070ti.json"
+  },
+  "29826": {
+   "rtx5070ti": "data/pr_29826/results.rtx5070ti.json"
+  },
+  "31722": {
+   "rtx5070ti": "data/pr_31722/results.rtx5070ti.json"
+  },
+  "31984": {
+   "rtx5070ti": "data/pr_31984/results.rtx5070ti.json"
   },
   "32975": {
    "rtx5070ti": "data/pr_32975/results.rtx5070ti.json"
@@ -87,14 +145,26 @@
   "33593": {
    "rtx5070ti": "data/pr_33593/results.rtx5070ti.json"
   },
+  "35330": {
+   "rtx5070ti": "data/pr_35330/results.rtx5070ti.json"
+  },
   "37225": {
    "rtx5070ti": "data/pr_37225/results.rtx5070ti.json"
+  },
+  "38559": {
+   "rtx5070ti": "data/pr_38559/results.rtx5070ti.json"
   },
   "39328": {
    "rtx5070ti": "data/pr_39328/results.rtx5070ti.json"
   },
+  "41043": {
+   "rtx5070ti": "data/pr_41043/results.rtx5070ti.json"
+  },
   "41163": {
    "rtx5070ti": "data/pr_41163/results.rtx5070ti.json"
+  },
+  "42311": {
+   "rtx5070ti": "data/pr_42311/results.rtx5070ti.json"
   }
  }
 }

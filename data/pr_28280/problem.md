@@ -34,6 +34,7 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Reported numbers (PR author)
 - gain: 8% (pct)
 - evidence: Output token throughput increases by approximately 8%, consistent with the intuition that this change is more friendly to older GPU architectures.*
+- reported = numbers from the PR body (author's machine)
 
 ## Rules
 - Edit only files under `./vllm`.

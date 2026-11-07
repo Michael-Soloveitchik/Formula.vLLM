@@ -706,7 +706,6 @@
    {
     "name": "input_throughput",
     "unit": "tok/s",
-    "parse": "input tok/s",
     "reported": {
      "base": 17916.0,
      "patch": 32258.0
@@ -715,7 +714,6 @@
    {
     "name": "output_throughput",
     "unit": "tok/s",
-    "parse": "output tok/s",
     "reported": {
      "base": 485.0,
      "patch": 874.0
@@ -724,23 +722,22 @@
    {
     "name": "cost_time",
     "unit": "s",
-    "parse": "cost time",
     "reported": {
      "base": 8.49,
      "patch": 4.83
     }
    }
   ],
-  "experiments_note": null,
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
   "workload": {
    "kind": "serving",
    "script": "benchmarks/benchmark_prefix_caching.py",
    "cmd": "VLLM_USE_V1=1 python3 benchmarks/benchmark_prefix_caching.py --model neuralmagic/Meta-Llama-3-8B-Instruct-FP8 --num-prompts 200 --repeat-count 2 --input-length-range 256:512 --dataset-path ./ShareGPT_V3_unfiltered_cleaned_split.json --seed 0 --enable-prefix-caching",
    "unit": "tok/s",
    "needs": "gpu",
-   "headline": null
+   "headline": "input_throughput"
   },
-  "wheel": null,
+  "wheel": "0.6.4",
   "requirements": {
    "hardware": {
     "gpu": true,
@@ -759,7 +756,7 @@
     "python3": true,
     "hf_cli": true,
     "hf_token": false,
-    "vllm_wheel": null,
+    "vllm_wheel": "0.6.4",
     "models": [
      "neuralmagic/Meta-Llama-3-8B-Instruct-FP8"
     ],
@@ -768,7 +765,7 @@
     ],
     "env": [],
     "needs_server": false,
-    "pipeline": "needs-wheel-task"
+    "pipeline": "wheel"
    }
   },
   "hardware_overrides": [],
@@ -977,23 +974,22 @@
    {
     "name": "fused_moe_kernel",
     "unit": "us",
-    "parse": "kernel us",
     "reported": {
      "base": null,
      "patch": null
     }
    }
   ],
-  "experiments_note": null,
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
   "workload": {
    "kind": "repo_benchmark",
    "script": "benchmarks/kernels/benchmark_moe.py",
    "cmd": "python3 benchmarks/kernels/benchmark_moe.py --model mistralai/Mixtral-8x7B-Instruct-v0.1 --tp-size 2 --dtype auto --seed 0",
    "unit": "us",
    "needs": "gpu",
-   "headline": null
+   "headline": "fused_moe_kernel"
   },
-  "wheel": null,
+  "wheel": "0.8.0",
   "requirements": {
    "hardware": {
     "gpu": true,
@@ -1012,7 +1008,7 @@
     "python3": true,
     "hf_cli": true,
     "hf_token": true,
-    "vllm_wheel": null,
+    "vllm_wheel": "0.8.0",
     "models": [
      "mistralai/Mixtral-8x7B-Instruct-v0.1"
     ],
@@ -1021,7 +1017,7 @@
      "ALLOW_MIXTRAL"
     ],
     "needs_server": false,
-    "pipeline": "needs-wheel-task"
+    "pipeline": "wheel"
    }
   },
   "hardware_overrides": [],
@@ -1382,7 +1378,6 @@
    {
     "name": "tpot",
     "unit": "ms",
-    "parse": "Mean TPOT",
     "reported": {
      "base": null,
      "patch": null
@@ -1391,7 +1386,6 @@
    {
     "name": "itl",
     "unit": "ms",
-    "parse": "Mean ITL",
     "reported": {
      "base": null,
      "patch": null
@@ -1400,23 +1394,22 @@
    {
     "name": "throughput",
     "unit": "tok/s",
-    "parse": "Output token throughput",
     "reported": {
      "base": null,
      "patch": null
     }
    }
   ],
-  "experiments_note": null,
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
   "workload": {
    "kind": "serving",
    "script": "benchmarks/benchmark_serving.py",
    "cmd": "python3 benchmarks/benchmark_serving.py --backend vllm --model facebook/opt-125m --dataset-name random --random-input-len 1000 --random-output-len 100 --num-prompts 100",
    "unit": "ms",
    "needs": "gpu",
-   "headline": null
+   "headline": "tpot"
   },
-  "wheel": null,
+  "wheel": "0.8.5",
   "requirements": {
    "hardware": {
     "gpu": true,
@@ -1435,14 +1428,14 @@
     "python3": true,
     "hf_cli": true,
     "hf_token": false,
-    "vllm_wheel": null,
+    "vllm_wheel": "0.8.5",
     "models": [
      "facebook/opt-125m"
     ],
     "datasets": [],
     "env": [],
     "needs_server": true,
-    "pipeline": "needs-wheel-task"
+    "pipeline": "wheel"
    }
   },
   "hardware_overrides": [],
@@ -1887,7 +1880,9 @@
    "default",
    "rtx5070ti"
   ],
-  "results_hws": []
+  "results_hws": [
+   "rtx5070ti"
+  ]
  },
  {
   "pr": 20841,
@@ -2173,7 +2168,9 @@
    "default",
    "rtx5070ti"
   ],
-  "results_hws": []
+  "results_hws": [
+   "rtx5070ti"
+  ]
  },
  {
   "pr": 22872,
@@ -2331,7 +2328,6 @@
    {
     "name": "serving_throughput",
     "unit": "tok/s",
-    "parse": "total tok/s",
     "reported": {
      "base": 16776.0,
      "patch": 16872.0
@@ -2340,23 +2336,22 @@
    {
     "name": "w8a8_kernel",
     "unit": "us",
-    "parse": "kernel us",
     "reported": {
      "base": null,
      "patch": null
     }
    }
   ],
-  "experiments_note": null,
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
   "workload": {
    "kind": "repo_benchmark",
    "script": "benchmarks/kernels/benchmark_w8a8_block_fp8.py",
    "cmd": "python3 benchmarks/kernels/benchmark_w8a8_block_fp8.py --tp-size 8 --input-type fp8 --out-dtype float16 --block-n 128 --block-k 128",
    "unit": "tok/s",
    "needs": "gpu",
-   "headline": null
+   "headline": "serving_throughput"
   },
-  "wheel": null,
+  "wheel": "0.10.2",
   "requirements": {
    "hardware": {
     "gpu": true,
@@ -2375,12 +2370,12 @@
     "python3": true,
     "hf_cli": false,
     "hf_token": false,
-    "vllm_wheel": null,
+    "vllm_wheel": "0.10.2",
     "models": [],
     "datasets": [],
     "env": [],
     "needs_server": false,
-    "pipeline": "needs-wheel-task"
+    "pipeline": "wheel"
    }
   },
   "hardware_overrides": [],
@@ -3437,7 +3432,9 @@
    "default",
    "rtx5070ti"
   ],
-  "results_hws": []
+  "results_hws": [
+   "rtx5070ti"
+  ]
  },
  {
   "pr": 27793,
@@ -3609,7 +3606,6 @@
    {
     "name": "output_throughput",
     "unit": "tok/s",
-    "parse": "Output token throughput",
     "reported": {
      "base": 267.82,
      "patch": 296.95
@@ -3618,23 +3614,22 @@
    {
     "name": "tpot",
     "unit": "ms",
-    "parse": "Mean TPOT",
     "reported": {
      "base": 67.93,
      "patch": 61.74
     }
    }
   ],
-  "experiments_note": null,
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
   "workload": {
    "kind": "serving",
    "script": "benchmarks/benchmark_serving.py",
    "cmd": "vllm bench serve --num-prompts 100 --dataset-name sharegpt",
    "unit": "tok/s",
    "needs": "gpu",
-   "headline": null
+   "headline": "output_throughput"
   },
-  "wheel": null,
+  "wheel": "0.11.1",
   "requirements": {
    "hardware": {
     "gpu": true,
@@ -3653,12 +3648,12 @@
     "python3": true,
     "hf_cli": false,
     "hf_token": false,
-    "vllm_wheel": null,
+    "vllm_wheel": "0.11.1",
     "models": [],
     "datasets": [],
     "env": [],
     "needs_server": true,
-    "pipeline": "needs-wheel-task"
+    "pipeline": "wheel"
    }
   },
   "hardware_overrides": [],
@@ -4130,7 +4125,9 @@
    "default",
    "rtx5070ti"
   ],
-  "results_hws": []
+  "results_hws": [
+   "rtx5070ti"
+  ]
  },
  {
   "pr": 30243,
@@ -4398,7 +4395,9 @@
    "default",
    "rtx5070ti"
   ],
-  "results_hws": []
+  "results_hws": [
+   "rtx5070ti"
+  ]
  },
  {
   "pr": 31984,
@@ -4495,7 +4494,9 @@
    "default",
    "rtx5070ti"
   ],
-  "results_hws": []
+  "results_hws": [
+   "rtx5070ti"
+  ]
  },
  {
   "pr": 32019,
@@ -5590,7 +5591,9 @@
    "default",
    "rtx5070ti"
   ],
-  "results_hws": []
+  "results_hws": [
+   "rtx5070ti"
+  ]
  },
  {
   "pr": 35451,
@@ -6170,7 +6173,9 @@
    "default",
    "rtx5070ti"
   ],
-  "results_hws": []
+  "results_hws": [
+   "rtx5070ti"
+  ]
  },
  {
   "pr": 38726,
@@ -6546,7 +6551,9 @@
    "default",
    "rtx5070ti"
   ],
-  "results_hws": []
+  "results_hws": [
+   "rtx5070ti"
+  ]
  },
  {
   "pr": 41163,
@@ -6758,7 +6765,9 @@
    "default",
    "rtx5070ti"
   ],
-  "results_hws": []
+  "results_hws": [
+   "rtx5070ti"
+  ]
  },
  {
   "pr": 42849,

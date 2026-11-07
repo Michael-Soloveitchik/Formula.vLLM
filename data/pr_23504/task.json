@@ -14,19 +14,24 @@
  "reported_gain": "1.6x",
  "gain_kind": "pct",
  "gain_evidence": "The initial throughput number looked too good (1.6x speedup with tuning).",
+ "source_files": [],
+ "test_files": [],
+ "wheel": "0.10.2",
+ "wheel_note": "first PyPI release after merge (2025-09-13 > 2025-08-24); picked by gen_tasks.py from PyPI upload dates.",
+ "test_note": "",
  "workload": {
   "kind": "repo_benchmark",
   "script": "benchmarks/kernels/benchmark_w8a8_block_fp8.py",
   "cmd": "python3 benchmarks/kernels/benchmark_w8a8_block_fp8.py --tp-size 8 --input-type fp8 --out-dtype float16 --block-n 128 --block-k 128",
   "unit": "tok/s",
   "needs": "gpu",
+  "headline": "serving_throughput",
   "note": "W8A8 block FP8 Triton kernel tuning; GPU-only (H200 config)."
  },
  "experiments": [
   {
    "name": "serving_throughput",
    "unit": "tok/s",
-   "parse": "total tok/s",
    "reported": {
     "base": 16776.0,
     "patch": 16872.0
@@ -35,13 +40,13 @@
   {
    "name": "w8a8_kernel",
    "unit": "us",
-   "parse": "kernel us",
    "reported": {
     "base": null,
     "patch": null
    }
   }
  ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
  "hardware_overrides": {},
  "requirements": {
   "hardware": {
@@ -61,12 +66,12 @@
    "python3": true,
    "hf_cli": false,
    "hf_token": false,
-   "vllm_wheel": null,
+   "vllm_wheel": "0.10.2",
    "models": [],
    "datasets": [],
    "env": [],
    "needs_server": false,
-   "pipeline": "needs-wheel-task"
+   "pipeline": "wheel"
   }
  }
 }
