@@ -15,6 +15,11 @@
 #                                    # Prints the reported-vs-measured table at the end.
 #                                    # CLEAN_IMAGES=1 ./run.sh --reproduce ...  removes each PR's
 #                                    # image after it is measured (disk: 13-25 GB per image).
+#   ./run.sh --reproduce --next 10   # AUTONOMIC: next 10 not-yet-measured PRs from workloads.json:
+#                                    # vendor task (gen_tasks/gen_workloads/gen_requirements) -> requirements
+#                                    # (+auto-install) -> run -> dump (record/derive) -> report. Unmet PRs are
+#                                    # remembered in .work/unmet_<pr>.txt; --retry-failed reruns 0-measured ones.
+#                                    # status: python3 next_prs.py --status
 #   ./run.sh --reproduce --health-check <pr>...
 #                                    # same checks, then start the real run for HEALTH_SECS
 #                                    # (default 180) per PR, watch the log, stop it, verdict.
@@ -37,14 +42,18 @@ mkdir -p .work results
 
 # flags: --reproduce (refs only, no solvers) | --health-check (with --reproduce) |
 #        --run-formula-harnesses (solver arms only, on already-reproduced PRs)
-REPRODUCE=0; HEALTH=0; HARNESSES=0; ARGS=()
+REPRODUCE=0; HEALTH=0; HARNESSES=0; NEXT=""; RETRY=""; ARGS=()
+PREV=""
 for a in "$@"; do
   case "$a" in
     --reproduce) REPRODUCE=1 ;;
+    --next) NEXT="10" ;;
+    --retry-failed|--retry-unmet) RETRY="$a" ;;
     --health-check) HEALTH=1 ;;
     --run-formula-harnesses) HARNESSES=1 ;;
-    *) ARGS+=("$a") ;;
+    *) if [ "$PREV" = "--next" ] && [[ "$a" =~ ^[0-9]+$ ]]; then NEXT="$a"; else ARGS+=("$a"); fi ;;
   esac
+  PREV="$a"
 done
 set -- ${ARGS[@]+"${ARGS[@]}"}
 if [ "$REPRODUCE" = 1 ] && [ "$HARNESSES" = 1 ]; then echo "--reproduce and --run-formula-harnesses are separate runs; pick one" >&2; exit 2; fi
@@ -101,7 +110,15 @@ else
 fi
 # reproduce mode: explicit PR numbers only; check each PR's requirements first
 if [ "$REPRODUCE" = 1 ]; then
-  [ $# -gt 0 ] || { echo "usage: ./run.sh --reproduce <pr> [<pr> ...]" >&2; exit 2; }
+  if [ -n "$NEXT" ] || [ -n "$RETRY" ]; then
+    set -- $(python3 next_prs.py ${RETRY:---next "$NEXT"})
+    echo "AUTONOMIC pick (${RETRY:---next $NEXT}): ${*:-nothing to do}"; [ $# -gt 0 ] || exit 0
+    # vendor whatever is missing for these PRs, then refresh requirements
+    python3 gen_tasks.py "$@" | grep -v "exists, skip" || true
+    python3 gen_workloads.py >/dev/null && python3 gen_requirements.py >/dev/null
+    PRS="$*"
+  fi
+  [ $# -gt 0 ] || { echo "usage: ./run.sh --reproduce <pr> [<pr> ...]   (or --next N)" >&2; exit 2; }
   for a in "$@"; do [[ "$a" =~ ^[0-9]+$ ]] || { echo "--reproduce takes PR numbers only (got '$a')" >&2; exit 2; }; done
   if [ "$HEALTH" = 1 ]; then
     for PR in $PRS; do bash "$HERE/health_check.sh" "$PR" "${HEALTH_SECS:-180}" | tee ".work/health_$PR.out" | tail -n 1; done
@@ -110,8 +127,8 @@ if [ "$REPRODUCE" = 1 ]; then
   fi
   KEEP=""; SKIPPED=""
   for PR in $PRS; do
-    if python3 requirements.py --quiet --install "$PR" >.work/req_$PR.txt; then KEEP="$KEEP $PR"
-    else echo "SKIP $PR - cannot reproduce on this machine:"; sed 's/^/    /' .work/req_$PR.txt; SKIPPED="$SKIPPED $PR"; fi
+    if python3 requirements.py --quiet --install "$PR" >.work/req_$PR.txt; then KEEP="$KEEP $PR"; rm -f ".work/unmet_$PR.txt"
+    else echo "SKIP $PR - cannot reproduce on this machine:"; sed 's/^/    /' .work/req_$PR.txt; SKIPPED="$SKIPPED $PR"; cp ".work/req_$PR.txt" ".work/unmet_$PR.txt"; fi
   done
   PRS="${KEEP# }"
   [ -n "$SKIPPED" ] && echo "skipped (unmet requirements):$SKIPPED"
@@ -124,5 +141,5 @@ for PR in $PRS; do
 done
 
 python3 aggregate.py
-[ "$REPRODUCE" = 1 ] && python3 reproduce_report.py $PRS
+if [ "$REPRODUCE" = 1 ]; then python3 reproduce_report.py $PRS; echo "---- status of all workload PRs ----"; python3 next_prs.py --status; fi
 echo 'run ./serve.sh then open http://localhost:8000/web/ (live reads results/all.json)'

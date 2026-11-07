@@ -129,6 +129,12 @@ def main():
         "logs": logs,
         "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }
+    mp = os.path.join(work, "machine.json")
+    if os.path.exists(mp):
+        try:
+            out["machine"] = json.load(open(mp))
+        except Exception:
+            pass
     # reproduce runs (RUN_SOLVERS=0) re-measure only baseline / PR's solution: keep the solver
     # arms an earlier (token-paid) run already recorded in results/<pr>.json instead of dropping them.
     if os.environ.get("RUN_SOLVERS", "1") == "0":

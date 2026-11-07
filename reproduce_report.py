@@ -41,7 +41,8 @@ for pr in sys.argv[1:]:
         meas = f"median {statistics.median(sp):.2f}x  max {max(sp):.2f}x  n={len(sp)}"
     else:
         meas = "no baseline + PR-solution timing"
-    rows.append((pr, (d.get("reported_gain") or "-")[:40], meas + f"  tests {tests}", d.get("title", "")[:50]))
+    v = (d.get("summary") or {}).get("verdict", "")
+    rows.append((pr, (d.get("reported_gain") or "-")[:40], meas + f"  tests {tests}  {v}", d.get("title", "")[:50]))
 print(f"{'PR':>6} | {'reported':40} | measured here (baseline -> PR's solution) | title")
 for r in rows:
     pr, rep, meas = r[0], r[1], r[2]

@@ -148,6 +148,8 @@ else
 fi
 fi  # KEEP_WORK (checkout/build)
 
+# machine snapshot (GPU, clocks, other tenants) next to the measurement, folded into results/<pr>.json by record.py
+[ -f "$HERE/machine.py" ] && python3 "$HERE/machine.py" snapshot >"$WORK/machine.json" 2>/dev/null || true
 # ---- in-container prelude: swap the arm's .py tree over the installed vllm --
 # Wipes the wheel's own .py files first so a file the arm tree lacks (e.g. a
 # kernel the PR introduces) cannot leak into the baseline arm; compiled .so stay.
@@ -183,7 +185,15 @@ cd /t
 # .weights/hf (model weights download once, never committed). --shm-size for
 # vLLM engine workloads.
 mkdir -p "$HERE/.weights/hf"
-run_in_img() { # run_in_img <tree> <script>
+# WL_TIMEOUT: hard cap per workload run (a hung bench must not block the queue); container gets killed with it.
+WL_TIMEOUT="${WL_TIMEOUT:-30m}"
+run_in_img() { # run_in_img <tree> <script>   (TIMED=1 -> capped by WL_TIMEOUT)
+  local cname="vllm-${PR}-$$-$RANDOM"
+  [ "${TIMED:-0}" = 1 ] && { timeout -k 20s "$WL_TIMEOUT" "$ENGINE" run --rm --name "$cname" $GPU --shm-size=2g ${ARM_ENV:-} \
+    -v "$1":/arm:ro -v "$WORK/gold_full":/gold:ro -v "$TASK":/task:ro \
+    -v "$HERE/.weights/hf":/root/.cache/huggingface \
+    -e HF_HUB_DISABLE_PROGRESS_BARS=1 \
+    "$IMG" -lc "$2"; local rc=$?; [ $rc = 124 ] && { $ENGINE kill "$cname" >/dev/null 2>&1; say "workload run hit WL_TIMEOUT=$WL_TIMEOUT -> killed"; }; return $rc; }
   $ENGINE run --rm $GPU --shm-size=2g ${ARM_ENV:-} \
     -v "$1":/arm:ro -v "$WORK/gold_full":/gold:ro -v "$TASK":/task:ro \
     -v "$HERE/.weights/hf":/root/.cache/huggingface \
@@ -207,7 +217,7 @@ run_workload() {
   [ -n "$WL_CMD" ] || return 0
   for i in $(seq 1 "$REPEATS"); do
     say "workload $arm run $i/$REPEATS"
-    ARM_ENV="-e ARM=$arm" run_in_img "$tree" "$PRELUDE $WL_CMD" >"$WORK/wl_${arm}_${i}.log" 2>&1 \
+    TIMED=1 ARM_ENV="-e ARM=$arm" run_in_img "$tree" "$PRELUDE $WL_CMD" >"$WORK/wl_${arm}_${i}.log" 2>&1 \
       || { say "workload $arm run $i failed (see $WORK/wl_${arm}_${i}.log)"; break; }
   done
 }
