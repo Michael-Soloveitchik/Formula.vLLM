@@ -143,5 +143,5 @@ for PR in $PRS; do
 done
 
 python3 aggregate.py
-if [ "$REPRODUCE" = 1 ]; then python3 reproduce_report.py $PRS; echo "---- status of all workload PRs ----"; python3 next_prs.py --status; fi
+if [ "$REPRODUCE" = 1 ]; then python3 gen_workloads.py >/dev/null 2>&1 || true; python3 reproduce_report.py $PRS; echo "---- status of all workload PRs ----"; python3 next_prs.py --status; fi
 echo 'run ./serve.sh then open http://localhost:8000/web/ (live reads results/all.json)'

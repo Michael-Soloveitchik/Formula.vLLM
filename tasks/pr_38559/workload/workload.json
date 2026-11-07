@@ -1,0 +1,204 @@
+{
+ "schema": "workload_v1",
+ "pr": 38559,
+ "title": "[Perf] Optimize mean pooling using chunks and index_add, 5.9% E2E throughput improvement (#38559)",
+ "url": "https://github.com/vllm-project/vllm/pull/38559",
+ "field": "scheduling",
+ "date": "2026-03-31",
+ "base_sha": "17b72fd1c8052f7a674056b2228a6e7ebfd4f123",
+ "merge_sha": "7b01d97a22c977aaad2f38fa03cd11742d2893e8",
+ "source_files": [
+  "vllm/model_executor/layers/pooler/seqwise/methods.py"
+ ],
+ "test_files": [],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:38559",
+  "dockerfile": "tasks/pr_38559/workload/Dockerfile",
+  "wheel": "0.19.0",
+  "wheel_note": "first PyPI release after merge (2026-04-03 > 2026-03-31); picked by gen_tasks.py from PyPI upload dates.",
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:38559 -f tasks/pr_38559/workload/Dockerfile --build-arg VLLM_VERSION=0.19.0 --build-arg BASE_SHA=17b72fd1c8052f7a674056b2228a6e7ebfd4f123 --build-arg MERGE_SHA=7b01d97a22c977aaad2f38fa03cd11742d2893e8 tasks/pr_38559/workload"
+ },
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "tasks/pr_38559/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "needs": "gpu",
+  "cluster": "none_gpu",
+  "all_clusters": [
+   "none_gpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "tasks/pr_38559 (bench.py, tests)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "MeanPool.forward via the real PoolingMetadata cursor: 64 x 512 tokens, hidden 768 fp16 (e5-base serving shape) and 32 x 256, hidden 4096 bf16; base = fp32 cumsum over all tokens, gold = chunked index_add_. Wall-clock us per forward. Author numbers are e2e embeddings serving (reported-only).",
+  "base_note": null,
+  "cmd_in_workloads_json": "python3 tasks/pr_38559/bench.py"
+ },
+ "policy": {
+  "source": "run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "tasks/pr_<n>/metadata.json:repeats",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in .work/pr_<n>/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> .work/pr_<n>/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY metadata.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "mean_pool_e5base_64x512",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": true,
+   "parse": "GENERIC line 'mean_pool_e5base_64x512 [label] <number>' (us)",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "mean_pool_32x256_h4096",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "GENERIC line 'mean_pool_32x256_h4096 [label] <number>' (us)",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "serving_request_throughput",
+   "unit": "req/s",
+   "higher_is_better": true,
+   "headline": false,
+   "parse": "GENERIC line 'serving_request_throughput [label] <number>' (req/s)",
+   "reported": {
+    "baseline": 238.52,
+    "pr_solution": 252.72
+   },
+   "note": null
+  },
+  {
+   "name": "serving_mean_e2el",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "GENERIC line 'serving_mean_e2el [label] <number>' (ms)",
+   "reported": {
+    "baseline": 265.4,
+    "pr_solution": 246.51
+   },
+   "note": null
+  }
+ ],
+ "headline": "mean_pool_e5base_64x512",
+ "reported": {
+  "gain": "5.9%",
+  "gain_kind": "pct",
+  "gain_evidence": "# PR #38559: [Perf] Optimize mean pooling using chunks and index_add, 5.9% E2E throughput improvement",
+  "perf_gain": {
+   "top_gain": "5.9%",
+   "gain_kind": "pct",
+   "gain_evidence": "# PR #38559: [Perf] Optimize mean pooling using chunks and index_add, 5.9% E2E throughput improvement"
+  },
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
+  "author_hardware_args": [
+   {
+    "line": 29,
+    "text": "`vllm serve intfloat/multilingual-e5-base   --runner pooling   --max-model-len 512   --max-num-batched-tokens 32768`"
+   },
+   {
+    "line": 31,
+    "text": "`vllm bench serve   --model intfloat/multilingual-e5-base   --backend openai-embeddings   --endpoint /v1/embeddings   --dataset-name random   --seed 0   --random-input-len 512   --random-range-ratio 0   --random-batch-size 1   --num-prompts"
+   }
+  ],
+  "source": "data/prs/scheduling/model_executor_layers/38559.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.19.0",
+   "cuda_build": null,
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ },
+ "reproduced": null,
+ "gap": {
+  "verdict": "not analysed",
+  "note": null,
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:38559 tasks/pr_38559/workload",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_38559:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:38559 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_38559:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:38559 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": "perf-only MeanPool rewrite; no test in the diff; bench.py checks against a dense mean."
+}

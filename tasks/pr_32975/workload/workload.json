@@ -1,0 +1,209 @@
+{
+ "schema": "workload_v1",
+ "pr": 32975,
+ "title": "[Perf] Optimize detokenizer python logic (#32975)",
+ "url": "https://github.com/vllm-project/vllm/pull/32975",
+ "field": "scheduling",
+ "date": "2026-02-10",
+ "base_sha": "97fa8f65909d4d8f2eb0edc2137fb22f576a5b25",
+ "merge_sha": "e1060a71a1bb96103ce9ca98345184dcdc982467",
+ "source_files": [
+  "vllm/v1/engine/detokenizer.py",
+  "vllm/v1/engine/output_processor.py"
+ ],
+ "test_files": [],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:32975",
+  "dockerfile": "tasks/pr_32975/workload/Dockerfile",
+  "wheel": "0.16.0",
+  "wheel_note": "first PyPI release after merge (2026-02-26 > 2026-02-10); picked by gen_tasks.py from PyPI upload dates.",
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:32975 -f tasks/pr_32975/workload/Dockerfile --build-arg VLLM_VERSION=0.16.0 --build-arg BASE_SHA=97fa8f65909d4d8f2eb0edc2137fb22f576a5b25 --build-arg MERGE_SHA=e1060a71a1bb96103ce9ca98345184dcdc982467 tasks/pr_32975/workload"
+ },
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "tasks/pr_32975/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "needs": "gpu",
+  "cluster": "none_cpu",
+  "all_clusters": [
+   "none_cpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "tasks/pr_32975 (bench.py, tests)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "Pure-Python detokenizer change (num_output_tokens avoids slice). 1.628x / 38.57%.",
+  "base_note": null,
+  "cmd_in_workloads_json": "python3 tasks/pr_32975/bench.py"
+ },
+ "policy": {
+  "source": "run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "tasks/pr_<n>/metadata.json:repeats",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in .work/pr_<n>/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> .work/pr_<n>/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY metadata.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "detokenize",
+   "unit": "us/tok",
+   "higher_is_better": false,
+   "headline": true,
+   "parse": "GENERIC line 'detokenize [label] <number>' (us/tok)",
+   "reported": {
+    "baseline": 1.628,
+    "pr_solution": 1.0
+   },
+   "note": null
+  }
+ ],
+ "headline": "detokenize",
+ "reported": {
+  "gain": "1.628x, 38.57%",
+  "gain_kind": "pct",
+  "gain_evidence": "```bash yewentao256@dgx-b200-02:~/vllm-source$ python benchmarks/overheads/benchmark_detokenizer_min_tokens.py old: 787.270 ms (39.36 ns/token) new: 483.633 ms ",
+  "perf_gain": {
+   "top_gain": "1.628x, 38.57%",
+   "gain_kind": "pct",
+   "gain_evidence": "```bash yewentao256@dgx-b200-02:~/vllm-source$ python benchmarks/overheads/benchmark_detokenizer_min_tokens.py old: 787.270 ms (39.36 ns/token) new: 483.633 ms "
+  },
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
+  "author_hardware_args": [
+   {
+    "line": 13,
+    "text": "1. adding a `num_output_tokens` function, to avoid `len(self.output_token_ids)` might do a slice in SlowIncrementalDetokenizer"
+   },
+   {
+    "line": 18,
+    "text": "def output_token_ids(self) -> list[int]:"
+   }
+  ],
+  "source": "data/prs/scheduling/v1_engine/32975.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.16.0",
+   "cuda_build": null,
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ },
+ "reproduced": {
+  "source": "results/32975.json",
+  "ts": "2026-11-04T00:00:00Z",
+  "image": null,
+  "tests": {
+   "base": "FAIL",
+   "gold": "PASS"
+  },
+  "verdict": "reproduced",
+  "reproduced_ratio_median": 11.3629,
+  "reported_ratio_median": 1.6278,
+  "machine": null,
+  "experiments": [
+   {
+    "name": "detokenize",
+    "unit": "us/tok",
+    "reported": {
+     "baseline": 0.03936,
+     "pr_solution": 0.02418,
+     "how": "absolute",
+     "marker": "",
+     "raw": "0.03936 -> 0.02418 us/tok",
+     "note": "author gave absolute numbers",
+     "ratio": 1.627792,
+     "pct": 62.78
+    },
+    "baseline": 1.330579,
+    "baseline_sd": 0.012124,
+    "pr_solution": 0.117099,
+    "pr_solution_sd": 0.000396,
+    "n": null,
+    "ratio": 11.362855,
+    "ratio_of_ratios": 6.981,
+    "verdict": "reproduced",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  ]
+ },
+ "gap": {
+  "verdict": "not analysed",
+  "note": null,
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:32975 tasks/pr_32975/workload",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_32975:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:32975 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_32975:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:32975 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": "perf-only detokenizer change; bench builds the detokenizer against the real gpt2 tokenizer (downloads into the shared HF cache)."
+}

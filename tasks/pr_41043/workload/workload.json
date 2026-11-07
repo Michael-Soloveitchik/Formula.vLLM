@@ -1,0 +1,260 @@
+{
+ "schema": "workload_v1",
+ "pr": 41043,
+ "title": "[Perf][Spec Decode] Avoid per-step numpy allocation in prepare_next_t… (#41043)",
+ "url": "https://github.com/vllm-project/vllm/pull/41043",
+ "field": "decoding_tpot",
+ "date": "2026-04-29",
+ "base_sha": "1628239eb234739646e21c4053e3fa652058e245",
+ "merge_sha": "b58669cb427effa49928b7be5b6e0f4fd707bce5",
+ "source_files": [
+  "vllm/v1/spec_decode/llm_base_proposer.py"
+ ],
+ "test_files": [],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:41043",
+  "dockerfile": "tasks/pr_41043/workload/Dockerfile",
+  "wheel": "0.20.1",
+  "wheel_note": "first PyPI release after merge (2026-05-03 > 2026-04-29); picked by gen_tasks.py from PyPI upload dates.",
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:41043 -f tasks/pr_41043/workload/Dockerfile --build-arg VLLM_VERSION=0.20.1 --build-arg BASE_SHA=1628239eb234739646e21c4053e3fa652058e245 --build-arg MERGE_SHA=b58669cb427effa49928b7be5b6e0f4fd707bce5 tasks/pr_41043/workload"
+ },
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "tasks/pr_41043/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "needs": "gpu",
+  "cluster": "none_gpu",
+  "all_clusters": [
+   "none_gpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "tasks/pr_41043 (bench.py, tests)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "SpecDecodeBaseProposer.prepare_next_token_ids_padded (unbound, real CpuGpuBuffer, stand-in InputBatch/requests) for decode batches of 16 and 256 with 3 spec tokens; PR drops the per-step tolist/list-comp/np.array temporaries. Wall-clock us per call (host prep + Triton launch). Author numbers are e2e TPOT with Eagle3 (reported-only).",
+  "base_note": null,
+  "cmd_in_workloads_json": "python3 tasks/pr_41043/bench.py"
+ },
+ "policy": {
+  "source": "run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "tasks/pr_<n>/metadata.json:repeats",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in .work/pr_<n>/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> .work/pr_<n>/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY metadata.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "prepare_next_token_ids_b16",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": true,
+   "parse": "GENERIC line 'prepare_next_token_ids_b16 [label] <number>' (us)",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "prepare_next_token_ids_b256",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "GENERIC line 'prepare_next_token_ids_b256 [label] <number>' (us)",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "mean_tpot",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "GENERIC line 'mean_tpot [label] <number>' (ms)",
+   "reported": {
+    "baseline": 2.6,
+    "pr_solution": 2.58
+   },
+   "note": null
+  },
+  {
+   "name": "p99_tpot",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "GENERIC line 'p99_tpot [label] <number>' (ms)",
+   "reported": {
+    "baseline": 3.24,
+    "pr_solution": 2.94
+   },
+   "note": null
+  }
+ ],
+ "headline": "prepare_next_token_ids_b16",
+ "reported": {
+  "gain": "0.8%, 9.3%",
+  "gain_kind": "pct",
+  "gain_evidence": "| | Mean TPOT (ms) | P99 TPOT (ms) | |---|---|---| | Before (3 runs avg) | 2.60 | 3.24 | | After (3 runs avg) | 2.58 | 2.94 | | **Improvement** | **0.8%** | **9",
+  "perf_gain": {
+   "top_gain": "0.8%, 9.3%",
+   "gain_kind": "pct",
+   "gain_evidence": "| | Mean TPOT (ms) | P99 TPOT (ms) | |---|---|---| | Before (3 runs avg) | 2.60 | 3.24 | | After (3 runs avg) | 2.58 | 2.94 | | **Improvement** | **0.8%** | **9"
+  },
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
+  "author_hardware_args": [
+   {
+    "line": 30,
+    "text": "Request A: \"The cat sat on the\" → sampled [mat]     (normal)"
+   },
+   {
+    "line": 31,
+    "text": "Request B: \"Hello world\"        → sampled []         (discarded — still prefilling)"
+   },
+   {
+    "line": 32,
+    "text": "Request C: \"Once upon a\"        → sampled [time]     (normal)"
+   },
+   {
+    "line": 39,
+    "text": "Request A: token at position 5 (= 6-1) → \"the\""
+   },
+   {
+    "line": 40,
+    "text": "Request B: token at position 1 (= 2-1) → \"world\""
+   },
+   {
+    "line": 41,
+    "text": "Request C: token at position 3 (= 4-1) → \"a\""
+   },
+   {
+    "line": 44,
+    "text": "The Triton kernel later picks: A→\"mat\" (sampled), B→\"world\" (backup), C→\"time\" (sampled)."
+   },
+   {
+    "line": 87,
+    "text": "vllm serve meta-llama/Llama-3.1-8B-Instruct \\"
+   },
+   {
+    "line": 91,
+    "text": "vllm bench serve \\"
+   },
+   {
+    "line": 95,
+    "text": "--sonnet-input-len 4096 --sonnet-output-len 512 --sonnet-prefix-len 0 \\"
+   },
+   {
+    "line": 96,
+    "text": "--num-prompts 200 --max-concurrency 1 \\"
+   },
+   {
+    "line": 102,
+    "text": "Llama-3.1-8B + Eagle3 (TP=4, num_speculative_tokens=3, H200, 3×100 prompts, max-concurrency 1):"
+   },
+   {
+    "line": 104,
+    "text": "| | Mean TPOT (ms) | P99 TPOT (ms) |"
+   },
+   {
+    "line": 106,
+    "text": "| Before (3 runs avg) | 2.60 | 3.24 |"
+   },
+   {
+    "line": 107,
+    "text": "| After (3 runs avg) | 2.58 | 2.94 |"
+   },
+   {
+    "line": 108,
+    "text": "| **Improvement** | **0.8%** | **9.3%** |"
+   }
+  ],
+  "source": "data/prs/decoding_tpot/v1_spec_decode/41043.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.20.1",
+   "cuda_build": null,
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ },
+ "reproduced": null,
+ "gap": {
+  "verdict": "not analysed",
+  "note": null,
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:41043 tasks/pr_41043/workload",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_41043:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:41043 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_41043:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:41043 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": "perf-only (drop per-step numpy temporaries); no test in the diff; bench.py checks the backup-token path."
+}

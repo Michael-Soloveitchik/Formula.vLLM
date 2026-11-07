@@ -229,7 +229,7 @@ def policy_from_runner():
         "contention_gate": {
             "enabled": "wait_for_quiet" in r,
             "max_wait_s": (lambda v: int(v) if v else None)(_rx(r'CONTENTION_WAIT="\$\{CONTENTION_WAIT:-(\d+)\}"', r)),
-            "rules": (lambda s: s and "wait while another tenant uses" + s.split("; then")[0].strip().rstrip(".") if s else None)(
+            "rules": (lambda s: "wait while another tenant uses " + s.split("; then")[0].strip().rstrip(".") if s else None)(
                 _rx(r"# contention gate.*?another tenant uses\n#(.*?)\n", r, flags=re.S)),
             "then": "run anyway, flagged in .work/pr_<n>/contended_<arm>_<i>.txt",
         },

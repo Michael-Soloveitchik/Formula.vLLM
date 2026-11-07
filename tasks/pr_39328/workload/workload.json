@@ -1,0 +1,310 @@
+{
+ "schema": "workload_v1",
+ "pr": 39328,
+ "title": "[Core] Cache InductorPass.hash_source with functools.cache (#39328)",
+ "url": "https://github.com/vllm-project/vllm/pull/39328",
+ "field": "gpu_kernels",
+ "date": "2026-04-20",
+ "base_sha": "304d5ba1a04b6cbfa2b5bd377c2a89d350a10921",
+ "merge_sha": "87805fa11ea6d9f9aa7a7fc92ac957c613bc2163",
+ "source_files": [
+  "vllm/compilation/passes/inductor_pass.py"
+ ],
+ "test_files": [],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:39328",
+  "dockerfile": "tasks/pr_39328/workload/Dockerfile",
+  "wheel": "0.20.0",
+  "wheel_note": "first PyPI release after merge (2026-04-27 > 2026-04-20); picked by gen_tasks.py from PyPI upload dates.",
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:39328 -f tasks/pr_39328/workload/Dockerfile --build-arg VLLM_VERSION=0.20.0 --build-arg BASE_SHA=304d5ba1a04b6cbfa2b5bd377c2a89d350a10921 --build-arg MERGE_SHA=87805fa11ea6d9f9aa7a7fc92ac957c613bc2163 tasks/pr_39328/workload"
+ },
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "tasks/pr_39328/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "needs": "gpu",
+  "cluster": "none_cpu",
+  "all_clusters": [
+   "none_cpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "tasks/pr_39328 (bench.py, tests)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "functools.cache over inspect.getsource; CPU-only hashing path.",
+  "base_note": null,
+  "cmd_in_workloads_json": "python3 tasks/pr_39328/bench.py"
+ },
+ "policy": {
+  "source": "run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "tasks/pr_<n>/metadata.json:repeats",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in .work/pr_<n>/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> .work/pr_<n>/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY metadata.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "cache_lookup",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": true,
+   "parse": "GENERIC line 'cache_lookup [label] <number>' (ms)",
+   "reported": {
+    "baseline": 32.5,
+    "pr_solution": 11.3
+   },
+   "note": null
+  },
+  {
+   "name": "cold_compile",
+   "unit": "s",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "GENERIC line 'cold_compile [label] <number>' (s)",
+   "reported": {
+    "baseline": 34.1,
+    "pr_solution": 29.7
+   },
+   "note": null
+  }
+ ],
+ "headline": "cache_lookup",
+ "reported": {
+  "gain": "1.15x, 2.88x",
+  "gain_kind": "pct",
+  "gain_evidence": "## Test Result - 4/4 tests passed in test_pass_manager.py - E2E test passed (cold compile 29.5s, correct output) - Cold compile time: 29.70s ± 0.50s (baseline 3",
+  "perf_gain": {
+   "top_gain": "1.15x, 2.88x",
+   "gain_kind": "pct",
+   "gain_evidence": "## Test Result - 4/4 tests passed in test_pass_manager.py - E2E test passed (cold compile 29.5s, correct output) - Cold compile time: 29.70s ± 0.50s (baseline 3"
+  },
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
+  "author_hardware_args": [
+   {
+    "line": 26,
+    "text": "- E2E test passed (cold compile 29.5s, correct output)"
+   },
+   {
+    "line": 27,
+    "text": "- Cold compile time: 29.70s ± 0.50s (baseline 34.10s ± 0.30s, 1.15x speedup)"
+   },
+   {
+    "line": 28,
+    "text": "- Cache lookup time: 11.30ms ± 0.30ms (baseline 32.50ms ± 1.05ms, 2.88x speedup)"
+   }
+  ],
+  "source": "data/prs/gpu_kernels/compilation_passes/39328.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.20.0",
+   "cuda_build": null,
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ },
+ "reproduced": {
+  "source": "results/39328.json",
+  "ts": "2026-11-07T17:23:35Z",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.20.0",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "tests": {
+   "base": "SKIP",
+   "gold": "SKIP"
+  },
+  "verdict": "partial",
+  "reproduced_ratio_median": 1.0,
+  "reported_ratio_median": 2.0121,
+  "machine": {
+   "ts": "2026-11-07T17:20:58Z",
+   "host": {
+    "hostname": "DESKTOP-michael",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "wsl2": true,
+    "os": "Ubuntu 24.04.3 LTS"
+   },
+   "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Ti",
+    "driver": "591.86",
+    "cuda": "13.1",
+    "sm_mhz": 180.0,
+    "sm_max_mhz": 3090.0,
+    "mem_mhz": 405.0,
+    "mem_max_mhz": 14001.0,
+    "vram_total_mib": 16303.0,
+    "vram_used_mib": 263.0,
+    "util_pct": 0.0,
+    "power_w": 30.19,
+    "power_limit_w": 300.0,
+    "temp_c": 34.0,
+    "pstate": "P8",
+    "throttle_reasons": "0x0000000000000000",
+    "processes": [
+     {
+      "pid": 2903,
+      "name": "python main.py --listen 0.0.0.0 --port 8188",
+      "mem_mib": null
+     }
+    ]
+   },
+   "cpu": {
+    "model": "Intel(R) Core(TM) i7-14700KF",
+    "nproc": 12,
+    "load1": 2.09375,
+    "load5": 1.58056640625,
+    "load15": 1.3486328125,
+    "top_cpu_procs": [
+     {
+      "pid": 812071,
+      "pcpu": 7.1,
+      "comm": "python3"
+     }
+    ]
+   },
+   "ram": {
+    "total_gb": 94.3,
+    "free_gb": 0.6,
+    "available_gb": 89.6
+   },
+   "docker": {
+    "version": "Docker version 29.8.1, build 4a63305",
+    "engine": "docker"
+   }
+  },
+  "experiments": [
+   {
+    "name": "cache_lookup",
+    "unit": "ms",
+    "reported": {
+     "baseline": 32.5,
+     "pr_solution": 11.3,
+     "how": "absolute",
+     "marker": "",
+     "raw": "32.5 -> 11.3 ms",
+     "note": "author gave absolute numbers",
+     "ratio": 2.876106,
+     "pct": 187.61
+    },
+    "baseline": 0.0003,
+    "baseline_sd": 0.0,
+    "pr_solution": 0.0003,
+    "pr_solution_sd": 0.0,
+    "n": 5,
+    "ratio": 1.0,
+    "ratio_of_ratios": 0.348,
+    "verdict": "partial",
+    "reliability": {
+     "flag": "below_host_floor",
+     "note": "baseline 0.0003 ms < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+    }
+   },
+   {
+    "name": "cold_compile",
+    "unit": "ms",
+    "reported": {
+     "baseline": 34.1,
+     "pr_solution": 29.7,
+     "how": "absolute",
+     "marker": "",
+     "raw": "34.1 -> 29.7 ms",
+     "note": "author gave absolute numbers",
+     "ratio": 1.148148,
+     "pct": 14.81
+    },
+    "baseline": null,
+    "baseline_sd": null,
+    "pr_solution": null,
+    "pr_solution_sd": null,
+    "n": null,
+    "ratio": null,
+    "ratio_of_ratios": null,
+    "verdict": "unknown",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  ]
+ },
+ "gap": {
+  "verdict": "not analysed",
+  "note": null,
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:39328 tasks/pr_39328/workload",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_39328:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:39328 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_39328:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:39328 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": "perf-only functools.cache over inspect.getsource; no test in the diff."
+}
