@@ -1,0 +1,65 @@
+{
+ "pr": 35330,
+ "title": "[Perf] Optimize maxsim scores computation for pooling models, 13.9% E2E throughput improvement (#35330)",
+ "field": "scheduling",
+ "date": "2026-02-26",
+ "hardware": [
+  "agnostic"
+ ],
+ "url": "https://github.com/vllm-project/vllm/pull/35330",
+ "base_sha": "ec8f943db1b8e5f3b32ed2ec29526b8a9a521088",
+ "merge_sha": "99c7892c5bf20afc90e2ef0e1ad0a89637ae67a9",
+ "source_files": [
+  "vllm/entrypoints/pooling/score/serving.py",
+  "vllm/entrypoints/pooling/score/utils.py"
+ ],
+ "test_files": [
+  "tests/entrypoints/pooling/score/test_utils.py"
+ ],
+ "wheel": "0.17.0",
+ "wheel_note": "first PyPI release after merge (2026-03-07 > 2026-02-26); picked by gen_tasks.py from PyPI upload dates.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "tasks/pr_35330/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "ms",
+  "needs": "gpu",
+  "headline": "maxsim_64pairs",
+  "note": "ColBERT MaxSim over 64 (query 32 x doc 1024..2048, dim 128) CPU fp32 pairs as serving sees pooling outputs; gold imports compute_maxsim_scores (padded GPU bmm batches), base tree lacks it so the bench runs serving.py's per-pair compute_maxsim_score loop. Wall-clock ms per 64-pair batch. Author numbers are e2e rerank serving (reported-only)."
+ },
+ "perf_gain": {
+  "top_gain": "13.9%",
+  "gain_kind": "pct",
+  "gain_evidence": "# PR #35330: [Perf] Optimize maxsim scores computation for pooling models, 13.9% E2E throughput improvement"
+ },
+ "needs": "gpu",
+ "experiments": [
+  {
+   "name": "maxsim_64pairs",
+   "unit": "ms",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "serving_request_throughput",
+   "unit": "req/s",
+   "reported": {
+    "base": 141.38,
+    "patch": 161.14
+   }
+  },
+  {
+   "name": "serving_mean_e2el",
+   "unit": "ms",
+   "reported": {
+    "base": 446.27,
+    "patch": 391.46
+   }
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "test_note": "the diff adds test_compute_maxsim_scores_matches_reference_per_pair (imports compute_maxsim_scores): base tree fails at import, PR tree passes.",
+ "generated_by": "gen_tasks.py"
+}

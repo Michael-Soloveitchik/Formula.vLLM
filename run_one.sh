@@ -196,7 +196,7 @@ cd /t
 # vLLM engine workloads.
 mkdir -p "$HERE/.weights/hf"
 # WL_TIMEOUT: hard cap per workload run (a hung bench must not block the queue); container gets killed with it.
-WL_TIMEOUT="${WL_TIMEOUT:-30m}"
+WL_TIMEOUT="${WL_TIMEOUT:-20m}"
 run_in_img() { # run_in_img <tree> <script>   (TIMED=1 -> capped by WL_TIMEOUT)
   local cname="vllm-${PR}-$$-$RANDOM"
   [ "${TIMED:-0}" = 1 ] && { timeout -k 20s "$WL_TIMEOUT" "$ENGINE" run --rm --name "$cname" $GPU --shm-size=2g ${ARM_ENV:-} \
@@ -258,13 +258,16 @@ run_workload_once() { # <arm> <tree> <i>
   [ -f "$HERE/machine.py" ] && python3 "$HERE/machine.py" snapshot >"$WORK/machine_${arm}_${i}.json" 2>/dev/null || true
   [ -n "$CONTENDED" ] && echo "$CONTENDED" >"$WORK/contended_${arm}_${i}.txt"
   say "workload $arm run $i/$REPEATS${CONTENDED:+ (contended: $CONTENDED)}"
-  TIMED=1 ARM_ENV="-e ARM=$arm" run_in_img "$tree" "$PRELUDE $WL_CMD" >"$WORK/wl_${arm}_${i}.log" 2>&1 \
-    || { say "workload $arm run $i failed (see $WORK/wl_${arm}_${i}.log)"; return 1; }
+  TIMED=1 ARM_ENV="-e ARM=$arm" run_in_img "$tree" "$PRELUDE $WL_CMD" >"$WORK/wl_${arm}_${i}.log" 2>&1
+  local rc=$?
+  [ $rc = 0 ] || { say "workload $arm run $i failed rc=$rc (see $WORK/wl_${arm}_${i}.log)"; rm -f "$WORK/wl_${arm}_${i}.log"; [ $rc = 124 ] && touch "$WORK/.wl_timeout"; return 1; }
 }
 run_workloads_abba() { # <armA> <treeA> <armB> <treeB>
   [ -n "$WL_CMD" ] || return 0
   local i failA=0 failB=0
+  rm -f "$WORK/.wl_timeout"
   for i in $(seq 1 "$REPEATS"); do
+    [ -f "$WORK/.wl_timeout" ] && { say "a workload run timed out: bench is stuck, aborting both arms"; break; }
     if [ $((i % 2)) = 1 ]; then
       [ $failA = 1 ] || run_workload_once "$1" "$2" "$i" || failA=1
       [ $failB = 1 ] || run_workload_once "$3" "$4" "$i" || failB=1

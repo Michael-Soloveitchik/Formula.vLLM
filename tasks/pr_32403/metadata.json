@@ -1,0 +1,71 @@
+{
+ "pr": 32403,
+ "title": "[Performance] Improve Triton prefill attention kernel's performance  (#32403)",
+ "field": "scheduling",
+ "date": "2026-01-18",
+ "hardware": [
+  "agnostic"
+ ],
+ "url": "https://github.com/vllm-project/vllm/pull/32403",
+ "base_sha": "4a6af8813fb53ebde21ffadc2bfce94c965e98b1",
+ "merge_sha": "8cc26acd8b77c8af12d2fbf1f5bd38d09861928c",
+ "source_files": [
+  "vllm/utils/math_utils.py",
+  "vllm/v1/attention/ops/triton_prefill_attention.py"
+ ],
+ "test_files": [],
+ "wheel": "0.14.0",
+ "wheel_note": "first PyPI release after merge (2026-01-20 > 2026-01-18); picked by gen_tasks.py from PyPI upload dates.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "tasks/pr_32403/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "us",
+  "needs": "gpu",
+  "headline": "prefill_attn_b8_s2048",
+  "note": "context_attention_fwd (Triton prefill attention) on batch 8 x 2048 and 16 x 1024, 32/8 heads, head 128, bf16, causal; PR = FA2-style exp2 rewrite (-1e8 mask, sm_scale/ln2). CUDA-event us per call. Author numbers are offline e2e (reported-only)."
+ },
+ "perf_gain": {
+  "top_gain": null,
+  "gain_kind": "audit",
+  "gain_evidence": "exp2 fusion speeds Triton prefill kernel"
+ },
+ "needs": "gpu",
+ "experiments": [
+  {
+   "name": "prefill_attn_b8_s2048",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "prefill_attn_b16_s1024",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "offline_latency_b8_2048",
+   "unit": "ms",
+   "reported": {
+    "base": 113.12,
+    "patch": 109.99
+   }
+  },
+  {
+   "name": "offline_throughput_b8_2048",
+   "unit": "req/s",
+   "reported": {
+    "base": 33.9996,
+    "patch": 34.969
+   }
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "test_note": "perf-only Triton kernel rewrite; the diff's only test change loosens tolerances in tests/models/language/pooling/test_token_classification.py, which downloads three HF models (bert/ModernBERT/Qwen3-0.6B) - dropped from the oracle; bench.py checks the kernel against SDPA.",
+ "generated_by": "gen_tasks.py"
+}

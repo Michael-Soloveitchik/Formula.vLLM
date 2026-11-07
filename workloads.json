@@ -534,5 +534,440 @@
     }
    }
   ]
+ },
+ "31722": {
+  "pr": 31722,
+  "field": "attention",
+  "title": "[PERF] Speed-up of GDN attention decode part (Qwen3-Next) (#31722)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_31722/bench.py",
+  "cmd": "python3 tasks/pr_31722/bench.py",
+  "needs": "gpu",
+  "notes": "Triton fused_recurrent_gated_delta_rule_fwd (GDN decode) with Qwen3-Next shapes (K=V=128; TP2: H=8/HV=16, TP4: H=4/HV=8), T=1, bf16. PR = BV tile 8->32. CUDA-event us per call. Reported = author's H200 kernel table.",
+  "experiments": [
+   {
+    "name": "fused_recurrent_b32_tp2",
+    "unit": "us",
+    "parse": "fused_recurrent_b32_tp2",
+    "reported": {
+     "base": 30.14,
+     "patch": 20.29
+    }
+   },
+   {
+    "name": "fused_recurrent_b128_tp2",
+    "unit": "us",
+    "parse": "fused_recurrent_b128_tp2",
+    "reported": {
+     "base": 93.38,
+     "patch": 59.17
+    }
+   },
+   {
+    "name": "fused_recurrent_b512_tp2",
+    "unit": "us",
+    "parse": "fused_recurrent_b512_tp2",
+    "reported": {
+     "base": 341.63,
+     "patch": 212.7
+    }
+   },
+   {
+    "name": "fused_recurrent_b128_tp4",
+    "unit": "us",
+    "parse": "fused_recurrent_b128_tp4",
+    "reported": {
+     "base": 52.06,
+     "patch": 33.76
+    }
+   },
+   {
+    "name": "decode_output_throughput",
+    "unit": "tok/s",
+    "parse": "Output token throughput (not measured: Qwen3-Next-80B TP2 serving)",
+    "reported": {
+     "base": 23891.0,
+     "patch": 27904.0
+    }
+   }
+  ]
+ },
+ "20839": {
+  "pr": 20839,
+  "field": "gpu_kernels",
+  "title": "[Model] Replace Mamba2 RMSNorm Gated with Fused Triton Kernel (#20839)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_20839/bench.py",
+  "cmd": "python3 tasks/pr_20839/bench.py",
+  "needs": "gpu",
+  "notes": "Mixer2RMSNormGated.forward_cuda on Bamba-9B-v2 shapes (hidden 8192, bf16, 16k/32k tokens); base = python silu-gate + ops.rms_norm, gold = fused Triton rms_norm_gated. TP helpers stubbed to world_size 1. CUDA-event us per call. Author numbers are whole-model benchmark_latency (kept reported-only).",
+  "experiments": [
+   {
+    "name": "rmsnorm_gated_16k",
+    "unit": "us",
+    "parse": "rmsnorm_gated_16k",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "rmsnorm_gated_32k",
+    "unit": "us",
+    "parse": "rmsnorm_gated_32k",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "latency_16k",
+    "unit": "s",
+    "parse": "Avg latency (not measured: benchmark_latency Bamba-9B-v2 16k)",
+    "reported": {
+     "base": 0.6323,
+     "patch": 0.5812
+    }
+   },
+   {
+    "name": "latency_32k",
+    "unit": "s",
+    "parse": "Avg latency (not measured: benchmark_latency Bamba-9B-v2 32k)",
+    "reported": {
+     "base": 1.2799,
+     "patch": 1.1791
+    }
+   }
+  ]
+ },
+ "29826": {
+  "pr": 29826,
+  "field": "decoding_tpot",
+  "title": "[Perf] Avoid pageable HtoD transfer in MinTokensLogitsProcessor (#29826)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_29826/bench.py",
+  "cmd": "python3 tasks/pr_29826/bench.py",
+  "needs": "gpu",
+  "notes": "MinTokensLogitsProcessor.apply on [64, 151936] fp32 logits with 64 pending min_tokens requests; base = pageable HtoD scalar copy (device sync), gold = index_put_ with a device scalar. Wall-clock us, alone and right after an async filler kernel. PR gives nsys traces only (up to 30% TPOT at low concurrency), no numbers.",
+  "experiments": [
+   {
+    "name": "min_tokens_apply",
+    "unit": "us",
+    "parse": "min_tokens_apply",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "min_tokens_apply_after_kernel",
+    "unit": "us",
+    "parse": "min_tokens_apply_after_kernel",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   }
+  ]
+ },
+ "38559": {
+  "pr": 38559,
+  "field": "scheduling",
+  "title": "[Perf] Optimize mean pooling using chunks and index_add, 5.9% E2E throughput improvement (#38559)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_38559/bench.py",
+  "cmd": "python3 tasks/pr_38559/bench.py",
+  "needs": "gpu",
+  "notes": "MeanPool.forward via the real PoolingMetadata cursor: 64 x 512 tokens, hidden 768 fp16 (e5-base serving shape) and 32 x 256, hidden 4096 bf16; base = fp32 cumsum over all tokens, gold = chunked index_add_. Wall-clock us per forward. Author numbers are e2e embeddings serving (reported-only).",
+  "experiments": [
+   {
+    "name": "mean_pool_e5base_64x512",
+    "unit": "us",
+    "parse": "mean_pool_e5base_64x512",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "mean_pool_32x256_h4096",
+    "unit": "us",
+    "parse": "mean_pool_32x256_h4096",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "serving_request_throughput",
+    "unit": "req/s",
+    "parse": "Request throughput (not measured: e5-base /v1/embeddings serving)",
+    "reported": {
+     "base": 238.52,
+     "patch": 252.72
+    }
+   },
+   {
+    "name": "serving_mean_e2el",
+    "unit": "ms",
+    "parse": "Mean E2EL (not measured)",
+    "reported": {
+     "base": 265.4,
+     "patch": 246.51
+    }
+   }
+  ]
+ },
+ "35330": {
+  "pr": 35330,
+  "field": "scheduling",
+  "title": "[Perf] Optimize maxsim scores computation for pooling models, 13.9% E2E throughput improvement (#35330)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_35330/bench.py",
+  "cmd": "python3 tasks/pr_35330/bench.py",
+  "needs": "gpu",
+  "notes": "ColBERT MaxSim over 64 (query 32 x doc 1024..2048, dim 128) CPU fp32 pairs as serving sees pooling outputs; gold imports compute_maxsim_scores (padded GPU bmm batches), base tree lacks it so the bench runs serving.py's per-pair compute_maxsim_score loop. Wall-clock ms per 64-pair batch. Author numbers are e2e rerank serving (reported-only).",
+  "experiments": [
+   {
+    "name": "maxsim_64pairs",
+    "unit": "ms",
+    "parse": "maxsim_64pairs",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "serving_request_throughput",
+    "unit": "req/s",
+    "parse": "Request throughput (not measured: jina-colbert-v2 /v1/rerank serving)",
+    "reported": {
+     "base": 141.38,
+     "patch": 161.14
+    }
+   },
+   {
+    "name": "serving_mean_e2el",
+    "unit": "ms",
+    "parse": "Mean E2EL (not measured)",
+    "reported": {
+     "base": 446.27,
+     "patch": 391.46
+    }
+   }
+  ]
+ },
+ "42311": {
+  "pr": 42311,
+  "field": "attention",
+  "title": "[Model] [Perf] Use flatten for Qwen3.5's GDN output projection (#42311)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_42311/bench.py",
+  "cmd": "python3 tasks/pr_42311/bench.py",
+  "needs": "gpu",
+  "notes": "GatedDeltaNetAttention._output_projection (unbound, minimal self with real RMSNormGated + Linear out_proj) on Qwen3.5-0.8B shapes (16 x 128 heads, hidden 1024, 8 decode tokens, fp16, eager); PR = einops rearrange -> flatten(-2). Wall-clock us per call. Author numbers are per-op profiler events (reported-only) + e2e serving.",
+  "experiments": [
+   {
+    "name": "gdn_output_projection",
+    "unit": "us",
+    "parse": "gdn_output_projection",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "merge_heads_op",
+    "unit": "us",
+    "parse": "profiler event avg (not measured: einops rearrange vs aten::flatten, CUDA eager)",
+    "reported": {
+     "base": 23.261,
+     "patch": 2.828
+    }
+   },
+   {
+    "name": "serving_mean_tpot",
+    "unit": "ms",
+    "parse": "Mean TPOT (not measured: Qwen3.5-0.8B eager serving, 600 concurrent)",
+    "reported": {
+     "base": 88.38,
+     "patch": 67.59
+    }
+   }
+  ]
+ },
+ "41043": {
+  "pr": 41043,
+  "field": "decoding_tpot",
+  "title": "[Perf][Spec Decode] Avoid per-step numpy allocation in prepare_next_t… (#41043)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_41043/bench.py",
+  "cmd": "python3 tasks/pr_41043/bench.py",
+  "needs": "gpu",
+  "notes": "SpecDecodeBaseProposer.prepare_next_token_ids_padded (unbound, real CpuGpuBuffer, stand-in InputBatch/requests) for decode batches of 16 and 256 with 3 spec tokens; PR drops the per-step tolist/list-comp/np.array temporaries. Wall-clock us per call (host prep + Triton launch). Author numbers are e2e TPOT with Eagle3 (reported-only).",
+  "experiments": [
+   {
+    "name": "prepare_next_token_ids_b16",
+    "unit": "us",
+    "parse": "prepare_next_token_ids_b16",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "prepare_next_token_ids_b256",
+    "unit": "us",
+    "parse": "prepare_next_token_ids_b256",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "mean_tpot",
+    "unit": "ms",
+    "parse": "Mean TPOT (not measured: Llama-3.1-8B + Eagle3 TP4 H200)",
+    "reported": {
+     "base": 2.6,
+     "patch": 2.58
+    }
+   },
+   {
+    "name": "p99_tpot",
+    "unit": "ms",
+    "parse": "P99 TPOT (not measured)",
+    "reported": {
+     "base": 3.24,
+     "patch": 2.94
+    }
+   }
+  ]
+ },
+ "21917": {
+  "pr": 21917,
+  "field": "scheduling",
+  "title": "[Core] Optimize scheduler request removal for single completions (#21917)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_21917/bench.py",
+  "cmd": "python3 tasks/pr_21917/bench.py",
+  "needs": "gpu",
+  "notes": "CPU-only: finished-request removal from a 256-long running queue; gold imports remove_all from the arm tree (list.remove fast path), base tree has no remove_all so the bench uses the pre-PR scheduler.py comprehension. us per removal for 1 and 4 stopped requests. Author: '2.6-3.4x faster single removal, 64% improvement' (no absolute numbers).",
+  "experiments": [
+   {
+    "name": "remove_single_request",
+    "unit": "us",
+    "parse": "remove_single_request",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "remove_four_requests",
+    "unit": "us",
+    "parse": "remove_four_requests",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   }
+  ]
+ },
+ "31984": {
+  "pr": 31984,
+  "field": "gpu_kernels",
+  "title": "[Kernel] Optimize Sliding Window Attention in 3D Triton Kernel (#31984)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_31984/bench.py",
+  "cmd": "python3 tasks/pr_31984/bench.py",
+  "needs": "gpu",
+  "notes": "unified_attention forced onto the 3D (split-softmax decode) Triton kernel with gpt-oss-20b shapes (64/8 heads, head 64, window 128, block 16, bf16): 1 decode query vs KV 4096/8192/16384 and 8 x 8192; PR prunes out-of-window tiles in the 3D kernel. CUDA-event us per call. Author: 3-4% e2e latency at 6.4k-12.8k output tokens (no kernel number).",
+  "experiments": [
+   {
+    "name": "sw128_decode_b1_kv4096",
+    "unit": "us",
+    "parse": "sw128_decode_b1_kv4096",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "sw128_decode_b1_kv8192",
+    "unit": "us",
+    "parse": "sw128_decode_b1_kv8192",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "sw128_decode_b1_kv16384",
+    "unit": "us",
+    "parse": "sw128_decode_b1_kv16384",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "sw128_decode_b8_kv8192",
+    "unit": "us",
+    "parse": "sw128_decode_b8_kv8192",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   }
+  ]
+ },
+ "32403": {
+  "pr": 32403,
+  "field": "scheduling",
+  "title": "[Performance] Improve Triton prefill attention kernel's performance  (#32403)",
+  "workload_kind": "microbench_in_pr",
+  "script": "tasks/pr_32403/bench.py",
+  "cmd": "python3 tasks/pr_32403/bench.py",
+  "needs": "gpu",
+  "notes": "context_attention_fwd (Triton prefill attention) on batch 8 x 2048 and 16 x 1024, 32/8 heads, head 128, bf16, causal; PR = FA2-style exp2 rewrite (-1e8 mask, sm_scale/ln2). CUDA-event us per call. Author numbers are offline e2e (reported-only).",
+  "experiments": [
+   {
+    "name": "prefill_attn_b8_s2048",
+    "unit": "us",
+    "parse": "prefill_attn_b8_s2048",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "prefill_attn_b16_s1024",
+    "unit": "us",
+    "parse": "prefill_attn_b16_s1024",
+    "reported": {
+     "base": null,
+     "patch": null
+    }
+   },
+   {
+    "name": "offline_latency_b8_2048",
+    "unit": "ms",
+    "parse": "Latency (not measured: v1_offline_triton bs8 x 2048)",
+    "reported": {
+     "base": 113.12,
+     "patch": 109.99
+    }
+   },
+   {
+    "name": "offline_throughput_b8_2048",
+    "unit": "req/s",
+    "parse": "Throughput (not measured)",
+    "reported": {
+     "base": 33.9996,
+     "patch": 34.969
+    }
+   }
+  ]
  }
 }

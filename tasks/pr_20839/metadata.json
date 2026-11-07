@@ -1,0 +1,72 @@
+{
+ "pr": 20839,
+ "title": "[Model] Replace Mamba2 RMSNorm Gated with Fused Triton Kernel (#20839)",
+ "field": "gpu_kernels",
+ "date": "2025-07-25",
+ "hardware": [
+  "agnostic"
+ ],
+ "url": "https://github.com/vllm-project/vllm/pull/20839",
+ "base_sha": "9fe98d42508f9a67d5b1c491a4a306966ded3976",
+ "merge_sha": "eab2f3980cd30132dd99e23ea8d6fc0274365757",
+ "source_files": [
+  "vllm/model_executor/layers/mamba/mamba_mixer2.py",
+  "vllm/model_executor/layers/mamba/ops/layernorm_gated.py"
+ ],
+ "test_files": [],
+ "wheel": "0.10.1",
+ "wheel_note": "first PyPI release after merge (2025-08-19 > 2025-07-25); picked by gen_tasks.py from PyPI upload dates.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "tasks/pr_20839/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "us",
+  "needs": "gpu",
+  "headline": "rmsnorm_gated_16k",
+  "note": "Mixer2RMSNormGated.forward_cuda on Bamba-9B-v2 shapes (hidden 8192, bf16, 16k/32k tokens); base = python silu-gate + ops.rms_norm, gold = fused Triton rms_norm_gated. TP helpers stubbed to world_size 1. CUDA-event us per call. Author numbers are whole-model benchmark_latency (kept reported-only)."
+ },
+ "perf_gain": {
+  "top_gain": "9%",
+  "gain_kind": "pct",
+  "gain_evidence": "**Approximately 8~9% latency improvements observed.**"
+ },
+ "needs": "gpu",
+ "experiments": [
+  {
+   "name": "rmsnorm_gated_16k",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "rmsnorm_gated_32k",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "latency_16k",
+   "unit": "s",
+   "reported": {
+    "base": 0.6323,
+    "patch": 0.5812
+   }
+  },
+  {
+   "name": "latency_32k",
+   "unit": "s",
+   "reported": {
+    "base": 1.2799,
+    "patch": 1.1791
+   }
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "test_note": "perf-only fused Triton rms_norm_gated; no test in the diff. Wheel 0.10.1 pins torch 2.7.1 cu126 (no sm_120) -> torch_fix swaps in the cu128 build of the same torch.",
+ "generated_by": "gen_tasks.py",
+ "torch_fix": "torch==2.7.1 --index-url https://download.pytorch.org/whl/cu128"
+}

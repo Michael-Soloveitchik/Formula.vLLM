@@ -1,0 +1,78 @@
+{
+ "pr": 31722,
+ "title": "[PERF] Speed-up of GDN attention decode part (Qwen3-Next) (#31722)",
+ "field": "attention",
+ "date": "2026-01-06",
+ "hardware": [
+  "agnostic"
+ ],
+ "url": "https://github.com/vllm-project/vllm/pull/31722",
+ "base_sha": "4c73be14e0397e99162ca13a8b559670c5abd3b0",
+ "merge_sha": "22dffca9822987f0e912bfd9635e94bbdd05def3",
+ "source_files": [
+  "vllm/model_executor/layers/fla/ops/fused_recurrent.py"
+ ],
+ "test_files": [],
+ "wheel": "0.14.0",
+ "wheel_note": "first PyPI release after merge (2026-01-20 > 2026-01-06); picked by gen_tasks.py from PyPI upload dates.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "tasks/pr_31722/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "us",
+  "needs": "gpu",
+  "headline": "fused_recurrent_b32_tp2",
+  "note": "Triton fused_recurrent_gated_delta_rule_fwd (GDN decode) with Qwen3-Next shapes (K=V=128; TP2: H=8/HV=16, TP4: H=4/HV=8), T=1, bf16. PR = BV tile 8->32. CUDA-event us per call. Reported = author's H200 kernel table."
+ },
+ "perf_gain": {
+  "top_gain": "16.8%",
+  "gain_kind": "pct",
+  "gain_evidence": "**Speedup: 16.8%**"
+ },
+ "needs": "gpu",
+ "experiments": [
+  {
+   "name": "fused_recurrent_b32_tp2",
+   "unit": "us",
+   "reported": {
+    "base": 30.14,
+    "patch": 20.29
+   }
+  },
+  {
+   "name": "fused_recurrent_b128_tp2",
+   "unit": "us",
+   "reported": {
+    "base": 93.38,
+    "patch": 59.17
+   }
+  },
+  {
+   "name": "fused_recurrent_b512_tp2",
+   "unit": "us",
+   "reported": {
+    "base": 341.63,
+    "patch": 212.7
+   }
+  },
+  {
+   "name": "fused_recurrent_b128_tp4",
+   "unit": "us",
+   "reported": {
+    "base": 52.06,
+    "patch": 33.76
+   }
+  },
+  {
+   "name": "decode_output_throughput",
+   "unit": "tok/s",
+   "reported": {
+    "base": 23891.0,
+    "patch": 27904.0
+   }
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "test_note": "perf-only one-constant change (BV 8 -> 32); no test in the diff.",
+ "generated_by": "gen_tasks.py"
+}

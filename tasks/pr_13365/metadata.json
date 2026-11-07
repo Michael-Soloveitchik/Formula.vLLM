@@ -23,7 +23,7 @@
   "unit": "s",
   "needs": "gpu",
   "headline": "ngram_match_overhead",
-  "note": "Numba-JIT N-gram matcher; CPU-only. Driver times NgramProposer.propose over ShareGPT token seqs."
+  "note": "Numba-JIT N-gram matcher; CPU-only. bench.py mirrors the author's workload: 5000 ShareGPT-like requests, NgramProposer.propose() called once per decode step on the growing context (~1.1M calls, like the engine does), cumulative seconds = ngram_match_overhead. The first call of the process (Numba JIT on the PR's solution) is reported separately as ngram_match_cold_first_call."
  },
  "perf_gain": {
   "top_gain": "30x, 2.5%",
@@ -38,10 +38,17 @@
    "reported": {
     "base": 54.3,
     "patch": 1.9
-   }
+   },
+   "note": "author: cumulative propose() overhead over a 5K-request ShareGPT run (per decode step); ours: same call pattern on synthetic requests, steady state"
+  },
+  {
+   "name": "ngram_match_cold_first_call",
+   "unit": "s",
+   "reported": null,
+   "note": "first propose() call of the process: Numba JIT compile on the PR's solution (author: 'under 1 second', paid once per engine start), plain call on the baseline"
   }
  ],
- "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "experiments_note": "reported = numbers from the PR body (author's machine); headline ngram_match_overhead",
  "test_note": "perf-only PR (numba JIT n-gram matcher); wheel 0.7.3 pins torch 2.5.1 cu124 (no sm_120) - bench is CPU-only numba, unaffected.",
  "generated_by": "gen_tasks.py",
  "extra_pip": "numba"

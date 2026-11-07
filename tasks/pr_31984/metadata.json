@@ -1,0 +1,70 @@
+{
+ "pr": 31984,
+ "title": "[Kernel] Optimize Sliding Window Attention in 3D Triton Kernel (#31984)",
+ "field": "gpu_kernels",
+ "date": "2026-01-10",
+ "hardware": [
+  "agnostic"
+ ],
+ "url": "https://github.com/vllm-project/vllm/pull/31984",
+ "base_sha": "e6c6f2c79d2c1e0765d17b4dec83a4a8283342e4",
+ "merge_sha": "b8bf5c45bbbb1249bd1656557603da71e9d4c3b9",
+ "source_files": [
+  "vllm/v1/attention/ops/triton_unified_attention.py"
+ ],
+ "test_files": [],
+ "wheel": "0.14.0",
+ "wheel_note": "first PyPI release after merge (2026-01-20 > 2026-01-10); picked by gen_tasks.py from PyPI upload dates.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "tasks/pr_31984/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "us",
+  "needs": "gpu",
+  "headline": "sw128_decode_b1_kv4096",
+  "note": "unified_attention forced onto the 3D (split-softmax decode) Triton kernel with gpt-oss-20b shapes (64/8 heads, head 64, window 128, block 16, bf16): 1 decode query vs KV 4096/8192/16384 and 8 x 8192; PR prunes out-of-window tiles in the 3D kernel. CUDA-event us per call. Author: 3-4% e2e latency at 6.4k-12.8k output tokens (no kernel number)."
+ },
+ "perf_gain": {
+  "top_gain": "4%",
+  "gain_kind": "pct",
+  "gain_evidence": "For longer sequence lengths, the performance improvement introduced by this PR becomes more pronounced, reaching approximately 3–4% for output lengths of 6,400 "
+ },
+ "needs": "gpu",
+ "experiments": [
+  {
+   "name": "sw128_decode_b1_kv4096",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "sw128_decode_b1_kv8192",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "sw128_decode_b1_kv16384",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "sw128_decode_b8_kv8192",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "test_note": "perf-only kernel tile pruning; no test in the diff (existing test_triton_unified_attention.py covers sliding window).",
+ "generated_by": "gen_tasks.py"
+}

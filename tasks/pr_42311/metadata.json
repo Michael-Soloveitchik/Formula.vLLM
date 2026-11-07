@@ -1,0 +1,62 @@
+{
+ "pr": 42311,
+ "title": "[Model] [Perf] Use flatten for Qwen3.5's GDN output projection (#42311)",
+ "field": "attention",
+ "date": "2026-05-18",
+ "hardware": [
+  "agnostic"
+ ],
+ "url": "https://github.com/vllm-project/vllm/pull/42311",
+ "base_sha": "7d5b033782681acee274f4f379c9fadc557fd7e8",
+ "merge_sha": "5ab6d1b3fd407404cd78488bf6f4cbcde6d912b7",
+ "source_files": [
+  "vllm/model_executor/layers/mamba/gdn_linear_attn.py"
+ ],
+ "test_files": [],
+ "wheel": "0.22.0",
+ "wheel_note": "first PyPI release after merge (2026-05-29 > 2026-05-18); picked by gen_tasks.py from PyPI upload dates.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "tasks/pr_42311/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "us",
+  "needs": "gpu",
+  "headline": "gdn_output_projection",
+  "note": "GatedDeltaNetAttention._output_projection (unbound, minimal self with real RMSNormGated + Linear out_proj) on Qwen3.5-0.8B shapes (16 x 128 heads, hidden 1024, 8 decode tokens, fp16, eager); PR = einops rearrange -> flatten(-2). Wall-clock us per call. Author numbers are per-op profiler events (reported-only) + e2e serving."
+ },
+ "perf_gain": {
+  "top_gain": "21.41x",
+  "gain_kind": "pct",
+  "gain_evidence": "Per-call average speedup: `21.41x`"
+ },
+ "needs": "gpu",
+ "experiments": [
+  {
+   "name": "gdn_output_projection",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "merge_heads_op",
+   "unit": "us",
+   "reported": {
+    "base": 23.261,
+    "patch": 2.828
+   }
+  },
+  {
+   "name": "serving_mean_tpot",
+   "unit": "ms",
+   "reported": {
+    "base": 88.38,
+    "patch": 67.59
+   }
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "test_note": "perf-only (rearrange -> flatten); no test in the diff.",
+ "generated_by": "gen_tasks.py"
+}

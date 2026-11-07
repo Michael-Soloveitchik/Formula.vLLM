@@ -1,0 +1,70 @@
+{
+ "pr": 38559,
+ "title": "[Perf] Optimize mean pooling using chunks and index_add, 5.9% E2E throughput improvement (#38559)",
+ "field": "scheduling",
+ "date": "2026-03-31",
+ "hardware": [
+  "agnostic"
+ ],
+ "url": "https://github.com/vllm-project/vllm/pull/38559",
+ "base_sha": "17b72fd1c8052f7a674056b2228a6e7ebfd4f123",
+ "merge_sha": "7b01d97a22c977aaad2f38fa03cd11742d2893e8",
+ "source_files": [
+  "vllm/model_executor/layers/pooler/seqwise/methods.py"
+ ],
+ "test_files": [],
+ "wheel": "0.19.0",
+ "wheel_note": "first PyPI release after merge (2026-04-03 > 2026-03-31); picked by gen_tasks.py from PyPI upload dates.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "tasks/pr_38559/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "us",
+  "needs": "gpu",
+  "headline": "mean_pool_e5base_64x512",
+  "note": "MeanPool.forward via the real PoolingMetadata cursor: 64 x 512 tokens, hidden 768 fp16 (e5-base serving shape) and 32 x 256, hidden 4096 bf16; base = fp32 cumsum over all tokens, gold = chunked index_add_. Wall-clock us per forward. Author numbers are e2e embeddings serving (reported-only)."
+ },
+ "perf_gain": {
+  "top_gain": "5.9%",
+  "gain_kind": "pct",
+  "gain_evidence": "# PR #38559: [Perf] Optimize mean pooling using chunks and index_add, 5.9% E2E throughput improvement"
+ },
+ "needs": "gpu",
+ "experiments": [
+  {
+   "name": "mean_pool_e5base_64x512",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "mean_pool_32x256_h4096",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "serving_request_throughput",
+   "unit": "req/s",
+   "reported": {
+    "base": 238.52,
+    "patch": 252.72
+   }
+  },
+  {
+   "name": "serving_mean_e2el",
+   "unit": "ms",
+   "reported": {
+    "base": 265.4,
+    "patch": 246.51
+   }
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "test_note": "perf-only MeanPool rewrite; no test in the diff; bench.py checks against a dense mean.",
+ "generated_by": "gen_tasks.py"
+}

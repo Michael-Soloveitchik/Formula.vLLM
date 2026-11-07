@@ -1068,7 +1068,34 @@
   "gain_evidence": "**Approximately 8~9% latency improvements observed.**",
   "base_sha": "9fe98d42508f9a67d5b1c491a4a306966ded3976",
   "merge_sha": "eab2f3980cd30132dd99e23ea8d6fc0274365757",
-  "source_path": "vllm/model_executor/layers/mamba/mamba_mixer2.py"
+  "source_path": "vllm/model_executor/layers/mamba/mamba_mixer2.py",
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.10.1",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
+  }
  },
  {
   "pr": 20841,
@@ -1226,7 +1253,34 @@
   "gain_evidence": "- 64% improvement in request removal operations",
   "base_sha": "c32e6ad1f63631fd8033f0cca3a35d5e48ccfc7f",
   "merge_sha": "0167efe20d3d2280c3da6aea94a6f59afec5099c",
-  "source_path": "vllm/v1/core/sched/scheduler.py"
+  "source_path": "vllm/v1/core/sched/scheduler.py",
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.10.2",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
+  }
  },
  {
   "pr": 22872,
@@ -2377,7 +2431,34 @@
   "gain_evidence": "At low concurrencies, this leads to a significant (up to 30%) increase in TPOT when including min_tokens in the request.",
   "base_sha": "afb1e5b380ff623e478d19a246b42b2903b9331f",
   "merge_sha": "1528e079e2b2cf8a807e4dce86ef05540e16a430",
-  "source_path": "vllm/v1/sample/logits_processor/builtin.py"
+  "source_path": "vllm/v1/sample/logits_processor/builtin.py",
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.12.0",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
+  }
  },
  {
   "pr": 30243,
@@ -2512,7 +2593,34 @@
   "gain_evidence": "**Speedup: 16.8%**",
   "base_sha": "4c73be14e0397e99162ca13a8b559670c5abd3b0",
   "merge_sha": "22dffca9822987f0e912bfd9635e94bbdd05def3",
-  "source_path": "vllm/model_executor/layers/fla/ops/fused_recurrent.py"
+  "source_path": "vllm/model_executor/layers/fla/ops/fused_recurrent.py",
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.14.0",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
+  }
  },
  {
   "pr": 31984,
@@ -2527,7 +2635,34 @@
   "gain_evidence": "For longer sequence lengths, the performance improvement introduced by this PR becomes more pronounced, reaching approximately 3–4% for output lengths of 6,400 ",
   "base_sha": "e6c6f2c79d2c1e0765d17b4dec83a4a8283342e4",
   "merge_sha": "b8bf5c45bbbb1249bd1656557603da71e9d4c3b9",
-  "source_path": "vllm/v1/attention/ops/triton_unified_attention.py"
+  "source_path": "vllm/v1/attention/ops/triton_unified_attention.py",
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.14.0",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
+  }
  },
  {
   "pr": 32019,
@@ -2587,7 +2722,34 @@
   "gain_evidence": "exp2 fusion speeds Triton prefill kernel",
   "base_sha": "4a6af8813fb53ebde21ffadc2bfce94c965e98b1",
   "merge_sha": "8cc26acd8b77c8af12d2fbf1f5bd38d09861928c",
-  "source_path": "vllm/v1/attention/ops/triton_prefill_attention.py"
+  "source_path": "vllm/v1/attention/ops/triton_prefill_attention.py",
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.14.0",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
+  }
  },
  {
   "pr": 32425,
@@ -3034,7 +3196,34 @@
   "gain_evidence": "# PR #35330: [Perf] Optimize maxsim scores computation for pooling models, 13.9% E2E throughput improvement",
   "base_sha": "ec8f943db1b8e5f3b32ed2ec29526b8a9a521088",
   "merge_sha": "99c7892c5bf20afc90e2ef0e1ad0a89637ae67a9",
-  "source_path": "vllm/entrypoints/pooling/score/serving.py"
+  "source_path": "vllm/entrypoints/pooling/score/serving.py",
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.17.0",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
+  }
  },
  {
   "pr": 35451,
@@ -3368,7 +3557,34 @@
   "gain_evidence": "# PR #38559: [Perf] Optimize mean pooling using chunks and index_add, 5.9% E2E throughput improvement",
   "base_sha": "17b72fd1c8052f7a674056b2228a6e7ebfd4f123",
   "merge_sha": "7b01d97a22c977aaad2f38fa03cd11742d2893e8",
-  "source_path": "vllm/model_executor/layers/pooler/seqwise/methods.py"
+  "source_path": "vllm/model_executor/layers/pooler/seqwise/methods.py",
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.19.0",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
+  }
  },
  {
   "pr": 38726,
@@ -3597,7 +3813,34 @@
   "gain_evidence": "| | Mean TPOT (ms) | P99 TPOT (ms) | |---|---|---| | Before (3 runs avg) | 2.60 | 3.24 | | After (3 runs avg) | 2.58 | 2.94 | | **Improvement** | **0.8%** | **9",
   "base_sha": "1628239eb234739646e21c4053e3fa652058e245",
   "merge_sha": "b58669cb427effa49928b7be5b6e0f4fd707bce5",
-  "source_path": "vllm/v1/spec_decode/llm_base_proposer.py"
+  "source_path": "vllm/v1/spec_decode/llm_base_proposer.py",
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.20.1",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
+  }
  },
  {
   "pr": 41163,
@@ -3706,7 +3949,34 @@
   "gain_evidence": "Per-call average speedup: `21.41x`",
   "base_sha": "7d5b033782681acee274f4f379c9fadc557fd7e8",
   "merge_sha": "5ab6d1b3fd407404cd78488bf6f4cbcde6d912b7",
-  "source_path": "vllm/model_executor/layers/mamba/gdn_linear_attn.py"
+  "source_path": "vllm/model_executor/layers/mamba/gdn_linear_attn.py",
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.22.0",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
+  }
  },
  {
   "pr": 42849,

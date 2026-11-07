@@ -6102,113 +6102,41 @@
   }
  },
  {
-  "pr": 33593,
-  "pr_url": "https://github.com/vllm-project/vllm/pull/33593",
-  "title": "[Perf] Optimize Python Slice for Structured Output using `islice` instead of [:] (#33593)",
-  "field": "decoding_tpot",
-  "reported_gain": "0.5%",
-  "base_sha": "c38b8d5a317da356353a0a9ae1ab87f612267fb3",
-  "merge_sha": "9ce8fad2a9fe010ede46b085f6cb4099c8ec402d",
-  "arms": {
-   "base": {
-    "tests": "FAIL"
-   },
-   "gold": {
-    "tests": "PASS"
-   }
-  },
-  "improved": true,
   "schema": "experiments_v2",
   "experiments": [
    {
-    "name": "membership_present",
-    "unit": "s/call",
-    "workload": "SIZE=100_000, end-token at 10%% in; `tok not in input_ids[:-1]` vs `tok not in islice(input_ids,0,len-1)`; INNER=200 calls/block, 18 paired samples, best-of + mean\u00b1sd",
-    "note": "Real PR hot path (reasoning parser extract_content_ids). Marker present early -> islice short-circuits + copies nothing; list[:-1] copies all N first. Gold wins.",
+    "name": "create_slice",
+    "unit": "s",
+    "workload": "python3 /task/bench.py",
     "reported": {
      "base": 0.0034,
-     "patch": 1e-06,
-     "scope": "PR microbench 'create slice' on a 2,000,000-element list, N=1,000,000: list[:N] 0.003368s vs islice 0.000001s (materialization cost, NOT a membership test)",
-     "comparable": false,
-     "scale_note": "DIFFERENT EXPERIMENT: the PR's 0.0034->1e-6 is pure list[:N] MATERIALIZATION (allocating the copy). Our membership_present measures the REAL hot-path idiom `tok not in islice(...)` which short-circuits -- a different operation. 3400x (the PR's alloc elision) is not the same quantity as our 2.31x (short-circuit membership). Honest: we measure the actual call site, the PR measured the underlying primitive in isolation."
+     "patch": 1e-06
     },
-    "arms": {
-     "base": {
-      "mean": 0.000358804,
-      "sd": 4.6743e-05,
-      "runs": [
-       0.000330733,
-       0.000377697,
-       0.000326645,
-       0.000345245,
-       0.000507789,
-       0.000329285,
-       0.000316241,
-       0.000341058,
-       0.000351174,
-       0.000400607,
-       0.000339538,
-       0.000377984,
-       0.000366388,
-       0.000344082,
-       0.000430289,
-       0.00033626,
-       0.000326537,
-       0.000310923
-      ]
-     },
-     "gold": {
-      "mean": 0.000155275,
-      "sd": 1.0947e-05,
-      "runs": [
-       0.000159376,
-       0.000169886,
-       0.000143453,
-       0.000149218,
-       0.000163265,
-       0.000155865,
-       0.00016565,
-       0.000155066,
-       0.000146417,
-       0.000169359,
-       0.000145489,
-       0.000183984,
-       0.000145105,
-       0.000150742,
-       0.00015026,
-       0.000152459,
-       0.000144649,
-       0.000144703
-      ],
-      "speedup_x": 2.3142,
-      "speedup_sd": 0.2775,
-      "counts": true
-     }
-    },
+    "arms": {},
     "derived": {
-     "unit": "s/call",
+     "unit": "s",
      "higher_is_better": false,
      "reported": {
       "baseline": 0.0034,
       "pr_solution": 1e-06,
       "how": "absolute",
       "marker": "",
-      "raw": "0.0034 -> 1e-06 s/call",
+      "raw": "0.0034 -> 1e-06 s",
       "note": "author gave absolute numbers",
       "ratio": 3400.0,
       "pct": 339900.0
      },
      "reproduced": {
-      "baseline": 0.000359,
-      "pr_solution": 0.000155,
-      "baseline_sd": 4.7e-05,
-      "pr_solution_sd": 1.1e-05,
-      "ratio": 2.310765,
-      "pct": 131.08
+      "baseline": null,
+      "pr_solution": null,
+      "baseline_sd": null,
+      "pr_solution_sd": null,
+      "ratio": null,
+      "pct": null
      },
      "reproduced_vs_reported": {
-      "ratio_of_ratios": 0.001,
-      "verdict": "not_reproduced"
+      "ratio_of_ratios": null,
+      "verdict": "unknown"
      },
      "reliability": {
       "flag": "ok",
@@ -6217,93 +6145,38 @@
     }
    },
    {
-    "name": "membership_absent",
-    "unit": "s/call",
-    "workload": "SIZE=100_000, end-token absent; same two idioms; INNER=200, 18 paired samples",
-    "note": "HONEST TRADEOFF: when the token is absent both scan all N, but list[:-1] is a C-level memcpy + C-level `in`, while islice yields through the Python iterator protocol per element. Gold is SLOWER here. Net PR win depends on how often reasoning has already ended (present case dominates in practice).",
+    "name": "sum_slice",
+    "unit": "s",
+    "workload": "python3 /task/bench.py",
     "reported": {
      "base": 0.0056,
-     "patch": 0.0047,
-     "comparable": false,
-     "scale_note": "CONSUMER DIFFERS. The PR's absent-case number comes from summing/materializing the whole slice (list[:-1] then consume all N); our membership_absent scans for a token that never occurs. Both are O(N) but list[:-1] is a C-level memcpy + C `in`, while islice yields per-element through the Python iterator protocol -> gold is SLOWER here (our 0.78x vs the PR's ~1.18x). Sign flips because the operation after the slice is not the same primitive. This is the honest tradeoff case: islice only wins when the marker is present (short-circuit), which dominates in practice."
+     "patch": 0.0047
     },
-    "arms": {
-     "base": {
-      "mean": 0.001291289,
-      "sd": 0.000529284,
-      "runs": [
-       0.001199808,
-       0.001103488,
-       0.001139905,
-       0.001095942,
-       0.001149443,
-       0.001095101,
-       0.001143228,
-       0.001148784,
-       0.00345858,
-       0.001183188,
-       0.001342441,
-       0.001288587,
-       0.001156719,
-       0.00118306,
-       0.001126867,
-       0.00116652,
-       0.001102764,
-       0.001158777
-      ]
-     },
-     "gold": {
-      "mean": 0.001658282,
-      "sd": 0.000147542,
-      "runs": [
-       0.001612199,
-       0.001790975,
-       0.001551818,
-       0.001517835,
-       0.001523724,
-       0.001485493,
-       0.001909483,
-       0.001542935,
-       0.00170378,
-       0.002030049,
-       0.00167952,
-       0.001712967,
-       0.00149505,
-       0.00150705,
-       0.001802099,
-       0.001664878,
-       0.001622824,
-       0.001696395
-      ],
-      "speedup_x": 0.7813,
-      "speedup_sd": 0.3093,
-      "counts": true
-     }
-    },
+    "arms": {},
     "derived": {
-     "unit": "s/call",
+     "unit": "s",
      "higher_is_better": false,
      "reported": {
       "baseline": 0.0056,
       "pr_solution": 0.0047,
       "how": "absolute",
       "marker": "",
-      "raw": "0.0056 -> 0.0047 s/call",
+      "raw": "0.0056 -> 0.0047 s",
       "note": "author gave absolute numbers",
       "ratio": 1.191489,
       "pct": 19.15
      },
      "reproduced": {
-      "baseline": 0.001291,
-      "pr_solution": 0.001658,
-      "baseline_sd": 0.000529,
-      "pr_solution_sd": 0.000148,
-      "ratio": 0.778691,
-      "pct": -22.13
+      "baseline": null,
+      "pr_solution": null,
+      "baseline_sd": null,
+      "pr_solution_sd": null,
+      "ratio": null,
+      "pct": null
      },
      "reproduced_vs_reported": {
-      "ratio_of_ratios": 0.654,
-      "verdict": "regression"
+      "ratio_of_ratios": null,
+      "verdict": "unknown"
      },
      "reliability": {
       "flag": "ok",
@@ -6312,49 +6185,85 @@
     }
    }
   ],
-  "environment": "docker python:3.12-slim cpu, colima arm64",
-  "ts": "2026-11-04T00:00:00Z",
+  "pr": 33593,
+  "pr_url": "https://github.com/vllm-project/vllm/pull/33593",
+  "title": "[Perf] Optimize Python Slice for Structured Output using `islice` instead of [:] (#33593)",
+  "field": "decoding_tpot",
+  "reported_gain": "0.5%",
+  "gain_kind": "pct",
+  "base_sha": "c38b8d5a317da356353a0a9ae1ab87f612267fb3",
+  "merge_sha": "9ce8fad2a9fe010ede46b085f6cb4099c8ec402d",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.16.0",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "arms": {
+   "base": {
+    "tests": "SKIP",
+    "slug": "base"
+   },
+   "gold": {
+    "tests": "SKIP",
+    "slug": "gold"
+   }
+  },
+  "improved": false,
+  "latency": {
+   "scenarios": {},
+   "pytorch_ref": {}
+  },
+  "logs": {
+   "base": {
+    "workload_runs": 5
+   },
+   "gold": {
+    "workload_runs": 5
+   }
+  },
+  "ts": "2026-11-07T17:15:17Z",
   "summary": {
    "experiments": 2,
-   "measured": 2,
-   "headline": "membership_present",
+   "measured": 0,
+   "headline": "create_slice",
    "headline_derived": {
-    "unit": "s/call",
+    "unit": "s",
     "higher_is_better": false,
     "reported": {
      "baseline": 0.0034,
      "pr_solution": 1e-06,
      "how": "absolute",
      "marker": "",
-     "raw": "0.0034 -> 1e-06 s/call",
+     "raw": "0.0034 -> 1e-06 s",
      "note": "author gave absolute numbers",
      "ratio": 3400.0,
      "pct": 339900.0
     },
     "reproduced": {
-     "baseline": 0.000359,
-     "pr_solution": 0.000155,
-     "baseline_sd": 4.7e-05,
-     "pr_solution_sd": 1.1e-05,
-     "ratio": 2.310765,
-     "pct": 131.08
+     "baseline": null,
+     "pr_solution": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
     },
     "reproduced_vs_reported": {
-     "ratio_of_ratios": 0.001,
-     "verdict": "not_reproduced"
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
     },
     "reliability": {
      "flag": "ok",
      "note": ""
     }
    },
-   "reproduced_ratio_median": 1.5447,
-   "reproduced_ratio_max": 2.3108,
+   "reproduced_ratio_median": null,
+   "reproduced_ratio_max": null,
    "reported_ratio_median": 1700.5957,
-   "verdict": "not_reproduced",
+   "verdict": "unknown",
    "tests": {
-    "base": "FAIL",
-    "gold": "PASS"
+    "base": "SKIP",
+    "gold": "SKIP"
    }
   }
  },

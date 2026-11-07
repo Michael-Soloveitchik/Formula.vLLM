@@ -1,0 +1,46 @@
+{
+ "pr": 6442,
+ "title": "[Core] Use numpy to speed up padded token processing (#6442)",
+ "field": "scheduling",
+ "date": "2024-07-16",
+ "hardware": [
+  "agnostic"
+ ],
+ "url": "https://github.com/vllm-project/vllm/pull/6442",
+ "base_sha": "7508a3dc34c2b7a5c5c971b13f15208d7dade442",
+ "merge_sha": "2bb0489cb3367e46e201e84ab629df535544495b",
+ "source_files": [
+  "vllm/model_executor/sampling_metadata.py"
+ ],
+ "test_files": [],
+ "wheel": "0.5.3",
+ "wheel_note": "first PyPI release after merge (2024-07-23 > 2024-07-16); picked by gen_tasks.py from PyPI upload dates.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "tasks/pr_6442/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "ms",
+  "needs": "gpu",
+  "headline": "sampler_latency",
+  "note": "Microbench imports v0 vllm Sampler; large batch, A100. ~50% sampler speedup."
+ },
+ "perf_gain": {
+  "top_gain": "50%",
+  "gain_kind": "pct",
+  "gain_evidence": "It results in approximately a 50% speedup for the sampler when processing large batch sizes."
+ },
+ "needs": "gpu",
+ "experiments": [
+  {
+   "name": "sampler_latency",
+   "unit": "ms",
+   "reported": {
+    "base": 2.0,
+    "patch": 1.0
+   }
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "test_note": "",
+ "generated_by": "gen_tasks.py"
+}

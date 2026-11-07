@@ -1,0 +1,70 @@
+{
+ "pr": 41043,
+ "title": "[Perf][Spec Decode] Avoid per-step numpy allocation in prepare_next_t… (#41043)",
+ "field": "decoding_tpot",
+ "date": "2026-04-29",
+ "hardware": [
+  "agnostic"
+ ],
+ "url": "https://github.com/vllm-project/vllm/pull/41043",
+ "base_sha": "1628239eb234739646e21c4053e3fa652058e245",
+ "merge_sha": "b58669cb427effa49928b7be5b6e0f4fd707bce5",
+ "source_files": [
+  "vllm/v1/spec_decode/llm_base_proposer.py"
+ ],
+ "test_files": [],
+ "wheel": "0.20.1",
+ "wheel_note": "first PyPI release after merge (2026-05-03 > 2026-04-29); picked by gen_tasks.py from PyPI upload dates.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "tasks/pr_41043/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "us",
+  "needs": "gpu",
+  "headline": "prepare_next_token_ids_b16",
+  "note": "SpecDecodeBaseProposer.prepare_next_token_ids_padded (unbound, real CpuGpuBuffer, stand-in InputBatch/requests) for decode batches of 16 and 256 with 3 spec tokens; PR drops the per-step tolist/list-comp/np.array temporaries. Wall-clock us per call (host prep + Triton launch). Author numbers are e2e TPOT with Eagle3 (reported-only)."
+ },
+ "perf_gain": {
+  "top_gain": "0.8%, 9.3%",
+  "gain_kind": "pct",
+  "gain_evidence": "| | Mean TPOT (ms) | P99 TPOT (ms) | |---|---|---| | Before (3 runs avg) | 2.60 | 3.24 | | After (3 runs avg) | 2.58 | 2.94 | | **Improvement** | **0.8%** | **9"
+ },
+ "needs": "gpu",
+ "experiments": [
+  {
+   "name": "prepare_next_token_ids_b16",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "prepare_next_token_ids_b256",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "mean_tpot",
+   "unit": "ms",
+   "reported": {
+    "base": 2.6,
+    "patch": 2.58
+   }
+  },
+  {
+   "name": "p99_tpot",
+   "unit": "ms",
+   "reported": {
+    "base": 3.24,
+    "patch": 2.94
+   }
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "test_note": "perf-only (drop per-step numpy temporaries); no test in the diff; bench.py checks the backup-token path.",
+ "generated_by": "gen_tasks.py"
+}
