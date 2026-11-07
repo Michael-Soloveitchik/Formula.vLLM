@@ -1,0 +1,70 @@
+{
+ "pr": 29354,
+ "title": "Add unpermute-aware fused MoE path and small-batch fallback (#29354)",
+ "field": "quantization",
+ "date": "2026-01-09",
+ "hardware": [
+  "agnostic"
+ ],
+ "url": "https://github.com/vllm-project/vllm/pull/29354",
+ "base_sha": "657e9c0e183d4bdb157b07db987644d2d9d36245",
+ "merge_sha": "a4d5d663e295e3b90a515c79df74048bc715e804",
+ "source_files": [
+  "vllm/model_executor/layers/fused_moe/fused_moe.py"
+ ],
+ "test_files": [],
+ "wheel": "0.14.0",
+ "wheel_note": "first PyPI release after merge (2026-01-20 > 2026-01-09); picked by gen_tasks.py from PyPI upload dates.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "tasks/pr_29354/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "us",
+  "needs": "gpu",
+  "headline": "fused_moe_e128_top1_m1",
+  "note": "fused_experts small-batch naive-block-assignment path: E=128 top_k=1 N=1024 K=5120 bf16 (Maverick TP8 shape), M in 1/4/16/32 (all on the new path), torch softmax+topk routing, CUDA-event us per call. Reported = author's benchmark_moe.py table (H100)."
+ },
+ "perf_gain": {
+  "top_gain": "up to 17.56% faster for small-batch MoE (M=1, Llama-4-Maverick TP8)",
+  "gain_kind": "pct",
+  "gain_evidence": "faster unpermute MoE path, benchmark speedups"
+ },
+ "needs": "gpu",
+ "experiments": [
+  {
+   "name": "fused_moe_e128_top1_m1",
+   "unit": "us",
+   "reported": {
+    "base": 33.14,
+    "patch": 28.19
+   }
+  },
+  {
+   "name": "fused_moe_e128_top1_m4",
+   "unit": "us",
+   "reported": {
+    "base": 49.42,
+    "patch": 44.02
+   }
+  },
+  {
+   "name": "fused_moe_e128_top1_m16",
+   "unit": "us",
+   "reported": {
+    "base": 136.29,
+    "patch": 130.47
+   }
+  },
+  {
+   "name": "fused_moe_e128_top1_m32",
+   "unit": "us",
+   "reported": {
+    "base": 234.63,
+    "patch": 228.19
+   }
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "test_note": "perf-only small-batch MoE path; the diff's test (tests/kernels/moe/test_moe.py) is a large kernel suite - dropped from the oracle, bench.py checks finiteness only (same kernel both arms).",
+ "generated_by": "gen_tasks.py"
+}

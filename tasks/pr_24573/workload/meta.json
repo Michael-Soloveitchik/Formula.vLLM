@@ -1,0 +1,11 @@
+{
+ "pr": 24573,
+ "needs": "gpu",
+ "cluster": "none_gpu",
+ "model": null,
+ "cmd": "python3 tasks/pr_24573/bench.py",
+ "workload_kind": "microbench_in_pr",
+ "all_clusters": [
+  "none_gpu"
+ ]
+}

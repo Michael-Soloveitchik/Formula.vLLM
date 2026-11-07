@@ -1,0 +1,211 @@
+{
+ "schema": "workload_v1",
+ "pr": 33529,
+ "title": "Triton MLA perf fixes (#33529)",
+ "url": "https://github.com/vllm-project/vllm/pull/33529",
+ "field": "attention",
+ "date": "2026-04-02",
+ "base_sha": "16a65e41736c5e8d27e9e843668f6e3f99d68d9a",
+ "merge_sha": "d9408ffba3c8da5e289b5695d507707afce10a2f",
+ "source_files": [
+  "vllm/v1/attention/backends/mla/triton_mla.py",
+  "vllm/v1/attention/ops/triton_decode_attention.py"
+ ],
+ "test_files": [],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:33529",
+  "dockerfile": "tasks/pr_33529/workload/Dockerfile",
+  "wheel": "0.19.0",
+  "wheel_note": "first PyPI release after merge (2026-04-03 > 2026-04-02); picked by gen_tasks.py from PyPI upload dates.",
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:33529 -f tasks/pr_33529/workload/Dockerfile --build-arg VLLM_VERSION=0.19.0 --build-arg BASE_SHA=16a65e41736c5e8d27e9e843668f6e3f99d68d9a --build-arg MERGE_SHA=d9408ffba3c8da5e289b5695d507707afce10a2f tasks/pr_33529/workload"
+ },
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "tasks/pr_33529/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "needs": "gpu",
+  "cluster": "none_gpu",
+  "all_clusters": [
+   "none_gpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "tasks/pr_33529 (bench.py, tests)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "TritonMLAImpl.forward_mqa (unbound, minimal self/metadata/layer stubs) on DeepSeek-V2-Lite-like MLA decode: 16 heads, latent 512+64, bf16 KV, block 64; ctx 8K/32K/80K at batch 1 and 8K at batch 8. PR = SM-aware num_kv_splits (was fixed 4) + kernel load tweaks + is_mla path. CUDA-event us per call. Author (Kimi K2.5 DCP8, sm120) peak tok/s reported-only.",
+  "base_note": null,
+  "cmd_in_workloads_json": "python3 tasks/pr_33529/bench.py"
+ },
+ "policy": {
+  "source": "run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "tasks/pr_<n>/metadata.json:repeats",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in .work/pr_<n>/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> .work/pr_<n>/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY metadata.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "mla_decode_b1_kv8192",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": true,
+   "parse": "GENERIC line 'mla_decode_b1_kv8192 [label] <number>' (us)",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "mla_decode_b1_kv32768",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "GENERIC line 'mla_decode_b1_kv32768 [label] <number>' (us)",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "mla_decode_b1_kv81920",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "GENERIC line 'mla_decode_b1_kv81920 [label] <number>' (us)",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "mla_decode_b8_kv8192",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "GENERIC line 'mla_decode_b8_kv8192 [label] <number>' (us)",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "peak_throughput_1req_80k",
+   "unit": "tok/s",
+   "higher_is_better": true,
+   "headline": false,
+   "parse": "GENERIC line 'peak_throughput_1req_80k [label] <number>' (tok/s)",
+   "reported": {
+    "baseline": 34.0,
+    "pr_solution": 52.0
+   },
+   "note": null
+  },
+  {
+   "name": "peak_throughput_8req_80k",
+   "unit": "tok/s",
+   "higher_is_better": true,
+   "headline": false,
+   "parse": "GENERIC line 'peak_throughput_8req_80k [label] <number>' (tok/s)",
+   "reported": {
+    "baseline": 176.0,
+    "pr_solution": 184.0
+   },
+   "note": null
+  }
+ ],
+ "headline": "mla_decode_b1_kv8192",
+ "reported": {
+  "gain": "1.05x, 4.36x",
+  "gain_kind": "pct",
+  "gain_evidence": "| Context | OLD (tok/s) | NEW (tok/s) | Improvement | |---------|-------------|-------------|-------------| | Short (100 in / 400 out) | 69.14 | 72.37 | 1.05x |",
+  "perf_gain": {
+   "top_gain": "1.05x, 4.36x",
+   "gain_kind": "pct",
+   "gain_evidence": "| Context | OLD (tok/s) | NEW (tok/s) | Improvement | |---------|-------------|-------------|-------------| | Short (100 in / 400 out) | 69.14 | 72.37 | 1.05x |"
+  },
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
+  "author_hardware_args": [
+   {
+    "line": 32,
+    "text": "| 1 (128 tokens)      | 54.00                      | 55.00                      | 1.85%                        |"
+   },
+   {
+    "line": 33,
+    "text": "| 8 (128 tokens)      | 272.00                     | 272.00                     | 0.00%                        |"
+   },
+   {
+    "line": 34,
+    "text": "| 1 (80K tokens)      | 34.00                      | 52.00                      | 52.94%                       |"
+   },
+   {
+    "line": 35,
+    "text": "| 8 (80K tokens)      | 176.00                     | 184.00                     | 4.55%                        |"
+   }
+  ],
+  "source": "data/prs/attention/v1_attention/33529.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": null,
+ "reproduced": null,
+ "gap": {
+  "verdict": "not analysed",
+  "note": null,
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:33529 tasks/pr_33529/workload",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_33529:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:33529 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_33529:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:33529 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": "perf-only Triton MLA decode changes; no test in the diff; bench stubs MLACommonMetadata.decode / layer._k_scale."
+}

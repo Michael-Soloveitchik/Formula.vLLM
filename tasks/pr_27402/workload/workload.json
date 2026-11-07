@@ -1,0 +1,230 @@
+{
+ "schema": "workload_v1",
+ "pr": 27402,
+ "title": "[Kernel] LoRA triton kernels support PDL (#27402)",
+ "url": "https://github.com/vllm-project/vllm/pull/27402",
+ "field": "gpu_kernels",
+ "date": "2025-11-07",
+ "base_sha": "a736e5ff770bd0e69492c24d24d04b7fd47789c0",
+ "merge_sha": "21b82f4ea2f12ab2c3d74f9156b50616b892ea7d",
+ "source_files": [
+  "vllm/lora/ops/triton_ops/fused_moe_lora_op.py",
+  "vllm/lora/ops/triton_ops/kernel_utils.py",
+  "vllm/lora/ops/triton_ops/lora_expand_op.py",
+  "vllm/lora/ops/triton_ops/lora_shrink_op.py",
+  "vllm/lora/ops/triton_ops/utils.py"
+ ],
+ "test_files": [],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:27402",
+  "dockerfile": "tasks/pr_27402/workload/Dockerfile",
+  "wheel": "0.11.1",
+  "wheel_note": "first PyPI release after merge (2025-11-19 > 2025-11-07); picked by gen_tasks.py from PyPI upload dates.",
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:27402 -f tasks/pr_27402/workload/Dockerfile --build-arg VLLM_VERSION=0.11.1 --build-arg BASE_SHA=a736e5ff770bd0e69492c24d24d04b7fd47789c0 --build-arg MERGE_SHA=21b82f4ea2f12ab2c3d74f9156b50616b892ea7d tasks/pr_27402/workload"
+ },
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "tasks/pr_27402/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "needs": "gpu",
+  "cluster": "none_gpu",
+  "all_clusters": [
+   "none_gpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "tasks/pr_27402 (bench.py, tests)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "lora_shrink + lora_expand back to back (a LoRA linear) via LoRAKernelMeta: hidden 4096, rank 16, 1 LoRA, 1 and 3 slices, 16 and 256 tokens; PR = PDL (griddepcontrol) in the LoRA Triton kernels (sm_90+, sm_120 ok). CUDA-event us per shrink+expand pair. Author: '5-20% kernel runtime speedup' + Qwen3-30B-A3B LoRA serving on H20 (reported-only).",
+  "base_note": null,
+  "cmd_in_workloads_json": "python3 tasks/pr_27402/bench.py"
+ },
+ "policy": {
+  "source": "run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "tasks/pr_<n>/metadata.json:repeats",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in .work/pr_<n>/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> .work/pr_<n>/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY metadata.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "lora_shrink_expand_1slice_t16",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": true,
+   "parse": "GENERIC line 'lora_shrink_expand_1slice_t16 [label] <number>' (us)",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "lora_shrink_expand_1slice_t256",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "GENERIC line 'lora_shrink_expand_1slice_t256 [label] <number>' (us)",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "lora_shrink_expand_3slice_t16",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "GENERIC line 'lora_shrink_expand_3slice_t16 [label] <number>' (us)",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "lora_shrink_expand_3slice_t256",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "GENERIC line 'lora_shrink_expand_3slice_t256 [label] <number>' (us)",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
+   },
+   "note": null
+  },
+  {
+   "name": "serving_output_throughput",
+   "unit": "tok/s",
+   "higher_is_better": true,
+   "headline": false,
+   "parse": "GENERIC line 'serving_output_throughput [label] <number>' (tok/s)",
+   "reported": {
+    "baseline": 1382.92,
+    "pr_solution": 1468.21
+   },
+   "note": null
+  },
+  {
+   "name": "serving_mean_tpot",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "GENERIC line 'serving_mean_tpot [label] <number>' (ms)",
+   "reported": {
+    "baseline": 63.67,
+    "pr_solution": 59.51
+   },
+   "note": null
+  }
+ ],
+ "headline": "lora_shrink_expand_1slice_t16",
+ "reported": {
+  "gain": "5%, 20%",
+  "gain_kind": "pct",
+  "gain_evidence": "This is a good feature to have, see following results, we generally see 5% to 20% kernel runtime speedup for smaller Ms.",
+  "perf_gain": {
+   "top_gain": "5%, 20%",
+   "gain_kind": "pct",
+   "gain_evidence": "This is a good feature to have, see following results, we generally see 5% to 20% kernel runtime speedup for smaller Ms."
+  },
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
+  "author_hardware_args": [
+   {
+    "line": 16,
+    "text": "vllm serve Qwen/Qwen3-30B-A3B -tp 1 -dp 1 --max-num-seqs 128 --enable-lora --max-lora-rank=64 --no-enable-prefix-caching --lora-modules test_lora_model=/path/to/loramodel"
+   },
+   {
+    "line": 19,
+    "text": "vllm bench serve --tokenizer Qwen/Qwen3-30B-A3B --dataset-name random --ignore-eos --metric-percentiles 90 --model test_lora_model --num-prompts 100 --random-input-len 2048 --random-output-len 1024 --request-rate inf"
+   },
+   {
+    "line": 31,
+    "text": "Output token throughput (tok/s):         1382.92"
+   },
+   {
+    "line": 32,
+    "text": "Peak output token throughput (tok/s):    1900.00"
+   },
+   {
+    "line": 39,
+    "text": "-----Time per Output Token (excl. 1st token)------"
+   },
+   {
+    "line": 60,
+    "text": "Output token throughput (tok/s):         1468.21"
+   },
+   {
+    "line": 61,
+    "text": "Peak output token throughput (tok/s):    2000.00"
+   },
+   {
+    "line": 68,
+    "text": "-----Time per Output Token (excl. 1st token)------"
+   }
+  ],
+  "source": "data/prs/gpu_kernels/lora_ops/27402.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": null,
+ "reproduced": null,
+ "gap": {
+  "verdict": "not analysed",
+  "note": null,
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:27402 tasks/pr_27402/workload",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_27402:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:27402 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_27402:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:27402 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": "perf-only PDL flags on LoRA Triton kernels; no test in the diff; needs sm_90+ (sm_120 ok)."
+}

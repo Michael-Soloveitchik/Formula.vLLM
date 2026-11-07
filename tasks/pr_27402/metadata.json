@@ -1,0 +1,90 @@
+{
+ "pr": 27402,
+ "title": "[Kernel] LoRA triton kernels support PDL (#27402)",
+ "field": "gpu_kernels",
+ "date": "2025-11-07",
+ "hardware": [
+  "agnostic"
+ ],
+ "url": "https://github.com/vllm-project/vllm/pull/27402",
+ "base_sha": "a736e5ff770bd0e69492c24d24d04b7fd47789c0",
+ "merge_sha": "21b82f4ea2f12ab2c3d74f9156b50616b892ea7d",
+ "source_files": [
+  "vllm/lora/ops/triton_ops/fused_moe_lora_op.py",
+  "vllm/lora/ops/triton_ops/kernel_utils.py",
+  "vllm/lora/ops/triton_ops/lora_expand_op.py",
+  "vllm/lora/ops/triton_ops/lora_shrink_op.py",
+  "vllm/lora/ops/triton_ops/utils.py"
+ ],
+ "test_files": [],
+ "wheel": "0.11.1",
+ "wheel_note": "first PyPI release after merge (2025-11-19 > 2025-11-07); picked by gen_tasks.py from PyPI upload dates.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "tasks/pr_27402/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "us",
+  "needs": "gpu",
+  "headline": "lora_shrink_expand_1slice_t16",
+  "note": "lora_shrink + lora_expand back to back (a LoRA linear) via LoRAKernelMeta: hidden 4096, rank 16, 1 LoRA, 1 and 3 slices, 16 and 256 tokens; PR = PDL (griddepcontrol) in the LoRA Triton kernels (sm_90+, sm_120 ok). CUDA-event us per shrink+expand pair. Author: '5-20% kernel runtime speedup' + Qwen3-30B-A3B LoRA serving on H20 (reported-only)."
+ },
+ "perf_gain": {
+  "top_gain": "5%, 20%",
+  "gain_kind": "pct",
+  "gain_evidence": "This is a good feature to have, see following results, we generally see 5% to 20% kernel runtime speedup for smaller Ms."
+ },
+ "needs": "gpu",
+ "experiments": [
+  {
+   "name": "lora_shrink_expand_1slice_t16",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "lora_shrink_expand_1slice_t256",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "lora_shrink_expand_3slice_t16",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "lora_shrink_expand_3slice_t256",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "serving_output_throughput",
+   "unit": "tok/s",
+   "reported": {
+    "base": 1382.92,
+    "patch": 1468.21
+   }
+  },
+  {
+   "name": "serving_mean_tpot",
+   "unit": "ms",
+   "reported": {
+    "base": 63.67,
+    "patch": 59.51
+   }
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "test_note": "perf-only PDL flags on LoRA Triton kernels; no test in the diff; needs sm_90+ (sm_120 ok).",
+ "generated_by": "gen_tasks.py"
+}

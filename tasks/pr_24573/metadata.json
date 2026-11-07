@@ -1,0 +1,71 @@
+{
+ "pr": 24573,
+ "title": "[EPLB] Reduce EPLB Inference Overhead (#24573)",
+ "field": "parallelism",
+ "date": "2025-09-22",
+ "hardware": [
+  "agnostic"
+ ],
+ "url": "https://github.com/vllm-project/vllm/pull/24573",
+ "base_sha": "175811e3b53f8f13eb3e8ac6aae02050f6e1412f",
+ "merge_sha": "06a41334c7e5c23b9a053f866c02524945d7d1db",
+ "source_files": [
+  "vllm/model_executor/layers/fused_moe/fused_moe.py",
+  "vllm/model_executor/layers/fused_moe/layer.py"
+ ],
+ "test_files": [],
+ "wheel": "0.11.0",
+ "wheel_note": "first PyPI release after merge (2025-10-04 > 2025-09-22); picked by gen_tasks.py from PyPI upload dates.",
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "tasks/pr_24573/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "unit": "us",
+  "needs": "gpu",
+  "headline": "eplb_select_experts_m64",
+  "note": "FusedMoE.select_experts (static) with enable_eplb=True on synthetic routing: 256 logical / 288 physical experts (32 replicated), top_k 8, M=64 and 1024; base = torch.rand replica pick + masks inline, gold = torch.compile'd eplb_map_to_physical_and_record. Wall-clock us per call. Author numbers are DP16 DeepSeek-V3 serving w/ EPLB main vs PR (reported-only)."
+ },
+ "perf_gain": {
+  "top_gain": "3.97%",
+  "gain_kind": "pct",
+  "gain_evidence": "**Summary:** Not accounting for the benefits of improved expert load balancing, on the main branch, EPLB introduces ~3.97% throughput drop."
+ },
+ "needs": "gpu",
+ "experiments": [
+  {
+   "name": "eplb_select_experts_m64",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "eplb_select_experts_m1024",
+   "unit": "us",
+   "reported": {
+    "base": null,
+    "patch": null
+   }
+  },
+  {
+   "name": "serving_request_throughput",
+   "unit": "req/s",
+   "reported": {
+    "base": 27.74,
+    "patch": 28.41
+   }
+  },
+  {
+   "name": "serving_mean_tpot",
+   "unit": "ms",
+   "reported": {
+    "base": 192.38,
+    "patch": 188.17
+   }
+  }
+ ],
+ "experiments_note": "reported = numbers from the PR body (author's machine)",
+ "test_note": "perf-only EPLB tail rewrite; no test in the diff; gold torch.compiles the tail (gcc in image).",
+ "generated_by": "gen_tasks.py"
+}
