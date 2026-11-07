@@ -12,7 +12,7 @@ names, /base and /gold container paths, {base,gold} path sets, SHA/ARG names.
 import os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SKIP_DIRS = {".git", ".work", "results", "results_workload", "data", ".weights", "node_modules", "__pycache__"}
+SKIP_DIRS = {".git", ".work", ".claude", "results", "results_workload", "data", ".weights", "node_modules", "__pycache__"}
 EXTS = (".py", ".sh", ".md", ".yaml", ".yml", ".html", ".txt")
 SKIP_FILES = {"check_terms.py", "numeric_solution.md", "index.json"}  # numeric_solution.md defines the rule itself
 
