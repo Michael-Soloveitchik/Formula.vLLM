@@ -756,7 +756,7 @@ function render(){
    h+=`<div class="prHead${r.pr===SEL?' sel':''}">${prCell}${r.pr===SEL?' <span class="chip field">selected</span>':''}</div>`;
    h+=experimentsOf(r).map(expTable).join('');
   });
-  $('#restabWrap').innerHTML='<h2 class="secH">experiment results <span>one table per experiment · baseline (measured) = 1.00× reference · variance in (±)</span></h2>'+h;
+  $('#restabWrap').innerHTML='<h2 class="secH">experiment results</h2>'+h;
  } else $('#restabWrap').innerHTML='<table class="restab"><tbody><tr><td class="muted">no results yet — run <code>./run.sh</code></td></tr></tbody></table>';
 
  // per-PR cards

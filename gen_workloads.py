@@ -193,6 +193,407 @@ def dataset_fetch(c):
     )
 
 
+# =============================================================================
+# workload.json + WORKLOAD.md: the canonical experiment description
+# =============================================================================
+def _read(path):
+    try:
+        return open(path, errors="replace").read()
+    except Exception:
+        return ""
+
+
+def _rx(pattern, text, group=1, flags=0):
+    m = re.search(pattern, text, flags)
+    return m.group(group) if m else None
+
+
+def policy_from_runner():
+    """Measurement policy as run_one.sh / config.yaml implement it RIGHT NOW (regex-extracted,
+    null when a knob is not found). This file never changes the policy, it only records it."""
+    r = _read(os.path.join(HERE, "run_one.sh"))
+    cfg = _read(os.path.join(HERE, "config.yaml"))
+    repeats_cfg = _rx(r"^\s*repeats:\s*(\d+)", cfg, flags=re.M)
+    return {
+        "source": "run_one.sh + config.yaml:measure (extracted at generation time)",
+        "repeats_default": int(repeats_cfg) if repeats_cfg else None,
+        "repeats_fallback": (lambda v: int(v) if v else None)(_rx(r'REPEATS="\$\{REPEATS:-(\d+)\}"', r)),
+        "repeats_task_override": "tasks/pr_<n>/metadata.json:repeats" if "TASK_REPEATS" in r else None,
+        "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+        "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)" if "run_workloads_abba" in r else "sequential per arm",
+        "gpu_flag_default": _rx(r'GPU="\$\{GPU_FLAG:-(.*?)\}"', r),
+        "container_env": sorted(set(re.findall(r"-e (CUDA_[A-Z_]+=\S+|HF_[A-Z_]+=\S+)", r))),
+        "shm_size": _rx(r"--shm-size=(\S+)", r),
+        "wl_timeout_default": _rx(r'WL_TIMEOUT="\$\{WL_TIMEOUT:-([^}]+)\}"', r),
+        "gpu_warmup_s": (lambda v: float(v) if v else None)(_rx(r"time\.time\(\) - t < ([\d.]+)", r)),
+        "contention_gate": {
+            "enabled": "wait_for_quiet" in r,
+            "max_wait_s": (lambda v: int(v) if v else None)(_rx(r'CONTENTION_WAIT="\$\{CONTENTION_WAIT:-(\d+)\}"', r)),
+            "rules": _rx(r"# contention gate.*?\n#(.*?)\n", r, flags=re.S),
+            "then": "run anyway, flagged in .work/pr_<n>/contended_<arm>_<i>.txt",
+        },
+        "machine_snapshot": "machine.py snapshot per workload run -> .work/pr_<n>/machine_<arm>_<i>.json" if "machine.py" in r else None,
+        "arm_isolation": {
+            "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+            "files": "overlay ONLY metadata.json:source_files from the arm over the wheel's own tree",
+            "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package",
+        },
+        "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure",
+    }
+
+
+def gap_verdicts():
+    """{pr: {verdict, note}} parsed from BASELINE_GAP.md '### <pr> — <what> — **<verdict>**' sections."""
+    txt = _read(os.path.join(HERE, "BASELINE_GAP.md"))
+    out = {}
+    for m in re.finditer(r"^### (\d+) — (.*?) — \*\*(.*?)\*\*\n(.*?)(?=^### |^## )", txt, re.M | re.S):
+        pr, what, verdict, body = m.groups()
+        para = " ".join(body.strip().split("\n\n")[0].split())
+        out[int(pr)] = {"verdict": verdict, "what": what, "note": para, "source": "BASELINE_GAP.md"}
+    return out
+
+
+HW_RX = re.compile(
+    r"H100|H200|A100|B200|GB200|MI300|MI250|RTX|L40|\bL4\b|A10G?|\bT4\b|V100|TPU|Xeon|EPYC|"
+    r"CUDA_VISIBLE_DEVICES|vllm bench|vllm serve|benchmark_\w+\.py|python3? \S+\.py|"
+    r"--num-prompts|--input-len|--output-len|--batch|--max-num-seqs|-dp \d|-tp \d|--enable-eplb|"
+    r"\d+(?:\.\d+)?\s*(?:ms|us|µs|sec)\b|->|→|speedup|faster|\d\s*%|^\|.*\d", re.I)
+
+
+def author_quotes(pr):
+    """Lines from the PR body (not the comments) that name the author's hardware, exact commands or
+    numbers: [{line, text}]. The line number is in data/prs/**/<pr>.md."""
+    paths = glob.glob(os.path.join(HERE, "data", "prs", "**", f"{pr}.md"), recursive=True)
+    if not paths:
+        return None, []
+    rel = os.path.relpath(paths[0], HERE)
+    lines = _read(paths[0]).splitlines()
+    body_start = next((i for i, l in enumerate(lines) if l.startswith("## Body")), 0)
+    body_end = next((i for i, l in enumerate(lines) if l.startswith("## Comments")), len(lines))
+    out = []
+    for i in range(body_start, body_end):
+        s = lines[i].strip()
+        if not s or s.startswith(("<!--", "- [", "|---")) or len(s) < 6:
+            continue
+        if HW_RX.search(s):
+            out.append({"line": i + 1, "text": s[:240]})
+        if len(out) >= 20:
+            break
+    return rel, out
+
+
+def higher_is_better(unit):
+    return bool(re.search(r"/s$|\bit/s\b|tok/s|req/s", unit or ""))
+
+
+def parse_hint(name, unit, explicit):
+    if explicit:
+        return explicit
+    if re.search(r"_b\d+_v\d+$", name):
+        return "benchmark_topk_topp.py SUMMARY TABLE row '<scenario> <batch> <vocab> ...' (Triton ms column; PyTorch column kept as pytorch_ref)"
+    if name == "allpool_forward_median":
+        return "regex 'AllPool.forward median: <us> us'"
+    if name.startswith("throughput_"):
+        return "regex 'Throughput: <req/s> requests/s, <tok/s> total tokens/s, <tok/s> output tokens/s'"
+    if re.match(r"(get_new_blocks|free_blocks)_a\d+$", name):
+        return "benchmark_block_pool.py tabulate row '| iters | total | alloc | get avg | get max | free avg | free max |'"
+    return f"GENERIC line '{name} [label] <number>' ({unit})"
+
+
+def _reported_pair(rep):
+    """metadata/workloads 'reported' -> canonical {baseline, pr_solution, ...} (keys renamed, rest kept)."""
+    if not isinstance(rep, dict):
+        return None
+    out = {}
+    for k, v in rep.items():
+        out[{"base": "baseline", "patch": "pr_solution"}.get(k, k)] = v
+    return out
+
+
+def metrics_for(pr_s, w, tm):
+    exps = tm.get("experiments") or w.get("experiments") or []
+    headline = (tm.get("workload") or {}).get("headline") or w.get("headline")
+    default_unit = (tm.get("workload") or {}).get("unit") or w.get("unit")
+    out = []
+    for e in exps:
+        unit = e.get("unit") or default_unit or "unit"
+        out.append({
+            "name": e["name"], "unit": unit, "higher_is_better": higher_is_better(unit),
+            "headline": e["name"] == headline,
+            "parse": parse_hint(e["name"], unit, e.get("parse")),
+            "reported": _reported_pair(e.get("reported")),
+            "note": e.get("note"),
+        })
+    return out, headline
+
+
+def reproduced_for(pr):
+    """results/<pr>.json folded to the essentials (null when the PR was never measured)."""
+    p = os.path.join(HERE, "results", f"{pr}.json")
+    if not os.path.exists(p):
+        return None
+    try:
+        d = json.load(open(p))
+    except Exception:
+        return None
+    exps = []
+    for e in d.get("experiments") or []:
+        dv = e.get("derived") or {}
+        rp = dv.get("reproduced") or {}
+        exps.append({
+            "name": e["name"], "unit": e.get("unit"),
+            "reported": dv.get("reported"),
+            "baseline": rp.get("baseline"), "baseline_sd": rp.get("baseline_sd"),
+            "pr_solution": rp.get("pr_solution"), "pr_solution_sd": rp.get("pr_solution_sd"),
+            "n": ((e.get("arms") or {}).get("base") or {}).get("n"),
+            "ratio": rp.get("ratio"), "ratio_of_ratios": (dv.get("reproduced_vs_reported") or {}).get("ratio_of_ratios"),
+            "verdict": (dv.get("reproduced_vs_reported") or {}).get("verdict"),
+            "reliability": dv.get("reliability"),
+        })
+    s = d.get("summary") or {}
+    return {
+        "source": f"results/{pr}.json", "ts": d.get("ts"), "image": d.get("image"),
+        "tests": s.get("tests") or {k: v.get("tests") for k, v in (d.get("arms") or {}).items() if k in ("base", "gold")},
+        "verdict": s.get("verdict"), "reproduced_ratio_median": s.get("reproduced_ratio_median"),
+        "reported_ratio_median": s.get("reported_ratio_median"),
+        "machine": d.get("machine"), "experiments": exps,
+    }
+
+
+def standalone_cmds(pr_s, ix, tm, w, needs, cluster):
+    """docker build + docker run lines that reproduce one arm WITHOUT run_one.sh. Mirrors the
+    runner's prelude (arm .py-tree swap over the wheel's site-packages; /base and /gold are baked
+    into the image). CPU-image PRs (no vendored metadata) mount a host checkout at /src instead."""
+    cmd = (tm.get("workload") or {}).get("cmd") or w.get("cmd") or f"python3 /task/bench.py"
+    swap = tm.get("swap", "tree")
+    src_files = " ".join(tm.get("source_files") or [])
+    build = f"docker build -t vllm-task:{pr_s} tasks/pr_{pr_s}/workload"
+    env = ("--gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID "
+           "-e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_%s:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface" % pr_s)
+    if tm.get("wheel"):
+        if swap == "files":
+            prelude = ('site=$(python3 -c "import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))"); '
+                       'for f in %s; do if [ -f "$A/$f" ]; then mkdir -p "$site/$(dirname "$f")"; cp "$A/$f" "$site/$f"; else rm -f "$site/$f"; fi; done; ' % src_files)
+        else:
+            prelude = ('site=$(python3 -c "import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))"); '
+                       'find "$site/vllm" -name "*.py" -delete; cp -a $A/vllm/. "$site/vllm/"; ')
+        prelude += ('ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && '
+                    'for d in tests benchmarks pyproject.toml conftest.py; do [ -e "$d" ] && cp -a "$d" /t/; done; cd /t; ')
+        def run(arm_dir, label):
+            return f"docker run --rm {env} -e ARM={label} vllm-task:{pr_s} -lc 'A={arm_dir}; {prelude}{cmd}'"
+        return {
+            "build": build,
+            "run_baseline": run("/base", "baseline"),
+            "run_pr_solution": run("/gold", "pr_solution"),
+            "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); "
+                    "the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, "
+                    "then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/).",
+        }
+    # no vendored wheel: the workload image expects the arm's checkout mounted at /src
+    base_sha, merge_sha = ix.get("base_sha") or "<base_sha>", ix.get("merge_sha") or "<merge_sha>"
+    checkout = (f"git clone --filter=blob:none https://github.com/vllm-project/vllm.git vllm && "
+                f"mkdir -p trees/baseline trees/pr_solution && "
+                f"git -C vllm archive {base_sha} | tar -x -C trees/baseline && "
+                f"git -C vllm archive {merge_sha} | tar -x -C trees/pr_solution")
+    gpu = "--gpus device=0 -e CUDA_VISIBLE_DEVICES=0 " if needs == "gpu" else ""
+    def run(tree, label):
+        return (f"docker run --rm {gpu}-e ARM={label} -v $PWD/trees/{tree}:/src:ro -v $PWD/tasks/pr_{pr_s}:/task:ro "
+                f"vllm-task:{pr_s} bash -lc 'cd /src && PYTHONPATH=/src {cmd}'")
+    return {
+        "build": build, "checkout": checkout,
+        "run_baseline": run("baseline", "baseline"), "run_pr_solution": run("pr_solution", "pr_solution"),
+        "note": "No tasks/pr_<n>/metadata.json (not vendored): run_one.sh would build Dockerfile.gpu from a host "
+                "clone (source mode). The workload image here installs no vLLM; the arm's tree is mounted at /src.",
+    }
+
+
+def build_workload_json(pr_s, w, cks, cluster, c, needs, cmd):
+    pr = int(pr_s)
+    ix = INDEX.get(pr, {})
+    tm = task_meta(pr_s)
+    wl = tm.get("workload") or {}
+    metrics, headline = metrics_for(pr_s, w, tm)
+    body_path, quotes = author_quotes(pr)
+    gap = gap_verdicts().get(pr) or {"verdict": "not analysed", "note": None, "source": "BASELINE_GAP.md"}
+    mode = "wheel" if tm.get("wheel") else ("cpu-image (source-mode in run_one.sh)" if needs == "cpu" else "source")
+    return {
+        "schema": "workload_v1",
+        "pr": pr, "title": ix.get("title") or w.get("title"), "url": f"https://github.com/vllm-project/vllm/pull/{pr}",
+        "field": ix.get("field"), "date": ix.get("date"),
+        "base_sha": ix.get("base_sha"), "merge_sha": ix.get("merge_sha"),
+        "source_files": tm.get("source_files"), "test_files": tm.get("test_files"),
+        "image": {
+            "mode": mode, "tag": f"vllm-task:{pr_s}", "dockerfile": f"tasks/pr_{pr_s}/workload/Dockerfile",
+            "wheel": tm.get("wheel"), "wheel_note": tm.get("wheel_note"),
+            "torch_fix": tm.get("torch_fix"), "extra_pip": tm.get("extra_pip"),
+            "swap": tm.get("swap", "tree"), "swap_note": tm.get("swap_note"),
+            "build": f"docker build -t vllm-task:{pr_s} -f tasks/pr_{pr_s}/workload/Dockerfile "
+                     f"--build-arg VLLM_VERSION={tm.get('wheel') or ''} --build-arg BASE_SHA={ix.get('base_sha') or ''} "
+                     f"--build-arg MERGE_SHA={ix.get('merge_sha') or ''} tasks/pr_{pr_s}/workload",
+        },
+        "workload": {
+            "kind": wl.get("kind") or w.get("workload_kind"), "script": wl.get("script") or w.get("script"),
+            "cmd": cmd, "needs": needs, "cluster": cluster, "all_clusters": cks, "model": c.get("model"),
+            "weights": {"hf_id": c.get("hf_id"), "size": c.get("size"), "cache": f".weights/{cluster}" if c.get("model") else None},
+            "env": ["ARM=<arm>", "CUDA_VISIBLE_DEVICES=0", "CUDA_DEVICE_ORDER=PCI_BUS_ID", "HF_HUB_DISABLE_PROGRESS_BARS=1"],
+            "mounts": {"/arm": "the arm's tree (read-only)", "/gold": "the PR's merge tree (tests/, benchmarks/)",
+                       "/task": f"tasks/pr_{pr_s} (bench.py, tests)", "/root/.cache/huggingface": ".weights/hf"},
+            "repeats": tm.get("repeats"), "note": wl.get("note") or w.get("notes"), "base_note": wl.get("base_note"),
+        },
+        "policy": policy_from_runner(),
+        "metrics": metrics, "headline": headline,
+        "reported": {
+            "gain": ix.get("reported_gain"), "gain_kind": ix.get("gain_kind"), "gain_evidence": ix.get("gain_evidence"),
+            "perf_gain": tm.get("perf_gain"), "experiments_note": tm.get("experiments_note") or w.get("notes"),
+            "author_hardware_args": quotes, "source": body_path,
+            "hardware_tag": ix.get("hardware"),
+        },
+        "requirements": ix.get("requirements"),
+        "reproduced": reproduced_for(pr),
+        "gap": gap,
+        "standalone": standalone_cmds(pr_s, ix, tm, w, needs, cluster),
+        "test_note": tm.get("test_note"),
+    }
+
+
+def _fmt(v, nd=4):
+    if v is None:
+        return "—"
+    if isinstance(v, float):
+        return f"{v:.{nd}g}"
+    return str(v)
+
+
+def render_workload_md(d):
+    L = []
+    L.append(f"# PR #{d['pr']} workload — {d['title']}")
+    L.append("")
+    L.append(f"Canonical experiment description (generated by `gen_workloads.py` from `workload.json`; edit the inputs, not this file). "
+             f"PR: {d['url']} · field `{d['field']}` · baseline `{(d['base_sha'] or '')[:12]}` → PR's solution `{(d['merge_sha'] or '')[:12]}`")
+    L.append("")
+    w, im = d["workload"], d["image"]
+    L.append("## What is measured")
+    L.append("")
+    L.append(f"- kind: `{w['kind']}` · script: `{w['script']}` · needs: `{w['needs']}` · cluster: `{w['cluster']}`" + (f" · model: `{w['model']}`" if w.get("model") else ""))
+    L.append(f"- cmd: `{w['cmd']}`")
+    if w.get("note"):
+        L.append(f"- note: {w['note']}")
+    if w.get("base_note"):
+        L.append(f"- baseline arm: {w['base_note']}")
+    L.append("")
+    L.append("| metric | unit | better | headline | reported baseline → PR's solution | parse |")
+    L.append("|---|---|---|---|---|---|")
+    for m in d["metrics"]:
+        rep = m.get("reported") or {}
+        rs = "—"
+        if rep.get("baseline") is not None or rep.get("pr_solution") is not None:
+            rs = f"{_fmt(rep.get('baseline'))} → {_fmt(rep.get('pr_solution'))}"
+        elif rep.get("pct") is not None:
+            rs = f"{rep['pct']} % (pct only)"
+        L.append(f"| `{m['name']}` | {m['unit']} | {'higher' if m['higher_is_better'] else 'lower'} | {'yes' if m['headline'] else ''} | {rs} | {m['parse']} |")
+    if not d["metrics"]:
+        L.append("| — | | | | no metric list vendored | |")
+    L.append("")
+    r = d["reported"]
+    L.append("## Reported by the author")
+    L.append("")
+    L.append(f"- gain: **{r.get('gain')}** ({r.get('gain_kind')}) — {r.get('gain_evidence')}")
+    if r.get("experiments_note"):
+        L.append(f"- {r['experiments_note']}")
+    if r.get("author_hardware_args"):
+        L.append(f"- hardware / args as written in the PR body (`{r['source']}`):")
+        for q in r["author_hardware_args"][:12]:
+            L.append(f"  - L{q['line']}: `{q['text']}`")
+    elif r.get("source"):
+        L.append(f"- the PR body (`{r['source']}`) names no hardware or command line")
+    L.append("")
+    rp = d.get("reproduced")
+    L.append("## Reproduced here")
+    L.append("")
+    if rp:
+        img = rp.get("image") or {}
+        L.append(f"- source `{rp['source']}` ({rp.get('ts')}), image mode `{img.get('mode')}` wheel `{img.get('wheel')}`, repeats {img.get('repeats')}, "
+                 f"tests baseline=`{(rp.get('tests') or {}).get('base')}` PR's solution=`{(rp.get('tests') or {}).get('gold')}`, "
+                 f"verdict **{rp.get('verdict')}** (median ratio ×{_fmt(rp.get('reproduced_ratio_median'))} vs reported ×{_fmt(rp.get('reported_ratio_median'))})")
+        mach = rp.get("machine") or {}
+        if mach:
+            g = mach.get("gpu") or {}
+            L.append(f"- machine: {g.get('name')} driver {g.get('driver')} CUDA {g.get('cuda')}, {(mach.get('cpu') or {}).get('model')}, {(mach.get('host') or {}).get('kernel')}")
+        L.append("")
+        L.append("| metric | reported baseline → PR's solution | reproduced baseline → PR's solution (mean ± sd, n) | ratio ours / reported | verdict |")
+        L.append("|---|---|---|---|---|")
+        for e in rp["experiments"]:
+            rep = e.get("reported") or {}
+            rs = "—"
+            if rep.get("baseline") is not None:
+                rs = f"{_fmt(rep.get('baseline'))} → {_fmt(rep.get('pr_solution'))} {e.get('unit') or ''}"
+            elif rep.get("pct") is not None:
+                rs = f"+{rep['pct']} %"
+            ours = "—"
+            if e.get("baseline") is not None:
+                ours = f"{_fmt(e['baseline'])} ± {_fmt(e.get('baseline_sd'))} → {_fmt(e['pr_solution'])} ± {_fmt(e.get('pr_solution_sd'))} {e.get('unit') or ''} (n={e.get('n')})"
+            rel = (e.get("reliability") or {}).get("flag")
+            v = e.get("verdict") or "—"
+            if rel and rel != "ok":
+                v += f" ({rel})"
+            L.append(f"| `{e['name']}` | {rs} | {ours} | ×{_fmt(e.get('ratio'))} / {_fmt(e.get('ratio_of_ratios'))} | {v} |")
+    else:
+        L.append("- not measured yet (no `results/<pr>.json`)")
+    L.append("")
+    g = d["gap"]
+    L.append("## Gap between the author's absolute numbers and ours")
+    L.append("")
+    L.append(f"- verdict: **{g['verdict']}**" + (f" — {g['note']}" if g.get("note") else " (this PR was not in the BASELINE_GAP.md analysis)"))
+    L.append("")
+    p = d["policy"]
+    L.append("## Measurement policy (as run_one.sh implements it)")
+    L.append("")
+    L.append(f"- repeats: {d['workload'].get('repeats') or p.get('repeats_default')} per arm; {p.get('interleave')}; one run = {p.get('one_run_is')}")
+    L.append(f"- GPU pin `{p.get('gpu_flag_default')}`, env {p.get('container_env')}, `--shm-size={p.get('shm_size')}`, per-run cap `WL_TIMEOUT={p.get('wl_timeout_default')}`")
+    L.append(f"- GPU warm-up {p.get('gpu_warmup_s')} s in the prelude; contention gate: {(p.get('contention_gate') or {}).get('rules')} (max wait {(p.get('contention_gate') or {}).get('max_wait_s')} s, then {(p.get('contention_gate') or {}).get('then')})")
+    L.append(f"- arm isolation `{im.get('swap')}`: {p['arm_isolation'][im.get('swap') or 'tree']}; {p.get('machine_snapshot')}")
+    L.append(f"- noise model: {p.get('noise_model')}")
+    L.append("")
+    s = d["standalone"]
+    L.append("## Re-run 1:1 without run_one.sh")
+    L.append("")
+    L.append("```bash")
+    L.append(f"# image: {im['mode']}" + (f", vLLM wheel {im['wheel']}" if im.get("wheel") else ""))
+    if s.get("checkout"):
+        L.append(s["checkout"])
+    L.append(s["build"])
+    L.append("# baseline arm")
+    L.append(s["run_baseline"])
+    L.append("# PR's solution arm")
+    L.append(s["run_pr_solution"])
+    L.append("```")
+    L.append("")
+    L.append(s["note"])
+    if im.get("torch_fix") or im.get("extra_pip"):
+        L.append("")
+        L.append(f"Image pins: torch_fix=`{im.get('torch_fix')}` extra_pip=`{im.get('extra_pip')}`" + (f" — {im.get('wheel_note')}" if im.get("wheel_note") else ""))
+    if im.get("swap_note"):
+        L.append("")
+        L.append(f"Swap mode `{im.get('swap')}`: {im['swap_note']}")
+    L.append("")
+    rq = d.get("requirements") or {}
+    L.append("## Machine requirements")
+    L.append("")
+    if rq:
+        hw, sw = rq.get("hardware") or {}, rq.get("software") or {}
+        L.append(f"- GPU: {hw.get('gpu')} ×{hw.get('gpu_count')} ≥{hw.get('vram_gb')} GB VRAM, compute capability ≥{hw.get('compute_cap_min')}"
+                 + (f" ({hw.get('gpu_hint')})" if hw.get("gpu_hint") else "") + f"; RAM {hw.get('ram_gb')} GB; disk {hw.get('disk_gb')} GB")
+        L.append(f"- software: docker={sw.get('docker')} nvidia-container-runtime={sw.get('nvidia_container_runtime')} vllm_wheel={sw.get('vllm_wheel')} "
+                 f"pipeline={sw.get('pipeline')} models={sw.get('models')} datasets={sw.get('datasets')} hf_token={sw.get('hf_token')} needs_server={sw.get('needs_server')}")
+    else:
+        L.append("- not recorded in index.json for this PR")
+    if d.get("test_note"):
+        L.append("")
+        L.append(f"Oracle note: {d['test_note']}")
+    L.append("")
+    return "\n".join(L)
+
+
 def main():
     made = []
     for pr_s, cks in sorted(PR_CLUSTERS.items(), key=lambda kv: int(kv[0])):
@@ -250,6 +651,17 @@ def main():
             "all_clusters": cks,
         }
         json.dump(meta, open(os.path.join(wdir, "meta.json"), "w"), indent=1)
+
+        # workload.json + WORKLOAD.md — the canonical, self-contained experiment description.
+        # cmd = what run_one.sh really runs (metadata.json:workload.cmd), else workloads.json:cmd.
+        canon_cmd = (task_meta(pr_s).get("workload") or {}).get("cmd") or cmd
+        wj = build_workload_json(pr_s, w, cks, cluster, c, needs, canon_cmd)
+        if canon_cmd != cmd:
+            wj["workload"]["cmd_in_workloads_json"] = cmd
+        with open(os.path.join(wdir, "workload.json"), "w") as f:
+            json.dump(wj, f, indent=1, ensure_ascii=False)
+            f.write("\n")
+        open(os.path.join(wdir, "WORKLOAD.md"), "w").write(render_workload_md(wj))
         made.append((pr_s, needs, cluster))
 
     print("generated %d workload dirs:" % len(made))
