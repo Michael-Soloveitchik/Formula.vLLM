@@ -2,7 +2,7 @@
 
 ## Objective
 Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the expert's merged patch (gold)**.
+workload runs **as fast as or faster than the expert's merged patch (the PR's solution)**.
 You are given the expert's known solution below. You may reproduce it, but you
 are explicitly asked to **try to beat it** — find a faster correct version.
 
@@ -15,13 +15,13 @@ In vllm/v1/engine/detokenizer.py, callers computed the output-token count via le
 ## Expert solution (reference — the merged PR)
 **General:** Add a dedicated method that returns the output-token count directly from stored values, without building any intermediate list. Switch the length-only call sites to use it. Same result, less work.
 
-**Detailed:** Added num_output_tokens() to the detokenizer classes: the base returns len(self.token_ids), and SlowIncrementalDetokenizer returns len(self.token_ids) - self.prompt_len, avoiding the self.token_ids[self.prompt_len:] slice. In detokenizer.py update(), both guards (len(self.output_token_ids) <= self.min_tokens and len(self.output_token_ids) > self.min_tokens) now call self.num_output_tokens(). In output_processor.py make_request_output(), the stream_interval check and the sent_tokens_offset assignment now call self.detokenizer.num_output_tokens() instead of len(...output_token_ids). A stale TODO about update() being inefficient when new_token_ids has more than one element was removed. The slicing output_token_ids property is kept for callers that need the actual list.
+**Detailed:** Added num_output_tokens() to the detokenizer classes: the baseline class returns len(self.token_ids), and SlowIncrementalDetokenizer returns len(self.token_ids) - self.prompt_len, avoiding the self.token_ids[self.prompt_len:] slice. In detokenizer.py update(), both guards (len(self.output_token_ids) <= self.min_tokens and len(self.output_token_ids) > self.min_tokens) now call self.num_output_tokens(). In output_processor.py make_request_output(), the stream_interval check and the sent_tokens_offset assignment now call self.detokenizer.num_output_tokens() instead of len(...output_token_ids). A stale TODO about update() being inefficient when new_token_ids has more than one element was removed. The slicing output_token_ids property is kept for callers that need the actual list.
 
 **Author's words:** Adding a num_output_tokens function, to avoid len(self.output_token_ids) might do a slice in SlowIncrementalDetokenizer. A second proposed change (accumulate pieces and join once), and a later spec-decoding fast/slow path split, were both reverted after review; only the num_output_tokens change was kept.
 
 ## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (gold). Your
-edit is timed on the SAME workload. Beat gold on these metrics:
+Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
+edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 - **detokenize** (us/tok): reported 1.628 -> 1.0 us/tok. workload: per tok
 
 ## Reported numbers (PR author)
@@ -32,4 +32,4 @@ edit is timed on the SAME workload. Beat gold on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than gold on the measured experiments wins. Same speed = ties gold.
+- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.

@@ -10,7 +10,7 @@ line it recognises (one "scenario" per metric):
   * benchmark_topk_topp.py SUMMARY TABLE rows
         <scenario> <batch> <vocab> <ops>% <triton_ms> <pytorch_ms> <speedup>x ...
     -> "<scenario>_b<batch>_v<vocab>" (ms, Triton column); the PyTorch column of
-       the gold arm is kept as `pytorch_ref` (= pre-PR number when the base tree
+       the PR's-solution arm is kept as `pytorch_ref` (= pre-PR number when the baseline tree
        cannot run the script at all, e.g. 33538 introduces it)
   * "AllPool.forward median: 39.65 us"            -> allpool_forward_median (us)
   * benchmark_throughput.py
@@ -74,7 +74,7 @@ def main():
     work, arms = sys.argv[1], sys.argv[2:]
     per_arm = {}      # arm -> scenario -> [values]
     units = {}        # scenario -> unit
-    pyt_ref = {}      # scenario -> [ms] (gold runs only)
+    pyt_ref = {}      # scenario -> [ms] (PR-solution runs only)
     for arm in arms:
         per_arm[arm] = {}
         # exact arm match: wl_<arm>_<n>.log (a bare glob would also match

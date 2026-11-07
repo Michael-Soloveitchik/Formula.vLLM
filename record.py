@@ -3,7 +3,7 @@
 
     python3 record.py <pr>
 
-Called by run_one.sh right after the base/gold measurement (so the dashboard
+Called by run_one.sh right after the baseline / PR-solution measurement (so the dashboard
 shows measured numbers immediately) and again after every solver arm. Reads:
   .work/pr_<pr>/arms.json        {"base":{"tests":..},"gold":{..},"<harness>":{"tests":..,"slug":..}}
   .work/pr_<pr>/wl_<slug>_<i>.log  workload logs (parse_workload.py)
@@ -52,7 +52,7 @@ def main():
             note = None
             if "base" not in a and n in pyref:
                 a["base"] = pyref[n]
-                note = (meta.get("workload") or {}).get("base_note") or "base = script's PyTorch column"
+                note = (meta.get("workload") or {}).get("base_note") or "baseline = script's PyTorch column"
             e = {"name": n, "unit": unit, "workload": wl, "reported": rep_by.get(n), "arms": a}
             if note:
                 e["note"] = note

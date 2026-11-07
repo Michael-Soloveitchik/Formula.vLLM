@@ -2,7 +2,7 @@
 # GPU box (Ubuntu + NVIDIA RTX 3060 Ti, 8 GB), set the two paths below, run.
 #
 # A "solver" produces a SOURCE patch given the pre-PR base_sha tree + the task
-# objective. We always run the two reference arms (base, gold) plus every
+# objective. We always run the two reference arms (baseline, PR's solution) plus every
 # enabled solver. A solver is just a shell command: the runner invokes
 #     <cmd> <task_objective>
 # inside the task work dir; the command edits ./vllm and exits.
@@ -18,6 +18,7 @@ machine:
 # where the vLLM git clone lives on the target box (needed to export base_sha
 # and merge_sha trees). The clone is huge, so it is NOT vendored in this repo.
 paths:
+  vllm_url: https://github.com/vllm-project/vllm.git   # --reproduce clones from here if vllm_git is missing
   vllm_git: ../../vllm   # ONLY for source-mode (Dockerfile.gpu). Wheel-mode tasks clone inside the image; no host clone needed.
 
 # measurement: repeat each timing to get mean + variance (see rules.md noise model)
@@ -32,8 +33,8 @@ measure:
 
 # reference arms always measured
 arms:
-  base: {kind: reference, tree: base_sha}      # pre-PR  -> expect tests FAIL
-  gold: {kind: reference, tree: merge_sha}     # expert  -> expect tests PASS
+  base: {kind: reference, tree: base_sha}      # baseline (pre-PR) -> expect tests FAIL
+  gold: {kind: reference, tree: merge_sha}     # PR's solution -> expect tests PASS
 
 # ---------------------------------------------------------------------------
 # solvers: one line each = harness x model x cmd. The runner reads `cmd` and

@@ -2,8 +2,8 @@
 """Generate per-PR tasks/pr_<n>/workload/ scaffolds from clusters.json + workloads.json.
 
 Each workload/ dir gets, idempotently:
-  Dockerfile        - isolated image for THIS PR's workload (cpu or gpu base)
-  run_workload.sh   - runs the author-mimicking workload for base + gold arms,
+  Dockerfile        - isolated image for THIS PR's workload (cpu or gpu parent image)
+  run_workload.sh   - runs the author-mimicking workload for baseline + PR-solution arms,
                       prints parseable lines, exits 0 even if an arm skips
   download.sh       - fetch-on-demand, gated; fetches shared weights into
                       ../../../.weights/<cluster> ONLY when run; nothing now
@@ -40,7 +40,7 @@ def chmod_x(path):
     os.chmod(path, os.stat(path).st_mode | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
 
 
-# ---- the CPU base image (no model): python:3.12-slim + CPU torch + import deps ----
+# ---- the CPU parent image (no model): python:3.12-slim + CPU torch + import deps ----
 CPU_DEPS = (
     "numpy pydantic psutil tabulate cloudpickle msgspec typing_extensions "
     "transformers regex filelock huggingface_hub cachetools pillow py-cpuinfo "
@@ -59,7 +59,7 @@ WORKDIR /bench
 # run_workload.sh is bind-mounted and invoked by run.sh; no baked CMD.
 """
 
-# ---- the GPU image: PyPI wheel + THIS PR's base/merge trees cloned in-image ----
+# ---- the GPU image: PyPI wheel + THIS PR's baseline/merge trees cloned in-image ----
 # Self-contained per PR: shas + wheel version are baked as ARG defaults, so
 #   docker build -t vllm-task:<pr> tasks/pr_<pr>/workload
 # works with no host clone. run_one.sh builds from this file in wheel mode.
@@ -74,7 +74,7 @@ FROM nvidia/cuda:${{CUDA_TAG}}
 ENV DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1 PYTHONDONTWRITEBYTECODE=1
 RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-pip python3-dev git \\
  && rm -rf /var/lib/apt/lists/*
-# vLLM wheel: first PyPI release AFTER merge_sha (compiled ops match the gold tree).
+# vLLM wheel: first PyPI release AFTER merge_sha (compiled ops match the PR-solution tree).
 # Empty VLLM_VERSION = latest (pick one and record it in tasks/pr_{pr}/metadata.json:wheel).
 ARG VLLM_VERSION={wheel}
 RUN pip install --upgrade pip && pip install "vllm${{VLLM_VERSION:+==$VLLM_VERSION}}" pytest pytest-asyncio
@@ -106,7 +106,7 @@ ENTRYPOINT ["/bin/bash"]
 
 RUN_CPU = """#!/usr/bin/env bash
 # AUTO-GENERATED — PR #{pr}. Mimic the author's workload for BOTH arms.
-# Mounts: /src = the arm's vllm tree (base or gold). Prints parseable lines.
+# Mounts: /src = the arm's vllm tree (baseline or PR solution). Prints parseable lines.
 set -euo pipefail
 ARM="${{ARM:-unknown}}"
 echo "# pr={pr} arm=$ARM cmd={cmd!r}"

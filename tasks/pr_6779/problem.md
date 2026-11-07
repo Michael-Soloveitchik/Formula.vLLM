@@ -2,7 +2,7 @@
 
 ## Objective
 Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the expert's merged patch (gold)**.
+workload runs **as fast as or faster than the expert's merged patch (the PR's solution)**.
 You are given the expert's known solution below. You may reproduce it, but you
 are explicitly asked to **try to beat it** — find a faster correct version.
 
@@ -20,8 +20,8 @@ In `from_sampling_metadata` (vllm/model_executor/sampling_metadata.py), token ID
 **Author's words:** Using `array.array` in SequenceData greatly improves performance of `make_tensor_with_pad` in Sampler. The `from_sampling_metadata` function optimized by this PR primarily runs on the CPU and is independent of logits, so it can overlap with the GPU work of model inference. It will only be on the critical path if its execution time exceeds that of model inference, which occurs with smaller models. This PR is for small models and large batch sizes.
 
 ## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (gold). Your
-edit is timed on the SAME workload. Beat gold on these metrics:
+Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
+edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 - **make_tensor_with_pad** (ms): reported 79.0 -> 22.0 ms. workload: latency ms
 - **e2e_qwen05b** (it/s): reported 24.76 -> 29.44 it/s. workload: it/s
 
@@ -33,4 +33,4 @@ edit is timed on the SAME workload. Beat gold on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than gold on the measured experiments wins. Same speed = ties gold.
+- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.

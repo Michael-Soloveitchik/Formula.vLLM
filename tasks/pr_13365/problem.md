@@ -2,7 +2,7 @@
 
 ## Objective
 Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the expert's merged patch (gold)**.
+workload runs **as fast as or faster than the expert's merged patch (the PR's solution)**.
 You are given the expert's known solution below. You may reproduce it, but you
 are explicitly asked to **try to beat it** — find a faster correct version.
 
@@ -20,8 +20,8 @@ The `NgramProposer.propose` method in `vllm/v1/spec_decode/ngram_proposer.py` ca
 **Author's words:** This PR optimizes the N-gram matching algorithm by JIT compiling it with Numba. I've observed 20-30x speedup with large batch sizes: For ShareGPT benchmark with 5K requests, the cumulative overhead reduces from 54.3 sec to 1.9 sec, which is ~2.5% of the entire running time.
 
 ## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (gold). Your
-edit is timed on the SAME workload. Beat gold on these metrics:
+Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
+edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 - **ngram_match_overhead** (s): reported 54.3 -> 1.9 s. workload: cumulative s
 
 ## Reported numbers (PR author)
@@ -32,4 +32,4 @@ edit is timed on the SAME workload. Beat gold on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than gold on the measured experiments wins. Same speed = ties gold.
+- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.

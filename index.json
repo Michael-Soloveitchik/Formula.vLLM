@@ -139,6 +139,33 @@
    "cmd": "# microbench from PR body: Sampler latency harness (import vllm Sampler + SamplingMetadata), large batch sizes",
    "unit": "ms (sampler latency)",
    "needs": "gpu"
+  },
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": "A100 in the PR; v0 Sampler",
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": null,
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "needs-wheel-task"
+   }
   }
  },
  {
@@ -191,6 +218,35 @@
    "cmd": "# microbench from PR body: make_tensor_with_pad over SequenceData with input_len=1024, batch_size=2048",
    "unit": "ms (make_tensor_with_pad latency)",
    "needs": "cpu"
+  },
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 31.0
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": true,
+    "hf_token": false,
+    "vllm_wheel": null,
+    "cuda_build": null,
+    "models": [
+     "Qwen/Qwen2-0.5B"
+    ],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "needs-wheel-task"
+   }
   }
  },
  {
@@ -348,6 +404,37 @@
    "cmd": "VLLM_USE_V1=1 python3 benchmarks/benchmark_prefix_caching.py --model neuralmagic/Meta-Llama-3-8B-Instruct-FP8 --num-prompts 200 --repeat-count 2 --input-length-range 256:512 --dataset-path ./ShareGPT_V3_unfiltered_cleaned_split.json --seed 0 --enable-prefix-caching",
    "unit": "tokens/s (input & output), cost time (s)",
    "needs": "gpu"
+  },
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 16,
+    "compute_cap_min": 8.9,
+    "compute_cap_max": null,
+    "gpu_hint": "FP8 model (Ada/Hopper+)",
+    "ram_gb": 8,
+    "disk_gb": 39.234765625
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": true,
+    "hf_token": false,
+    "vllm_wheel": null,
+    "cuda_build": null,
+    "models": [
+     "neuralmagic/Meta-Llama-3-8B-Instruct-FP8"
+    ],
+    "datasets": [
+     "ShareGPT_V3_unfiltered_cleaned_split.json"
+    ],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "needs-wheel-task"
+   }
   }
  },
  {
@@ -418,7 +505,7 @@
   "hardware": [
    "agnostic"
   ],
-  "reported_gain": "2% (20.77ms\u219220.45ms)",
+  "reported_gain": "2% (20.77ms→20.45ms)",
   "gain_kind": "unit",
   "gain_evidence": "The forward time for every step (batchsize 8) reduces from 20.77ms to 20.45ms.",
   "base_sha": "a732900efc4eb0d4393e3885d5df8ef3516d4834",
@@ -475,6 +562,37 @@
    "cmd": "python3 benchmarks/kernels/benchmark_moe.py --model mistralai/Mixtral-8x7B-Instruct-v0.1 --tp-size 2 --dtype auto --seed 0",
    "unit": "us (fused MoE kernel latency per config)",
    "needs": "gpu"
+  },
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 2,
+    "vram_gb": 48,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": "Mixtral-8x7B TP=2",
+    "ram_gb": 8,
+    "disk_gb": 120.0
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": true,
+    "hf_token": true,
+    "vllm_wheel": null,
+    "cuda_build": null,
+    "models": [
+     "mistralai/Mixtral-8x7B-Instruct-v0.1"
+    ],
+    "datasets": [],
+    "env": [
+     "ALLOW_MIXTRAL"
+    ],
+    "needs_server": false,
+    "pipeline": "needs-wheel-task"
+   }
   }
  },
  {
@@ -557,6 +675,33 @@
    "cmd": "# microbench: time vllm.v1.spec_decode.ngram_proposer.NgramProposer.propose over ShareGPT token sequences",
    "unit": "s (cumulative N-gram matching overhead)",
    "needs": "cpu"
+  },
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": null,
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "needs-wheel-task"
+   }
   }
  },
  {
@@ -684,6 +829,35 @@
    "cmd": "python3 benchmarks/benchmark_serving.py --backend vllm --model <small-model> --dataset-name random --random-input-len 1000 --random-output-len 100 --num-prompts 100",
    "unit": "ms TPOT, ms ITL, tokens/s",
    "needs": "gpu"
+  },
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 6,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": "serving bench: needs a vllm server + client",
+    "ram_gb": 8,
+    "disk_gb": 30.244140625
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": true,
+    "hf_token": false,
+    "vllm_wheel": null,
+    "cuda_build": null,
+    "models": [
+     "facebook/opt-125m"
+    ],
+    "datasets": [],
+    "env": [],
+    "needs_server": true,
+    "pipeline": "needs-wheel-task"
+   }
   }
  },
  {
@@ -754,9 +928,9 @@
   "hardware": [
    "agnostic"
   ],
-  "reported_gain": "82% (127ms\u219223.1ms)",
+  "reported_gain": "82% (127ms→23.1ms)",
   "gain_kind": "unit",
-  "gain_evidence": "- ITL (P99) \u219381.8% (127ms \u2192 23.1ms)",
+  "gain_evidence": "- ITL (P99) ↓81.8% (127ms → 23.1ms)",
   "base_sha": "5f52a846850a3aed258e3a95bbea8fcaeb39d725",
   "merge_sha": "eccdc8318c50ad3e2adfaaf99d714a8dccc6ab16",
   "source_path": null
@@ -934,7 +1108,7 @@
   "hardware": [
    "agnostic"
   ],
-  "reported_gain": "95% (0.15ms\u21920.008ms)",
+  "reported_gain": "95% (0.15ms→0.008ms)",
   "gain_kind": "unit",
   "gain_evidence": "### benchmark scripts - Get new blocks improved from 0.15ms to 0.008ms - Free new blocks improved from 33us to 9us",
   "base_sha": "10904e6d755051260a7c3ce98659d8907c74caa9",
@@ -946,6 +1120,33 @@
    "cmd": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
    "unit": "ms/op (get_new_blocks), us/op (free_blocks)",
    "needs": "cpu"
+  },
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": null,
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "needs-wheel-task"
+   }
   }
  },
  {
@@ -956,7 +1157,7 @@
   "hardware": [
    "agnostic"
   ],
-  "reported_gain": "77% (0.13ms\u21920.03ms)",
+  "reported_gain": "77% (0.13ms→0.03ms)",
   "gain_kind": "unit",
   "gain_evidence": "## Test Result Quite significant improvements 0.13ms -> 0.03ms",
   "base_sha": "e7b204268132cb775c139574c1ff4ad7e15c8f66",
@@ -968,6 +1169,33 @@
    "cmd": "python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000",
    "unit": "ms/op (allocate_new_block path)",
    "needs": "cpu"
+  },
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": null,
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "needs-wheel-task"
+   }
   }
  },
  {
@@ -978,7 +1206,7 @@
   "hardware": [
    "agnostic"
   ],
-  "reported_gain": "80% (35us\u21927us)",
+  "reported_gain": "80% (35us→7us)",
   "gain_kind": "unit",
   "gain_evidence": "--profile ``` ## Test Result With the change, handle_client_request in engine core thread reduced from 35us to 7us.",
   "base_sha": "601f856d5679a474b6488fb7dd75ebbd7125d1ca",
@@ -1035,6 +1263,35 @@
    "cmd": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 30000",
    "unit": "requests/s, total tokens/s, output tokens/s (compute_slot_mapping in us)",
    "needs": "gpu"
+  },
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 4,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30.244140625
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": true,
+    "hf_token": false,
+    "vllm_wheel": "0.10.1",
+    "cuda_build": null,
+    "models": [
+     "facebook/opt-125m"
+    ],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
   }
  },
  {
@@ -1087,6 +1344,33 @@
    "cmd": "python3 benchmarks/kernels/benchmark_w8a8_block_fp8.py --tp-size 8 --input-type fp8 --out-dtype float16 --block-n 128 --block-k 128",
    "unit": "tokens/s (end-to-end serving), us (w8a8 block fp8 kernel)",
    "needs": "gpu"
+  },
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 24,
+    "compute_cap_min": 8.9,
+    "compute_cap_max": null,
+    "gpu_hint": "H200 (--tp-size 8 only shapes the problem; one GPU runs it)",
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": null,
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "needs-wheel-task"
+   }
   }
  },
  {
@@ -1142,7 +1426,7 @@
   "hardware": [
    "agnostic"
   ],
-  "reported_gain": "30% (Load Time (s): 20\u219214)",
+  "reported_gain": "30% (Load Time (s): 20→14)",
   "gain_kind": "unit",
   "gain_evidence": "Load Time (s): before 20 / after 14",
   "base_sha": "7be141b2c52366f0cc4e731c36819aed178d2258",
@@ -1202,9 +1486,9 @@
   "hardware": [
    "agnostic"
   ],
-  "reported_gain": "1.62\u00d7",
+  "reported_gain": "1.62×",
   "gain_kind": "pct",
-  "gain_evidence": "Baseline (non-speculative): 215.84 s Speculative decoding model: 133.24 s Speedup: 1.62\u00d7",
+  "gain_evidence": "Baseline (non-speculative): 215.84 s Speculative decoding model: 133.24 s Speedup: 1.62×",
   "base_sha": "56aafa8c0bb9cce3594d834b996a5352504b985e",
   "merge_sha": "33f6aaf9725ab3c0b07ed88d8a6113621f9eb4d2",
   "source_path": "vllm/model_executor/models/minicpm.py"
@@ -1262,7 +1546,7 @@
   "hardware": [
    "agnostic"
   ],
-  "reported_gain": "16% (10.27ms\u21928.66ms)",
+  "reported_gain": "16% (10.27ms→8.66ms)",
   "gain_kind": "unit",
   "gain_evidence": "on latest torch, TPOT goes from 10.27ms -> 8.66ms",
   "base_sha": "b23fb78623f0019854af7a820d398cba9a316677",
@@ -1637,7 +1921,7 @@
   "hardware": [
    "agnostic"
   ],
-  "reported_gain": "75% (6.3us\u21921.6us)",
+  "reported_gain": "75% (6.3us→1.6us)",
   "gain_kind": "unit",
   "gain_evidence": "When early stop happened, the cost reduced from 6.3us to 1.6us now.",
   "base_sha": "d3ab240f39219df0175ec662416f630d7bf273d8",
@@ -1649,6 +1933,33 @@
    "cmd": "pytest -v tests/v1/e2e/test_correctness_sliding_window.py",
    "unit": "us (remove_skipped_blocks cost)",
    "needs": "gpu"
+  },
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": null,
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "needs-wheel-task"
+   }
   }
  },
  {
@@ -1671,6 +1982,33 @@
    "cmd": "pytest -v tests/v1/core/test_kv_cache_metrics.py",
    "unit": "overhead ~48 bytes/block; metrics correctness (no timing number)",
    "needs": "cpu"
+  },
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": null,
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "needs-wheel-task"
+   }
   }
  },
  {
@@ -1768,6 +2106,33 @@
    "cmd": "vllm serve <model> ; vllm bench serve --num-prompts 100 --dataset-name sharegpt",
    "unit": "tokens/s, ms TTFT/TPOT/ITL",
    "needs": "gpu"
+  },
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 16,
+    "compute_cap_min": 8.9,
+    "compute_cap_max": null,
+    "gpu_hint": "serving (sharegpt) on Qwen2-0.5B / Llama-3-8B-FP8",
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": null,
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": true,
+    "pipeline": "needs-wheel-task"
+   }
   }
  },
  {
@@ -1898,7 +2263,7 @@
   "hardware": [
    "agnostic"
   ],
-  "reported_gain": "90% (200ms\u219220ms)",
+  "reported_gain": "90% (200ms→20ms)",
   "gain_kind": "unit",
   "gain_evidence": "Using [olmoe-lora](https://huggingface.co/jeeejeee/olmoe-instruct-text2sql-spider/blob/main/adapter_model.safetensors) testing, the time consumption decreased f",
   "base_sha": "cf348c8d27c34247f5976a86ebe6f4a3b4f9e888",
@@ -1940,6 +2305,33 @@
    "cmd": "pytest -v tests/distributed/test_eplb_algo.py",
    "unit": "EPLB primitive latency (PR reports 20-27% avg)",
    "needs": "cpu"
+  },
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": null,
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "needs-wheel-task"
+   }
   }
  },
  {
@@ -2070,7 +2462,7 @@
   "hardware": [
    "agnostic"
   ],
-  "reported_gain": "7% (83.41ms\u219277.53ms)",
+  "reported_gain": "7% (83.41ms→77.53ms)",
   "gain_kind": "unit",
   "gain_evidence": "With random dataset and max-concurrency = 1, TTFT on two A10 machines running Qwen2.5-7B-Instruct is improved: random-input-len 128: 83.41ms -> 77.53ms random-i",
   "base_sha": "18e7cbbb158a86bdc76585e64ada795bf1c0d435",
@@ -2132,7 +2524,7 @@
   ],
   "reported_gain": "4%",
   "gain_kind": "pct",
-  "gain_evidence": "For longer sequence lengths, the performance improvement introduced by this PR becomes more pronounced, reaching approximately 3\u20134% for output lengths of 6,400 ",
+  "gain_evidence": "For longer sequence lengths, the performance improvement introduced by this PR becomes more pronounced, reaching approximately 3–4% for output lengths of 6,400 ",
   "base_sha": "e6c6f2c79d2c1e0765d17b4dec83a4a8283342e4",
   "merge_sha": "b8bf5c45bbbb1249bd1656557603da71e9d4c3b9",
   "source_path": "vllm/v1/attention/ops/triton_unified_attention.py"
@@ -2292,6 +2684,33 @@
    "cmd": "pytest -v tests/tokenizers_/test_detokenize.py tests/detokenizer/test_min_tokens.py",
    "unit": "detokenize throughput (PR reports 1.628x / 38.57%)",
    "needs": "cpu"
+  },
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": null,
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "needs-wheel-task"
+   }
   }
  },
  {
@@ -2344,6 +2763,33 @@
    "cmd": "python benchmarks/benchmark_topk_topp.py",
    "unit": "ms (plus VRAM)",
    "needs": "gpu"
+  },
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.5,
+    "compute_cap_max": null,
+    "gpu_hint": "Triton kernel",
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.16.0",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
   }
  },
  {
@@ -2366,6 +2812,33 @@
    "cmd": "python - <<'PY'  # slice-vs-islice microbench from PR body; SIZE=2_000_000 N=1_000_000 R=5, times list[:N] vs islice and sum over both\nPY",
    "unit": "s (best wall time) + peak MiB",
    "needs": "cpu"
+  },
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": null,
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "needs-wheel-task"
+   }
   }
  },
  {
@@ -2408,7 +2881,7 @@
   ],
   "reported_gain": "1.3%",
   "gain_kind": "pct",
-  "gain_evidence": "\u2502 Mean TPOT (ms) \u2502 25.02 \u2502 24.70 \u2502 -1.3% \u2502",
+  "gain_evidence": "│ Mean TPOT (ms) │ 25.02 │ 24.70 │ -1.3% │",
   "base_sha": "b7892a3beff05971f7e1ed3519aec96c3d89bfb0",
   "merge_sha": "2bcf71b9c0305e2a3d645e7a5ced4460262b4a6c",
   "source_path": "vllm/v1/spec_decode/eagle.py"
@@ -2453,7 +2926,7 @@
   ],
   "reported_gain": "2x",
   "gain_kind": "pct",
-  "gain_evidence": "### E2E Serving: DeepSeek-V2-Lite (MLA) with FP8 KV cache \u2705 - **Config:** `--attention-backend TRITON_MLA --kv-cache-dtype fp8 --tensor-parallel-size 1` - **Thr",
+  "gain_evidence": "### E2E Serving: DeepSeek-V2-Lite (MLA) with FP8 KV cache ✅ - **Config:** `--attention-backend TRITON_MLA --kv-cache-dtype fp8 --tensor-parallel-size 1` - **Thr",
   "base_sha": "abcffbba8c1b8752915fe8ddbb6c77e1eecd18b5",
   "merge_sha": "a1257fd1ea93da6e27b31e4739ac2707781d8ba7",
   "source_path": "vllm/v1/attention/backends/mla/triton_mla.py"
@@ -2648,7 +3121,7 @@
   ],
   "reported_gain": "5.8%",
   "gain_kind": "pct",
-  "gain_evidence": "\u2502 Peak output throughput \u2502 31,129 tok/s \u2502 32,938 tok/s \u2502 +5.8% \u2502",
+  "gain_evidence": "│ Peak output throughput │ 31,129 tok/s │ 32,938 tok/s │ +5.8% │",
   "base_sha": "30679319e83a78f6fd405130e562043c1e7f5e7e",
   "merge_sha": "ecf5ff7ce3ac2a8db51654712cbcea3540faaef8",
   "source_path": "vllm/config/cache.py"
@@ -2661,9 +3134,9 @@
   "hardware": [
    "agnostic"
   ],
-  "reported_gain": "5\u00d7",
+  "reported_gain": "5×",
   "gain_kind": "pct",
-  "gain_evidence": "The `call_hf_processor` retry loop (up to 5\u00d7 with `time.sleep(0.5)`) masks the error from clients but causes severe latency spikes.",
+  "gain_evidence": "The `call_hf_processor` retry loop (up to 5× with `time.sleep(0.5)`) masks the error from clients but causes severe latency spikes.",
   "base_sha": "195c9972037034355c5e85207f611aa09023cb66",
   "merge_sha": "d0cd736caadafea1ec1721737af432d8b0a7e919",
   "source_path": null
@@ -2738,7 +3211,7 @@
   ],
   "reported_gain": "28%, 25%",
   "gain_kind": "pct",
-  "gain_evidence": "## Benchmark results (benchmark_topk_topp.py) - **top-k only: 17\u201328% faster** across all batch sizes and vocab sizes - **top-k + top-p combined: 16\u201325% faster**",
+  "gain_evidence": "## Benchmark results (benchmark_topk_topp.py) - **top-k only: 17–28% faster** across all batch sizes and vocab sizes - **top-k + top-p combined: 16–25% faster**",
   "base_sha": "4ed51308c8826619459be858a6dc4333206f41c1",
   "merge_sha": "51b2333be19000db7d03b76ccf1b842972c98541",
   "source_path": "vllm/v1/sample/ops/topk_topp_triton.py",
@@ -2748,6 +3221,33 @@
    "cmd": "python benchmarks/benchmark_topk_topp.py --batch-sizes 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20",
    "unit": "ms",
    "needs": "gpu"
+  },
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.5,
+    "compute_cap_max": null,
+    "gpu_hint": "Triton kernel",
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.18.0",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
   }
  },
  {
@@ -2773,9 +3273,9 @@
   "hardware": [
    "agnostic"
   ],
-  "reported_gain": "4.0\u00d7, 4.1\u00d7",
+  "reported_gain": "4.0×, 4.1×",
   "gain_kind": "pct",
-  "gain_evidence": "| Metric | **A** (without patch) | **B** (with patch) | Improvement | |---|---|---|---| | Duration | 109.73 s | 27.34 s | **4.0\u00d7 faster** | | Total token throug",
+  "gain_evidence": "| Metric | **A** (without patch) | **B** (with patch) | Improvement | |---|---|---|---| | Duration | 109.73 s | 27.34 s | **4.0× faster** | | Total token throug",
   "base_sha": "54ab804e87dd534c0a8cb8ad8eec7ad5d75775ae",
   "merge_sha": "a16133a0f12e8e406206be1bc8041727d9f1ea7d",
   "source_path": "vllm/model_executor/models/qwen3_next.py"
@@ -2878,7 +3378,7 @@
   "hardware": [
    "agnostic"
   ],
-  "reported_gain": "229% (Input token throughput (: 1392.32\u21924578.14)",
+  "reported_gain": "229% (Input token throughput (: 1392.32→4578.14)",
   "gain_kind": "unit",
   "gain_evidence": "Input token throughput (tos/s): before 1392.32 / after 4578.14",
   "base_sha": "1174723eba176fcc68673a5a0a2c0090416aada8",
@@ -2940,7 +3440,7 @@
   ],
   "reported_gain": "1.15x, 2.88x",
   "gain_kind": "pct",
-  "gain_evidence": "## Test Result - 4/4 tests passed in test_pass_manager.py - E2E test passed (cold compile 29.5s, correct output) - Cold compile time: 29.70s \u00b1 0.50s (baseline 3",
+  "gain_evidence": "## Test Result - 4/4 tests passed in test_pass_manager.py - E2E test passed (cold compile 29.5s, correct output) - Cold compile time: 29.70s ± 0.50s (baseline 3",
   "base_sha": "304d5ba1a04b6cbfa2b5bd377c2a89d350a10921",
   "merge_sha": "87805fa11ea6d9f9aa7a7fc92ac957c613bc2163",
   "source_path": "vllm/compilation/passes/inductor_pass.py",
@@ -2950,6 +3450,33 @@
    "cmd": "pytest -v tests/compile/passes/test_pass_manager.py",
    "unit": "ms (pass uuid cache lookup)",
    "needs": "cpu"
+  },
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": null,
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": null,
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "needs-wheel-task"
+   }
   }
  },
  {
@@ -2992,7 +3519,7 @@
   ],
   "reported_gain": "1.10%",
   "gain_kind": "pct",
-  "gain_evidence": "Bidi improves MMMU-Pro by +0.81\u20131.10% when images fit within the sliding window.",
+  "gain_evidence": "Bidi improves MMMU-Pro by +0.81–1.10% when images fit within the sliding window.",
   "base_sha": "4c34b2f6fc63435c791c9054c579ca3f8c902bb6",
   "merge_sha": "512f52219240b0aa1be687955ab52fcdd0c5a40e",
   "source_path": "vllm/v1/worker/gpu_model_runner.py"
@@ -3007,7 +3534,7 @@
   ],
   "reported_gain": "12%",
   "gain_kind": "pct",
-  "gain_evidence": "Run-to-run variance within the same branch is ~11\u201312% on TTFT, so any single-run TTFT delta below that threshold is noise.",
+  "gain_evidence": "Run-to-run variance within the same branch is ~11–12% on TTFT, so any single-run TTFT delta below that threshold is noise.",
   "base_sha": "9f771b3ab92d26a7d91a8255572c5d8d2b3ad601",
   "merge_sha": "914d0464c1b1ec77d1560b485624f32002532b83",
   "source_path": "vllm/v1/attention/ops/triton_unified_attention.py"
@@ -3020,9 +3547,9 @@
   "hardware": [
    "agnostic"
   ],
-  "reported_gain": "1.0\u00d7, 28\u00d7, 719\u00d7",
+  "reported_gain": "1.0×, 28×, 719×",
   "gain_kind": "pct",
-  "gain_evidence": "| Approach | us/call | Speedup | |---|---|---| | Old (regex, no cache) | 1289 | 1.0\u00d7 | | New (CaseKey, no cache) | 46 | 28\u00d7 | | New (CaseKey, cached) | 1.8 | 71",
+  "gain_evidence": "| Approach | us/call | Speedup | |---|---|---| | Old (regex, no cache) | 1289 | 1.0× | | New (CaseKey, no cache) | 46 | 28× | | New (CaseKey, cached) | 1.8 | 71",
   "base_sha": "baf068d8be09b22db636ae8c6a2082033e2b6911",
   "merge_sha": "0b999713522099cfdf0de57d42972369dddff053",
   "source_path": "vllm/kernels/helion/configs/silu_mul_fp8/nvidia_h100.json"
@@ -3037,7 +3564,7 @@
   ],
   "reported_gain": "2.78%, 10.17%",
   "gain_kind": "pct",
-  "gain_evidence": "| Output throughput (tok/s) | 631.21 \u00b10.64 | 648.73 \u00b114.60 | +2.78% \u2713 | 17221.96 \u00b1168.39 | 18974.27 \u00b1176.49 | +10.17% \u2713 |",
+  "gain_evidence": "| Output throughput (tok/s) | 631.21 ±0.64 | 648.73 ±14.60 | +2.78% ✓ | 17221.96 ±168.39 | 18974.27 ±176.49 | +10.17% ✓ |",
   "base_sha": "54f548e9e58087f0155e4e164e416ad7efdfde6d",
   "merge_sha": "10ebb40d62e024116c1a4473f8e357a3e72761ed",
   "source_path": "vllm/v1/executor/uniproc_executor.py"
@@ -3052,14 +3579,14 @@
   ],
   "reported_gain": "14%",
   "gain_kind": "pct",
-  "gain_evidence": "**Impact**: -14% TTFT at 15K context (377ms \u2192 326ms).",
+  "gain_evidence": "**Impact**: -14% TTFT at 15K context (377ms → 326ms).",
   "base_sha": "5d5c7764446da0d4888add9a060604e376e4e856",
   "merge_sha": "2cc008e7b491bb77f0caf4d27ad55a83f196114c",
   "source_path": "vllm/model_executor/layers/attention/attention.py"
  },
  {
   "pr": 41043,
-  "title": "[Perf][Spec Decode] Avoid per-step numpy allocation in prepare_next_t\u2026 (#41043)",
+  "title": "[Perf][Spec Decode] Avoid per-step numpy allocation in prepare_next_t… (#41043)",
   "date": "2026-04-29",
   "field": "decoding_tpot",
   "hardware": [
@@ -3092,6 +3619,33 @@
    "cmd": "python - <<'PY'  # paste the AllPool bench from PR body; imports vllm.model_executor.layers.pooler.tokwise.methods.AllPool, DEVICE=cuda:0, HIDDEN=4096, 64x128 seqs, WARMUP 500 ITERS 4000 REPEATS 5\nPY",
    "unit": "us (per AllPool.forward call, median)",
    "needs": "gpu"
+  },
+  "requirements": {
+   "hardware": {
+    "gpu": true,
+    "gpu_count": 1,
+    "vram_gb": 8,
+    "compute_cap_min": 7.0,
+    "compute_cap_max": null,
+    "gpu_hint": "AllPool.forward on cuda:0",
+    "ram_gb": 8,
+    "disk_gb": 30
+   },
+   "software": {
+    "docker": true,
+    "nvidia_container_runtime": true,
+    "git": true,
+    "python3": true,
+    "hf_cli": false,
+    "hf_token": false,
+    "vllm_wheel": "0.20.1",
+    "cuda_build": null,
+    "models": [],
+    "datasets": [],
+    "env": [],
+    "needs_server": false,
+    "pipeline": "wheel"
+   }
   }
  },
  {
@@ -3117,7 +3671,7 @@
   "hardware": [
    "agnostic"
   ],
-  "reported_gain": "3% (TTFT (P50): 1.39s\u21921.35s)",
+  "reported_gain": "3% (TTFT (P50): 1.39s→1.35s)",
   "gain_kind": "unit",
   "gain_evidence": "TTFT (P50): before 1.39s / after 1.35s",
   "base_sha": "34ab4f2565572a1525865a06d2ba19cc5fcb4f00",

@@ -2,7 +2,7 @@
 
 ## Objective
 Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the expert's merged patch (gold)**.
+workload runs **as fast as or faster than the expert's merged patch (the PR's solution)**.
 You are given the expert's known solution below. You may reproduce it, but you
 are explicitly asked to **try to beat it** — find a faster correct version.
 
@@ -20,8 +20,8 @@ In `vllm/v1/worker/block_table.py`, `BlockTable.compute_slot_mapping` does `bloc
 **Author's words:** Streamline slot mapping computation by replacing Torch tensor flattening and conversion with direct NumPy indexing via `ravel`, eliminating redundant copies and conversions. Reduced `compute_slot_mapping` from 400+ µs to 15–30 µs; ~2% higher end-to-end throughput on the opt-125m throughput benchmark.
 
 ## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (gold). Your
-edit is timed on the SAME workload. Beat gold on these metrics:
+Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
+edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 - **throughput_output_tok_s** (tok/s, higher is better): reported +2.07 % end-to-end. workload: `benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 2000 --dtype float16` (author used 30000 prompts).
 - **throughput_total_tok_s**, **throughput_req_s**: same run, other columns.
 
@@ -33,4 +33,4 @@ edit is timed on the SAME workload. Beat gold on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than gold on the measured experiments wins. Same speed = ties gold.
+- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.

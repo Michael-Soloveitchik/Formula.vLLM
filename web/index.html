@@ -271,7 +271,7 @@ let IDX=[], RES={}, AREA={};   // AREA: pr -> {field, area}
 let SEL=null;    // PR selected in the tree: its results go to the top of the list
 let TFILT='all';   // tree scope: all | run (has a measured result) | solved (has a harness arm)
 // run  = we executed the workload (result exists in RES)
-// solved = a solver harness arm (not base/gold) landed in that result
+// solved = a solver harness arm (not baseline / PR solution) landed in that result
 function isRun(pr){return !!RES[pr];}
 function isSolved(pr){const r=RES[pr];return !!(r&&r.arms&&Object.keys(r.arms).some(k=>k!=='base'&&k!=='gold'));}
 function passTFilt(pr){return TFILT==='all'?true:TFILT==='run'?isRun(pr):isSolved(pr);}
@@ -383,7 +383,7 @@ function prRow(r){
  const res=RES[r.pr], st=statusOf(r.pr);
  const stDot=st==='improved'?'<span class="dot g" title="improved"></span>':
    st==='not'?'<span class="dot r" title="not improved"></span>':'<span class="dot o" title="pending"></span>';
- // harness-run dot: any solver arm (not base/gold) present in results
+ // harness-run dot: any solver arm (not baseline / PR solution) present in results
  const hasH=res&&res.arms&&Object.keys(res.arms).some(k=>k!=='base'&&k!=='gold');
  const hDot=hasH?'<span class="dot a" title="harness run"></span>':'';
  const chips=`<span class="chips-mini">${stDot}${hDot}</span>`;
@@ -437,7 +437,7 @@ function mdToHtml(src){
 }
 
 // ---------- per-experiment results table (reported / measured / <harness_i>) ----------
-// One table PER experiment. measured = our run of expert (gold) patch = 1.00x ref; variance in (±).
+// One table PER experiment. measured = our run of the PR's solution = 1.00x ref; variance in (±).
 // A PR carries res.experiments[] (schema experiments_v2). Legacy res.latency -> single synthetic exp.
 function experimentsOf(res){
  if(!res) return [];
@@ -461,19 +461,19 @@ function gainVs(val,baseVal,unit){
 // resolve the PR author's REPORTED absolute value in the task unit.
 // reported may carry:
 //   {base, patch}  -> both absolute; value=patch, authorBase=base
-//   {delta, base?} -> an improvement magnitude in units; value = base±delta
-//   {pct,   base?} -> a fractional improvement;         value = base*(1±pct)
-// base defaults to OUR measured baseline when the author gave none.
+//   {delta, base?} -> an improvement magnitude in units; value = baseline±delta
+//   {pct,   base?} -> a fractional improvement;         value = baseline*(1±pct)
+// baseline defaults to OUR measured baseline when the author gave none.
 // sign direction-aware: throughput improves UP, time improves DOWN.
 function resolveReported(rep,baseV,unit){
  if(!rep) return null;
  const up=higherBetter(unit);
  if(rep.patch!=null) return {value:+rep.patch, authorBase:rep.base!=null?+rep.base:null, how:'absolute'};
  if(rep.delta!=null){const ab=rep.base!=null?+rep.base:baseV; if(ab==null) return null;
-  return {value: up? ab+Math.abs(rep.delta): ab-Math.abs(rep.delta), authorBase:ab, how:rep.base!=null?'author base ± diff':'our baseline ± diff'};}
+  return {value: up? ab+Math.abs(rep.delta): ab-Math.abs(rep.delta), authorBase:ab, how:rep.base!=null?'author baseline ± diff':'our baseline ± diff'};}
  if(rep.pct!=null){const ab=rep.base!=null?+rep.base:baseV; if(ab==null) return null;
   const f=Math.abs(rep.pct)>1?rep.pct/100:rep.pct;
-  return {value: up? ab*(1+f): ab*(1-f), authorBase:ab, how:rep.base!=null?'author base ± %':'our baseline ± %'};}
+  return {value: up? ab*(1+f): ab*(1-f), authorBase:ab, how:rep.base!=null?'author baseline ± %':'our baseline ± %'};}
  return null;
 }
 // Δ vs baseline in task units. positive = improvement (direction-aware).
@@ -595,7 +595,7 @@ async function showPR(pr){
   </div>
   <!-- BOTTOM: PR info -->
   <div class="dsec${FOLD.info?' folded':''}" data-k="info">
-   <div class="dsecH" onclick="toggleSec(this)"><span class="fcaret">▾</span>PR info · base ${esc((r.base_sha||'').slice(0,10))} → merge ${esc((r.merge_sha||'').slice(0,10))} <span class="fhint">click to fold / unfold</span></div>
+   <div class="dsecH" onclick="toggleSec(this)"><span class="fcaret">▾</span>PR info · baseline ${esc((r.base_sha||'').slice(0,10))} → merge ${esc((r.merge_sha||'').slice(0,10))} <span class="fhint">click to fold / unfold</span></div>
    <div class="dbody"><div class="md" id="mdbody"><span class="muted">loading detail…</span></div></div>
   </div>
  </div>`;
@@ -612,7 +612,7 @@ function render(){
  const q=$('#q').value.trim().toLowerCase(), ff=$('#field').value, sf=$('#status').value;
  // stats over ALL measured
  // processed = we ran the PR (result exists); measured = our own numbers exist for
- // base AND gold on >=1 experiment; improved = correctness gate (after-merge reproduces)
+ // baseline AND PR solution on >=1 experiment; improved = correctness gate (after-merge reproduces)
  const processed=IDX.filter(r=>RES[r.pr]);
  const hasMeas=res=>experimentsOf(res).some(e=>e.arms&&e.arms.base&&e.arms.base.mean!=null&&e.arms.gold&&e.arms.gold.mean!=null);
  const measured=processed.filter(r=>hasMeas(RES[r.pr]));
@@ -677,7 +677,7 @@ function render(){
    <h3><a href="${r.pr?('https://github.com/vllm-project/vllm/pull/'+r.pr):'#'}" target="_blank">#${r.pr}</a>
      <span class="chip field">${r.field||'—'}</span> ${stChip}</h3>
    <div class="t">${(r.title||'').replace(/</g,'&lt;')}</div>
-   <div class="meta">reported: ${r.reported_gain||'—'} · base ${(r.base_sha||'').slice(0,10)} → merge ${(r.merge_sha||'').slice(0,10)}</div>
+   <div class="meta">reported: ${r.reported_gain||'—'} · baseline ${(r.base_sha||'').slice(0,10)} → merge ${(r.merge_sha||'').slice(0,10)}</div>
    ${arms?`<div class="meta">tests: ${arms}</div>`:''}
    ${lat}
   </div>`;}).join('')||'<div class="muted">no match</div>';

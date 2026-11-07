@@ -48,7 +48,7 @@ that clear a MAD gate.
 Measured in Docker, 5 repeats per arm (mean ± sd), author's own benchmark command.
 `claude` = blind (objective without the expert solution), `claude + PR's solution` = guided.
 
-| PR | metric | base | gold (merged PR) | ours | author | claude | claude + PR's solution |
+| PR | metric | baseline | PR's solution | ours | author | claude | claude + PR's solution |
 |---|---|---|---|---|---|---|---|
 | [#37225](https://github.com/vllm-project/vllm/pull/37225) top-k search | topk_whole b2048 v32k, ms | 1.259 ± 0.003 | 0.958 ± 0.003 | **1.31×** | 1.38× | **0.839 ± 0.166, PASS** (40 min) | **0.778 ± 0.037, PASS** |
 | [#33538](https://github.com/vllm-project/vllm/pull/33538) Triton top-k/top-p | topk_whole b16 v32k, ms (10 repeats) | 1.222 ± 0.020 (PyTorch sort) | 0.093 ± 0.029 | **13×** | 4.2× | rerun pending | rerun pending |
@@ -61,7 +61,7 @@ Measured in Docker, 5 repeats per arm (mean ± sd), author's own benchmark comma
 - #41163: both claude arms beat the author's patch ~7× by also caching the first-token
   indices on the CPU (no device sync at all); hidden pooling test passes.
 - #22940: GPU-bound workload on this box; the slot-mapping CPU gain is inside the noise.
-- #33538 base = the script's PyTorch sort path (the PR introduces both kernel and script).
+- #33538 baseline = the script's PyTorch sort path (the PR introduces both kernel and script).
 
 ## <img src="web/shots/h/methodology.svg" height="40" alt="Methodology">
 

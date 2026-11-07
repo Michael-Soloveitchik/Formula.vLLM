@@ -2,7 +2,7 @@
 # Cluster-ordered workload runner. For each cluster in clusters.json["order"]:
 #   1. download.sh ONCE (fetch-on-demand, gated, cached in .weights/<cluster>)
 #   2. for each PR in the cluster: build tasks/pr_<n>/workload/Dockerfile,
-#      run run_workload.sh for BOTH arms (base tree + gold tree) with the
+#      run run_workload.sh for BOTH arms (baseline tree + PR's solution tree) with the
 #      shared weights mounted at /weights, fold latency into results_workload/<pr>.json
 #
 # SAFE on a laptop: GPU clusters self-skip (run_workload.sh prints SKIP=no_cuda,
@@ -57,7 +57,7 @@ PY
     WDIR="tasks/pr_${PR}/workload"
     [ -d "$WDIR" ] || { echo "# pr_$PR: no workload/ (not scaffolded), skip"; continue; }
     RES="results/${PR}.json"
-    [ -f "$RES" ] || { echo "# pr_$PR: no results/${PR}.json (need base/merge sha), skip"; continue; }
+    [ -f "$RES" ] || { echo "# pr_$PR: no results/${PR}.json (need baseline + PR commits), skip"; continue; }
 
     read -r BASE GOLD < <(python3 - "$RES" <<'PY'
 import json,sys

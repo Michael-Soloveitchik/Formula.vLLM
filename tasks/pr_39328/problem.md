@@ -2,7 +2,7 @@
 
 ## Objective
 Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the expert's merged patch (gold)**.
+workload runs **as fast as or faster than the expert's merged patch (the PR's solution)**.
 You are given the expert's known solution below. You may reproduce it, but you
 are explicitly asked to **try to beat it** — find a faster correct version.
 
@@ -20,8 +20,8 @@ InductorPass.hash_source() in vllm/compilation/passes/inductor_pass.py calls ins
 **Author's words:** InductorPass.hash_source() calls inspect.getsource() on every pass class each time it's invoked, which is expensive. Since source code doesn't change at runtime, extract the hashing into a module-level _hash_source_cached() helper decorated with functools.cache. Object instances are resolved to their __class__ for a hashable cache key, eliminating repeated inspect.getsource() calls across all pass uuid() computations.
 
 ## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (gold). Your
-edit is timed on the SAME workload. Beat gold on these metrics:
+Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
+edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 - **cache_lookup** (ms): reported 32.5 -> 11.3 ms. workload: lookup ms
 - **cold_compile** (s): reported 34.1 -> 29.7 s. workload: compile s
 
@@ -33,4 +33,4 @@ edit is timed on the SAME workload. Beat gold on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than gold on the measured experiments wins. Same speed = ties gold.
+- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.

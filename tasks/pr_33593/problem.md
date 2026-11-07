@@ -2,7 +2,7 @@
 
 ## Objective
 Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the expert's merged patch (gold)**.
+workload runs **as fast as or faster than the expert's merged patch (the PR's solution)**.
 You are given the expert's known solution below. You may reproduce it, but you
 are explicitly asked to **try to beat it** — find a faster correct version.
 
@@ -20,8 +20,8 @@ In the vllm/reasoning parsers, extract_content_ids tested `self.end_token_id not
 **Author's words:** Python split -> islice (iterator) and get perf improvement. We do hope to land this change as it both saves memory and improves performance (although small). The e2e perf improvement is smaller than < 0.5% so hidden in fluctuations, but small optimizations gathered can make a difference. This is for structured output related logic.
 
 ## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (gold). Your
-edit is timed on the SAME workload. Beat gold on these metrics:
+Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
+edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 - **create_slice** (s): reported 0.0034 -> 1e-06 s. workload: create best
 - **sum_slice** (s): reported 0.0056 -> 0.0047 s. workload: sum best
 
@@ -33,4 +33,4 @@ edit is timed on the SAME workload. Beat gold on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than gold on the measured experiments wins. Same speed = ties gold.
+- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.

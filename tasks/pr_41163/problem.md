@@ -2,7 +2,7 @@
 
 ## Objective
 Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the expert's merged patch (gold)**.
+workload runs **as fast as or faster than the expert's merged patch (the PR's solution)**.
 You are given the expert's known solution below. You may reproduce it, but you
 are explicitly asked to **try to beat it** — find a faster correct version.
 
@@ -20,8 +20,8 @@ In `vllm/model_executor/layers/pooler/tokwise/methods.py`, `AllPool.forward` com
 **Author's words:** Optimize `AllPool.forward` by slicing first — 51% faster in the method-level benchmark: median 59.89 µs → 39.65 µs. Accuracy covered by existing CI.
 
 ## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (gold). Your
-edit is timed on the SAME workload. Beat gold on these metrics:
+Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
+edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 - **allpool_forward_median** (µs): reported 59.89 -> 39.65 µs. workload: the author's method-level benchmark (`tasks/pr_41163/bench.py`): 64 requests × 128 tokens, sub-group of 32, hidden 4096, bf16, median of 5 × 4000 iterations.
 
 ## Reported numbers (PR author)
@@ -32,4 +32,4 @@ edit is timed on the SAME workload. Beat gold on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than gold on the measured experiments wins. Same speed = ties gold.
+- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.

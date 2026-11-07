@@ -13,12 +13,12 @@
 #            host clone at VLLM_GIT / paths.vllm_git.
 #
 # Pipeline (all in code):
-#   1. checkout  : export base + gold trees (from the image in wheel mode)
+#   1. checkout  : export baseline + PR's-solution trees (from the image in wheel mode)
 #   2. build     : one image per task
 #   3. isolate   : each arm = a .py-tree swap INSIDE that same image, so the
 #                  environment is byte-identical across arms (FormulaCode-style)
-#   4. run       : the hidden pytest oracle — base must FAIL, gold must PASS
-#   5. solve     : each enabled solver edits a base tree, is re-verified
+#   4. run       : the hidden pytest oracle — baseline must FAIL, PR's solution must PASS
+#   5. solve     : each enabled solver edits a baseline tree, is re-verified
 #   6. measure   : run the task's workload cmd per arm, `repeats` times, inside
 #                  the same image -> ms per scenario, mean ± sd
 set -euo pipefail
@@ -34,8 +34,8 @@ WORK="$HERE/.work/pr_${PR}"
 TASK="$HERE/tasks/pr_${PR}"
 REPEATS="${REPEATS:-$(python3 conf.py get measure.repeats)}"; REPEATS="${REPEATS:-5}"
 SOLVER_TIMEOUT="${SOLVER_TIMEOUT:-15m}"   # hard cap per solver arm (claude -p / codex exec)
-KEEP_WORK="${KEEP_WORK:-0}"             # 1 = reuse existing .work/pr_<n> refs (base/gold logs), run solvers only
-# RUN_SOLVERS=0 -> measure base/gold only (fast numbers first); run solvers later with KEEP_WORK=1
+KEEP_WORK="${KEEP_WORK:-0}"             # 1 = reuse existing .work/pr_<n> refs (baseline / PR-solution logs), run solvers only
+# RUN_SOLVERS=0 -> measure baseline / PR solution only (fast numbers first); run solvers later with KEEP_WORK=1
 
 say(){ echo "[$PR] $*"; }
 die(){ echo "[$PR] ERROR: $*" >&2; exit 1; }
@@ -44,7 +44,7 @@ die(){ echo "[$PR] ERROR: $*" >&2; exit 1; }
 BASE=$(python3 -c "import json;print({x['pr']:x for x in json.load(open('index.json'))}[$PR]['base_sha'])") \
   || die "pr $PR not in index.json"
 MERGE=$(python3 -c "import json;print({x['pr']:x for x in json.load(open('index.json'))}[$PR]['merge_sha'])")
-[ -n "$BASE" ] && [ -n "$MERGE" ] || die "missing base/merge sha for $PR"
+[ -n "$BASE" ] && [ -n "$MERGE" ] || die "missing baseline/PR commit sha for $PR"
 
 # ---- task metadata: tests, wheel mode, workload ----------------------------
 meta(){ python3 -c "
@@ -88,12 +88,13 @@ if [ "$DRY_RUN" = "1" ]; then
     say "2. build    : $ENGINE build -t $IMG -f $DF --build-arg VLLM_VERSION=$WHEEL --build-arg BASE_SHA=$BASE --build-arg MERGE_SHA=$MERGE <ctx>"
     say "1. checkout : $ENGINE cp <container>:/base -> $WORK/base_full ; /gold -> $WORK/gold_full"
   else
+    [ "${FETCH_SOURCES:-0}" = 1 ] && say "0. fetch    : fetch_sources.sh $PR (clone vLLM if missing; fetch $BASE and $MERGE)"
     say "1. checkout : git -C $VLLM_GIT archive $BASE  -> $WORK/base_full"
     say "            : git -C $VLLM_GIT archive $MERGE -> $WORK/gold_full"
     say "2. build    : $ENGINE build -t $IMG -f Dockerfile.gpu --build-arg SRC_DIR=.work/pr_${PR}/base_full --build-arg PRETEND_VERSION=$VER ."
   fi
-  say "3. isolate  : $ENGINE run --rm $GPU -v <tree>:/arm:ro -v <gold>:/gold:ro $IMG  (wipe site-packages/vllm/*.py, cp /arm/vllm -> site-packages, tests+benchmarks copied to /t)"
-  say "4. run      : python3 -m pytest -q ${TESTS:-<none>}  (base expect FAIL, gold expect PASS)"
+  say "3. isolate  : $ENGINE run --rm $GPU -v <tree>:/arm:ro -v <pr_solution_tree>:/gold:ro $IMG  (wipe site-packages/vllm/*.py, cp /arm/vllm -> site-packages, tests+benchmarks copied to /t)"
+  say "4. run      : python3 -m pytest -q ${TESTS:-<none>}  (baseline expect FAIL, PR's solution expect PASS)"
   [ -n "$TESTS" ] || say "   WARN: no test_files in $TASK/metadata.json"
   [ -f "$TASK/metadata.json" ] || say "   WARN: no vendored task at $TASK (oracle unknown)"
   n=0
@@ -102,8 +103,8 @@ if [ "$DRY_RUN" = "1" ]; then
     mode=$([ "${GUIDED:-0}" = "1" ] && echo guided || echo blind)
     say "5. solve    : [$HN/$MODEL $mode] (cd base_tree && $CMD \"<objective:$mode>\")"
     n=$((n+1))
-  done < <(python3 conf.py solvers)
-  say "   enabled solvers: $n"
+  done < <([ "${RUN_SOLVERS:-1}" = 1 ] && python3 conf.py solvers)
+  say "   enabled solvers: $n (RUN_SOLVERS=${RUN_SOLVERS:-1})"
   if [ -n "$WL_CMD" ]; then say "6. measure  : per arm x$REPEATS inside $IMG: $WL_CMD  -> parse_workload.py"
   elif [ -f "$TASK/results_measured.json" ]; then say "6. measure  : fold $TASK/results_measured.json (µs/op + variance)"
   else say "6. measure  : no bench shipped for this PR — latency omitted"; fi
@@ -112,11 +113,13 @@ if [ "$DRY_RUN" = "1" ]; then
 fi
 
 # =============================== REAL RUN ====================================
+# source mode: clone vLLM and fetch the exact baseline / PR-solution commits (FETCH_SOURCES=1, set by --reproduce)
+if [ "$MODE" = source ] && [ "${FETCH_SOURCES:-0}" = 1 ]; then bash "$HERE/fetch_sources.sh" "$PR" || die "fetch_sources failed"; fi
 preflight
 say "mode=$MODE swap=$SWAP base=$BASE merge=$MERGE wheel=${WHEEL:--} engine=$ENGINE repeats=$REPEATS"
 
 if [ "$KEEP_WORK" = 1 ] && [ -f "$WORK/arms.json" ]; then
-  say "KEEP_WORK=1: reusing refs in $WORK (skipping checkout/build/base+gold measurement)"
+  say "KEEP_WORK=1: reusing refs in $WORK (skipping checkout/build/baseline + PR-solution measurement)"
 else
 rm -rf "$WORK"; mkdir -p "$WORK/base_full" "$WORK/gold_full"
 if [ "$MODE" = wheel ]; then
@@ -147,7 +150,7 @@ fi  # KEEP_WORK (checkout/build)
 
 # ---- in-container prelude: swap the arm's .py tree over the installed vllm --
 # Wipes the wheel's own .py files first so a file the arm tree lacks (e.g. a
-# kernel the PR introduces) cannot leak into the base arm; compiled .so stay.
+# kernel the PR introduces) cannot leak into the baseline arm; compiled .so stay.
 # tests/ + benchmarks/ are copied to /t WITHOUT a sibling vllm/ package, so
 # `import vllm` always resolves to site-packages (= the swapped arm).
 if [ "$SWAP" = files ]; then
@@ -222,7 +225,7 @@ python3 - "$WORK/arms.json" "$BASE_RES" "$GOLD_RES" <<'PY'
 import json,sys
 json.dump({"base":{"tests":sys.argv[2],"slug":"base"},"gold":{"tests":sys.argv[3],"slug":"gold"}},open(sys.argv[1],"w"),indent=1)
 PY
-python3 record.py "$PR"          # measured base/gold numbers are live on the dashboard from here on
+python3 record.py "$PR"          # measured baseline / PR-solution numbers are live on the dashboard from here on
 fi  # KEEP_WORK (refs)
 
 # blind objective = problem.md with the "## Expert solution" section removed
@@ -231,7 +234,7 @@ OBJ_BLIND="$(printf '%s\n' "$OBJ" | awk '
   skip && /^## /{skip=0}
   !skip{print}')"
 
-# 5. solvers: each starts from the base tree, edits ./vllm via `cmd + objective`.
+# 5. solvers: each starts from the baseline tree, edits ./vllm via `cmd + objective`.
 SOLVERS=""; ARMS="base gold"
 if [ "${RUN_SOLVERS:-1}" = 1 ]; then
 while IFS=$'\t' read -r HN MODEL CMD GUIDED; do

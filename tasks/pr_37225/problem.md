@@ -2,7 +2,7 @@
 
 ## Objective
 Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the expert's merged patch (gold)**.
+workload runs **as fast as or faster than the expert's merged patch (the PR's solution)**.
 You are given the expert's known solution below. You may reproduce it, but you
 are explicitly asked to **try to beat it** — find a faster correct version.
 
@@ -20,8 +20,8 @@ In `vllm/v1/sample/ops/topk_topp_triton.py`, `_topk_topp_kernel` sets `min_large
 **Author's words:** Fix `min_larger` in top-k ternary search to compute min of values above the pivot instead of the global min. This makes the termination condition converge correctly (~3-5 iterations instead of hitting the 18-iteration cap). Fuse the `num_min_larger` second pass into the first pass for the top-k paths, eliminating a redundant full data scan per search iteration. Top-k only: 17–28% faster; top-k + top-p: 16–25% faster; top-p only unchanged.
 
 ## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (gold). Your
-edit is timed on the SAME workload. Beat gold on these metrics:
+Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
+edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 - **topk_whole b2048 v32k** (ms): reported 0.761 -> 0.550 ms. workload: `benchmarks/benchmark_topk_topp.py --batch-sizes 128 2048 --vocab-sizes 32768 131072`
 - **topk_whole b2048 v128k** (ms): reported 2.312 -> 1.891 ms.
 - **topk_topp_whole b2048 v32k** (ms): reported 1.211 -> 0.907 ms.
@@ -35,4 +35,4 @@ edit is timed on the SAME workload. Beat gold on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than gold on the measured experiments wins. Same speed = ties gold.
+- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.

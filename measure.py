@@ -7,7 +7,7 @@ noise.py concepts, stripped to CPU + no-Docker + no-ASV:
 - paired A-B-B-A interleaving in one process to cancel drift
 - natural-log speedup  s = ln(T_base / T_patch)  (additive, symmetric noise)
 - robust SD via MAD:   sd = 1.4826 * median|x - median(x)|
-- nop (base-vs-base) baseline to learn host spread s_repo
+- nop (baseline-vs-baseline) run to learn host spread s_repo
 - pooled sigma:        sigma^2 = (n_b*s_b^2 + n0*s_repo^2)/(n_b+n0)
 - threshold:           theta = clip(k*sigma, theta_min, theta_max)
 - a gain "counts" only if >= ORACLE_MIN_RUNS paired samples clear +theta
@@ -30,7 +30,7 @@ K_SIGMA = 3.0             # theta = clip(k*sigma, ...)
 THETA_MIN = 0.01          # ~1% log-speedup floor
 THETA_MAX = 0.50          # cap so a huge sigma can't swallow real gains
 DEFAULT_PAIRS = 7         # A-B-B-A pairs per comparison
-DEFAULT_NOP = 7           # base-vs-base pairs for host spread
+DEFAULT_NOP = 7           # baseline-vs-baseline pairs for host spread
 
 
 def robust_sd(xs: list[float], center: Optional[float] = None) -> float:
@@ -74,7 +74,7 @@ def paired_logspeedups(base_fn: Callable[[], None],
 
 @dataclass
 class Comparison:
-    """Result of base-vs-patch with noise gate."""
+    """Result of baseline-vs-PR-solution with noise gate."""
     name: str
     samples: list[float]          # per-pair log-speedups
     s_repo: float                 # host spread from nop baseline
@@ -106,7 +106,7 @@ def compare(name: str,
             pairs: int = DEFAULT_PAIRS,
             inner: int = 1000,
             nop: int = DEFAULT_NOP) -> Comparison:
-    """Measure base-vs-patch; learn host spread from base-vs-base nop runs."""
+    """Measure baseline vs PR solution; learn host spread from baseline-vs-baseline nop runs."""
     nop_samples = paired_logspeedups(base_fn, base_fn, pairs=nop, inner=inner)
     s_repo = robust_sd(nop_samples, center=0.0)
     samples = paired_logspeedups(base_fn, patch_fn, pairs=pairs, inner=inner)

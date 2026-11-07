@@ -2,7 +2,7 @@
 
 ## Objective
 Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the expert's merged patch (gold)**.
+workload runs **as fast as or faster than the expert's merged patch (the PR's solution)**.
 You are given the expert's known solution below. You may reproduce it, but you
 are explicitly asked to **try to beat it** — find a faster correct version.
 
@@ -20,8 +20,8 @@ The EPLB rearrange step in eplb_state.py and its helper primitives in rebalance_
 **Author's words:** Removes multiple gpu-cpu transfers in move_from_buffer. Implements get_ep_ranks_with_expert, move_to_buffer, move_from_buffer in numpy which gives 20-25% on average for each primitive. Adds preserve_intragpu_slots primitive that post-processes rebalance algo results, ensuring experts assigned to be moved within the same gpu stay in their slots, avoiding unnecessary gpu memcopies. Adds log_balancedness_interval config parameter to tune the frequency of balancedness logs and possibly reduce the number of collectives required for this logging. Improves performance of sync and async eplb. Fixes bug in EPLB config post processing.
 
 ## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (gold). Your
-edit is timed on the SAME workload. Beat gold on these metrics:
+Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
+edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 - **move_from_buffer** (us): no author number. workload: move_from_buffer
 - **get_ep_ranks_with_expert** (us): no author number. workload: get_ep_ranks
 - **move_to_buffer** (us): no author number. workload: move_to_buffer
@@ -34,4 +34,4 @@ edit is timed on the SAME workload. Beat gold on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than gold on the measured experiments wins. Same speed = ties gold.
+- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
