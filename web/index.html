@@ -530,7 +530,7 @@ function expTable(exp){
  const a=exp.arms||{}, unit=exp.unit||'value';
  const baseV=(a.base||{}).mean;                     // before-merge baseline value, in unit
  const num=(m,sd)=> m==null?'—':`<span class="mv">${(+m).toFixed(3)}</span>${sd==null?'':`<span class="var">(±${(+sd).toFixed(3)})</span>`}`;
- const bh=baseV!=null?`<span class="eb">baseline (measured) ${(+baseV).toFixed(3)} ${esc(unit)}</span>`:'';
+ const bh='';   // baseline value lives in the table row, not the header
  let h=`<div class="expH">${esc(exp.name)} <span class="eu">${esc(unit)}</span>${bh}`+
    (exp.workload?`<span class="ew" title="${esc(exp.workload)}">${esc(exp.workload)}</span>`:'')+`</div>`;
  h+=`<table class="restab exp"><colgroup><col class="c-row"><col class="c-val"><col class="c-d"><col class="c-r"><col class="c-d"><col class="c-r"><col class="c-src"></colgroup>`+

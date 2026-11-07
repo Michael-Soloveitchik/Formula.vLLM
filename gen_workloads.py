@@ -229,7 +229,8 @@ def policy_from_runner():
         "contention_gate": {
             "enabled": "wait_for_quiet" in r,
             "max_wait_s": (lambda v: int(v) if v else None)(_rx(r'CONTENTION_WAIT="\$\{CONTENTION_WAIT:-(\d+)\}"', r)),
-            "rules": _rx(r"# contention gate.*?\n#(.*?)\n", r, flags=re.S),
+            "rules": (lambda s: s and "wait while another tenant uses" + s.split("; then")[0].strip().rstrip(".") if s else None)(
+                _rx(r"# contention gate.*?another tenant uses\n#(.*?)\n", r, flags=re.S)),
             "then": "run anyway, flagged in .work/pr_<n>/contended_<arm>_<i>.txt",
         },
         "machine_snapshot": "machine.py snapshot per workload run -> .work/pr_<n>/machine_<arm>_<i>.json" if "machine.py" in r else None,
@@ -370,7 +371,9 @@ def standalone_cmds(pr_s, ix, tm, w, needs, cluster):
     build = f"docker build -t vllm-task:{pr_s} tasks/pr_{pr_s}/workload"
     env = ("--gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID "
            "-e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_%s:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface" % pr_s)
-    if tm.get("wheel"):
+    # The GPU Dockerfile always bakes /base + /gold and installs a wheel (pinned when
+    # metadata.json:wheel exists, else PyPI latest), so the swap one-liner applies to every GPU image.
+    if tm.get("wheel") or needs == "gpu":
         if swap == "files":
             prelude = ('site=$(python3 -c "import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))"); '
                        'for f in %s; do if [ -f "$A/$f" ]; then mkdir -p "$site/$(dirname "$f")"; cp "$A/$f" "$site/$f"; else rm -f "$site/$f"; fi; done; ' % src_files)
@@ -381,14 +384,16 @@ def standalone_cmds(pr_s, ix, tm, w, needs, cluster):
                     'for d in tests benchmarks pyproject.toml conftest.py; do [ -e "$d" ] && cp -a "$d" /t/; done; cd /t; ')
         def run(arm_dir, label):
             return f"docker run --rm {env} -e ARM={label} vllm-task:{pr_s} -lc 'A={arm_dir}; {prelude}{cmd}'"
-        return {
-            "build": build,
-            "run_baseline": run("/base", "baseline"),
-            "run_pr_solution": run("/gold", "pr_solution"),
-            "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); "
-                    "the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, "
-                    "then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/).",
-        }
+        note = ("The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); "
+                "the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, "
+                "then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/).")
+        if not tm.get("wheel"):
+            note += (" NOT PINNED: no tasks/pr_<n>/metadata.json:wheel, so the Dockerfile installs the latest PyPI vLLM "
+                     "(compiled ops may not match either tree) and run_one.sh falls back to source mode (Dockerfile.gpu "
+                     "from a host clone). Pick the first PyPI release after merge_sha and record it as metadata.json:wheel "
+                     "before trusting numbers from this image.")
+        return {"build": build, "run_baseline": run("/base", "baseline"),
+                "run_pr_solution": run("/gold", "pr_solution"), "note": note}
     # no vendored wheel: the workload image expects the arm's checkout mounted at /src
     base_sha, merge_sha = ix.get("base_sha") or "<base_sha>", ix.get("merge_sha") or "<merge_sha>"
     checkout = (f"git clone --filter=blob:none https://github.com/vllm-project/vllm.git vllm && "
@@ -497,7 +502,7 @@ def render_workload_md(d):
     r = d["reported"]
     L.append("## Reported by the author")
     L.append("")
-    L.append(f"- gain: **{r.get('gain')}** ({r.get('gain_kind')}) — {r.get('gain_evidence')}")
+    L.append(f"- gain: **{r.get('gain')}** ({r.get('gain_kind')}) — {' '.join((r.get('gain_evidence') or '').replace('#', '').split())}")
     if r.get("experiments_note"):
         L.append(f"- {r['experiments_note']}")
     if r.get("author_hardware_args"):
@@ -581,7 +586,7 @@ def render_workload_md(d):
     L.append("")
     if rq:
         hw, sw = rq.get("hardware") or {}, rq.get("software") or {}
-        L.append(f"- GPU: {hw.get('gpu')} ×{hw.get('gpu_count')} ≥{hw.get('vram_gb')} GB VRAM, compute capability ≥{hw.get('compute_cap_min')}"
+        L.append(f"- GPU: {'yes' if hw.get('gpu') else 'no'} ×{hw.get('gpu_count')} ≥{hw.get('vram_gb')} GB VRAM, compute capability ≥{hw.get('compute_cap_min')}"
                  + (f" ({hw.get('gpu_hint')})" if hw.get("gpu_hint") else "") + f"; RAM {hw.get('ram_gb')} GB; disk {hw.get('disk_gb')} GB")
         L.append(f"- software: docker={sw.get('docker')} nvidia-container-runtime={sw.get('nvidia_container_runtime')} vllm_wheel={sw.get('vllm_wheel')} "
                  f"pipeline={sw.get('pipeline')} models={sw.get('models')} datasets={sw.get('datasets')} hf_token={sw.get('hf_token')} needs_server={sw.get('needs_server')}")
