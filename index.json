@@ -423,7 +423,7 @@
     "python3": true,
     "hf_cli": true,
     "hf_token": false,
-    "vllm_wheel": null,
+    "vllm_wheel": "0.6.4",
     "cuda_build": null,
     "models": [
      "neuralmagic/Meta-Llama-3-8B-Instruct-FP8"
@@ -433,7 +433,7 @@
     ],
     "env": [],
     "needs_server": false,
-    "pipeline": "needs-wheel-task"
+    "pipeline": "wheel"
    }
   }
  },
@@ -581,7 +581,7 @@
     "python3": true,
     "hf_cli": true,
     "hf_token": true,
-    "vllm_wheel": null,
+    "vllm_wheel": "0.8.0",
     "cuda_build": null,
     "models": [
      "mistralai/Mixtral-8x7B-Instruct-v0.1"
@@ -591,7 +591,7 @@
      "ALLOW_MIXTRAL"
     ],
     "needs_server": false,
-    "pipeline": "needs-wheel-task"
+    "pipeline": "wheel"
    }
   }
  },
@@ -848,7 +848,7 @@
     "python3": true,
     "hf_cli": true,
     "hf_token": false,
-    "vllm_wheel": null,
+    "vllm_wheel": "0.8.5",
     "cuda_build": null,
     "models": [
      "facebook/opt-125m"
@@ -856,7 +856,7 @@
     "datasets": [],
     "env": [],
     "needs_server": true,
-    "pipeline": "needs-wheel-task"
+    "pipeline": "wheel"
    }
   }
  },
@@ -1444,13 +1444,13 @@
     "python3": true,
     "hf_cli": false,
     "hf_token": false,
-    "vllm_wheel": null,
+    "vllm_wheel": "0.10.2",
     "cuda_build": null,
     "models": [],
     "datasets": [],
     "env": [],
     "needs_server": false,
-    "pipeline": "needs-wheel-task"
+    "pipeline": "wheel"
    }
   }
  },
@@ -2314,13 +2314,13 @@
     "python3": true,
     "hf_cli": false,
     "hf_token": false,
-    "vllm_wheel": null,
+    "vllm_wheel": "0.11.1",
     "cuda_build": null,
     "models": [],
     "datasets": [],
     "env": [],
     "needs_server": true,
-    "pipeline": "needs-wheel-task"
+    "pipeline": "wheel"
    }
   }
  },

@@ -7,19 +7,21 @@
  "date": "2025-11-11",
  "base_sha": "b06b9470ca881f89feea72e4d89b20c213f360d4",
  "merge_sha": "40e2eeeb92d926b9773c4ed339375d26b10456e2",
- "source_files": null,
- "test_files": null,
+ "source_files": [
+  "vllm/lora/ops/triton_ops/kernel_utils.py"
+ ],
+ "test_files": [],
  "image": {
-  "mode": "source",
+  "mode": "wheel",
   "tag": "vllm-task:28280",
   "dockerfile": "tasks/pr_28280/workload/Dockerfile",
-  "wheel": null,
-  "wheel_note": null,
+  "wheel": "0.11.1",
+  "wheel_note": "first PyPI release after merge (2025-11-19 > 2025-11-11); picked by gen_tasks.py from PyPI upload dates.",
   "torch_fix": null,
   "extra_pip": null,
   "swap": "tree",
   "swap_note": null,
-  "build": "docker build -t vllm-task:28280 -f tasks/pr_28280/workload/Dockerfile --build-arg VLLM_VERSION= --build-arg BASE_SHA=b06b9470ca881f89feea72e4d89b20c213f360d4 --build-arg MERGE_SHA=40e2eeeb92d926b9773c4ed339375d26b10456e2 tasks/pr_28280/workload"
+  "build": "docker build -t vllm-task:28280 -f tasks/pr_28280/workload/Dockerfile --build-arg VLLM_VERSION=0.11.1 --build-arg BASE_SHA=b06b9470ca881f89feea72e4d89b20c213f360d4 --build-arg MERGE_SHA=40e2eeeb92d926b9773c4ed339375d26b10456e2 tasks/pr_28280/workload"
  },
  "workload": {
   "kind": "serving",
@@ -88,8 +90,8 @@
    "name": "output_throughput",
    "unit": "tok/s",
    "higher_is_better": true,
-   "headline": false,
-   "parse": "Output token throughput",
+   "headline": true,
+   "parse": "GENERIC line 'output_throughput [label] <number>' (tok/s)",
    "reported": {
     "baseline": 267.82,
     "pr_solution": 296.95
@@ -101,7 +103,7 @@
    "unit": "ms",
    "higher_is_better": false,
    "headline": false,
-   "parse": "Mean TPOT",
+   "parse": "GENERIC line 'tpot [label] <number>' (ms)",
    "reported": {
     "baseline": 67.93,
     "pr_solution": 61.74
@@ -109,13 +111,17 @@
    "note": null
   }
  ],
- "headline": null,
+ "headline": "output_throughput",
  "reported": {
   "gain": "8%",
   "gain_kind": "pct",
   "gain_evidence": "Output token throughput increases by approximately 8%, consistent with the intuition that this change is more friendly to older GPU architectures.*",
-  "perf_gain": null,
-  "experiments_note": "Triton matmul (EVEN_K masking). PR gives serving numbers only (C500/H800).",
+  "perf_gain": {
+   "top_gain": "8%",
+   "gain_kind": "pct",
+   "gain_evidence": "Output token throughput increases by approximately 8%, consistent with the intuition that this change is more friendly to older GPU architectures.*"
+  },
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
   "author_hardware_args": [
    {
     "line": 33,
@@ -200,7 +206,7 @@
   "build": "docker build -t vllm-task:28280 tasks/pr_28280/workload",
   "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_28280:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:28280 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; vllm bench serve --num-prompts 100 --dataset-name sharegpt'",
   "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_28280:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:28280 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; vllm bench serve --num-prompts 100 --dataset-name sharegpt'",
-  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/). NOT PINNED: no tasks/pr_<n>/metadata.json:wheel, so the Dockerfile installs the latest PyPI vLLM (compiled ops may not match either tree) and run_one.sh falls back to source mode (Dockerfile.gpu from a host clone). Pick the first PyPI release after merge_sha and record it as metadata.json:wheel before trusting numbers from this image."
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
  },
- "test_note": null
+ "test_note": ""
 }

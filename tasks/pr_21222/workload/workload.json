@@ -168,7 +168,7 @@
  },
  "reproduced": {
   "source": "results/21222.json",
-  "ts": "2026-11-07T16:05:02Z",
+  "ts": "2026-11-07T22:05:58Z",
   "image": {
    "mode": "wheel",
    "wheel": "0.10.0",
@@ -182,7 +182,56 @@
   "verdict": "unknown",
   "reproduced_ratio_median": null,
   "reported_ratio_median": 11.2083,
-  "machine": null,
+  "machine": {
+   "ts": "2026-11-07T22:05:30Z",
+   "host": {
+    "hostname": "DESKTOP-michael",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "wsl2": true,
+    "os": "Ubuntu 24.04.3 LTS"
+   },
+   "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Ti",
+    "driver": "591.86",
+    "cuda": "13.1",
+    "sm_mhz": 180.0,
+    "sm_max_mhz": 3090.0,
+    "mem_mhz": 405.0,
+    "mem_max_mhz": 14001.0,
+    "vram_total_mib": 16303.0,
+    "vram_used_mib": 273.0,
+    "util_pct": 0.0,
+    "power_w": 30.3,
+    "power_limit_w": 300.0,
+    "temp_c": 34.0,
+    "pstate": "P8",
+    "throttle_reasons": "0x0000000000000000",
+    "processes": [
+     {
+      "pid": 2903,
+      "name": "python main.py --listen 0.0.0.0 --port 8188",
+      "mem_mib": null
+     }
+    ]
+   },
+   "cpu": {
+    "model": "Intel(R) Core(TM) i7-14700KF",
+    "nproc": 12,
+    "load1": 2.9326171875,
+    "load5": 1.56103515625,
+    "load15": 0.8173828125,
+    "top_cpu_procs": []
+   },
+   "ram": {
+    "total_gb": 94.3,
+    "free_gb": 49.1,
+    "available_gb": 89.2
+   },
+   "docker": {
+    "version": "Docker version 29.8.1, build 4a63305",
+    "engine": "docker"
+   }
+  },
   "experiments": [
    {
     "name": "get_new_blocks",

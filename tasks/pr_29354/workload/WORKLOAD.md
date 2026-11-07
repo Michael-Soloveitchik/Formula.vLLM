@@ -64,6 +64,7 @@ The image already holds both trees (/base = baseline commit, /gold = the PR's me
 
 ## Machine requirements
 
-- not recorded in index.json for this PR
+- GPU: yes ×1 ≥8 GB VRAM, compute capability ≥7.0; RAM 8 GB; disk 30 GB
+- software: docker=True nvidia-container-runtime=True vllm_wheel=0.14.0 pipeline=wheel models=[] datasets=[] hf_token=False needs_server=False
 
 Oracle note: perf-only small-batch MoE path; the diff's test (tests/kernels/moe/test_moe.py) is a large kernel suite - dropped from the oracle, bench.py checks finiteness only (same kernel both arms).

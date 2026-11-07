@@ -56,6 +56,7 @@ The image already holds both trees (/base = baseline commit, /gold = the PR's me
 
 ## Machine requirements
 
-- not recorded in index.json for this PR
+- GPU: yes ×1 ≥8 GB VRAM, compute capability ≥7.0; RAM 8 GB; disk 30 GB
+- software: docker=True nvidia-container-runtime=True vllm_wheel=0.10.2 pipeline=wheel models=[] datasets=[] hf_token=False needs_server=False
 
 Oracle note: opt-in multi-thread loader; no test in the diff; bench writes 1 GB of synthetic shards to a temp dir and deletes them.

@@ -7,19 +7,26 @@
  "date": "2024-11-07",
  "base_sha": "42b4f46b71572e21582fd12c498ec3b0b78ada7b",
  "merge_sha": "201fc07730ec96dd88b758064f148a424f4b251b",
- "source_files": null,
- "test_files": null,
+ "source_files": [
+  "vllm/v1/core/kv_cache_manager.py",
+  "vllm/v1/core/kv_cache_utils.py",
+  "vllm/v1/core/scheduler.py",
+  "vllm/v1/engine/llm_engine.py"
+ ],
+ "test_files": [
+  "tests/v1/core/test_prefix_caching.py"
+ ],
  "image": {
-  "mode": "source",
+  "mode": "wheel",
   "tag": "vllm-task:9972",
   "dockerfile": "tasks/pr_9972/workload/Dockerfile",
-  "wheel": null,
-  "wheel_note": null,
+  "wheel": "0.6.4",
+  "wheel_note": "first PyPI release after merge (2024-11-15 > 2024-11-07); picked by gen_tasks.py from PyPI upload dates.",
   "torch_fix": null,
   "extra_pip": null,
   "swap": "tree",
   "swap_note": null,
-  "build": "docker build -t vllm-task:9972 -f tasks/pr_9972/workload/Dockerfile --build-arg VLLM_VERSION= --build-arg BASE_SHA=42b4f46b71572e21582fd12c498ec3b0b78ada7b --build-arg MERGE_SHA=201fc07730ec96dd88b758064f148a424f4b251b tasks/pr_9972/workload"
+  "build": "docker build -t vllm-task:9972 -f tasks/pr_9972/workload/Dockerfile --build-arg VLLM_VERSION=0.6.4 --build-arg BASE_SHA=42b4f46b71572e21582fd12c498ec3b0b78ada7b --build-arg MERGE_SHA=201fc07730ec96dd88b758064f148a424f4b251b tasks/pr_9972/workload"
  },
  "workload": {
   "kind": "serving",
@@ -87,8 +94,8 @@
    "name": "input_throughput",
    "unit": "tok/s",
    "higher_is_better": true,
-   "headline": false,
-   "parse": "input tok/s",
+   "headline": true,
+   "parse": "GENERIC line 'input_throughput [label] <number>' (tok/s)",
    "reported": {
     "baseline": 17916.0,
     "pr_solution": 32258.0
@@ -100,7 +107,7 @@
    "unit": "tok/s",
    "higher_is_better": true,
    "headline": false,
-   "parse": "output tok/s",
+   "parse": "GENERIC line 'output_throughput [label] <number>' (tok/s)",
    "reported": {
     "baseline": 485.0,
     "pr_solution": 874.0
@@ -112,7 +119,7 @@
    "unit": "s",
    "higher_is_better": false,
    "headline": false,
-   "parse": "cost time",
+   "parse": "GENERIC line 'cost_time [label] <number>' (s)",
    "reported": {
     "baseline": 8.49,
     "pr_solution": 4.83
@@ -120,13 +127,17 @@
    "note": null
   }
  ],
- "headline": null,
+ "headline": "input_throughput",
  "reported": {
   "gain": "3x",
   "gain_kind": "pct",
   "gain_evidence": "It is ~3x faster than list matching.",
-  "perf_gain": null,
-  "experiments_note": "Offline batching bench; needs model + ShareGPT dataset. GPU serving run. Numbers are cache-enabled (49% hit).",
+  "perf_gain": {
+   "top_gain": "3x",
+   "gain_kind": "pct",
+   "gain_evidence": "It is ~3x faster than list matching."
+  },
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
   "author_hardware_args": [
    {
     "line": 21,
@@ -231,7 +242,7 @@
   "build": "docker build -t vllm-task:9972 tasks/pr_9972/workload",
   "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_9972:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:9972 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; VLLM_USE_V1=1 python3 benchmarks/benchmark_prefix_caching.py --model neuralmagic/Meta-Llama-3-8B-Instruct-FP8 --num-prompts 200 --repeat-count 2 --input-length-range 256:512 --dataset-path ./ShareGPT_V3_unfiltered_cleaned_split.json --seed 0 --enable-prefix-caching'",
   "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_9972:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:9972 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; VLLM_USE_V1=1 python3 benchmarks/benchmark_prefix_caching.py --model neuralmagic/Meta-Llama-3-8B-Instruct-FP8 --num-prompts 200 --repeat-count 2 --input-length-range 256:512 --dataset-path ./ShareGPT_V3_unfiltered_cleaned_split.json --seed 0 --enable-prefix-caching'",
-  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/). NOT PINNED: no tasks/pr_<n>/metadata.json:wheel, so the Dockerfile installs the latest PyPI vLLM (compiled ops may not match either tree) and run_one.sh falls back to source mode (Dockerfile.gpu from a host clone). Pick the first PyPI release after merge_sha and record it as metadata.json:wheel before trusting numbers from this image."
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
  },
- "test_note": null
+ "test_note": ""
 }

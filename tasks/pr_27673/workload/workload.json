@@ -51,7 +51,7 @@
    "/root/.cache/huggingface": ".weights/hf"
   },
   "repeats": null,
-  "note": "Pure-Python early return; driver times remove_skipped_blocks on the no-op path (CPU).",
+  "note": "Real BlockPool + SlidingWindowManager (block 16, window 4096, 2048 blocks for one request); times the two no-op paths the PR short-circuits: steady state (blocks below the window already freed) and context shorter than the window. us per call, CPU only.",
   "base_note": null,
   "cmd_in_workloads_json": "python3 tasks/pr_27673/bench.py"
  },
@@ -95,6 +95,18 @@
    "reported": {
     "baseline": 6.3,
     "pr_solution": 1.6
+   },
+   "note": null
+  },
+  {
+   "name": "remove_skipped_blocks_short_ctx",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "GENERIC line 'remove_skipped_blocks_short_ctx [label] <number>' (us)",
+   "reported": {
+    "baseline": null,
+    "pr_solution": null
    },
    "note": null
   }

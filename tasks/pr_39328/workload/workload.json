@@ -51,7 +51,7 @@
    "/root/.cache/huggingface": ".weights/hf"
   },
   "repeats": null,
-  "note": "functools.cache over inspect.getsource; CPU-only hashing path.",
+  "note": "Real InductorPass.hash_source, 10000 lookups cycling 5 source objects after one untimed call each; total ms per 10000 lookups (author's scale), median of 5. cold_compile (Llama-3-70B TP4 torch.compile) is reported-only.",
   "base_note": null,
   "cmd_in_workloads_json": "python3 tasks/pr_39328/bench.py"
  },
@@ -306,5 +306,5 @@
   "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_39328:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:39328 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
   "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
  },
- "test_note": "perf-only functools.cache over inspect.getsource; no test in the diff."
+ "test_note": "perf-only functools.cache over inspect.getsource; no test in the diff. cold_compile needs a real torch.compile of a 70B model - reported-only."
 }

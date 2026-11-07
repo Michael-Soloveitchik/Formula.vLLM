@@ -62,6 +62,7 @@ The image already holds both trees (/base = baseline commit, /gold = the PR's me
 
 ## Machine requirements
 
-- not recorded in index.json for this PR
+- GPU: yes ×1 ≥8 GB VRAM, compute capability ≥7.0; RAM 8 GB; disk 30 GB
+- software: docker=True nvidia-container-runtime=True vllm_wheel=0.11.1 pipeline=wheel models=[] datasets=[] hf_token=False needs_server=False
 
 Oracle note: perf-only PDL flags on LoRA Triton kernels; no test in the diff; needs sm_90+ (sm_120 ok).

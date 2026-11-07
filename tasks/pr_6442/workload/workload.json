@@ -51,7 +51,7 @@
    "/root/.cache/huggingface": ".weights/hf"
   },
   "repeats": null,
-  "note": "Microbench imports v0 vllm Sampler; large batch, A100. ~50% sampler speedup.",
+  "note": "v0 SamplingTensors.from_lists (real classmethod) on a 256-seq penalty batch (prompts 512..1024, 128 output tokens, vocab 128256), CPU only, pinned memory off (wheel 0.5.3 torch 2.3 cu121 has no sm_120 kernels). ms per call. Author: ~50% sampler speedup at large batch on A100, no absolute numbers.",
   "base_note": null,
   "cmd_in_workloads_json": "python3 tasks/pr_6442/bench.py"
  },
@@ -93,8 +93,8 @@
    "headline": true,
    "parse": "GENERIC line 'sampler_latency [label] <number>' (ms)",
    "reported": {
-    "baseline": 2.0,
-    "pr_solution": 1.0
+    "baseline": null,
+    "pr_solution": null
    },
    "note": null
   }
@@ -236,5 +236,5 @@
   "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_6442:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:6442 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
   "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
  },
- "test_note": ""
+ "test_note": "perf-only v0 sampler change; no test in the diff. Wheel 0.5.3 pins torch 2.3 cu121 (no sm_120 kernels): bench is CPU-only and disables pinned memory."
 }

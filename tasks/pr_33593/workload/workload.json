@@ -58,7 +58,7 @@
    "/root/.cache/huggingface": ".weights/hf"
   },
   "repeats": null,
-  "note": "Pure-Python microbench, SIZE=2M N=1M R=5; list[:N] vs islice, create + sum.",
+  "note": "Arm's real call sites: StructuredOutputManager.should_advance (unbound; delta = whole 1M-token sequence) and BaseThinkingReasoningParser.extract_content_ids on a DeepSeekR1 parser over a stub vocab; no end token present. Seconds per call, best of 5. Metric names follow the author's list[:N]-vs-islice microbench (SIZE 2M / N 1M); reported numbers are that microbench's.",
   "base_note": null,
   "cmd_in_workloads_json": "python3 tasks/pr_33593/bench.py"
  },

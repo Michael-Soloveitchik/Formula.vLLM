@@ -1,90 +1,51 @@
 {
- "pr": 32975,
- "pr_url": "https://github.com/vllm-project/vllm/pull/32975",
- "title": "[Perf] Optimize detokenizer python logic (#32975)",
- "field": "scheduling",
- "reported_gain": "1.628x, 38.57%",
- "base_sha": "97fa8f65909d4d8f2eb0edc2137fb22f576a5b25",
- "merge_sha": "e1060a71a1bb96103ce9ca98345184dcdc982467",
- "arms": {
-  "base": {
-   "tests": "FAIL"
-  },
-  "gold": {
-   "tests": "PASS"
-  }
- },
- "improved": true,
  "schema": "experiments_v2",
  "experiments": [
   {
    "name": "detokenize",
    "unit": "us/tok",
-   "workload": "200 seqs x 2000 tokens; isolated SlowIncrementalDetokenizer per-token output-count check (slice vs tracked), 7 repeats",
-   "note": "approach=fallback (self-contained, both arms in ONE process on the same CPU, no cross-container noise). Reproduces the exact changed inner logic: base recomputes len(self.token_ids[self.prompt_len:]) per token (slice alloc), gold uses num_output_tokens()==len(token_ids)-prompt_len. speedup_x = mean of per-repeat base/gold ratios. NOTE: the real full detokenizer path was ALSO driven (PYTHONPATH=/src, real gpt2 tokenizer via transformers, real SlowIncrementalDetokenizer.update() loop, batched updates, long prompt); there the native tokenizer decode (~5us/tok) dominates and the slice removal is below run-to-run noise (real base ~5.36 us/tok vs gold ~6.39 us/tok, i.e. no measurable end-to-end gain). The isolated fallback below matches the PR's own reported methodology of timing the detokenizer PYTHON logic in isolation.",
+   "workload": "python3 /task/bench.py",
    "reported": {
-    "base": 0.03936,
-    "patch": 0.02418,
-    "scope": "benchmark_detokenizer_min_tokens.py: 39.36 ns/token -> 24.18 ns/token (1.628x, -38.57%) -- but this benchmarks the min_tokens offset-accumulation loop that was REVERTED, not the merged change",
-    "comparable": false,
-    "scale_note": "UNIT-BUG FIXED + SCOPE CAVEAT. Earlier this field held base=1.628/patch=1.0, pasting the SPEEDUP RATIO as an absolute us/tok value; real PR numbers are 39.36->24.18 ns/token = 0.03936->0.02418 us/tok. BUT the 1.628x is unrepresentative TWICE OVER: (1) the PR's benchmark_detokenizer_min_tokens.py times a synthetic pure-Python int/str accumulation loop (new_chars_len += len(piece) vs stop_check_offset += len(piece)) with NO tokenizer / NO update() / NO slice -- it measures the min_tokens stop_check_offset change, which was REVERTED (njhill 2026-02-06; only num_output_tokens was merged). (2) njhill noted the common case is 1 token/update where the change is MORE work, so the benchmark doesn't reflect production. Our microbench isolates the actually-merged num_output_tokens() slice-vs-count primitive (base ~1.33 us/tok, 11x). Direction agrees; the PR's 1.628x and our 11x measure different code and are not comparable."
+    "base": null,
+    "patch": null
    },
    "arms": {
     "base": {
-     "mean": 1.330579,
-     "sd": 0.012124,
-     "runs": [
-      1.322138,
-      1.333397,
-      1.322168,
-      1.322721,
-      1.320539,
-      1.336379,
-      1.356709
-     ]
+     "mean": 24.4438,
+     "sd": 0.4408,
+     "n": 5
     },
     "gold": {
-     "mean": 0.117099,
-     "sd": 0.000396,
-     "runs": [
-      0.117234,
-      0.11725,
-      0.116556,
-      0.117155,
-      0.116553,
-      0.117773,
-      0.117172
-     ],
-     "speedup_x": 11.362829,
-     "speedup_sd": 0.093282,
-     "counts": true
+     "mean": 23.2144,
+     "sd": 0.19,
+     "n": 5
     }
    },
    "derived": {
     "unit": "us/tok",
     "higher_is_better": false,
     "reported": {
-     "baseline": 0.03936,
-     "pr_solution": 0.02418,
-     "how": "absolute",
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
      "marker": "",
-     "raw": "0.03936 -> 0.02418 us/tok",
-     "note": "author gave absolute numbers",
-     "ratio": 1.627792,
-     "pct": 62.78
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
     },
     "reproduced": {
-     "baseline": 1.330579,
-     "pr_solution": 0.117099,
-     "ratio_sd": 0.110437,
-     "baseline_sd": 0.012124,
-     "pr_solution_sd": 0.000396,
-     "ratio": 11.362855,
-     "pct": 1036.29
+     "baseline": 24.4438,
+     "pr_solution": 23.2144,
+     "ratio_sd": 0.020852,
+     "baseline_sd": 0.4408,
+     "pr_solution_sd": 0.19,
+     "ratio": 1.052959,
+     "pct": 5.3
     },
     "reproduced_vs_reported": {
-     "ratio_of_ratios": 6.981,
-     "verdict": "reproduced"
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
     },
     "reliability": {
      "flag": "ok",
@@ -93,8 +54,108 @@
    }
   }
  ],
- "environment": "docker vllm-cpu-bench:32975 (python:3.12-slim + CPU torch + transformers + gguf), PYTHONPATH=/src with per-arm vllm source tree mounted ro; colima arm64 Mac (aarch64), py 3.12.16; identical image for both arms, only vllm/ source differs",
- "ts": "2026-11-04T00:00:00Z",
+ "pr": 32975,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/32975",
+ "title": "[Perf] Optimize detokenizer python logic (#32975)",
+ "field": "scheduling",
+ "reported_gain": "1.628x, 38.57%",
+ "gain_kind": "pct",
+ "base_sha": "97fa8f65909d4d8f2eb0edc2137fb22f576a5b25",
+ "merge_sha": "e1060a71a1bb96103ce9ca98345184dcdc982467",
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.16.0",
+  "workload_cmd": "python3 /task/bench.py",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "SKIP",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "SKIP",
+   "slug": "gold"
+  }
+ },
+ "improved": false,
+ "latency": {
+  "scenarios": {
+   "detokenize": {
+    "unit": "us/tok",
+    "base": {
+     "mean": 24.4438,
+     "sd": 0.4408,
+     "n": 5
+    },
+    "gold": {
+     "mean": 23.2144,
+     "sd": 0.19,
+     "n": 5
+    }
+   }
+  },
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {
+   "workload_runs": 5
+  },
+  "gold": {
+   "workload_runs": 5
+  }
+ },
+ "ts": "2026-11-07T22:15:26Z",
+ "machine": {
+  "ts": "2026-11-07T22:13:43Z",
+  "host": {
+   "hostname": "DESKTOP-michael",
+   "kernel": "6.18.33.2-microsoft-standard-WSL2",
+   "wsl2": true,
+   "os": "Ubuntu 24.04.3 LTS"
+  },
+  "gpu": {
+   "name": "NVIDIA GeForce RTX 5070 Ti",
+   "driver": "591.86",
+   "cuda": "13.1",
+   "sm_mhz": 180.0,
+   "sm_max_mhz": 3090.0,
+   "mem_mhz": 405.0,
+   "mem_max_mhz": 14001.0,
+   "vram_total_mib": 16303.0,
+   "vram_used_mib": 275.0,
+   "util_pct": 0.0,
+   "power_w": 30.18,
+   "power_limit_w": 300.0,
+   "temp_c": 35.0,
+   "pstate": "P8",
+   "throttle_reasons": "0x0000000000000000",
+   "processes": [
+    {
+     "pid": 2903,
+     "name": "python main.py --listen 0.0.0.0 --port 8188",
+     "mem_mib": null
+    }
+   ]
+  },
+  "cpu": {
+   "model": "Intel(R) Core(TM) i7-14700KF",
+   "nproc": 12,
+   "load1": 2.2421875,
+   "load5": 1.5947265625,
+   "load15": 1.103515625,
+   "top_cpu_procs": []
+  },
+  "ram": {
+   "total_gb": 94.3,
+   "free_gb": 37.2,
+   "available_gb": 89.1
+  },
+  "docker": {
+   "version": "Docker version 29.8.1, build 4a63305",
+   "engine": "docker"
+  }
+ },
  "summary": {
   "experiments": 1,
   "measured": 1,
@@ -103,40 +164,40 @@
    "unit": "us/tok",
    "higher_is_better": false,
    "reported": {
-    "baseline": 0.03936,
-    "pr_solution": 0.02418,
-    "how": "absolute",
+    "baseline": null,
+    "pr_solution": null,
+    "how": null,
     "marker": "",
-    "raw": "0.03936 -> 0.02418 us/tok",
-    "note": "author gave absolute numbers",
-    "ratio": 1.627792,
-    "pct": 62.78
+    "raw": "no number in the PR",
+    "note": "",
+    "ratio": null,
+    "pct": null
    },
    "reproduced": {
-    "baseline": 1.330579,
-    "pr_solution": 0.117099,
-    "ratio_sd": 0.110437,
-    "baseline_sd": 0.012124,
-    "pr_solution_sd": 0.000396,
-    "ratio": 11.362855,
-    "pct": 1036.29
+    "baseline": 24.4438,
+    "pr_solution": 23.2144,
+    "ratio_sd": 0.020852,
+    "baseline_sd": 0.4408,
+    "pr_solution_sd": 0.19,
+    "ratio": 1.052959,
+    "pct": 5.3
    },
    "reproduced_vs_reported": {
-    "ratio_of_ratios": 6.981,
-    "verdict": "reproduced"
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number"
    },
    "reliability": {
     "flag": "ok",
     "note": ""
    }
   },
-  "reproduced_ratio_median": 11.3629,
-  "reproduced_ratio_max": 11.3629,
-  "reported_ratio_median": 1.6278,
-  "verdict": "reproduced",
+  "reproduced_ratio_median": 1.053,
+  "reproduced_ratio_max": 1.053,
+  "reported_ratio_median": null,
+  "verdict": "no_reported_number",
   "tests": {
-   "base": "FAIL",
-   "gold": "PASS"
+   "base": "SKIP",
+   "gold": "SKIP"
   }
  }
 }

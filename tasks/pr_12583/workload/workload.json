@@ -7,19 +7,39 @@
  "date": "2025-02-24",
  "base_sha": "7940d8a6a7841113c89b168080b51785946f0cdb",
  "merge_sha": "781096e385112f799c2b12a9aa2660b85efaf983",
- "source_files": null,
- "test_files": null,
+ "source_files": [
+  "vllm/config.py",
+  "vllm/envs.py",
+  "vllm/model_executor/layers/fused_moe/fused_moe.py",
+  "vllm/model_executor/layers/fused_moe/layer.py",
+  "vllm/model_executor/layers/fused_moe/moe_torch_iterative.py",
+  "vllm/model_executor/layers/quantization/awq_marlin.py",
+  "vllm/model_executor/layers/quantization/compressed_tensors/compressed_tensors_moe.py",
+  "vllm/model_executor/layers/quantization/experts_int8.py",
+  "vllm/model_executor/layers/quantization/fp8.py",
+  "vllm/model_executor/layers/quantization/gptq_marlin.py",
+  "vllm/model_executor/layers/quantization/moe_wna16.py",
+  "vllm/model_executor/layers/quantization/quark/quark_moe.py",
+  "vllm/model_executor/models/deepseek_v2.py"
+ ],
+ "test_files": [
+  "tests/distributed/test_expert_parallel.py",
+  "tests/kernels/test_awq_marlin.py",
+  "tests/kernels/test_moe.py",
+  "tests/kernels/utils.py",
+  "tests/utils.py"
+ ],
  "image": {
-  "mode": "source",
+  "mode": "wheel",
   "tag": "vllm-task:12583",
   "dockerfile": "tasks/pr_12583/workload/Dockerfile",
-  "wheel": null,
-  "wheel_note": null,
+  "wheel": "0.8.0",
+  "wheel_note": "first PyPI release after merge (2025-03-18 > 2025-02-24); picked by gen_tasks.py from PyPI upload dates.",
   "torch_fix": null,
   "extra_pip": null,
   "swap": "tree",
   "swap_note": null,
-  "build": "docker build -t vllm-task:12583 -f tasks/pr_12583/workload/Dockerfile --build-arg VLLM_VERSION= --build-arg BASE_SHA=7940d8a6a7841113c89b168080b51785946f0cdb --build-arg MERGE_SHA=781096e385112f799c2b12a9aa2660b85efaf983 tasks/pr_12583/workload"
+  "build": "docker build -t vllm-task:12583 -f tasks/pr_12583/workload/Dockerfile --build-arg VLLM_VERSION=0.8.0 --build-arg BASE_SHA=7940d8a6a7841113c89b168080b51785946f0cdb --build-arg MERGE_SHA=781096e385112f799c2b12a9aa2660b85efaf983 tasks/pr_12583/workload"
  },
  "workload": {
   "kind": "repo_benchmark",
@@ -88,8 +108,8 @@
    "name": "fused_moe_kernel",
    "unit": "us",
    "higher_is_better": false,
-   "headline": false,
-   "parse": "kernel us",
+   "headline": true,
+   "parse": "GENERIC line 'fused_moe_kernel [label] <number>' (us)",
    "reported": {
     "baseline": null,
     "pr_solution": null
@@ -97,13 +117,17 @@
    "note": null
   }
  ],
- "headline": null,
+ "headline": "fused_moe_kernel",
  "reported": {
   "gain": "30%",
   "gain_kind": "pct",
   "gain_evidence": "I noticed that after enabling EP on a 16-card setup, the time taken for the all-reduce kernel has doubled, and the throughput has dropped by 30%.",
-  "perf_gain": null,
-  "experiments_note": "FusedMoE Triton kernel microbench, GPU-only. PR gives no before/after numbers (design doc).",
+  "perf_gain": {
+   "top_gain": "30%",
+   "gain_kind": "pct",
+   "gain_evidence": "I noticed that after enabling EP on a 16-card setup, the time taken for the all-reduce kernel has doubled, and the throughput has dropped by 30%."
+  },
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
   "author_hardware_args": [],
   "source": "data/prs/quantization/model_executor_layers/12583.md",
   "hardware_tag": [
@@ -151,7 +175,7 @@
   "build": "docker build -t vllm-task:12583 tasks/pr_12583/workload",
   "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_12583:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:12583 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 benchmarks/kernels/benchmark_moe.py --model mistralai/Mixtral-8x7B-Instruct-v0.1 --tp-size 2 --dtype auto --seed 0'",
   "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/tasks/pr_12583:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:12583 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 benchmarks/kernels/benchmark_moe.py --model mistralai/Mixtral-8x7B-Instruct-v0.1 --tp-size 2 --dtype auto --seed 0'",
-  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/). NOT PINNED: no tasks/pr_<n>/metadata.json:wheel, so the Dockerfile installs the latest PyPI vLLM (compiled ops may not match either tree) and run_one.sh falls back to source mode (Dockerfile.gpu from a host clone). Pick the first PyPI release after merge_sha and record it as metadata.json:wheel before trusting numbers from this image."
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
  },
- "test_note": null
+ "test_note": ""
 }

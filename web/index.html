@@ -671,7 +671,7 @@ async function showPR(pr){
 })();
 
 // ---------- STATS COLUMN: reported vs reproduced, PRs on x, values on y ----------
-let STAB='speedup';
+let STAB='gapratio';
 function statRows(){
  // one row per PR actually measured here (summary.measured>0, a real run, not a hand-entered scaffold entry)
  const out=[];
@@ -684,67 +684,64 @@ function statRows(){
    verdict:(d.reproduced_vs_reported||{}).verdict||'', rel:(d.reliability||{}).flag||'ok'});}
  return out;
 }
-const TABS=[['speedup','speedup ×'],['pct','improvement %'],['baseline','baseline ratio'],['field','per field']];
-// generic column chart: x = categories, y = numeric (log2 or linear); series = [{key,color,shape,err?}]
-function colChart(el,rows,opts){
+const TABS=[['gapratio','gap ratio'],['gaps','gaps'],['fgapratio','gap ratio / field'],['fgaps','gaps / field']];
+// gap = PR's solution − baseline. Relative gap = (baseline − PR's solution) ÷ baseline, so a 30 % faster run is +0.30
+// whatever the unit (throughput units: (PR's solution − baseline) ÷ baseline). Gap ratio = reproduced gap ÷ reported gap.
+function gapRows(){
+ return statRows().map(r=>{const up=/\/s$|tok\/s|req\/s/.test(r.unit||'');
+  const rel=(b,s)=>(b==null||s==null||!b)?null:(up?(s-b)/b:(b-s)/b);
+  let repGap=null;
+  if(r.repPct!=null) repGap=(r.rep!=null)?(up?r.rep-1:1-1/r.rep):null;   // from the reported ratio (author's %, delta or absolutes, all resolved by derive.py)
+  const measGap=(r.meas!=null)?(up?r.meas-1:1-1/r.meas):null;
+  const gapRatio=(repGap&&measGap!=null&&repGap!==0)?measGap/repGap:null;
+  return {...r,repGap,measGap,gapRatio};});
+}
+// bar chart: x = categories, y = numeric; series = side-by-side bars per category; log (ratio, ref 1) or linear (ref 0)
+function barChart(el,rows,opts){
  const W=Math.max(260,(el.clientWidth||300)-4), L=48, R=8, TOP=12, XL=opts.xl||46, PH=Math.max(120,Math.min(260,Math.round(W*0.55)));
- const H=TOP+PH+XL; const n=rows.length; const step=(W-L-R)/Math.max(1,n); const xc=i=>L+step*(i+0.5);
- const vals=[]; rows.forEach(r=>opts.series.forEach(s=>{const v=r[s.key]; if(v!=null&&isFinite(v)&&(!opts.log||v>0)) {vals.push(v); if(s.err&&r[s.err]){vals.push(v+r[s.err]); if(!opts.log||v-r[s.err]>0) vals.push(v-r[s.err]);}}}));
+ const H=TOP+PH+XL, n=rows.length, step=(W-L-R)/Math.max(1,n), xc=i=>L+step*(i+0.5), bw=Math.max(3,Math.min(14,step/(opts.series.length+1)));
+ const vals=[]; rows.forEach(r=>opts.series.forEach(s=>{const v=r[s.key]; if(v!=null&&isFinite(v)&&(!opts.log||v>0)) vals.push(v);}));
  if(!vals.length) return `<div class="shint">nothing to plot yet</div>`;
- let lo=Math.min(...vals,opts.ref!=null?opts.ref:Infinity), hi=Math.max(...vals,opts.ref!=null?opts.ref:-Infinity);
- if(opts.log){lo=Math.pow(2,Math.floor(Math.log2(lo))); hi=Math.pow(2,Math.ceil(Math.log2(hi))); if(hi===lo) hi=lo*2;}
- else {const pad=(hi-lo)*0.1||1; lo-=pad; hi+=pad;}
- const y=v=>opts.log? TOP+PH-(Math.log2(v)-Math.log2(lo))/(Math.log2(hi)-Math.log2(lo))*PH : TOP+PH-(v-lo)/(hi-lo)*PH;
- // ticks: log -> powers of 2 thinned to <= 8 labels; linear -> "nice" steps (1,2,5 x 10^k)
+ let lo=Math.min(...vals,opts.ref), hi=Math.max(...vals,opts.ref);
  let ticks=[];
- if(opts.log){const all=[]; for(let t=lo;t<=hi*1.0001;t*=2) all.push(t); const every=Math.ceil(all.length/8); ticks=all.filter((_,i)=>i%every===0);}
- else {const raw=(hi-lo)/5, mag=Math.pow(10,Math.floor(Math.log10(raw||1))); const st=[1,2,5,10].map(m=>m*mag).find(s=>s>=raw)||raw;
-   lo=Math.floor(lo/st)*st; hi=Math.ceil(hi/st)*st; for(let t=lo;t<=hi+st/2;t+=st) ticks.push(+t.toFixed(10));}
+ if(opts.log){lo=Math.pow(2,Math.floor(Math.log2(lo))); hi=Math.pow(2,Math.ceil(Math.log2(hi))); if(hi===lo) hi=lo*2; const all=[]; for(let t=lo;t<=hi*1.0001;t*=2) all.push(t); const ev=Math.ceil(all.length/8); ticks=all.filter((_,i)=>i%ev===0);}
+ else {const raw=(hi-lo)/5||1, mag=Math.pow(10,Math.floor(Math.log10(raw))); const st=[1,2,5,10].map(m=>m*mag).find(s=>s>=raw)||raw; lo=Math.floor(lo/st)*st; hi=Math.ceil(hi/st)*st; if(hi===lo) hi=lo+st; for(let t=lo;t<=hi+st/2;t+=st) ticks.push(+t.toFixed(10));}
+ const y=v=>opts.log? TOP+PH-(Math.log2(v)-Math.log2(lo))/(Math.log2(hi)-Math.log2(lo))*PH : TOP+PH-(v-lo)/(hi-lo)*PH;
+ const y0=y(opts.ref);
  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.title)}">`;
- s+=ticks.map(t=>`<line x1="${L}" y1="${y(t).toFixed(1)}" x2="${W-R}" y2="${y(t).toFixed(1)}" stroke="${opts.ref!=null&&Math.abs(t-opts.ref)<1e-9?'#c9d6ec':'#eef2f9'}" stroke-width="1"/><text x="${L-4}" y="${(y(t)+3).toFixed(1)}" text-anchor="end" fill="#98a2b8">${opts.fmt(t)}</text>`).join('');
- if(opts.ref!=null&&opts.ref>=lo&&opts.ref<=hi) s+=`<line x1="${L}" y1="${y(opts.ref).toFixed(1)}" x2="${W-R}" y2="${y(opts.ref).toFixed(1)}" stroke="#c9d6ec" stroke-width="1.4"/>`;
+ s+=ticks.map(t=>`<line x1="${L}" y1="${y(t).toFixed(1)}" x2="${W-R}" y2="${y(t).toFixed(1)}" stroke="#eef2f9"/><text x="${L-4}" y="${(y(t)+3).toFixed(1)}" text-anchor="end" fill="#98a2b8">${opts.fmt(t)}</text>`).join('');
+ s+=`<line x1="${L}" y1="${y0.toFixed(1)}" x2="${W-R}" y2="${y0.toFixed(1)}" stroke="#c9d6ec" stroke-width="1.4"/>`;
  rows.forEach((r,i)=>{const x=xc(i);
-  const tip=`#${r.pr} ${r.head}\n`+opts.series.map(se=>`${se.label}: ${r[se.key]!=null?opts.fmt(r[se.key]):'—'}${se.err&&r[se.err]?' ±'+opts.fmt(r[se.err]):''}`).join('\n')+`\n${r.verdict||''}${r.rel&&r.rel!=='ok'?' · '+r.rel:''}`;
-  s+=`<g><title>${esc(tip)}</title>`;
-  s+=`<text transform="translate(${x.toFixed(1)},${TOP+PH+6}) rotate(55)" fill="#172a5c" font-weight="700" font-size="9">#${r.pr}</text>`;
-  opts.series.forEach((se,k)=>{const v=r[se.key]; if(v==null||!isFinite(v)||(opts.log&&v<=0)) return; const dx=(k-(opts.series.length-1)/2)*7; const px=x+dx, py=y(v);
-   if(se.err&&r[se.err]){const a=opts.log?Math.max(lo,v-r[se.err]):v-r[se.err], b=Math.min(hi,v+r[se.err]); s+=`<line x1="${px.toFixed(1)}" y1="${y(a).toFixed(1)}" x2="${px.toFixed(1)}" y2="${y(b).toFixed(1)}" stroke="${se.color}" stroke-width="2" stroke-linecap="round" opacity=".55"/>`;}
-   if(se.shape==='diamond') s+=`<path d="M${px.toFixed(1)} ${(py-4.5).toFixed(1)} l4.5 4.5 l-4.5 4.5 l-4.5 -4.5 z" fill="${se.color}" stroke="#fff" stroke-width="1"/>`;
-   else s+=`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="4" fill="${se.color}" stroke="${r.rel!=='ok'&&se.key!=='rep'?'#e5533f':'#fff'}" stroke-width="1.2"${r.rel!=='ok'&&se.key!=='rep'?' stroke-dasharray="1.5 1.5"':''}/>`;});
+  const tip=`${r.pr} ${r.head||''}\n`+opts.series.map(se=>`${se.label}: ${r[se.key]!=null&&isFinite(r[se.key])?opts.fmt(r[se.key]):'—'}`).join('\n')+(r.extra?'\n'+r.extra:'')+(r.rel&&r.rel!=='ok'?'\n'+r.rel:'');
+  s+=`<g><title>${esc(tip)}</title><text transform="translate(${x.toFixed(1)},${TOP+PH+6}) rotate(55)" fill="#172a5c" font-weight="700" font-size="9">${esc(r.label||('#'+r.pr))}</text>`;
+  opts.series.forEach((se,k)=>{const v=r[se.key]; if(v==null||!isFinite(v)||(opts.log&&v<=0)) return; const px=x+(k-(opts.series.length-1)/2)*(bw+2)-bw/2; const yv=y(v); const top=Math.min(yv,y0), h=Math.max(1,Math.abs(yv-y0));
+   s+=`<rect x="${px.toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${se.color}"${r.rel&&r.rel!=='ok'&&se.key!=='repGap'?' stroke="#e5533f" stroke-dasharray="2 2"':''}/>`;
+   if(se.err&&r[se.err]!=null&&r[se.err]>0){const a=opts.log?Math.max(lo,v/ (1+r[se.err]/v)):v-r[se.err], b2=opts.log?Math.min(hi,v*(1+r[se.err]/v)):v+r[se.err]; s+=`<line x1="${(px+bw/2).toFixed(1)}" y1="${y(a).toFixed(1)}" x2="${(px+bw/2).toFixed(1)}" y2="${y(b2).toFixed(1)}" stroke="#172a5c" stroke-width="1.2" opacity=".6"/>`;}});
   s+='</g>';});
  s+='</svg>';
- const lgd=`<div class="slgd">`+opts.series.map(se=>`<span><i style="width:8px;height:8px;${se.shape==='diamond'?'transform:rotate(45deg);':'border-radius:50%;'}background:${se.color};display:inline-block"></i>${esc(se.label)}</span>`).join('')+`</div>`;
+ const lgd=`<div class="slgd">`+opts.series.map(se=>`<span><i style="width:10px;height:8px;border-radius:2px;background:${se.color};display:inline-block"></i>${esc(se.label)}</span>`).join('')+`</div>`;
  return `<div class="stitle">${esc(opts.title)}</div>`+lgd+s+`<div class="shint">${opts.hint}</div>`;
 }
+function medRange(xs){const q=xs.filter(v=>v!=null&&isFinite(v)).sort((a,b)=>a-b); if(!q.length) return {med:null,lo:null,hi:null,n:0}; return {med:q[Math.floor(q.length/2)],lo:q[0],hi:q[q.length-1],n:q.length};}
 function renderStatsPane(){
  const el=$('#spane'); if(!el) return;
- const rows=statRows().sort((a,b)=>a.pr-b.pr);
+ const rows=gapRows().sort((a,b)=>a.pr-b.pr);
  const tabs=`<div class="stabs">`+TABS.map(([k,l])=>`<button class="${STAB===k?'on':''}" onclick="STAB='${k}';renderStatsPane()">${l}</button>`).join('')+`</div>`;
  if(!rows.length){el.innerHTML=tabs+'<div class="shint">no reproduced PRs yet</div>';return;}
- const BLUE='#0b8ce8', ORG='#e39b00', x2=v=>(v>=10?v.toFixed(0):v>=1?v.toFixed(1):v.toFixed(2))+'×', pc=v=>(v>=0?'+':'')+v.toFixed(0)+'%';
- const n=rows.length, ok=rows.filter(r=>r.verdict==='reproduced').length;
- if(STAB==='speedup'){
-  el.innerHTML=tabs+colChart(el,rows,{title:'speedup: reported vs reproduced',log:true,ref:1,fmt:x2,
-   series:[{key:'rep',label:'reported (PR author)',color:ORG,shape:'diamond'},{key:'meas',label:'reproduced ± sd (this GPU)',color:BLUE,err:'sd'}],
-   hint:`speedup = baseline ÷ PR's solution per PR (log scale, 1× = no change) · ${n} PRs reproduced, ${ok} match the reported ratio (≥0.8 of it) · red-dashed = below host floor`});
- } else if(STAB==='pct'){
-  el.innerHTML=tabs+colChart(el,rows,{title:'improvement %: reported vs reproduced',log:false,ref:0,fmt:pc,
-   series:[{key:'repPct',label:'reported %',color:ORG,shape:'diamond'},{key:'measPct',label:'reproduced %',color:BLUE}],
-   hint:`improvement = (speedup − 1) × 100, i.e. the delta relative to the baseline, so PRs with different units share one axis · negative = PR's solution slower here`});
- } else if(STAB==='baseline'){
-  const rr=rows.map(r=>({...r,bratio:(r.repBase&&r.measBase)?r.repBase/r.measBase:null}));
-  const have=rr.filter(r=>r.bratio!=null).length;
-  el.innerHTML=tabs+colChart(el,rr,{title:'baseline: reported ÷ reproduced',log:true,ref:1,fmt:x2,
-   series:[{key:'bratio',label:'author baseline ÷ our baseline',color:'#2457d8'}],
-   hint:`how much faster the author's machine ran the UNCHANGED code (1 = same speed) · only PRs whose author gave an absolute baseline (${have} of ${n}); * / + rows have none · <1 = our box is faster (rare), >1 = theirs`});
+ const BLUE='#0b8ce8', ORG='#e39b00', x2=v=>(v>=10?v.toFixed(0):v>=1?v.toFixed(1):v.toFixed(2))+'×', pc=v=>(v>=0?'+':'')+(v*100).toFixed(0)+'%';
+ const withRep=rows.filter(r=>r.gapRatio!=null), n=rows.length;
+ if(STAB==='gapratio'){
+  el.innerHTML=tabs+barChart(el,rows,{title:'gap ratio: reproduced gap ÷ reported gap',log:true,ref:1,fmt:x2,series:[{key:'gapRatio',label:'reproduced ÷ reported gap',color:BLUE}],
+   hint:`gap = PR's solution − baseline, taken relative to its own baseline so units cancel · 1 = we reproduce exactly the author's gap, 0.5 = half of it, >1 = more · ${withRep.length} of ${n} PRs have a reported number · red-dashed = below host floor`});
+ } else if(STAB==='gaps'){
+  el.innerHTML=tabs+barChart(el,rows,{title:'gaps: reported vs reproduced',log:false,ref:0,fmt:pc,series:[{key:'repGap',label:'reported gap',color:ORG},{key:'measGap',label:'reproduced gap',color:BLUE}],
+   hint:`gap relative to baseline: (baseline − PR's solution) ÷ baseline (throughput: (PR's solution − baseline) ÷ baseline) · +30% = PR's solution 30% faster · negative = slower here`});
  } else {
-  // per field: median + range of reproduced ÷ reported
   const F={}; rows.forEach(r=>{(F[r.field]=F[r.field]||[]).push(r);});
-  const fr=Object.entries(F).map(([f,rs])=>{const q=rs.filter(r=>r.rep>0).map(r=>r.meas/r.rep).sort((a,b)=>a-b); const med=q.length?q[Math.floor(q.length/2)]:null;
-    return {pr:f,head:`${rs.length} PR(s)`,rel:'ok',verdict:'',med,lo:q[0],hi:q[q.length-1],err:(med!=null&&q.length>1)?Math.max(med-q[0],q[q.length-1]-med):0};}).sort((a,b)=>b.head.localeCompare(a.head));
-  let h=colChart(el,fr,{title:'per field: reproduced ÷ reported',log:true,ref:1,fmt:x2,xl:74,series:[{key:'med',label:'median (bar = min–max)',color:BLUE,err:'err'}],
-   hint:`1 = exactly the author's gain, <1 = we see less · grouped by field`});
-  el.innerHTML=tabs+h.replace(/#([a-z_]+)<\/text>/g,'$1</text>');
+  const fr=Object.entries(F).map(([f,rs])=>{const g=medRange(rs.map(r=>r.gapRatio)), rg=medRange(rs.map(r=>r.repGap)), mg=medRange(rs.map(r=>r.measGap));
+    return {pr:f,label:f,head:`${rs.length} PR(s)`,rel:'ok',gapRatio:g.med,gapErr:g.med!=null&&g.n>1?Math.max(g.med-g.lo,g.hi-g.med):0,repGap:rg.med,measGap:mg.med,extra:`gap ratio range ${g.lo!=null?g.lo.toFixed(2):'—'}–${g.hi!=null?g.hi.toFixed(2):'—'} (n=${g.n})`};}).sort((a,b)=>a.label.localeCompare(b.label));
+  if(STAB==='fgapratio') el.innerHTML=tabs+barChart(el,fr,{title:'gap ratio per field (median, whisker = min–max)',log:true,ref:1,fmt:x2,xl:74,series:[{key:'gapRatio',label:'median reproduced ÷ reported gap',color:BLUE,err:'gapErr'}],hint:`1 = exactly the author's gap · grouped by field`});
+  else el.innerHTML=tabs+barChart(el,fr,{title:'gaps per field (median)',log:false,ref:0,fmt:pc,xl:74,series:[{key:'repGap',label:'reported gap',color:ORG},{key:'measGap',label:'reproduced gap',color:BLUE}],hint:`median relative gap per field · reported vs reproduced`});
  }
 }
 

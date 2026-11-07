@@ -67,6 +67,7 @@ Image pins: torch_fix=`torch==2.7.0 --index-url https://download.pytorch.org/whl
 
 ## Machine requirements
 
-- not recorded in index.json for this PR
+- GPU: yes ×1 ≥8 GB VRAM, compute capability ≥7.0; RAM 8 GB; disk 30 GB
+- software: docker=True nvidia-container-runtime=True vllm_wheel=0.9.2 pipeline=wheel models=[] datasets=[] hf_token=False needs_server=False
 
 Oracle note: perf-only causal tile skipping; no test in the diff. Wheel 0.9.2 pins torch 2.7.0 cu126 (no sm_120) -> torch_fix set by hand to the cu128 build of the same torch 2.7.0 (triton 3.3.0; first sm_120 run of this wheel is unverified).
