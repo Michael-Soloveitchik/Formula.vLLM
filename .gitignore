@@ -19,3 +19,4 @@ vllm/
 # aggregate dir: only all.json + manifest.json are tracked
 results/.lock
 results/.tmp-*
+workloads.json.local-backup

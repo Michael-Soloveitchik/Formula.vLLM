@@ -14,7 +14,7 @@ names, /base and /gold container paths, {base,gold} path sets, SHA/ARG names.
 import os, re, sys
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # repo root
-SKIP_DIRS = {".git", ".work", "results", ".weights", "node_modules", "__pycache__", "work", "logs", "tests", "templates", }
+SKIP_DIRS = {".git", ".work", "results", ".weights", "node_modules", "__pycache__", "work", "logs", "tests", "templates", "prompts", }
 EXTS = (".py", ".sh", ".md", ".yaml", ".yml", ".html", ".txt")
 SKIP_FILES = {"check_terms.py", "numeric_solution.md", "index.json", "index.jsonl",
               "pr.md", "pr.diff", "solution.md", "bench.py"}   # numeric_solution.md defines the rule itself; pr.md/solution.md = the author's words

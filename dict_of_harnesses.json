@@ -1,5 +1,5 @@
 {
- "_doc": "Single source of truth for solver harnesses. run_one.sh reads this via conf.py (conf.py falls back to config.yaml:solvers only if this file is absent). Each entry: key = the arm name shown in the dashboard (MUST match web/index.html HARNESSES). guided=false -> objective has the '## Expert solution' section STRIPPED (blind FormulaCode: discover the optimization). guided=true -> full problem.md incl. the expert's merged patch, asked to beat it. The runner invokes:  <cmd> \"<objective>\"  inside a copy of the base_sha tree; the command edits ./vllm and exits. NOTE: claude's --allowedTools is variadic, so `-p` must be the LAST token of cmd: the runner appends \"<objective>\" and it becomes -p's argument.",
+ "_doc": "Single source of truth for solver harnesses. run_one.sh reads this via conf.py (conf.py falls back to config.yaml:solvers only if this file is absent). Each entry: key = the arm name shown in the dashboard (MUST match web/index.html HARNESSES). guided=false -> objective has the '## PR's solution' section STRIPPED (blind FormulaCode: discover the optimization). guided=true -> full problem.md incl. the author's merged patch, asked to beat it. compile='cpu' -> the arm must leave its edit under data/pr_<n>/files/<arm>/ (a vllm/ tree overlay) and that overlay must compile + run on the CPU mirror image (templates/Dockerfile.cpu-wheel); pipeline/apply_ai_solutions.py applies it and re-measures with the SAME instrument (bench.py + parse_workload.py). The runner invokes:  <cmd> \"<objective>\"  inside a copy of the base_sha tree; the command edits ./vllm and exits. NOTE: claude's --allowedTools is variadic, so `-p` must be the LAST token of cmd: the runner appends \"<objective>\" and it becomes -p's argument.",
  "harnesses": [
   {
    "key": "claude",
@@ -34,6 +34,50 @@
    "model": "gpt-6.1-sol",
    "cmd": "codex exec --skip-git-repo-check",
    "guided": true,
+   "enabled": false,
+   "env": [
+    "LITELLM_API_KEY",
+    "LITELLM_KEY"
+   ],
+   "_note": "codex CLI not installed on this GPU box"
+  },
+  {
+   "key": "claude + cpu-compilation",
+   "model": "claude-fable-5-1",
+   "cmd": "claude --model claude-fable-5-1 --permission-mode acceptEdits --allowedTools \"Read,Edit,Write,Glob,Grep,Bash(python3:*),Bash(python:*)\" -p",
+   "guided": false,
+   "compile": "cpu",
+   "enabled": true,
+   "env": []
+  },
+  {
+   "key": "claude + PR's solution + cpu-compilation",
+   "model": "claude-fable-5-1",
+   "cmd": "claude --model claude-fable-5-1 --permission-mode acceptEdits --allowedTools \"Read,Edit,Write,Glob,Grep,Bash(python3:*),Bash(python:*)\" -p",
+   "guided": true,
+   "compile": "cpu",
+   "enabled": true,
+   "env": []
+  },
+  {
+   "key": "codex + cpu-compilation",
+   "model": "gpt-6.1-sol",
+   "cmd": "codex exec --skip-git-repo-check",
+   "guided": false,
+   "compile": "cpu",
+   "enabled": false,
+   "env": [
+    "LITELLM_API_KEY",
+    "LITELLM_KEY"
+   ],
+   "_note": "codex CLI not installed on this GPU box"
+  },
+  {
+   "key": "codex + PR's solution + cpu-compilation",
+   "model": "gpt-6.1-sol",
+   "cmd": "codex exec --skip-git-repo-check",
+   "guided": true,
+   "compile": "cpu",
    "enabled": false,
    "env": [
     "LITELLM_API_KEY",

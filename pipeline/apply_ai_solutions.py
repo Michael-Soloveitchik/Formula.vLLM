@@ -15,11 +15,11 @@ For each requested PR and arm this script:
   1. builds the PR's CPU image (templates/Dockerfile.cpu-wheel copy) if absent,
   2. exports /base and /gold trees from the image (cached in data/pr_<n>/work),
   3. makes the arm tree  = base_full + files/<arm>/ overlay,
-  4. runs data/pr_<n>/bench.py on the arm tree and the gold tree, ABBA-interleaved,
+  4. runs data/pr_<n>/bench.py on the arm tree and the PR's-solution tree, ABBA-interleaved,
      REPEATS times, writing wl_<arm>_<i>.log / wl_gold_<i>.log — the identical log
      names pipeline/parse_workload.py already parses,
   5. folds the logs with parse_workload.py (SAME instrument as record.py) and
-     writes data/pr_<n>/results.ai.<arm>.json  { scenario: {gold, <arm>, ratio} }.
+     writes data/pr_<n>/results.ai.<arm>.json  { scenario: {"gold", "<arm>", ratio} }.
 
 CPU-only, no GPU, no vllm wheel: the arm's vllm/ tree runs on PYTHONPATH (the CPU
 image mirrors the GPU one). The absolute speed is not the GPU number; this proves
@@ -143,7 +143,7 @@ def apply_one(pr, arm):
         if f.startswith((f"wl_{arm}_", "wl_gold_")) and f.endswith(".log"):
             os.remove(os.path.join(work, f))
 
-    # ABBA: arm, gold, gold, arm, ... (same interleave as run_one.sh run_workloads_abba)
+    # ABBA interleave (arm, PR, PR, arm, ...) — same as run_one.sh run_workloads_abba
     for i in range(1, REPEATS + 1):
         order = (arm, "gold") if i % 2 else ("gold", arm)
         for a in order:
@@ -174,7 +174,7 @@ def apply_one(pr, arm):
     print(f"  -> {layout.rel(out_path)}")
     for name, e in res["scenarios"].items():
         r = e.get("ratio_arm_over_gold")
-        print(f"     {name} ({e['unit']}): arm={_m(e.get(arm))} gold={_m(e.get('gold'))}"
+        print(f"     {name} ({e['unit']}): arm={_m(e.get(arm))} PR={_m(e.get('gold'))}"
               + (f"  ratio arm/PR={r}x" if r else ""))
     return out_path
 
