@@ -1,0 +1,276 @@
+{
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "build_pooling_cursor_n128",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 35.8028,
+     "sd": 14.892,
+     "n": 5
+    },
+    "gold": {
+     "mean": 20.9084,
+     "sd": 9.8465,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 35.8028,
+     "pr_solution": 20.9084,
+     "ratio_sd": 1.075919,
+     "baseline_sd": 14.892,
+     "pr_solution_sd": 9.8465,
+     "ratio": 1.712364,
+     "pct": 71.24
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "below_host_floor",
+     "note": "baseline 35.8028 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+    }
+   }
+  },
+  {
+   "name": "build_pooling_cursor_n16",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 33.252,
+     "sd": 9.892,
+     "n": 5
+    },
+    "gold": {
+     "mean": 21.4128,
+     "sd": 10.1401,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 33.252,
+     "pr_solution": 21.4128,
+     "ratio_sd": 0.868447,
+     "baseline_sd": 9.892,
+     "pr_solution_sd": 10.1401,
+     "ratio": 1.552903,
+     "pct": 55.29
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "below_host_floor",
+     "note": "baseline 33.252 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+    }
+   }
+  }
+ ],
+ "pr": 37347,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/37347",
+ "title": "[Perf] Optimize token_embed for pooling models, 1.0% token throughput improvement (#37347)",
+ "field": "scheduling",
+ "reported_gain": "1%",
+ "gain_kind": "pct",
+ "base_sha": "6accb21f2a9aa2411a2eb23f96ac90828554f3f4",
+ "merge_sha": "e37ff5b5c8c1ca692f4a83df3ba4c564a4bf1df6",
+ "hw_slug": "rtx5070ti",
+ "hw_override": null,
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.18.0",
+  "workload_cmd": "python3 /task/bench.py",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "SKIP",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "SKIP",
+   "slug": "gold"
+  }
+ },
+ "improved": false,
+ "latency": {
+  "scenarios": {
+   "build_pooling_cursor_n128": {
+    "unit": "us",
+    "base": {
+     "mean": 35.8028,
+     "sd": 14.892,
+     "n": 5
+    },
+    "gold": {
+     "mean": 20.9084,
+     "sd": 9.8465,
+     "n": 5
+    }
+   },
+   "build_pooling_cursor_n16": {
+    "unit": "us",
+    "base": {
+     "mean": 33.252,
+     "sd": 9.892,
+     "n": 5
+    },
+    "gold": {
+     "mean": 21.4128,
+     "sd": 10.1401,
+     "n": 5
+    }
+   }
+  },
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {
+   "workload_runs": 5
+  },
+  "gold": {
+   "workload_runs": 5
+  }
+ },
+ "ts": "2026-11-08T00:42:36Z",
+ "machine": {
+  "ts": "2026-11-08T00:41:12Z",
+  "host": {
+   "hostname": "DESKTOP-michael",
+   "kernel": "6.18.33.2-microsoft-standard-WSL2",
+   "wsl2": true,
+   "os": "Ubuntu 24.04.3 LTS"
+  },
+  "gpu": {
+   "name": "NVIDIA GeForce RTX 5070 Ti",
+   "driver": "591.86",
+   "cuda": "13.1",
+   "sm_mhz": 180.0,
+   "sm_max_mhz": 3090.0,
+   "mem_mhz": 405.0,
+   "mem_max_mhz": 14001.0,
+   "vram_total_mib": 16303.0,
+   "vram_used_mib": 273.0,
+   "util_pct": 0.0,
+   "power_w": 30.57,
+   "power_limit_w": 300.0,
+   "temp_c": 36.0,
+   "pstate": "P8",
+   "throttle_reasons": "0x0000000000000000",
+   "processes": [
+    {
+     "pid": 2903,
+     "name": "python main.py --listen 0.0.0.0 --port 8188",
+     "mem_mib": null
+    }
+   ]
+  },
+  "cpu": {
+   "model": "Intel(R) Core(TM) i7-14700KF",
+   "nproc": 12,
+   "load1": 1.36279296875,
+   "load5": 1.189453125,
+   "load15": 1.197265625,
+   "top_cpu_procs": [
+    {
+     "pid": 1048468,
+     "pcpu": 5.5,
+     "comm": "python3"
+    }
+   ]
+  },
+  "ram": {
+   "total_gb": 94.3,
+   "free_gb": 1.2,
+   "available_gb": 88.9
+  },
+  "docker": {
+   "version": "Docker version 29.8.1, build 4a63305",
+   "engine": "docker"
+  }
+ },
+ "summary": {
+  "experiments": 2,
+  "measured": 2,
+  "headline": "build_pooling_cursor_n128",
+  "headline_derived": {
+   "unit": "us",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": null,
+    "pr_solution": null,
+    "how": null,
+    "marker": "",
+    "raw": "no number in the PR",
+    "note": "",
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced": {
+    "baseline": 35.8028,
+    "pr_solution": 20.9084,
+    "ratio_sd": 1.075919,
+    "baseline_sd": 14.892,
+    "pr_solution_sd": 9.8465,
+    "ratio": 1.712364,
+    "pct": 71.24
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number"
+   },
+   "reliability": {
+    "flag": "below_host_floor",
+    "note": "baseline 35.8028 us < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+   }
+  },
+  "reproduced_ratio_median": 1.6326,
+  "reproduced_ratio_max": 1.7124,
+  "reported_ratio_median": null,
+  "verdict": "no_reported_number",
+  "tests": {
+   "base": "SKIP",
+   "gold": "SKIP"
+  }
+ }
+}

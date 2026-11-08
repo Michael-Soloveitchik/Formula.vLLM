@@ -1,0 +1,346 @@
+{
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "prefill_attn_s2000",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {},
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "prefill_attn_s8000",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {},
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "prefill_attn_s16000",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {},
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "serving_mean_ttft",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": 3874.12,
+    "patch": 3588.36
+   },
+   "arms": {},
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 3874.12,
+     "pr_solution": 3588.36,
+     "how": "absolute",
+     "marker": "",
+     "raw": "3874.12 -> 3588.36 us",
+     "note": "author gave absolute numbers",
+     "ratio": 1.079635,
+     "pct": 7.96
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "serving_request_throughput",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": 44.37,
+    "patch": 45.9
+   },
+   "arms": {},
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 44.37,
+     "pr_solution": 45.9,
+     "how": "absolute",
+     "marker": "",
+     "raw": "44.37 -> 45.9 us",
+     "note": "author gave absolute numbers",
+     "ratio": 0.966667,
+     "pct": -3.33
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  }
+ ],
+ "pr": 20308,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/20308",
+ "title": "[Kernel] Optimize Prefill Attention in Unified Triton Attention Kernel (#20308)",
+ "field": "gpu_kernels",
+ "reported_gain": "3%, 5%",
+ "gain_kind": "pct",
+ "base_sha": "a6d795d593046abd490b16349bcd9b40feedd334",
+ "merge_sha": "22dd9c2730dc1124b9d0ac15fff223d0b8d9020b",
+ "hw_slug": "rtx5070ti",
+ "hw_override": null,
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.9.2",
+  "workload_cmd": "python3 /task/bench.py",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "SKIP",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "SKIP",
+   "slug": "gold"
+  }
+ },
+ "improved": false,
+ "latency": {
+  "scenarios": {},
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {},
+  "gold": {}
+ },
+ "ts": "2026-11-07T23:46:14Z",
+ "machine": {
+  "ts": "2026-11-07T23:45:59Z",
+  "host": {
+   "hostname": "DESKTOP-michael",
+   "kernel": "6.18.33.2-microsoft-standard-WSL2",
+   "wsl2": true,
+   "os": "Ubuntu 24.04.3 LTS"
+  },
+  "gpu": {
+   "name": "NVIDIA GeForce RTX 5070 Ti",
+   "driver": "591.86",
+   "cuda": "13.1",
+   "sm_mhz": 180.0,
+   "sm_max_mhz": 3090.0,
+   "mem_mhz": 405.0,
+   "mem_max_mhz": 14001.0,
+   "vram_total_mib": 16303.0,
+   "vram_used_mib": 273.0,
+   "util_pct": 0.0,
+   "power_w": 30.46,
+   "power_limit_w": 300.0,
+   "temp_c": 35.0,
+   "pstate": "P8",
+   "throttle_reasons": "0x0000000000000000",
+   "processes": [
+    {
+     "pid": 2903,
+     "name": "python main.py --listen 0.0.0.0 --port 8188",
+     "mem_mib": null
+    }
+   ]
+  },
+  "cpu": {
+   "model": "Intel(R) Core(TM) i7-14700KF",
+   "nproc": 12,
+   "load1": 2.26513671875,
+   "load5": 1.58935546875,
+   "load15": 1.3701171875,
+   "top_cpu_procs": [
+    {
+     "pid": 997422,
+     "pcpu": 5.8,
+     "comm": "python3"
+    }
+   ]
+  },
+  "ram": {
+   "total_gb": 94.3,
+   "free_gb": 0.7,
+   "available_gb": 89.0
+  },
+  "docker": {
+   "version": "Docker version 29.8.1, build 4a63305",
+   "engine": "docker"
+  }
+ },
+ "summary": {
+  "experiments": 5,
+  "measured": 0,
+  "headline": "prefill_attn_s2000",
+  "headline_derived": {
+   "unit": "us",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": null,
+    "pr_solution": null,
+    "how": null,
+    "marker": "",
+    "raw": "no number in the PR",
+    "note": "",
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced": {
+    "baseline": null,
+    "pr_solution": null,
+    "ratio_sd": null,
+    "baseline_sd": null,
+    "pr_solution_sd": null,
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "unknown"
+   },
+   "reliability": {
+    "flag": "ok",
+    "note": ""
+   }
+  },
+  "reproduced_ratio_median": null,
+  "reproduced_ratio_max": null,
+  "reported_ratio_median": 1.0232,
+  "verdict": "unknown",
+  "tests": {
+   "base": "SKIP",
+   "gold": "SKIP"
+  }
+ }
+}

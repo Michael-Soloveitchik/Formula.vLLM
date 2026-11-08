@@ -1,0 +1,488 @@
+{
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "mla_decode_b1_kv8192",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 153.4586,
+     "sd": 0.9508,
+     "n": 5
+    },
+    "gold": {
+     "mean": 115.078,
+     "sd": 17.7699,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 153.4586,
+     "pr_solution": 115.078,
+     "ratio_sd": 0.206082,
+     "baseline_sd": 0.9508,
+     "pr_solution_sd": 17.7699,
+     "ratio": 1.333518,
+     "pct": 33.35
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "mla_decode_b1_kv32768",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 567.885,
+     "sd": 0.4828,
+     "n": 5
+    },
+    "gold": {
+     "mean": 123.6444,
+     "sd": 26.9494,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 567.885,
+     "pr_solution": 123.6444,
+     "ratio_sd": 1.001069,
+     "baseline_sd": 0.4828,
+     "pr_solution_sd": 26.9494,
+     "ratio": 4.592889,
+     "pct": 359.29
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "mla_decode_b1_kv81920",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 1563.3138,
+     "sd": 3.7437,
+     "n": 5
+    },
+    "gold": {
+     "mean": 200.8914,
+     "sd": 1.56,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 1563.3138,
+     "pr_solution": 200.8914,
+     "ratio_sd": 0.063238,
+     "baseline_sd": 3.7437,
+     "pr_solution_sd": 1.56,
+     "ratio": 7.781885,
+     "pct": 678.19
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "mla_decode_b8_kv8192",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 176.195,
+     "sd": 2.8324,
+     "n": 5
+    },
+    "gold": {
+     "mean": 137.5862,
+     "sd": 1.4825,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 176.195,
+     "pr_solution": 137.5862,
+     "ratio_sd": 0.024783,
+     "baseline_sd": 2.8324,
+     "pr_solution_sd": 1.4825,
+     "ratio": 1.280615,
+     "pct": 28.06
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "peak_throughput_1req_80k",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": 34.0,
+    "patch": 52.0
+   },
+   "arms": {},
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 34.0,
+     "pr_solution": 52.0,
+     "how": "absolute",
+     "marker": "",
+     "raw": "34.0 -> 52.0 us",
+     "note": "author gave absolute numbers",
+     "ratio": 0.653846,
+     "pct": -34.62
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "peak_throughput_8req_80k",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": 176.0,
+    "patch": 184.0
+   },
+   "arms": {},
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 176.0,
+     "pr_solution": 184.0,
+     "how": "absolute",
+     "marker": "",
+     "raw": "176.0 -> 184.0 us",
+     "note": "author gave absolute numbers",
+     "ratio": 0.956522,
+     "pct": -4.35
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  }
+ ],
+ "pr": 33529,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/33529",
+ "title": "Triton MLA perf fixes (#33529)",
+ "field": "attention",
+ "reported_gain": "1.05x, 4.36x",
+ "gain_kind": "pct",
+ "base_sha": "16a65e41736c5e8d27e9e843668f6e3f99d68d9a",
+ "merge_sha": "d9408ffba3c8da5e289b5695d507707afce10a2f",
+ "hw_slug": "rtx5070ti",
+ "hw_override": null,
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.19.0",
+  "workload_cmd": "python3 /task/bench.py",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "SKIP",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "SKIP",
+   "slug": "gold"
+  }
+ },
+ "improved": false,
+ "latency": {
+  "scenarios": {
+   "mla_decode_b1_kv32768": {
+    "unit": "us",
+    "base": {
+     "mean": 567.885,
+     "sd": 0.4828,
+     "n": 5
+    },
+    "gold": {
+     "mean": 123.6444,
+     "sd": 26.9494,
+     "n": 5
+    }
+   },
+   "mla_decode_b1_kv8192": {
+    "unit": "us",
+    "base": {
+     "mean": 153.4586,
+     "sd": 0.9508,
+     "n": 5
+    },
+    "gold": {
+     "mean": 115.078,
+     "sd": 17.7699,
+     "n": 5
+    }
+   },
+   "mla_decode_b1_kv81920": {
+    "unit": "us",
+    "base": {
+     "mean": 1563.3138,
+     "sd": 3.7437,
+     "n": 5
+    },
+    "gold": {
+     "mean": 200.8914,
+     "sd": 1.56,
+     "n": 5
+    }
+   },
+   "mla_decode_b8_kv8192": {
+    "unit": "us",
+    "base": {
+     "mean": 176.195,
+     "sd": 2.8324,
+     "n": 5
+    },
+    "gold": {
+     "mean": 137.5862,
+     "sd": 1.4825,
+     "n": 5
+    }
+   }
+  },
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {
+   "workload_runs": 5
+  },
+  "gold": {
+   "workload_runs": 5
+  }
+ },
+ "ts": "2026-11-08T00:24:27Z",
+ "machine": {
+  "ts": "2026-11-08T00:22:43Z",
+  "host": {
+   "hostname": "DESKTOP-michael",
+   "kernel": "6.18.33.2-microsoft-standard-WSL2",
+   "wsl2": true,
+   "os": "Ubuntu 24.04.3 LTS"
+  },
+  "gpu": {
+   "name": "NVIDIA GeForce RTX 5070 Ti",
+   "driver": "591.86",
+   "cuda": "13.1",
+   "sm_mhz": 180.0,
+   "sm_max_mhz": 3090.0,
+   "mem_mhz": 405.0,
+   "mem_max_mhz": 14001.0,
+   "vram_total_mib": 16303.0,
+   "vram_used_mib": 275.0,
+   "util_pct": 0.0,
+   "power_w": 30.62,
+   "power_limit_w": 300.0,
+   "temp_c": 36.0,
+   "pstate": "P8",
+   "throttle_reasons": "0x0000000000000000",
+   "processes": [
+    {
+     "pid": 2903,
+     "name": "python main.py --listen 0.0.0.0 --port 8188",
+     "mem_mib": null
+    }
+   ]
+  },
+  "cpu": {
+   "model": "Intel(R) Core(TM) i7-14700KF",
+   "nproc": 12,
+   "load1": 1.640625,
+   "load5": 1.30126953125,
+   "load15": 1.341796875,
+   "top_cpu_procs": [
+    {
+     "pid": 1034097,
+     "pcpu": 5.8,
+     "comm": "python3"
+    }
+   ]
+  },
+  "ram": {
+   "total_gb": 94.3,
+   "free_gb": 4.6,
+   "available_gb": 88.2
+  },
+  "docker": {
+   "version": "Docker version 29.8.1, build 4a63305",
+   "engine": "docker"
+  }
+ },
+ "summary": {
+  "experiments": 6,
+  "measured": 4,
+  "headline": "mla_decode_b1_kv8192",
+  "headline_derived": {
+   "unit": "us",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": null,
+    "pr_solution": null,
+    "how": null,
+    "marker": "",
+    "raw": "no number in the PR",
+    "note": "",
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced": {
+    "baseline": 153.4586,
+    "pr_solution": 115.078,
+    "ratio_sd": 0.206082,
+    "baseline_sd": 0.9508,
+    "pr_solution_sd": 17.7699,
+    "ratio": 1.333518,
+    "pct": 33.35
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number"
+   },
+   "reliability": {
+    "flag": "ok",
+    "note": ""
+   }
+  },
+  "reproduced_ratio_median": 2.9632,
+  "reproduced_ratio_max": 7.7819,
+  "reported_ratio_median": 0.8052,
+  "verdict": "no_reported_number",
+  "tests": {
+   "base": "SKIP",
+   "gold": "SKIP"
+  }
+ }
+}

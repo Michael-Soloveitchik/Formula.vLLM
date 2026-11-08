@@ -1,0 +1,471 @@
+{
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "fused_moe_e64_top6_m1",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 217.542,
+     "sd": 44.1359,
+     "n": 5
+    },
+    "gold": {
+     "mean": 196.287,
+     "sd": 48.7295,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 217.542,
+     "pr_solution": 196.287,
+     "ratio_sd": 0.355332,
+     "baseline_sd": 44.1359,
+     "pr_solution_sd": 48.7295,
+     "ratio": 1.108285,
+     "pct": 10.83
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "fused_moe_e64_top6_m16",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 1057.748,
+     "sd": 7.5805,
+     "n": 5
+    },
+    "gold": {
+     "mean": 1057.9336,
+     "sd": 4.3904,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 1057.748,
+     "pr_solution": 1057.9336,
+     "ratio_sd": 0.00828,
+     "baseline_sd": 7.5805,
+     "pr_solution_sd": 4.3904,
+     "ratio": 0.999825,
+     "pct": -0.02
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "regression"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "fused_moe_e64_top6_m128",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 1906.36,
+     "sd": 1.2392,
+     "n": 5
+    },
+    "gold": {
+     "mean": 1392.775,
+     "sd": 2.4485,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 1906.36,
+     "pr_solution": 1392.775,
+     "ratio_sd": 0.002565,
+     "baseline_sd": 1.2392,
+     "pr_solution_sd": 2.4485,
+     "ratio": 1.368749,
+     "pct": 36.87
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "fused_moe_e64_top6_m1024",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 2111.125,
+     "sd": 5.037,
+     "n": 5
+    },
+    "gold": {
+     "mean": 1751.4936,
+     "sd": 8.8129,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 2111.125,
+     "pr_solution": 1751.4936,
+     "ratio_sd": 0.006712,
+     "baseline_sd": 5.037,
+     "pr_solution_sd": 8.8129,
+     "ratio": 1.205328,
+     "pct": 20.53
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "fused_moe_e64_top6_m4096",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 5581.464,
+     "sd": 11.862,
+     "n": 5
+    },
+    "gold": {
+     "mean": 6021.9554,
+     "sd": 8.5633,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 5581.464,
+     "pr_solution": 6021.9554,
+     "ratio_sd": 0.00237,
+     "baseline_sd": 11.862,
+     "pr_solution_sd": 8.5633,
+     "ratio": 0.926852,
+     "pct": -7.31
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "regression"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  }
+ ],
+ "pr": 34846,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/34846",
+ "title": "[Perf] Improve default triton fused moe configs (#34846)",
+ "field": "quantization",
+ "reported_gain": "up to 2x at large batch for many-expert MoE (H100)",
+ "gain_kind": "unit",
+ "base_sha": "596ed1f02ef2a068e459a019d7d3f54593cc7e9e",
+ "merge_sha": "22a97e66134a26c74b9dae73d9446c4e32718269",
+ "hw_slug": "rtx5070ti",
+ "hw_override": null,
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.16.0",
+  "workload_cmd": "python3 /task/bench.py",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "SKIP",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "SKIP",
+   "slug": "gold"
+  }
+ },
+ "improved": false,
+ "latency": {
+  "scenarios": {
+   "fused_moe_e64_top6_m1": {
+    "unit": "us",
+    "base": {
+     "mean": 217.542,
+     "sd": 44.1359,
+     "n": 5
+    },
+    "gold": {
+     "mean": 196.287,
+     "sd": 48.7295,
+     "n": 5
+    }
+   },
+   "fused_moe_e64_top6_m1024": {
+    "unit": "us",
+    "base": {
+     "mean": 2111.125,
+     "sd": 5.037,
+     "n": 5
+    },
+    "gold": {
+     "mean": 1751.4936,
+     "sd": 8.8129,
+     "n": 5
+    }
+   },
+   "fused_moe_e64_top6_m128": {
+    "unit": "us",
+    "base": {
+     "mean": 1906.36,
+     "sd": 1.2392,
+     "n": 5
+    },
+    "gold": {
+     "mean": 1392.775,
+     "sd": 2.4485,
+     "n": 5
+    }
+   },
+   "fused_moe_e64_top6_m16": {
+    "unit": "us",
+    "base": {
+     "mean": 1057.748,
+     "sd": 7.5805,
+     "n": 5
+    },
+    "gold": {
+     "mean": 1057.9336,
+     "sd": 4.3904,
+     "n": 5
+    }
+   },
+   "fused_moe_e64_top6_m4096": {
+    "unit": "us",
+    "base": {
+     "mean": 5581.464,
+     "sd": 11.862,
+     "n": 5
+    },
+    "gold": {
+     "mean": 6021.9554,
+     "sd": 8.5633,
+     "n": 5
+    }
+   }
+  },
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {
+   "workload_runs": 5
+  },
+  "gold": {
+   "workload_runs": 5
+  }
+ },
+ "ts": "2026-11-08T00:34:03Z",
+ "machine": {
+  "ts": "2026-11-08T00:32:09Z",
+  "host": {
+   "hostname": "DESKTOP-michael",
+   "kernel": "6.18.33.2-microsoft-standard-WSL2",
+   "wsl2": true,
+   "os": "Ubuntu 24.04.3 LTS"
+  },
+  "gpu": {
+   "name": "NVIDIA GeForce RTX 5070 Ti",
+   "driver": "591.86",
+   "cuda": "13.1",
+   "sm_mhz": 180.0,
+   "sm_max_mhz": 3090.0,
+   "mem_mhz": 405.0,
+   "mem_max_mhz": 14001.0,
+   "vram_total_mib": 16303.0,
+   "vram_used_mib": 273.0,
+   "util_pct": 0.0,
+   "power_w": 30.72,
+   "power_limit_w": 300.0,
+   "temp_c": 36.0,
+   "pstate": "P8",
+   "throttle_reasons": "0x0000000000000000",
+   "processes": [
+    {
+     "pid": 2903,
+     "name": "python main.py --listen 0.0.0.0 --port 8188",
+     "mem_mib": null
+    }
+   ]
+  },
+  "cpu": {
+   "model": "Intel(R) Core(TM) i7-14700KF",
+   "nproc": 12,
+   "load1": 1.841796875,
+   "load5": 1.31640625,
+   "load15": 1.26953125,
+   "top_cpu_procs": [
+    {
+     "pid": 1040768,
+     "pcpu": 6.2,
+     "comm": "python3"
+    }
+   ]
+  },
+  "ram": {
+   "total_gb": 94.3,
+   "free_gb": 1.3,
+   "available_gb": 89.0
+  },
+  "docker": {
+   "version": "Docker version 29.8.1, build 4a63305",
+   "engine": "docker"
+  }
+ },
+ "summary": {
+  "experiments": 5,
+  "measured": 5,
+  "headline": "fused_moe_e64_top6_m1",
+  "headline_derived": {
+   "unit": "us",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": null,
+    "pr_solution": null,
+    "how": null,
+    "marker": "",
+    "raw": "no number in the PR",
+    "note": "",
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced": {
+    "baseline": 217.542,
+    "pr_solution": 196.287,
+    "ratio_sd": 0.355332,
+    "baseline_sd": 44.1359,
+    "pr_solution_sd": 48.7295,
+    "ratio": 1.108285,
+    "pct": 10.83
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number"
+   },
+   "reliability": {
+    "flag": "ok",
+    "note": ""
+   }
+  },
+  "reproduced_ratio_median": 1.1083,
+  "reproduced_ratio_max": 1.3687,
+  "reported_ratio_median": null,
+  "verdict": "no_reported_number",
+  "tests": {
+   "base": "SKIP",
+   "gold": "SKIP"
+  }
+ }
+}

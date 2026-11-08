@@ -1,0 +1,205 @@
+{
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "sampler_latency",
+   "unit": "ms",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 6.9664,
+     "sd": 0.165,
+     "n": 5
+    },
+    "gold": {
+     "mean": 3.0255,
+     "sd": 0.0296,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "ms",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 6.9664,
+     "pr_solution": 3.0255,
+     "ratio_sd": 0.059006,
+     "baseline_sd": 0.165,
+     "pr_solution_sd": 0.0296,
+     "ratio": 2.302562,
+     "pct": 130.26
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "no_reported_number"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  }
+ ],
+ "pr": 6442,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/6442",
+ "title": "[Core] Use numpy to speed up padded token processing (#6442)",
+ "field": "scheduling",
+ "reported_gain": "50%",
+ "gain_kind": "pct",
+ "base_sha": "7508a3dc34c2b7a5c5c971b13f15208d7dade442",
+ "merge_sha": "2bb0489cb3367e46e201e84ab629df535544495b",
+ "hw_slug": "rtx5070ti",
+ "hw_override": null,
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.5.3",
+  "workload_cmd": "python3 /task/bench.py",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "SKIP",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "SKIP",
+   "slug": "gold"
+  }
+ },
+ "improved": false,
+ "latency": {
+  "scenarios": {
+   "sampler_latency": {
+    "unit": "ms",
+    "base": {
+     "mean": 6.9664,
+     "sd": 0.165,
+     "n": 5
+    },
+    "gold": {
+     "mean": 3.0255,
+     "sd": 0.0296,
+     "n": 5
+    }
+   }
+  },
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {
+   "workload_runs": 5
+  },
+  "gold": {
+   "workload_runs": 5
+  }
+ },
+ "ts": "2026-11-08T00:49:53Z",
+ "machine": {
+  "ts": "2026-11-08T00:49:03Z",
+  "host": {
+   "hostname": "DESKTOP-michael",
+   "kernel": "6.18.33.2-microsoft-standard-WSL2",
+   "wsl2": true,
+   "os": "Ubuntu 24.04.3 LTS"
+  },
+  "gpu": {
+   "name": "NVIDIA GeForce RTX 5070 Ti",
+   "driver": "591.86",
+   "cuda": "13.1",
+   "sm_mhz": 180.0,
+   "sm_max_mhz": 3090.0,
+   "mem_mhz": 405.0,
+   "mem_max_mhz": 14001.0,
+   "vram_total_mib": 16303.0,
+   "vram_used_mib": 273.0,
+   "util_pct": 0.0,
+   "power_w": 30.57,
+   "power_limit_w": 300.0,
+   "temp_c": 36.0,
+   "pstate": "P8",
+   "throttle_reasons": "0x0000000000000000",
+   "processes": [
+    {
+     "pid": 2903,
+     "name": "python main.py --listen 0.0.0.0 --port 8188",
+     "mem_mib": null
+    }
+   ]
+  },
+  "cpu": {
+   "model": "Intel(R) Core(TM) i7-14700KF",
+   "nproc": 12,
+   "load1": 1.59814453125,
+   "load5": 1.15771484375,
+   "load15": 1.14697265625,
+   "top_cpu_procs": []
+  },
+  "ram": {
+   "total_gb": 94.3,
+   "free_gb": 1.2,
+   "available_gb": 88.2
+  },
+  "docker": {
+   "version": "Docker version 29.8.1, build 4a63305",
+   "engine": "docker"
+  }
+ },
+ "summary": {
+  "experiments": 1,
+  "measured": 1,
+  "headline": "sampler_latency",
+  "headline_derived": {
+   "unit": "ms",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": null,
+    "pr_solution": null,
+    "how": null,
+    "marker": "",
+    "raw": "no number in the PR",
+    "note": "",
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced": {
+    "baseline": 6.9664,
+    "pr_solution": 3.0255,
+    "ratio_sd": 0.059006,
+    "baseline_sd": 0.165,
+    "pr_solution_sd": 0.0296,
+    "ratio": 2.302562,
+    "pct": 130.26
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number"
+   },
+   "reliability": {
+    "flag": "ok",
+    "note": ""
+   }
+  },
+  "reproduced_ratio_median": 2.3026,
+  "reproduced_ratio_max": 2.3026,
+  "reported_ratio_median": null,
+  "verdict": "no_reported_number",
+  "tests": {
+   "base": "SKIP",
+   "gold": "SKIP"
+  }
+ }
+}

@@ -1,0 +1,297 @@
+{
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "weights_load_1gb_s",
+   "unit": "s",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 0.0014,
+     "sd": 0.0001,
+     "n": 5
+    },
+    "gold": {
+     "mean": 0.0075,
+     "sd": 0.0044,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "s",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 0.0014,
+     "pr_solution": 0.0075,
+     "ratio_sd": 0.11032,
+     "baseline_sd": 0.0001,
+     "pr_solution_sd": 0.0044,
+     "ratio": 0.186667,
+     "pct": -81.33
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "regression"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "model_load_time",
+   "unit": "s",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": 20.0,
+    "patch": 14.0
+   },
+   "arms": {},
+   "derived": {
+    "unit": "s",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 20.0,
+     "pr_solution": 14.0,
+     "how": "absolute",
+     "marker": "",
+     "raw": "20.0 -> 14.0 s",
+     "note": "author gave absolute numbers",
+     "ratio": 1.428571,
+     "pct": 42.86
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "multi_thread_weight_loading",
+   "unit": "s",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": 20,
+    "patch": 14,
+    "comparable": false,
+    "scope": "wall-clock weight Load Time for a 62 GB QwQ-32B model read from a single NVMe SSD with page cache dropped; the win is disk-bandwidth-bound (3.1 -> 4.42 GB/s) not compute",
+    "scale_short": "Author's 20->14s is for a 62 GB model streamed from a specific NVMe SSD with cold page cache; the gain depends entirely on the storage device's parallel-read bandwidth. TO MAKE 1:1: load a multi-shard safetensors model from the SAME class of NVMe with the page cache dropped, timing _get_weights_iterator with num_threads=1 vs 8; a tiny model or warm page cache collapses the gap (author saw only ~0.2s from cache).",
+    "scale_note": "This is CPU/IO-measurable later but NOT GPU-dependent. The speedup is purely from parallelizing shard reads to saturate NVMe bandwidth; the author confirmed in comments that with a warm page cache the improvement shrinks to ~0.2s, so magnitude is highly storage- and model-size-dependent. Direction is genuine for cold large-model loads from fast disks."
+   },
+   "arms": {},
+   "derived": {
+    "unit": "s",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 20.0,
+     "pr_solution": 14.0,
+     "how": "absolute",
+     "marker": "",
+     "raw": "20 -> 14 s",
+     "note": "author gave absolute numbers",
+     "ratio": 1.428571,
+     "pct": 42.86
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  }
+ ],
+ "pr": 23928,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/23928",
+ "title": "[Model loader]: support multi-thread model weight loading (#23928)",
+ "field": "memory",
+ "reported_gain": "30% (Load Time (s): 20\u219214)",
+ "gain_kind": "unit",
+ "base_sha": "7be141b2c52366f0cc4e731c36819aed178d2258",
+ "merge_sha": "43d9ad03ba8584547537da71aee3e1810a0abbfd",
+ "hw_slug": "rtx5070ti",
+ "hw_override": null,
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.10.2",
+  "workload_cmd": "python3 /task/bench.py",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "SKIP",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "SKIP",
+   "slug": "gold"
+  }
+ },
+ "improved": false,
+ "latency": {
+  "scenarios": {
+   "weights_load_1gb_s": {
+    "unit": "s",
+    "base": {
+     "mean": 0.0014,
+     "sd": 0.0001,
+     "n": 5
+    },
+    "gold": {
+     "mean": 0.0075,
+     "sd": 0.0044,
+     "n": 5
+    }
+   }
+  },
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {
+   "workload_runs": 5
+  },
+  "gold": {
+   "workload_runs": 5
+  }
+ },
+ "ts": "2026-11-07T23:49:47Z",
+ "machine": {
+  "ts": "2026-11-07T23:47:02Z",
+  "host": {
+   "hostname": "DESKTOP-michael",
+   "kernel": "6.18.33.2-microsoft-standard-WSL2",
+   "wsl2": true,
+   "os": "Ubuntu 24.04.3 LTS"
+  },
+  "gpu": {
+   "name": "NVIDIA GeForce RTX 5070 Ti",
+   "driver": "591.86",
+   "cuda": "13.1",
+   "sm_mhz": 180.0,
+   "sm_max_mhz": 3090.0,
+   "mem_mhz": 405.0,
+   "mem_max_mhz": 14001.0,
+   "vram_total_mib": 16303.0,
+   "vram_used_mib": 273.0,
+   "util_pct": 0.0,
+   "power_w": 30.64,
+   "power_limit_w": 300.0,
+   "temp_c": 36.0,
+   "pstate": "P8",
+   "throttle_reasons": "0x0000000000000000",
+   "processes": [
+    {
+     "pid": 2903,
+     "name": "python main.py --listen 0.0.0.0 --port 8188",
+     "mem_mib": null
+    }
+   ]
+  },
+  "cpu": {
+   "model": "Intel(R) Core(TM) i7-14700KF",
+   "nproc": 12,
+   "load1": 2.39599609375,
+   "load5": 1.70654296875,
+   "load15": 1.421875,
+   "top_cpu_procs": [
+    {
+     "pid": 998479,
+     "pcpu": 5.2,
+     "comm": "python3"
+    }
+   ]
+  },
+  "ram": {
+   "total_gb": 94.3,
+   "free_gb": 5.3,
+   "available_gb": 88.3
+  },
+  "docker": {
+   "version": "Docker version 29.8.1, build 4a63305",
+   "engine": "docker"
+  }
+ },
+ "summary": {
+  "experiments": 3,
+  "measured": 1,
+  "headline": "weights_load_1gb_s",
+  "headline_derived": {
+   "unit": "s",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": null,
+    "pr_solution": null,
+    "how": null,
+    "marker": "",
+    "raw": "no number in the PR",
+    "note": "",
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced": {
+    "baseline": 0.0014,
+    "pr_solution": 0.0075,
+    "ratio_sd": 0.11032,
+    "baseline_sd": 0.0001,
+    "pr_solution_sd": 0.0044,
+    "ratio": 0.186667,
+    "pct": -81.33
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "regression"
+   },
+   "reliability": {
+    "flag": "ok",
+    "note": ""
+   }
+  },
+  "reproduced_ratio_median": 0.1867,
+  "reproduced_ratio_max": 0.1867,
+  "reported_ratio_median": 1.4286,
+  "verdict": "regression",
+  "tests": {
+   "base": "SKIP",
+   "gold": "SKIP"
+  }
+ }
+}

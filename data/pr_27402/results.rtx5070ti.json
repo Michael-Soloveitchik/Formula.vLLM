@@ -1,0 +1,488 @@
+{
+ "schema": "experiments_v2",
+ "experiments": [
+  {
+   "name": "lora_shrink_expand_1slice_t16",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 129.3806,
+     "sd": 31.9172,
+     "n": 5
+    },
+    "gold": {
+     "mean": 148.5456,
+     "sd": 27.3328,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 129.3806,
+     "pr_solution": 148.5456,
+     "ratio_sd": 0.268051,
+     "baseline_sd": 31.9172,
+     "pr_solution_sd": 27.3328,
+     "ratio": 0.870982,
+     "pct": -12.9
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "regression"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "lora_shrink_expand_1slice_t256",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 113.3798,
+     "sd": 12.1207,
+     "n": 5
+    },
+    "gold": {
+     "mean": 143.9464,
+     "sd": 28.2712,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 113.3798,
+     "pr_solution": 143.9464,
+     "ratio_sd": 0.176127,
+     "baseline_sd": 12.1207,
+     "pr_solution_sd": 28.2712,
+     "ratio": 0.787653,
+     "pct": -21.23
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "regression"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "lora_shrink_expand_3slice_t16",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 128.1724,
+     "sd": 23.881,
+     "n": 5
+    },
+    "gold": {
+     "mean": 165.8752,
+     "sd": 32.1627,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 128.1724,
+     "pr_solution": 165.8752,
+     "ratio_sd": 0.207785,
+     "baseline_sd": 23.881,
+     "pr_solution_sd": 32.1627,
+     "ratio": 0.772704,
+     "pct": -22.73
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "regression"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "lora_shrink_expand_3slice_t256",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": null,
+    "patch": null
+   },
+   "arms": {
+    "base": {
+     "mean": 130.3248,
+     "sd": 33.9992,
+     "n": 5
+    },
+    "gold": {
+     "mean": 159.2264,
+     "sd": 28.7034,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 130.3248,
+     "pr_solution": 159.2264,
+     "ratio_sd": 0.259546,
+     "baseline_sd": 33.9992,
+     "pr_solution_sd": 28.7034,
+     "ratio": 0.818487,
+     "pct": -18.15
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "regression"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "serving_output_throughput",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": 1382.92,
+    "patch": 1468.21
+   },
+   "arms": {},
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 1382.92,
+     "pr_solution": 1468.21,
+     "how": "absolute",
+     "marker": "",
+     "raw": "1382.92 -> 1468.21 us",
+     "note": "author gave absolute numbers",
+     "ratio": 0.941909,
+     "pct": -5.81
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "serving_mean_tpot",
+   "unit": "us",
+   "workload": "python3 /task/bench.py",
+   "reported": {
+    "base": 63.67,
+    "patch": 59.51
+   },
+   "arms": {},
+   "derived": {
+    "unit": "us",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": 63.67,
+     "pr_solution": 59.51,
+     "how": "absolute",
+     "marker": "",
+     "raw": "63.67 -> 59.51 us",
+     "note": "author gave absolute numbers",
+     "ratio": 1.069904,
+     "pct": 6.99
+    },
+    "reproduced": {
+     "baseline": null,
+     "pr_solution": null,
+     "ratio_sd": null,
+     "baseline_sd": null,
+     "pr_solution_sd": null,
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "unknown"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  }
+ ],
+ "pr": 27402,
+ "pr_url": "https://github.com/vllm-project/vllm/pull/27402",
+ "title": "[Kernel] LoRA triton kernels support PDL (#27402)",
+ "field": "gpu_kernels",
+ "reported_gain": "5%, 20%",
+ "gain_kind": "pct",
+ "base_sha": "a736e5ff770bd0e69492c24d24d04b7fd47789c0",
+ "merge_sha": "21b82f4ea2f12ab2c3d74f9156b50616b892ea7d",
+ "hw_slug": "rtx5070ti",
+ "hw_override": null,
+ "image": {
+  "mode": "wheel",
+  "wheel": "0.11.1",
+  "workload_cmd": "python3 /task/bench.py",
+  "repeats": 5
+ },
+ "arms": {
+  "base": {
+   "tests": "SKIP",
+   "slug": "base"
+  },
+  "gold": {
+   "tests": "SKIP",
+   "slug": "gold"
+  }
+ },
+ "improved": false,
+ "latency": {
+  "scenarios": {
+   "lora_shrink_expand_1slice_t16": {
+    "unit": "us",
+    "base": {
+     "mean": 129.3806,
+     "sd": 31.9172,
+     "n": 5
+    },
+    "gold": {
+     "mean": 148.5456,
+     "sd": 27.3328,
+     "n": 5
+    }
+   },
+   "lora_shrink_expand_1slice_t256": {
+    "unit": "us",
+    "base": {
+     "mean": 113.3798,
+     "sd": 12.1207,
+     "n": 5
+    },
+    "gold": {
+     "mean": 143.9464,
+     "sd": 28.2712,
+     "n": 5
+    }
+   },
+   "lora_shrink_expand_3slice_t16": {
+    "unit": "us",
+    "base": {
+     "mean": 128.1724,
+     "sd": 23.881,
+     "n": 5
+    },
+    "gold": {
+     "mean": 165.8752,
+     "sd": 32.1627,
+     "n": 5
+    }
+   },
+   "lora_shrink_expand_3slice_t256": {
+    "unit": "us",
+    "base": {
+     "mean": 130.3248,
+     "sd": 33.9992,
+     "n": 5
+    },
+    "gold": {
+     "mean": 159.2264,
+     "sd": 28.7034,
+     "n": 5
+    }
+   }
+  },
+  "pytorch_ref": {}
+ },
+ "logs": {
+  "base": {
+   "workload_runs": 5
+  },
+  "gold": {
+   "workload_runs": 5
+  }
+ },
+ "ts": "2026-11-08T00:08:47Z",
+ "machine": {
+  "ts": "2026-11-08T00:07:03Z",
+  "host": {
+   "hostname": "DESKTOP-michael",
+   "kernel": "6.18.33.2-microsoft-standard-WSL2",
+   "wsl2": true,
+   "os": "Ubuntu 24.04.3 LTS"
+  },
+  "gpu": {
+   "name": "NVIDIA GeForce RTX 5070 Ti",
+   "driver": "591.86",
+   "cuda": "13.1",
+   "sm_mhz": 180.0,
+   "sm_max_mhz": 3090.0,
+   "mem_mhz": 405.0,
+   "mem_max_mhz": 14001.0,
+   "vram_total_mib": 16303.0,
+   "vram_used_mib": 276.0,
+   "util_pct": 0.0,
+   "power_w": 30.24,
+   "power_limit_w": 300.0,
+   "temp_c": 36.0,
+   "pstate": "P8",
+   "throttle_reasons": "0x0000000000000000",
+   "processes": [
+    {
+     "pid": 2903,
+     "name": "python main.py --listen 0.0.0.0 --port 8188",
+     "mem_mib": null
+    }
+   ]
+  },
+  "cpu": {
+   "model": "Intel(R) Core(TM) i7-14700KF",
+   "nproc": 12,
+   "load1": 2.43115234375,
+   "load5": 1.66357421875,
+   "load15": 1.4248046875,
+   "top_cpu_procs": [
+    {
+     "pid": 1015230,
+     "pcpu": 12.5,
+     "comm": "python3"
+    }
+   ]
+  },
+  "ram": {
+   "total_gb": 94.3,
+   "free_gb": 14.5,
+   "available_gb": 88.4
+  },
+  "docker": {
+   "version": "Docker version 29.8.1, build 4a63305",
+   "engine": "docker"
+  }
+ },
+ "summary": {
+  "experiments": 6,
+  "measured": 4,
+  "headline": "lora_shrink_expand_1slice_t16",
+  "headline_derived": {
+   "unit": "us",
+   "higher_is_better": false,
+   "reported": {
+    "baseline": null,
+    "pr_solution": null,
+    "how": null,
+    "marker": "",
+    "raw": "no number in the PR",
+    "note": "",
+    "ratio": null,
+    "pct": null
+   },
+   "reproduced": {
+    "baseline": 129.3806,
+    "pr_solution": 148.5456,
+    "ratio_sd": 0.268051,
+    "baseline_sd": 31.9172,
+    "pr_solution_sd": 27.3328,
+    "ratio": 0.870982,
+    "pct": -12.9
+   },
+   "reproduced_vs_reported": {
+    "ratio_of_ratios": null,
+    "verdict": "regression"
+   },
+   "reliability": {
+    "flag": "ok",
+    "note": ""
+   }
+  },
+  "reproduced_ratio_median": 0.8031,
+  "reproduced_ratio_max": 0.871,
+  "reported_ratio_median": 1.0059,
+  "verdict": "regression",
+  "tests": {
+   "base": "SKIP",
+   "gold": "SKIP"
+  }
+ }
+}
