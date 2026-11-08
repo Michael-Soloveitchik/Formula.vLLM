@@ -9,8 +9,9 @@ data/pr_*/logs/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
-# a vLLM clone is never needed (the per-PR image clones the commits); ignore one if present
-vllm/
+# a vLLM clone is never needed (the per-PR image clones the commits); ignore a stray ROOT clone.
+# anchored so solver solution overlays under data/pr_*/files/<arm>/vllm/ stay tracked (GPU box applies them).
+/vllm/
 # shared model weights, fetch-on-demand per cluster (download.sh), never committed
 .weights/
 # runner / dashboard logs
