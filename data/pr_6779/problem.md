@@ -1,10 +1,28 @@
 # Task PR #6779 — [Core] Use array to speedup padding (#6779)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **make_tensor_with_pad** in `ms` (milliseconds (1e-3 s)); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **make_tensor_with_pad** (headline) — `ms` (milliseconds (1e-3 s)), ↓ lower is better. reported 79 -> 22 ms.
+- **e2e_qwen05b** — `it/s` (iterations per second), ↑ higher is better. reported 24.76 -> 29.44 it/s.
+
+Workload command (run per arm): `python3 /task/bench.py`
+Mechanism / note: Microbench pasted in PR body; make_tensor_with_pad over SequenceData, input_len=1024 batch=2048. v0 API.
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,13 +42,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > Use `array.array` in `SequenceData` to store token IDs, which greatly speeds up `make_tensor_with_pad` in the Sampler. The author validated with a micro-benchmark (79ms to 22ms at 1024 len / 2048 batch) and an end-to-end qwen-1.5-0.5b throughput test showing higher it/s and toks/s.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **make_tensor_with_pad** (ms): reported 79 -> 22 ms. workload: `python3 /task/bench.py`
-- **e2e_qwen05b** (it/s): reported 24.76 -> 29.44 it/s.
-- note: Microbench pasted in PR body; make_tensor_with_pad over SequenceData, input_len=1024 batch=2048. v0 API.
-
 ## Reported numbers (PR author)
 - gain: 18% (e2e 24.76->29.44 it/s) (pct)
 - evidence: Nice to see an 18% speedup from this optimization.
@@ -39,4 +50,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

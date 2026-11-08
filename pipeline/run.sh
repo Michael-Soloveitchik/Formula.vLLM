@@ -41,12 +41,13 @@ HERE="$(cd "$(dirname "$0")" && pwd)"; ROOT="$(cd "$HERE/.." && pwd)"; cd "$ROOT
 . "$ROOT/gen/layout.sh"
 WORK_ROOT="$(lay WORK_ROOT 2>/dev/null || echo "$ROOT/.work")"; WORK_ROOT="$ROOT/.work"
 mkdir -p "$WORK_ROOT" results
-# one benchmark run at a time on this machine (two PRs sharing the GPU = noisy numbers): queued callers block here
-exec 9>"$(lay run_lock)"; flock 9
+# one benchmark run at a time on this machine (two PRs sharing the GPU = noisy numbers): queued callers block here.
+# flock is Linux-only; on macOS (no flock) the lock is skipped — fine for CPU apply/dev runs.
+if command -v flock >/dev/null 2>&1; then exec 9>"$(lay run_lock)"; flock 9; fi
 
 # flags: --reproduce (refs only, no solvers) | --health-check (with --reproduce) |
 #        --run-formula-harnesses (solver arms only, on already-reproduced PRs)
-REPRODUCE=0; HEALTH=0; HARNESSES=0; NEXT=""; RETRY=""; ARGS=()
+REPRODUCE=0; HEALTH=0; HARNESSES=0; APPLY_AI=0; NEXT=""; RETRY=""; ARGS=()
 PREV=""
 for a in "$@"; do
   case "$a" in
@@ -55,6 +56,7 @@ for a in "$@"; do
     --retry-failed|--retry-unmet) RETRY="$a" ;;
     --health-check) HEALTH=1 ;;
     --run-formula-harnesses) HARNESSES=1 ;;
+    --apply-ai-generated-solutions) APPLY_AI=1 ;;
     *) if [ "$PREV" = "--next" ] && [[ "$a" =~ ^[0-9]+$ ]]; then NEXT="$a"; else ARGS+=("$a"); fi ;;
   esac
   PREV="$a"
@@ -63,6 +65,16 @@ set -- ${ARGS[@]+"${ARGS[@]}"}
 if [ "$REPRODUCE" = 1 ] && [ "$HARNESSES" = 1 ]; then echo "--reproduce and --run-formula-harnesses are separate runs; pick one" >&2; exit 2; fi
 if [ "$HEALTH" = 1 ] && [ "$REPRODUCE" != 1 ] && [ "$HARNESSES" != 1 ]; then echo "--health-check goes with --reproduce or --run-formula-harnesses" >&2; exit 2; fi
 if [ "$REPRODUCE" = 1 ]; then export RUN_SOLVERS=0 CLEAN_IMAGE="${CLEAN_IMAGES:-0}"; echo "REPRODUCE: baseline vs PR's solution only, solver arms disabled (CLEAN_IMAGES=${CLEAN_IMAGES:-0}, hw=$(lay hw_slug))"; fi
+# apply-ai mode: take the saved data/pr_<n>/files/<arm>/ solutions, overlay them on the
+# baseline tree and re-measure on CPU with the SAME instrument (bench.py + parse_workload.py).
+# No GPU, no solver CLI, no API key: just applies what is already in files/ and times it.
+if [ "$APPLY_AI" = 1 ]; then
+  [ $# -gt 0 ] || { echo "usage: ./run.sh --apply-ai-generated-solutions <pr> [<pr> ...] [--arm <name>]" >&2; exit 2; }
+  echo "APPLY AI SOLUTIONS: overlay data/pr_<n>/files/<arm>/ on baseline, re-measure on CPU (hw=$(lay hw_slug))"
+  python3 "$HERE/apply_ai_solutions.py" "$@"
+  exit $?
+fi
+
 if [ "$HARNESSES" = 1 ]; then
   [ $# -gt 0 ] || { echo "usage: ./run.sh --run-formula-harnesses <pr> [<pr> ...]" >&2; exit 2; }
   export RUN_SOLVERS=1 KEEP_WORK=1

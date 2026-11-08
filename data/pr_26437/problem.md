@@ -1,10 +1,29 @@
 # Task PR #26437 — [PERF] Qwen3-next MTP speedup (change bool mask indexing to index_select / index_copy to reduce d2h) (#26437)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **chunk_indices_6way_cycle** in `us` (microseconds (1e-6 s)); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **chunk_indices_6way_cycle** (headline) — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **serving_mean_tpot** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. reported 22.89 -> 21.12 ms.
+- **serving_output_throughput** — `tok/s` (tokens per second), ↑ higher is better. reported 1.595e+04 -> 1.787e+04 tok/s.
+
+Workload command (run per arm): `python3 /task/bench.py`
+Mechanism / note: fla @tensor_cache 4 -> 8 entries (part 2 of the PR): prepare_chunk_indices cycled over 6 distinct cu_seqlens (2 calls x 3 groups per GDN layer) - baseline LRU thrashes and recomputes (incl. .tolist() sync), PR's solution hits. Wall-clock us per call. Parts 1 (bool-mask -> index_select in qwen3_next.py) and 3 are model-level and not measured. Author e2e (Qwen3-Next-80B MTP, B200) reported-only.
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,14 +43,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > Remove boolean indexing from GDN and replace with direct index_select/index_copy indexing to avoid the d2h transfer caused by `tensor[bool_mask]` needing the True-element count. Increase `@tensor_cache` cache size since there are 2 calls per GDN attn grouped by 3, requiring at least 2*3 entries. Make q, k, v `.contiguous()` early in GDN; not helpful now but aids torch.compile fusion.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **chunk_indices_6way_cycle** (us): no number reported in the PR. workload: `python3 /task/bench.py`
-- **serving_mean_tpot** (ms): reported 22.89 -> 21.12 ms.
-- **serving_output_throughput** (tok/s): reported 1.595e+04 -> 1.787e+04 tok/s.
-- note: fla @tensor_cache 4 -> 8 entries (part 2 of the PR): prepare_chunk_indices cycled over 6 distinct cu_seqlens (2 calls x 3 groups per GDN layer) - baseline LRU thrashes and recomputes (incl. .tolist() sync), PR's solution hits. Wall-clock us per call. Parts 1 (bool-mask -> index_select in qwen3_next.py) and 3 are model-level and not measured. Author e2e (Qwen3-Next-80B MTP, B200) reported-only.
-
 ## Reported numbers (PR author)
 - gain: 12% (pct)
 - evidence: Speedup of Output token throughput is **12%**
@@ -40,4 +51,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

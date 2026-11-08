@@ -1,10 +1,27 @@
 # Task PR #6442 — [Core] Use numpy to speed up padded token processing (#6442)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **sampler_latency** in `ms` (milliseconds (1e-3 s)); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **sampler_latency** (headline) — `ms` (milliseconds (1e-3 s)), ↓ lower is better. no number reported in the PR.
+
+Workload command (run per arm): `python3 /task/bench.py`
+Mechanism / note: v0 SamplingTensors.from_lists (real classmethod) on a 256-seq penalty batch (prompts 512..1024, 128 output tokens, vocab 128256), CPU only, pinned memory off (wheel 0.5.3 torch 2.3 cu121 has no sm_120 kernels). ms per call. Author: ~50% sampler speedup at large batch on A100, no absolute numbers.
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,12 +41,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > Replace the list comprehension with NumPy operations for padded token processing, yielding roughly a 50% sampler speedup at large batch sizes and improving throughput when serving small models, as shown in the author's A100 80GB benchmarks.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **sampler_latency** (ms): no number reported in the PR. workload: `python3 /task/bench.py`
-- note: v0 SamplingTensors.from_lists (real classmethod) on a 256-seq penalty batch (prompts 512..1024, 128 output tokens, vocab 128256), CPU only, pinned memory off (wheel 0.5.3 torch 2.3 cu121 has no sm_120 kernels). ms per call. Author: ~50% sampler speedup at large batch on A100, no absolute numbers.
-
 ## Reported numbers (PR author)
 - gain: 50% (pct)
 - evidence: It results in approximately a 50% speedup for the sampler when processing large batch sizes.
@@ -38,4 +49,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

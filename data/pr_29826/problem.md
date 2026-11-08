@@ -1,10 +1,28 @@
 # Task PR #29826 — [Perf] Avoid pageable HtoD transfer in MinTokensLogitsProcessor (#29826)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **min_tokens_apply** in `us` (microseconds (1e-6 s)); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **min_tokens_apply** (headline) — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **min_tokens_apply_after_kernel** — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+
+Workload command (run per arm): `python3 /task/bench.py`
+Mechanism / note: MinTokensLogitsProcessor.apply on [64, 151936] fp32 logits with 64 pending min_tokens requests; baseline = pageable HtoD scalar copy (device sync), PR's solution = index_put_ with a device scalar. Wall-clock us, alone and right after an async filler kernel. PR gives nsys traces only (up to 30% TPOT at low concurrency), no numbers.
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,13 +42,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > Author identified the pageable HtoD transfer in MinTokensLogitsProcessor as a device-synchronizing operation that breaks scheduler overlap under --async-scheduling, causing up to 30% TPOT increase at low concurrency, backed by nsys traces. Fix avoids the transfer by using a preallocated device tensor for the -inf fill; per a review comment, the min-p path was converted to use `.masked_fill_(-float("inf"))`. Existing MinTokensLogitsProcessor tests deemed sufficient.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **min_tokens_apply** (us): no number reported in the PR. workload: `python3 /task/bench.py`
-- **min_tokens_apply_after_kernel** (us): no number reported in the PR.
-- note: MinTokensLogitsProcessor.apply on [64, 151936] fp32 logits with 64 pending min_tokens requests; baseline = pageable HtoD scalar copy (device sync), PR's solution = index_put_ with a device scalar. Wall-clock us, alone and right after an async filler kernel. PR gives nsys traces only (up to 30% TPOT at low concurrency), no numbers.
-
 ## Reported numbers (PR author)
 - gain: 30% (pct)
 - evidence: At low concurrencies, this leads to a significant (up to 30%) increase in TPOT when including min_tokens in the request.
@@ -39,4 +50,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

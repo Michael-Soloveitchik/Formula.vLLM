@@ -1,10 +1,28 @@
 # Task PR #28280 — [Kernel] Optimization of the mm_k operator. (#28280)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **output_throughput** in `tok/s` (tokens per second); maximize it (higher is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **output_throughput** (headline) — `tok/s` (tokens per second), ↑ higher is better. reported 267.8 -> 296.9 tok/s.
+- **tpot** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. reported 67.93 -> 61.74 ms.
+
+Workload command (run per arm): `vllm bench serve --num-prompts 100 --dataset-name sharegpt`
+Mechanism / note: Triton matmul (EVEN_K masking). PR gives serving numbers only (C500/H800).
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,13 +42,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > The author observed that in the non-`EVEN_K` case the main branch adds masking and a `tl.dot()` on every loop iteration, but masking is only needed for partially out-of-bound accesses. They split each iteration into three cases: completely in bounds (skip masking, just `tl.dot()`), completely out of bounds (skip entirely — no masking or `tl.dot()`), and partial (mask as before). Reducing redundant masking and `tl.dot()` calls improves speed, particularly on less advanced GPU architectures, with gains shown on Metax C500 and H800.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **output_throughput** (tok/s): reported 267.8 -> 296.9 tok/s. workload: `vllm bench serve --num-prompts 100 --dataset-name sharegpt`
-- **tpot** (ms): reported 67.93 -> 61.74 ms.
-- note: Triton matmul (EVEN_K masking). PR gives serving numbers only (C500/H800).
-
 ## Reported numbers (PR author)
 - gain: 8% (pct)
 - evidence: Output token throughput increases by approximately 8%, consistent with the intuition that this change is more friendly to older GPU architectures.*
@@ -39,4 +50,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

@@ -1,10 +1,32 @@
 # Task PR #33529 — Triton MLA perf fixes (#33529)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **mla_decode_b1_kv8192** in `us` (microseconds (1e-6 s)); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **mla_decode_b1_kv8192** (headline) — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **mla_decode_b1_kv32768** — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **mla_decode_b1_kv81920** — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **mla_decode_b8_kv8192** — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **peak_throughput_1req_80k** — `tok/s` (tokens per second), ↑ higher is better. reported 34 -> 52 tok/s.
+- **peak_throughput_8req_80k** — `tok/s` (tokens per second), ↑ higher is better. reported 176 -> 184 tok/s.
+
+Workload command (run per arm): `python3 /task/bench.py`
+Mechanism / note: TritonMLAImpl.forward_mqa (unbound, minimal self/metadata/layer stubs) on DeepSeek-V2-Lite-like MLA decode: 16 heads, latent 512+64, bf16 KV, block 64; ctx 8K/32K/80K at batch 1 and 8K at batch 8. PR = SM-aware num_kv_splits (was fixed 4) + kernel load tweaks + is_mla path. CUDA-event us per call. Author (Kimi K2.5 DCP8, sm120) peak tok/s reported-only.
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,17 +46,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > The author identified two primary issues: suboptimal KV splitting during low batch count that underutilizes SMs, and unnecessary loading of the Q/V vector since c_kv already contains both. The fix makes KV splitting adaptive to context length and SM count, and avoids the redundant c_kv load in the MLA path. Validated on Kimi 2.5, DeepSeek V2, and Qwen 235B, showing ~53% throughput gain at batch 1 / 80K context.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **mla_decode_b1_kv8192** (us): no number reported in the PR. workload: `python3 /task/bench.py`
-- **mla_decode_b1_kv32768** (us): no number reported in the PR.
-- **mla_decode_b1_kv81920** (us): no number reported in the PR.
-- **mla_decode_b8_kv8192** (us): no number reported in the PR.
-- **peak_throughput_1req_80k** (tok/s): reported 34 -> 52 tok/s.
-- **peak_throughput_8req_80k** (tok/s): reported 176 -> 184 tok/s.
-- note: TritonMLAImpl.forward_mqa (unbound, minimal self/metadata/layer stubs) on DeepSeek-V2-Lite-like MLA decode: 16 heads, latent 512+64, bf16 KV, block 64; ctx 8K/32K/80K at batch 1 and 8K at batch 8. PR = SM-aware num_kv_splits (was fixed 4) + kernel load tweaks + is_mla path. CUDA-event us per call. Author (Kimi K2.5 DCP8, sm120) peak tok/s reported-only.
-
 ## Reported numbers (PR author)
 - gain: 1.05x, 4.36x (pct)
 - evidence: | Context | OLD (tok/s) | NEW (tok/s) | Improvement | |---------|-------------|-------------|-------------| | Short (100 in / 400 out) | 69.14 | 72.37 | 1.05x |
@@ -43,4 +54,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

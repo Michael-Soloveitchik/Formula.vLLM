@@ -1,10 +1,28 @@
 # Task PR #33593 — [Perf] Optimize Python Slice for Structured Output using `islice` instead of [:] (#33593)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **create_slice** in `s` (seconds); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **create_slice** (headline) — `s` (seconds), ↓ lower is better. reported 0.0034 -> 1e-06 s.
+- **sum_slice** — `s` (seconds), ↓ lower is better. reported 0.0056 -> 0.0047 s.
+
+Workload command (run per arm): `python3 /task/bench.py`
+Mechanism / note: Arm's real call sites: StructuredOutputManager.should_advance (unbound; delta = whole 1M-token sequence) and BaseThinkingReasoningParser.extract_content_ids on a DeepSeekR1 parser over a stub vocab; no end token present. Seconds per call, best of 5. Metric names follow the author's list[:N]-vs-islice microbench (SIZE 2M / N 1M); reported numbers are that microbench's.
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,13 +42,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > Author replaced Python list splits/slices with iterators (`islice`), giving a perf improvement by avoiding copy and allocation. Backed with a micro-benchmark showing `islice` creation at ~1e-6s / 0 MiB vs slice at ~0.0034s / 7.63 MiB, plus an E2E structured-output serving benchmark on DeepSeek-R1-Distill-Qwen-7B showing lower mean TPOT (7.82ms vs main) and TTFT.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **create_slice** (s): reported 0.0034 -> 1e-06 s. workload: `python3 /task/bench.py`
-- **sum_slice** (s): reported 0.0056 -> 0.0047 s.
-- note: Arm's real call sites: StructuredOutputManager.should_advance (unbound; delta = whole 1M-token sequence) and BaseThinkingReasoningParser.extract_content_ids on a DeepSeekR1 parser over a stub vocab; no end token present. Seconds per call, best of 5. Metric names follow the author's list[:N]-vs-islice microbench (SIZE 2M / N 1M); reported numbers are that microbench's.
-
 ## Reported numbers (PR author)
 - gain: 0.5% (pct)
 - evidence: OK added in the title, the e2e perf improvement is smaller than < 0.5% so hidden in fluctuations.
@@ -39,4 +50,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

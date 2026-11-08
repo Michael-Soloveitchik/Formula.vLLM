@@ -1,10 +1,30 @@
 # Task PR #31984 — [Kernel] Optimize Sliding Window Attention in 3D Triton Kernel (#31984)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **sw128_decode_b1_kv4096** in `us` (microseconds (1e-6 s)); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **sw128_decode_b1_kv4096** (headline) — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **sw128_decode_b1_kv8192** — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **sw128_decode_b1_kv16384** — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **sw128_decode_b8_kv8192** — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+
+Workload command (run per arm): `python3 /task/bench.py`
+Mechanism / note: unified_attention forced onto the 3D (split-softmax decode) Triton kernel with gpt-oss-20b shapes (64/8 heads, head 64, window 128, block 16, bf16): 1 decode query vs KV 4096/8192/16384 and 8 x 8192; PR prunes out-of-window tiles in the 3D kernel. CUDA-event us per call. Author: 3-4% e2e latency at 6.4k-12.8k output tokens (no kernel number).
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,15 +44,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > Author applies the same optimization already used in the 2D kernel to the 3D kernel, ensuring only tiles within the defined sliding window are processed. This reduces computational overhead and improves performance, with gains growing for longer sequences (~3-4% at 6,400 and 12,800 output tokens). Correctness confirmed via existing unit tests (512 passed) and gsm8k lm_eval.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **sw128_decode_b1_kv4096** (us): no number reported in the PR. workload: `python3 /task/bench.py`
-- **sw128_decode_b1_kv8192** (us): no number reported in the PR.
-- **sw128_decode_b1_kv16384** (us): no number reported in the PR.
-- **sw128_decode_b8_kv8192** (us): no number reported in the PR.
-- note: unified_attention forced onto the 3D (split-softmax decode) Triton kernel with gpt-oss-20b shapes (64/8 heads, head 64, window 128, block 16, bf16): 1 decode query vs KV 4096/8192/16384 and 8 x 8192; PR prunes out-of-window tiles in the 3D kernel. CUDA-event us per call. Author: 3-4% e2e latency at 6.4k-12.8k output tokens (no kernel number).
-
 ## Reported numbers (PR author)
 - gain: 4% (pct)
 - evidence: For longer sequence lengths, the performance improvement introduced by this PR becomes more pronounced, reaching approximately 3–4% for output lengths of 6,400
@@ -41,4 +52,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

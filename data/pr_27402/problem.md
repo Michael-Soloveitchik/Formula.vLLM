@@ -1,10 +1,32 @@
 # Task PR #27402 — [Kernel] LoRA triton kernels support PDL (#27402)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **lora_shrink_expand_1slice_t16** in `us` (microseconds (1e-6 s)); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **lora_shrink_expand_1slice_t16** (headline) — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **lora_shrink_expand_1slice_t256** — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **lora_shrink_expand_3slice_t16** — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **lora_shrink_expand_3slice_t256** — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **serving_output_throughput** — `tok/s` (tokens per second), ↑ higher is better. reported 1383 -> 1468 tok/s.
+- **serving_mean_tpot** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. reported 63.67 -> 59.51 ms.
+
+Workload command (run per arm): `python3 /task/bench.py`
+Mechanism / note: lora_shrink + lora_expand back to back (a LoRA linear) via LoRAKernelMeta: hidden 4096, rank 16, 1 LoRA, 1 and 3 slices, 16 and 256 tokens; PR = PDL (griddepcontrol) in the LoRA Triton kernels (sm_90+, sm_120 ok). CUDA-event us per shrink+expand pair. Author: '5-20% kernel runtime speedup' + Qwen3-30B-A3B LoRA serving on H20 (reported-only).
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,17 +46,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > The author adds PDL support to the LoRA triton shrink/expand kernels so dependent kernels overlap, reporting a slight end-to-end serving gain on H20 (74.05s -> 69.74s, TPOT 63.67ms -> 59.51ms) and 5-20% kernel-runtime speedup for smaller Ms on Qwen3-32B TP=4 shapes. This is part 2 of issue #27371 and requires Triton 3.5.0 (Triton 3.4.0 errored). Adding the same logic to fused_moe_lora shrink/expand was suggested as follow-up.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **lora_shrink_expand_1slice_t16** (us): no number reported in the PR. workload: `python3 /task/bench.py`
-- **lora_shrink_expand_1slice_t256** (us): no number reported in the PR.
-- **lora_shrink_expand_3slice_t16** (us): no number reported in the PR.
-- **lora_shrink_expand_3slice_t256** (us): no number reported in the PR.
-- **serving_output_throughput** (tok/s): reported 1383 -> 1468 tok/s.
-- **serving_mean_tpot** (ms): reported 63.67 -> 59.51 ms.
-- note: lora_shrink + lora_expand back to back (a LoRA linear) via LoRAKernelMeta: hidden 4096, rank 16, 1 LoRA, 1 and 3 slices, 16 and 256 tokens; PR = PDL (griddepcontrol) in the LoRA Triton kernels (sm_90+, sm_120 ok). CUDA-event us per shrink+expand pair. Author: '5-20% kernel runtime speedup' + Qwen3-30B-A3B LoRA serving on H20 (reported-only).
-
 ## Reported numbers (PR author)
 - gain: 5%, 20% (pct)
 - evidence: This is a good feature to have, see following results, we generally see 5% to 20% kernel runtime speedup for smaller Ms.
@@ -43,4 +54,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

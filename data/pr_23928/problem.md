@@ -1,10 +1,29 @@
 # Task PR #23928 — [Model loader]: support multi-thread model weight loading (#23928)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **weights_load_1gb_s** in `s` (seconds); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **weights_load_1gb_s** (headline) — `s` (seconds), ↓ lower is better. no number reported in the PR.
+- **model_load_time** — `s` (seconds), ↓ lower is better. reported 20 -> 14 s.
+- **multi_thread_weight_loading** — `s` (seconds), ↓ lower is better. reported 20 -> 14 s. Diff adds multi_thread_safetensors_weights_iterator and multi_thread_pt_weights_iterator (concurrent.futures.ThreadPoolExecutor over shard files) in weight_utils.py, and DefaultModelLoader selects them when enable_multithread_load is set (num_threads default 8); also validates extra-config keys. Number source: PR body Test Result table - disable 20 s / 3.1 GB/s vs enable 14 s / 4.42 GB/s, 'Load Weight speed up 1.43x'.
+
+Workload command (run per arm): `python3 /task/bench.py`
+Mechanism / note: Weight-shard iteration over 8 synthetic 128 MB bf16 safetensors files (1 GB, written to a temp dir, page-cached): PR's solution = multi_thread_safetensors_weights_iterator (8 workers), baseline tree lacks it so the bench runs the single-thread safetensors_weights_iterator the loader uses there. Seconds per full pass, best of 3. Author: QwQ-32B 62 GB load 20 s -> 14 s (reported-only). Opt-in feature (enable_multithread_load).
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,14 +43,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > Author ports Sglang PR #7277 logic: add multi_thread_safetensors_weights_iterator and multi_thread_pt_weights_iterator using Python ThreadPoolExecutor to parallelize loading safetensor and pt/bin files. DefaultModelLoader uses these when enable_multithread_load extra config is set, with configurable num_threads (default 8). Also adds validation of extra config keys, allowing only enable_multithread_load and num_threads and raising on unexpected keys.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **weights_load_1gb_s** (s): no number reported in the PR. workload: `python3 /task/bench.py`
-- **model_load_time** (s): reported 20 -> 14 s.
-- **multi_thread_weight_loading** (s): reported 20 -> 14 s. Diff adds multi_thread_safetensors_weights_iterator and multi_thread_pt_weights_iterator (concurrent.futures.ThreadPoolExecutor over shard files) in weight_utils.py, and DefaultModelLoader selects them when enable_multithread_load is set (num_threads default 8); also validates extra-config keys. Number source: PR body Test Result table - disable 20 s / 3.1 GB/s vs enable 14 s / 4.42 GB/s, 'Load Weight speed up 1.43x'.
-- note: Weight-shard iteration over 8 synthetic 128 MB bf16 safetensors files (1 GB, written to a temp dir, page-cached): PR's solution = multi_thread_safetensors_weights_iterator (8 workers), baseline tree lacks it so the bench runs the single-thread safetensors_weights_iterator the loader uses there. Seconds per full pass, best of 3. Author: QwQ-32B 62 GB load 20 s -> 14 s (reported-only). Opt-in feature (enable_multithread_load).
-
 ## Reported numbers (PR author)
 - gain: 30% (Load Time (s): 20→14) (unit)
 - evidence: Load Time (s): before 20 / after 14
@@ -40,4 +51,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

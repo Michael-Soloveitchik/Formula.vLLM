@@ -1,10 +1,27 @@
 # Task PR #32975 — [Perf] Optimize detokenizer python logic (#32975)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **detokenize** in `us/tok` (us/tok); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **detokenize** (headline) — `us/tok` (us/tok), ↓ lower is better. no number reported in the PR.
+
+Workload command (run per arm): `python3 /task/bench.py`
+Mechanism / note: Real SlowIncrementalDetokenizer.update() one token at a time with a stop string set (per-update output length check), 8 seqs x 2048 tokens after a 256-token prompt, in-process byte-level BPE tokenizer (no download). us per generated token, median of 5 passes. Author: 1.628x micro ratio only.
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,12 +41,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > Author adds a `num_output_tokens` function to avoid `len(self.output_token_ids)` triggering a slice in `SlowIncrementalDetokenizer`. A second idea (accumulate string pieces and join once instead of repeated string concatenation) was proposed but struck out/dropped. Author notes e2e perf gain is <0.5% (within noise) and provided an AI-generated microbenchmark comparing old vs new `stop_check_offset` logic.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **detokenize** (us/tok): no number reported in the PR. workload: `python3 /task/bench.py`
-- note: Real SlowIncrementalDetokenizer.update() one token at a time with a stop string set (per-update output length check), 8 seqs x 2048 tokens after a 256-token prompt, in-process byte-level BPE tokenizer (no download). us per generated token, median of 5 passes. Author: 1.628x micro ratio only.
-
 ## Reported numbers (PR author)
 - gain: 1.628x, 38.57% (pct)
 - evidence: ```bash yewentao256@dgx-b200-02:~/vllm-source$ python benchmarks/overheads/benchmark_detokenizer_min_tokens.py old: 787.270 ms (39.36 ns/token) new: 483.633 ms
@@ -38,4 +49,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

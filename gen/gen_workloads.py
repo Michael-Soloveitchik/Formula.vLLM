@@ -68,8 +68,13 @@ def write(path, txt, exe=False):
 
 
 # ---- templates ---------------------------------------------------------------------
+def dockerfile_template(hw):
+    """cpu slug -> CPU mirror image (no CUDA); every other slug -> the GPU wheel image."""
+    return "Dockerfile.cpu-wheel" if hw == "cpu" else "Dockerfile.gpu-wheel"
+
+
 def render_dockerfile(pr, t, hw):
-    tpl = _read(layout.template("Dockerfile.gpu-wheel"))
+    tpl = _read(layout.template(dockerfile_template(hw)))
     # drop the template's own header (everything up to the AUTO-GENERATED line)
     tpl = tpl[tpl.index("# AUTO-GENERATED"):]
     vals = {"pr": str(pr), "title": (t.get("title") or "").replace('"', "'"), "hw": hw,
@@ -332,7 +337,7 @@ def build_workload_json(pr, t, hw, cluster, c, wdir_rel):
         "source_files": t.get("source_files"), "test_files": t.get("test_files"),
         "image": {
             "mode": "wheel" if t.get("wheel") else "wheel (UNPINNED: no task.json:wheel)", "tag": f"vllm-task:{pr}",
-            "dockerfile": f"{wdir_rel}/Dockerfile", "template": "templates/Dockerfile.gpu-wheel",
+            "dockerfile": f"{wdir_rel}/Dockerfile", "template": f"templates/{dockerfile_template(hw)}",
             "wheel": t.get("wheel"), "wheel_note": t.get("wheel_note"),
             "torch_fix": t.get("torch_fix"), "extra_pip": t.get("extra_pip"),
             "swap": t.get("swap", "tree"), "swap_note": t.get("swap_note"),
@@ -554,6 +559,17 @@ def _quote(txt):
     return "\n".join("> " + ln if ln.strip() else ">" for ln in (txt or "").splitlines())
 
 
+def _unit_desc(unit):
+    """short human gloss for a metric unit, used in the objective so the solver knows the scale."""
+    u = (unit or "").strip()
+    table = {
+        "us": "microseconds (1e-6 s)", "ms": "milliseconds (1e-3 s)", "s": "seconds",
+        "ns": "nanoseconds (1e-9 s)", "tok/s": "tokens per second", "req/s": "requests per second",
+        "it/s": "iterations per second", "GB/s": "gigabytes per second", "MB/s": "megabytes per second",
+    }
+    return table.get(u, u or "unit")
+
+
 def render_problem_md(pr, t):
     S = solution_sections(pr)
     issue = S.get("Problem") or _first_paras(S.get("Original PR description (captured source)"))
@@ -561,15 +577,56 @@ def render_problem_md(pr, t):
     fix = S.get("Fix in words") or S.get("Source-backed resolution")
     author = S.get("Author's solution")
     wl = t.get("workload") or {}
+    exps = t.get("experiments") or []
+    # headline metric drives the one-line "what / unit / direction" summary
+    head = exps[0] if exps else None
+    head_unit = (head.get("unit") if head else None) or wl.get("unit") or "unit"
+    head_up = higher_is_better(head_unit)
+    goal = "maximize it (higher is better)" if head_up else "minimize it (lower is better)"
+
     L = [f"# Task PR #{pr} — {t.get('title')}", "",
          "## Objective",
-         "Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the",
-         "workload runs **as fast as or faster than the PR's solution**.",
-         "You are given the PR author's known solution below. You may reproduce it, but you",
-         "are explicitly asked to **try to beat it** — find a faster correct version.", "",
-         "## The problem (issue)", "(from `solution.md`, quoted)", "", _quote(issue) if issue else "> (see solution.md)", ""]
+         "Edit the code under `./vllm` so that:",
+         "1. the hidden correctness tests still PASS, and",
+         f"2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.", "",
+         f"The headline metric is **{head['name'] if head else (wl.get('cmd') or 'the workload')}** "
+         f"in `{head_unit}` ({_unit_desc(head_unit)}); {goal}.", ""]
+
+    # --- shared detail: survives the blind strip (NOT under '## PR's solution') ---
+    L += ["## How you are measured",
+          "The SAME workload is timed three times, all on this machine:",
+          "- **baseline** — the code before the PR (`base_sha`).",
+          "- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.",
+          "- **your edit** — baseline tree + your changes.",
+          "", "Each metric below is parsed from the workload's stdout and averaged over repeated runs.",
+          "You win a metric when your edit is faster than the PR's solution on it; equal speed ties.", ""]
+
+    L += ["### Metrics", ""]
+    if exps:
+        for i, e in enumerate(exps):
+            unit = e.get("unit") or wl.get("unit") or "unit"
+            up = higher_is_better(unit)
+            arrow = "↑ higher is better" if up else "↓ lower is better"
+            tag = " (headline)" if i == 0 else ""
+            line = f"- **{e['name']}**{tag} — `{unit}` ({_unit_desc(unit)}), {arrow}. {_rep_str(e, unit)}."
+            if e.get("note"):
+                line += f" {e['note']}"
+            L.append(line)
+    else:
+        L.append(f"- `{wl.get('cmd')}` — `{wl.get('unit') or 'unit'}`; no per-metric number reported in the PR.")
+    if wl.get("cmd"):
+        L += ["", f"Workload command (run per arm): `{wl['cmd']}`"]
+    if wl.get("note"):
+        L.append(f"Mechanism / note: {wl['note']}")
+    L.append("")
+
+    # --- the issue the PR set out to fix ---
+    L += ["## The problem (issue)", "(from `solution.md`, quoted)", "",
+          _quote(issue) if issue else "> (see solution.md)", ""]
     if detail:
         L += ["### Issue — detailed", "", _quote(detail), ""]
+
+    # --- PR's solution: the blind arm has everything below this heading stripped ---
     L += ["## PR's solution (reference — what was merged)"]
     if fix:
         L += ["**Fix in words** (from `solution.md`):", "", _quote(fix), ""]
@@ -577,32 +634,18 @@ def render_problem_md(pr, t):
         L += ["**Author's words:**", "", _quote(author), ""]
     if not fix and not author:
         L += ["(see solution.md)", ""]
-    L += ["## Workload + experiments (what will be measured)",
-          "Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your",
-          "edit is timed on the SAME workload. Beat the PR's solution on these metrics:"]
-    exps = t.get("experiments") or []
-    for i, e in enumerate(exps):
-        unit = e.get("unit") or wl.get("unit") or "unit"
-        line = f"- **{e['name']}** ({unit}): {_rep_str(e, unit)}."
-        if i == 0 and wl.get("cmd"):
-            line += f" workload: `{wl['cmd']}`"
-        if e.get("note"):
-            line += f" {e['note']}"
-        L.append(line)
-    if not exps:
-        L.append(f"- the workload `{wl.get('cmd')}` ({wl.get('unit') or 'unit'}); no per-metric number in the PR")
-    if wl.get("note"):
-        L.append(f"- note: {wl['note']}")
-    L += ["", "## Reported numbers (PR author)",
+
+    L += ["## Reported numbers (PR author)",
           f"- gain: {t.get('reported_gain') or '—'} ({t.get('gain_kind') or '—'})"]
     if t.get("gain_evidence"):
         L.append(f"- evidence: {' '.join(str(t['gain_evidence']).replace('#', '').split())}")
     if t.get("experiments_note"):
         L.append(f"- {t['experiments_note']}")
+
     L += ["", "## Rules",
           "- Edit only files under `./vllm`.",
           "- Keep behavior correct (hidden pytest must pass).",
-          "- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.", ""]
+          "- Beating the PR's solution on the headline metric wins; equal speed ties it.", ""]
     return "\n".join(L)
 
 

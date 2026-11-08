@@ -1,10 +1,33 @@
 # Task PR #33538 — [Kernel] Triton-based Top-k and Top-p sampler kernels (#33538)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **topk_whole_b16_v32768** in `ms` (milliseconds (1e-3 s)); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **topk_whole_b16_v32768** (headline) — `ms` (milliseconds (1e-3 s)), ↓ lower is better. reported 0.28 -> 0.067 ms.
+- **topp_whole_b16_v32768** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. reported 0.361 -> 0.184 ms.
+- **topk_topp_whole_b16_v32768** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. reported 0.242 -> 0.093 ms.
+- **mixed_partial_b16_v32768** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. reported 0.266 -> 0.205 ms.
+- **topk_whole_b1_v32768** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. reported 0.101 -> 0.065 ms.
+- **topk_whole_b128_v32768** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. no number reported in the PR.
+- **topk_topp_whole_b2048_v131072** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. no number reported in the PR.
+
+Workload command (run per arm): `python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20`
+Mechanism / note: Adds Triton sampler + bench script. Triton vs PyTorch sort-based. CUDA-only.
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -201,18 +224,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 >
 > Existing semantic notes in [33538.sem.json](./33538.sem.json) are derived annotations. They are not a substitute for this patch or the original discussion.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **topk_whole_b16_v32768** (ms): reported 0.28 -> 0.067 ms. workload: `python3 benchmarks/benchmark_topk_topp.py --batch-sizes 1 16 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20`
-- **topp_whole_b16_v32768** (ms): reported 0.361 -> 0.184 ms.
-- **topk_topp_whole_b16_v32768** (ms): reported 0.242 -> 0.093 ms.
-- **mixed_partial_b16_v32768** (ms): reported 0.266 -> 0.205 ms.
-- **topk_whole_b1_v32768** (ms): reported 0.101 -> 0.065 ms.
-- **topk_whole_b128_v32768** (ms): no number reported in the PR.
-- **topk_topp_whole_b2048_v131072** (ms): no number reported in the PR.
-- note: Adds Triton sampler + bench script. Triton vs PyTorch sort-based. CUDA-only.
-
 ## Reported numbers (PR author)
 - gain: up to 9.94x vs PyTorch topk sampler (batch 4, vocab 32768) (unit)
 - evidence: faster triton topk/topp sampler kernels
@@ -221,4 +232,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

@@ -1,10 +1,31 @@
 # Task PR #37225 — [Perf] Optimize top-k search in apply_top_k_top_p_triton sampler (#37225)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **topk_whole_b2048_v32768** in `ms` (milliseconds (1e-3 s)); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **topk_whole_b2048_v32768** (headline) — `ms` (milliseconds (1e-3 s)), ↓ lower is better. reported 0.761 -> 0.55 ms.
+- **topk_whole_b2048_v131072** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. reported 2.312 -> 1.891 ms.
+- **topk_topp_whole_b2048_v32768** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. reported 1.211 -> 0.907 ms.
+- **topk_topp_whole_b2048_v131072** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. reported 3.206 -> 2.652 ms.
+- **topk_whole_b128_v32768** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. reported 0.071 -> 0.056 ms.
+
+Workload command (run per arm): `python3 benchmarks/benchmark_topk_topp.py --batch-sizes 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20`
+Mechanism / note: CUDA-only (aborts without torch.cuda). topk_whole b2048/32k 0.761->0.550ms.
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,16 +45,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > Fix `min_larger` in the top-k ternary search to compute the min of values above the pivot rather than the global min, making the termination condition converge in ~3–5 iterations instead of hitting the 18-iteration cap. Fuse the `num_min_larger` second pass into the first pass for the top-k paths, eliminating a redundant full data scan per search iteration. Top-p-only path left untouched.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **topk_whole_b2048_v32768** (ms): reported 0.761 -> 0.55 ms. workload: `python3 benchmarks/benchmark_topk_topp.py --batch-sizes 128 2048 --vocab-sizes 32768 131072 --warmup-iters 5 --benchmark-iters 20`
-- **topk_whole_b2048_v131072** (ms): reported 2.312 -> 1.891 ms.
-- **topk_topp_whole_b2048_v32768** (ms): reported 1.211 -> 0.907 ms.
-- **topk_topp_whole_b2048_v131072** (ms): reported 3.206 -> 2.652 ms.
-- **topk_whole_b128_v32768** (ms): reported 0.071 -> 0.056 ms.
-- note: CUDA-only (aborts without torch.cuda). topk_whole b2048/32k 0.761->0.550ms.
-
 ## Reported numbers (PR author)
 - gain: 28%, 25% (pct)
 - evidence: Benchmark results (benchmark_topk_topp.py) - **top-k only: 17–28% faster** across all batch sizes and vocab sizes - **top-k + top-p combined: 16–25% faster**
@@ -42,4 +53,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

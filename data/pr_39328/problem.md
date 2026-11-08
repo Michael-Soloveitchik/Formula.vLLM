@@ -1,10 +1,28 @@
 # Task PR #39328 — [Core] Cache InductorPass.hash_source with functools.cache (#39328)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **cache_lookup** in `ms` (milliseconds (1e-3 s)); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **cache_lookup** (headline) — `ms` (milliseconds (1e-3 s)), ↓ lower is better. reported 32.5 -> 11.3 ms.
+- **cold_compile** — `s` (seconds), ↓ lower is better. reported 34.1 -> 29.7 s.
+
+Workload command (run per arm): `python3 /task/bench.py`
+Mechanism / note: Real InductorPass.hash_source, 10000 lookups cycling 5 source objects after one untimed call each; total ms per 10000 lookups (author's scale), median of 5. cold_compile (Llama-3-70B TP4 torch.compile) is reported-only.
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,13 +42,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > Author notes hash_source() repeatedly calls inspect.getsource() though source doesn't change at runtime. They extract hashing into a module-level _hash_source_cached() helper decorated with functools.cache, resolving object instances to their __class__ to form a hashable cache key, eliminating repeated inspect.getsource() calls across all pass uuid() computations.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **cache_lookup** (ms): reported 32.5 -> 11.3 ms. workload: `python3 /task/bench.py`
-- **cold_compile** (s): reported 34.1 -> 29.7 s.
-- note: Real InductorPass.hash_source, 10000 lookups cycling 5 source objects after one untimed call each; total ms per 10000 lookups (author's scale), median of 5. cold_compile (Llama-3-70B TP4 torch.compile) is reported-only.
-
 ## Reported numbers (PR author)
 - gain: 1.15x, 2.88x (pct)
 - evidence: Test Result - 4/4 tests passed in test_pass_manager.py - E2E test passed (cold compile 29.5s, correct output) - Cold compile time: 29.70s ± 0.50s (baseline 3
@@ -39,4 +50,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

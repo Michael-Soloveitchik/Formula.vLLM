@@ -1,0 +1,172 @@
+{
+ "schema": "workload_v2",
+ "pr": 41163,
+ "title": "[Perf] Optimize `AllPool.forward` by slicing first, 51% faster in the method level benchmark (#41163)",
+ "url": "https://github.com/vllm-project/vllm/pull/41163",
+ "field": "gpu_kernels",
+ "area": "model_executor/layers",
+ "date": "2026-04-29",
+ "hw": "cpu",
+ "hw_override": null,
+ "base_sha": "b92ef9ec5a041b538f44d9584bef0e34bfbeecd1",
+ "merge_sha": "39a7f4f4e2635012ead0ad127970d7b6778890af",
+ "source_files": [
+  "vllm/model_executor/layers/pooler/tokwise/methods.py"
+ ],
+ "test_files": [
+  "tests/models/language/pooling/test_token_classification.py"
+ ],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:41163",
+  "dockerfile": "data/pr_41163/workload/cpu/Dockerfile",
+  "template": "templates/Dockerfile.cpu-wheel",
+  "wheel": "0.20.1",
+  "wheel_note": "first PyPI release after merge (2026-05-04 > 2026-04-29); torch 2.11 cu128 wheel runs on sm_120.",
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:41163 data/pr_41163/workload/cpu"
+ },
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_41163/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "needs": "gpu",
+  "cluster": "none_gpu",
+  "all_clusters": [
+   "none_gpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "data/pr_41163 (bench.py, tests/)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "bench.py is the author's method-level benchmark from the PR body, verbatim (64 reqs x 128 tokens, subgroup 32, hidden 4096, bf16; median of 5 x 4000 iters). /task = tasks/pr_41163 mounted read-only in the task image.",
+  "base_note": null
+ },
+ "policy": {
+  "source": "pipeline/run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "task.json:repeats (or hardware_overrides[<hw>].repeats)",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in data/pr_<n>/work/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> data/pr_<n>/work/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY task.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "allpool_forward_median",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": true,
+   "parse": "regex 'AllPool.forward median: <us> us'",
+   "reported": {
+    "baseline": 59.89,
+    "pr_solution": 39.65
+   },
+   "note": null
+  }
+ ],
+ "headline": "allpool_forward_median",
+ "reported": {
+  "gain": "51%",
+  "gain_kind": "pct",
+  "gain_evidence": "# PR #41163: [Perf] Optimize `AllPool.forward` by slicing first, 51% faster in the method level benchmark",
+  "experiments_note": "reported = PR body (us, median of the author's benchmark on their GPU)",
+  "author_hardware_args": [
+   {
+    "line": 50,
+    "text": "def build_metadata(device: torch.device) -> PoolingMetadata:"
+   },
+   {
+    "line": 136,
+    "text": "AllPool.forward median: 39.65 us"
+   },
+   {
+    "line": 143,
+    "text": "AllPool.forward median: 59.89 us"
+   }
+  ],
+  "source": "data/pr_41163/pr.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": "AllPool.forward on cuda:0",
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.20.1",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ },
+ "reproduced": null,
+ "gap": {
+  "verdict": "contention / WSL2 host overhead** (not hardware)\nReported median 59.89→39.65 µs (author's runs 59.4-60.2, 39.5-39.7: sd < 1 %). Ours\n106→78.5 µs with sd 23 / 16 µs (22 %). Per-run medians are **bimodal**: baseline\n[89, 107, 91, 72, 132], PR's solution [71, 72, 71, 131, 88] — both arms touch ~71 and ~131 µs, a 1.85×\nstep. The benchmark is wall-clock around 4000 calls that each `.tolist()`/sync, so it measures\nhost launch+sync latency, not GPU work. Our *floor* (71 µs) is identical for baseline and PR's solution: the\nPR's saving (fewer GPU bytes) is entirely hidden under WSL2 launch/sync latency, and the 1.35×\n\"gain\" we record is an artefact of which runs landed on the slow mode. Verdict: box, not GPU —\nP/E-core placement of the WSL2 vCPU and/or other tenants. Bench script is the author's verbatim\n(64 × 128 tokens, subgroup 32, hidden 4096, bf16, 500 warmup, 5 × 4000). Fix: recommendations\n1-5; also run baseline / PR-solution interleaved (ABBA) so both arms sample the same mode.\n\n### 33538 — Triton top-k/top-p sampler vs PyTorch sort — **WSL2 launch latency (box), small-batch rows",
+  "what": "`AllPool.forward` slicing",
+  "note": "Baseline arm cannot run the script (it is introduced by the PR); baseline = the script's own \"PyTorch (ms)\" column in the PR's-solution run (by design, `task.json:workload.base_note`). Reported PyTorch 0.28 ms at b16 v32k; ours 1.21 ms. Our PyTorch column is **flat in batch**: 1.14 ms at b128, 1.23 ms at b16, 0.23-0.28 ms at b1 — i.e. ~1.1 ms of fixed per-call overhead for the ~20-30 kernels the sort/cumsum/mask path launches, vs the author's floor of ~0.10 ms (their b1 row). That is a 10× per-launch gap, exactly the WSL2 signature. The Triton arm (3-4 launches) is only 1.6× off the author (0.067 → 0.109 ms), so our 11× ratio vs their 4.2× overstates the PR at small batch. Large-batch rows (b2048: 20.4 / 81.5 ms PyTorch) are bandwidth-bound and are the honest comparison. Args are a superset of the author's (`--batch-sizes 1 16 128 2048`; author also ran 4 24 32 48 56). Cannot be made 1:1 on WSL2; report b2048 rows as headline or note the floor.",
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:41163 data/pr_41163/workload/cpu",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_41163:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:41163 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_41163:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:41163 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": "PR says 'covered in current CI'; test_token_classification.py exercises the token-wise pooler (AllPool) end-to-end on a small HF model (downloads into the shared HF cache). Perf-only PR: baseline and PR's solution both expected PASS."
+}

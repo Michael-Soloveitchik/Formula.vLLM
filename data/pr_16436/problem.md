@@ -1,10 +1,29 @@
 # Task PR #16436 — [Core] Speed up decode by remove synchronizing operation in sampler (#16436)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **tpot** in `ms` (milliseconds (1e-3 s)); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **tpot** (headline) — `ms` (milliseconds (1e-3 s)), ↓ lower is better. no number reported in the PR.
+- **itl** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. no number reported in the PR.
+- **throughput** — `tok/s` (tokens per second), ↑ higher is better. no number reported in the PR.
+
+Workload command (run per arm): `python3 benchmarks/benchmark_serving.py --backend vllm --model facebook/opt-125m --dataset-name random --random-input-len 1000 --random-output-len 100 --num-prompts 100`
+Mechanism / note: Removes CUDA sync in apply_penalties; win via GPU serving + trace. ~8% decode for small models.
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,14 +43,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > Author identified that boolean advanced indexing calls `nonzero`, which requires a CPU sync in PyTorch (confirmed via sync debug mode and pytorch/pytorch#12461, where the sync is deemed unavoidable for mask indexing). By refactoring to avoid the indexing, the sync is removed, letting much more sampling-phase CPU work overlap with the GPU forward pass, giving an 8% decode speedup for smaller models.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **tpot** (ms): no number reported in the PR. workload: `python3 benchmarks/benchmark_serving.py --backend vllm --model facebook/opt-125m --dataset-name random --random-input-len 1000 --random-output-len 100 --num-prompts 100`
-- **itl** (ms): no number reported in the PR.
-- **throughput** (tok/s): no number reported in the PR.
-- note: Removes CUDA sync in apply_penalties; win via GPU serving + trace. ~8% decode for small models.
-
 ## Reported numbers (PR author)
 - gain: 8% (pct)
 - evidence: By refactoring the code to avoid the indexing, we can remove the sync and allow much more of the sampling phase CPU work to overlap with the forward pass on the
@@ -40,4 +51,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

@@ -1,10 +1,30 @@
 # Task PR #24573 — [EPLB] Reduce EPLB Inference Overhead (#24573)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **eplb_select_experts_m64** in `us` (microseconds (1e-6 s)); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **eplb_select_experts_m64** (headline) — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **eplb_select_experts_m1024** — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **serving_request_throughput** — `req/s` (requests per second), ↑ higher is better. reported 27.74 -> 28.41 req/s.
+- **serving_mean_tpot** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. reported 192.4 -> 188.2 ms.
+
+Workload command (run per arm): `python3 /task/bench.py`
+Mechanism / note: FusedMoE.select_experts (static) with enable_eplb=True on synthetic routing: 256 logical / 288 physical experts (32 replicated), top_k 8, M=64 and 1024; baseline = torch.rand replica pick + masks inline, PR's solution = torch.compile'd eplb_map_to_physical_and_record. Wall-clock us per call. Author numbers are DP16 DeepSeek-V3 serving w/ EPLB main vs PR (reported-only).
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,15 +44,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > Author reduces EPLB overhead three ways: (1) switch from `torch.rand` to a simple modulo-based pseudo-random replica selection keyed on token index and routing rank `k`; (2) remove unnecessary masking of local experts since global physical expert-load metrics are now collected; (3) extract all EPLB logic from `select_experts` into a `torch.compile`-friendly function. Tested with EPLB enabled, `num_redundant_experts=0`, and no rearrangement to isolate replica-selection and load-recording cost on DeepSeek-V3-0324 DP16.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **eplb_select_experts_m64** (us): no number reported in the PR. workload: `python3 /task/bench.py`
-- **eplb_select_experts_m1024** (us): no number reported in the PR.
-- **serving_request_throughput** (req/s): reported 27.74 -> 28.41 req/s.
-- **serving_mean_tpot** (ms): reported 192.4 -> 188.2 ms.
-- note: FusedMoE.select_experts (static) with enable_eplb=True on synthetic routing: 256 logical / 288 physical experts (32 replicated), top_k 8, M=64 and 1024; baseline = torch.rand replica pick + masks inline, PR's solution = torch.compile'd eplb_map_to_physical_and_record. Wall-clock us per call. Author numbers are DP16 DeepSeek-V3 serving w/ EPLB main vs PR (reported-only).
-
 ## Reported numbers (PR author)
 - gain: 3.97% (pct)
 - evidence: **Summary:** Not accounting for the benefits of improved expert load balancing, on the main branch, EPLB introduces ~3.97% throughput drop.
@@ -41,4 +52,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

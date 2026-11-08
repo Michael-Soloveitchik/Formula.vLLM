@@ -1,0 +1,210 @@
+{
+ "schema": "workload_v2",
+ "pr": 28280,
+ "title": "[Kernel] Optimization of the mm_k operator. (#28280)",
+ "url": "https://github.com/vllm-project/vllm/pull/28280",
+ "field": "gpu_kernels",
+ "area": "lora/ops",
+ "date": "2025-11-11",
+ "hw": "cpu",
+ "hw_override": null,
+ "base_sha": "b06b9470ca881f89feea72e4d89b20c213f360d4",
+ "merge_sha": "40e2eeeb92d926b9773c4ed339375d26b10456e2",
+ "source_files": [
+  "vllm/lora/ops/triton_ops/kernel_utils.py"
+ ],
+ "test_files": [],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:28280",
+  "dockerfile": "data/pr_28280/workload/cpu/Dockerfile",
+  "template": "templates/Dockerfile.cpu-wheel",
+  "wheel": "0.11.1",
+  "wheel_note": "first PyPI release after merge (2025-11-19 > 2025-11-11); picked by gen_tasks.py from PyPI upload dates.",
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:28280 data/pr_28280/workload/cpu"
+ },
+ "workload": {
+  "kind": "serving",
+  "script": "benchmarks/benchmark_serving.py",
+  "cmd": "vllm bench serve --num-prompts 100 --dataset-name sharegpt",
+  "needs": "gpu",
+  "cluster": "qwen05b",
+  "all_clusters": [
+   "qwen05b",
+   "llama8b_fp8"
+  ],
+  "model": "Qwen/Qwen2-0.5B",
+  "weights": {
+   "hf_id": "Qwen/Qwen2-0.5B",
+   "size": "~1GB",
+   "cache": ".weights/qwen05b"
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "data/pr_28280 (bench.py, tests/)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "Triton matmul (EVEN_K masking). PR gives serving numbers only (C500/H800).",
+  "base_note": null
+ },
+ "policy": {
+  "source": "pipeline/run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "task.json:repeats (or hardware_overrides[<hw>].repeats)",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in data/pr_<n>/work/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> data/pr_<n>/work/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY task.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "output_throughput",
+   "unit": "tok/s",
+   "higher_is_better": true,
+   "headline": true,
+   "parse": "GENERIC line 'output_throughput [label] <number>' (tok/s)",
+   "reported": {
+    "baseline": 267.82,
+    "pr_solution": 296.95
+   },
+   "note": null
+  },
+  {
+   "name": "tpot",
+   "unit": "ms",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "GENERIC line 'tpot [label] <number>' (ms)",
+   "reported": {
+    "baseline": 67.93,
+    "pr_solution": 61.74
+   },
+   "note": null
+  }
+ ],
+ "headline": "output_throughput",
+ "reported": {
+  "gain": "8%",
+  "gain_kind": "pct",
+  "gain_evidence": "Output token throughput increases by approximately 8%, consistent with the intuition that this change is more friendly to older GPU architectures.*",
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
+  "author_hardware_args": [
+   {
+    "line": 33,
+    "text": "Output token throughput (tok/s):         267.82"
+   },
+   {
+    "line": 39,
+    "text": "-----Time per Output Token (excl. 1st token)------"
+   },
+   {
+    "line": 58,
+    "text": "Output token throughput (tok/s):         296.95"
+   },
+   {
+    "line": 64,
+    "text": "-----Time per Output Token (excl. 1st token)------"
+   },
+   {
+    "line": 88,
+    "text": "Output token throughput (tok/s):         1039.72"
+   },
+   {
+    "line": 89,
+    "text": "Peak output token throughput (tok/s):    1176.00"
+   },
+   {
+    "line": 96,
+    "text": "-----Time per Output Token (excl. 1st token)------"
+   },
+   {
+    "line": 117,
+    "text": "Output token throughput (tok/s):         1053.84"
+   },
+   {
+    "line": 118,
+    "text": "Peak output token throughput (tok/s):    1160.00"
+   },
+   {
+    "line": 125,
+    "text": "-----Time per Output Token (excl. 1st token)------"
+   }
+  ],
+  "source": "data/pr_28280/pr.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 16,
+   "compute_cap_min": 8.9,
+   "compute_cap_max": null,
+   "gpu_hint": "serving (sharegpt) on Qwen2-0.5B / Llama-3-8B-FP8",
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.11.1",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": true,
+   "pipeline": "wheel"
+  }
+ },
+ "reproduced": null,
+ "gap": {
+  "verdict": "not analysed",
+  "note": null,
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:28280 data/pr_28280/workload/cpu",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_28280:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:28280 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; vllm bench serve --num-prompts 100 --dataset-name sharegpt'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_28280:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:28280 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; vllm bench serve --num-prompts 100 --dataset-name sharegpt'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": ""
+}

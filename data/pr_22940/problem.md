@@ -1,10 +1,29 @@
 # Task PR #22940 — [Core] direct indexing on self.block_table_np in compute_slot_mapping (#22940)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **throughput_output_tok_s** in `tok/s` (tokens per second); maximize it (higher is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **throughput_output_tok_s** (headline) — `tok/s` (tokens per second), ↑ higher is better. reported 2.07 % gain.
+- **throughput_total_tok_s** — `tok/s` (tokens per second), ↑ higher is better. no number reported in the PR.
+- **throughput_req_s** — `tok/s` (tokens per second), ↑ higher is better. no number reported in the PR.
+
+Workload command (run per arm): `VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 30000 --dtype float16 --max-num-seqs 1024 --max-num-batched-tokens 16384`
+Mechanism / note: Author ran --num-prompts 30000 (opt-125m, in 800 / out 75). We run 2000 prompts per repeat so 5 repeats x 4 arms fit in a session; same per-step hot path (compute_slot_mapping runs every step), throughput ratio comparable, absolute tok/s not 1:1 (different GPU, shorter run). Weights come from the HF cache mounted at /root/.cache/huggingface (.weights/hf on the host). Args match the author: vllm 0.10.1 gives >=70 GiB GPUs max_num_seqs=1024/max_num_batched_tokens=16384 by default, we must pass them; 30000 prompts ~16 min/run so repeats=1.
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,14 +43,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > Author replaced Torch tensor flattening and conversion with direct NumPy indexing via `ravel` on `self.block_table_np`, eliminating redundant copies and framework conversions in slot-mapping computation.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **throughput_output_tok_s** (tok/s): reported 2.07 % gain. workload: `VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 30000 --dtype float16 --max-num-seqs 1024 --max-num-batched-tokens 16384`
-- **throughput_total_tok_s** (tok/s): no number reported in the PR.
-- **throughput_req_s** (tok/s): no number reported in the PR.
-- note: Author ran --num-prompts 30000 (opt-125m, in 800 / out 75). We run 2000 prompts per repeat so 5 repeats x 4 arms fit in a session; same per-step hot path (compute_slot_mapping runs every step), throughput ratio comparable, absolute tok/s not 1:1 (different GPU, shorter run). Weights come from the HF cache mounted at /root/.cache/huggingface (.weights/hf on the host). Args match the author: vllm 0.10.1 gives >=70 GiB GPUs max_num_seqs=1024/max_num_batched_tokens=16384 by default, we must pass them; 30000 prompts ~16 min/run so repeats=1.
-
 ## Reported numbers (PR author)
 - gain: 2.07% (pct)
 - evidence: Throughput improved 2.07% for opt-125m with input=800 and output=75
@@ -40,4 +51,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

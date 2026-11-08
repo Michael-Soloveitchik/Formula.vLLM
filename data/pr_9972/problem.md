@@ -1,10 +1,29 @@
 # Task PR #9972 — [V1] Prefix caching (take 2) (#9972)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **input_throughput** in `tok/s` (tokens per second); maximize it (higher is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **input_throughput** (headline) — `tok/s` (tokens per second), ↑ higher is better. reported 1.792e+04 -> 3.226e+04 tok/s.
+- **output_throughput** — `tok/s` (tokens per second), ↑ higher is better. reported 485 -> 874 tok/s.
+- **cost_time** — `s` (seconds), ↓ lower is better. reported 8.49 -> 4.83 s.
+
+Workload command (run per arm): `VLLM_USE_V1=1 python3 benchmarks/benchmark_prefix_caching.py --model neuralmagic/Meta-Llama-3-8B-Instruct-FP8 --num-prompts 200 --repeat-count 2 --input-length-range 256:512 --dataset-path ./ShareGPT_V3_unfiltered_cleaned_split.json --seed 0 --enable-prefix-caching`
+Mechanism / note: Offline batching bench; needs model + ShareGPT dataset. GPU serving run. Numbers are cache-enabled (49% hit).
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -26,14 +45,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 >
 > Existing semantic notes in [9972.sem.json](./9972.sem.json) are derived annotations. They are not a substitute for this patch or the original discussion.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **input_throughput** (tok/s): reported 1.792e+04 -> 3.226e+04 tok/s. workload: `VLLM_USE_V1=1 python3 benchmarks/benchmark_prefix_caching.py --model neuralmagic/Meta-Llama-3-8B-Instruct-FP8 --num-prompts 200 --repeat-count 2 --input-length-range 256:512 --dataset-path ./ShareGPT_V3_unfiltered_cleaned_split.json --seed 0 --enable-prefix-caching`
-- **output_throughput** (tok/s): reported 485 -> 874 tok/s.
-- **cost_time** (s): reported 8.49 -> 4.83 s.
-- note: Offline batching bench; needs model + ShareGPT dataset. GPU serving run. Numbers are cache-enabled (49% hit).
-
 ## Reported numbers (PR author)
 - gain: 3x (pct)
 - evidence: It is ~3x faster than list matching.
@@ -42,4 +53,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

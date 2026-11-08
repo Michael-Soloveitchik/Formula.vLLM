@@ -1,10 +1,31 @@
 # Task PR #31722 — [PERF] Speed-up of GDN attention decode part (Qwen3-Next) (#31722)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **fused_recurrent_b32_tp2** in `us` (microseconds (1e-6 s)); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **fused_recurrent_b32_tp2** (headline) — `us` (microseconds (1e-6 s)), ↓ lower is better. reported 30.14 -> 20.29 us.
+- **fused_recurrent_b128_tp2** — `us` (microseconds (1e-6 s)), ↓ lower is better. reported 93.38 -> 59.17 us.
+- **fused_recurrent_b512_tp2** — `us` (microseconds (1e-6 s)), ↓ lower is better. reported 341.6 -> 212.7 us.
+- **fused_recurrent_b128_tp4** — `us` (microseconds (1e-6 s)), ↓ lower is better. reported 52.06 -> 33.76 us.
+- **decode_output_throughput** — `tok/s` (tokens per second), ↑ higher is better. reported 2.389e+04 -> 2.79e+04 tok/s.
+
+Workload command (run per arm): `python3 /task/bench.py`
+Mechanism / note: Triton fused_recurrent_gated_delta_rule_fwd (GDN decode) with Qwen3-Next shapes (K=V=128; TP2: H=8/HV=16, TP4: H=4/HV=8), T=1, bf16. PR = BV tile 8->32. CUDA-event us per call. Reported = author's H200 kernel table.
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,16 +45,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > The author sped up the GDN decode kernel `fused_recurrent_gated_delta_rule_fwd` for Qwen3-Next shapes, benchmarking it in isolation on H200/B200 (TP=2 and TP=4, batch 32–1024) and showing ~1.4–1.6x kernel speedups. End-to-end, serving Qwen/Qwen3-Next-80B-A3B-Instruct-FP8 at TP=2 with expert parallelism and async scheduling, output token throughput rose from 23891 to 27904 tok/s, a 16.8% improvement.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **fused_recurrent_b32_tp2** (us): reported 30.14 -> 20.29 us. workload: `python3 /task/bench.py`
-- **fused_recurrent_b128_tp2** (us): reported 93.38 -> 59.17 us.
-- **fused_recurrent_b512_tp2** (us): reported 341.6 -> 212.7 us.
-- **fused_recurrent_b128_tp4** (us): reported 52.06 -> 33.76 us.
-- **decode_output_throughput** (tok/s): reported 2.389e+04 -> 2.79e+04 tok/s.
-- note: Triton fused_recurrent_gated_delta_rule_fwd (GDN decode) with Qwen3-Next shapes (K=V=128; TP2: H=8/HV=16, TP4: H=4/HV=8), T=1, bf16. PR = BV tile 8->32. CUDA-event us per call. Reported = author's H200 kernel table.
-
 ## Reported numbers (PR author)
 - gain: 16.8% (pct)
 - evidence: **Speedup: 16.8%**
@@ -42,4 +53,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

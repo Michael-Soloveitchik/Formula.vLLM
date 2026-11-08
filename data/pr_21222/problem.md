@@ -1,10 +1,28 @@
 # Task PR #21222 — [Core] Introduce popleft_n and append_n in FreeKVCacheBlockQueue to further optimize block_pool (#21222)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **get_new_blocks** in `us/op` (us/op); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **get_new_blocks** (headline) — `us/op` (us/op), ↓ lower is better. reported 150 -> 8 us/op.
+- **free_blocks** — `us/op` (us/op), ↓ lower is better. reported 33 -> 9 us/op.
+
+Workload command (run per arm): `python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000`
+Mechanism / note: Pure Python microbench; imports vllm.v1.core.block_pool.BlockPool + vllm.utils, no CUDA. One run prints both ops.
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,13 +42,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > Introduce bulk popleft_n and append_n operators that exploit the known total count to perform the linked-list manipulation in a single pass, rather than popping/appending one block at a time. Because single-element popleft/append each do an unnecessary fake-head/tail reconnection, batching halves the number of linked-list operations. New unit tests cover append_n and popleft_n, and benchmarks confirm get_blocks and free_blocks times are cut in half.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **get_new_blocks** (us/op): reported 150 -> 8 us/op. workload: `python3 benchmarks/kv_cache/benchmark_block_pool.py --num-gpu-blocks 100000 --num-iteration 1000 --allocate-blocks 10 50 100 500 1000`
-- **free_blocks** (us/op): reported 33 -> 9 us/op.
-- note: Pure Python microbench; imports vllm.v1.core.block_pool.BlockPool + vllm.utils, no CUDA. One run prints both ops.
-
 ## Reported numbers (PR author)
 - gain: 95% (0.15ms→0.008ms) (unit)
 - evidence: benchmark scripts - Get new blocks improved from 0.15ms to 0.008ms - Free new blocks improved from 33us to 9us
@@ -39,4 +50,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

@@ -1,10 +1,28 @@
 # Task PR #23504 — [Perf] Add Triton config for DeepSeek V3 FP8 EP32 H200 (#23504)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **serving_throughput** in `tok/s` (tokens per second); maximize it (higher is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **serving_throughput** (headline) — `tok/s` (tokens per second), ↑ higher is better. reported 1.678e+04 -> 1.687e+04 tok/s.
+- **w8a8_kernel** — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+
+Workload command (run per arm): `python3 benchmarks/kernels/benchmark_w8a8_block_fp8.py --tp-size 8 --input-type fp8 --out-dtype float16 --block-n 128 --block-k 128`
+Mechanism / note: W8A8 block FP8 Triton kernel tuning; GPU-only (H200 config).
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,13 +42,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > Add the optimal tuned Triton config for DeepSeek V3 under the DP8TP4EP32 deployment on H200, which resolves the two missing-config warnings (block-FP8 N=2112,K=7168 and fused MoE E=8,N=2048). Validated by benchmarking DeepSeek V3-0324 serving at max-concurrency 2048, 4096 prompts, 2048/1024 input/output len; tuned vs untuned showed comparable-to-slightly-better throughput (16872 vs 16776 tok/s total) and TPOT.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **serving_throughput** (tok/s): reported 1.678e+04 -> 1.687e+04 tok/s. workload: `python3 benchmarks/kernels/benchmark_w8a8_block_fp8.py --tp-size 8 --input-type fp8 --out-dtype float16 --block-n 128 --block-k 128`
-- **w8a8_kernel** (us): no number reported in the PR.
-- note: W8A8 block FP8 Triton kernel tuning; GPU-only (H200 config).
-
 ## Reported numbers (PR author)
 - gain: 1.6x (pct)
 - evidence: The initial throughput number looked too good (1.6x speedup with tuning).
@@ -39,4 +50,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

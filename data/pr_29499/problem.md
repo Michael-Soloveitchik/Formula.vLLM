@@ -1,10 +1,30 @@
 # Task PR #29499 — [EPLB] Optimize EPLB with numpy (#29499)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **rearrange_e2e** in `ms` (milliseconds (1e-3 s)); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **rearrange_e2e** (headline) — `ms` (milliseconds (1e-3 s)), ↓ lower is better. reported 1370 -> 1077 ms. author: profile of eplb_state.py rearrange on one rank incl. P2P + GPU copies (1s370ms -> 1s77ms); ours: CPU index-mapping path for all 8 ranks x 48 layers, no transport -- compare the ratio, not the absolute
+- **get_ep_ranks_with_expert** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. no number reported in the PR.
+- **move_to_buffer** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. no number reported in the PR.
+- **move_from_buffer** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. no number reported in the PR.
+
+Workload command (run per arm): `python3 /task/bench.py`
+Mechanism / note: EPLB rebalance index logic on CPU, Qwen3-Next-80B -dp 8 geometry (8 ranks x 68 local = 544 physical experts, 48 MoE layers) as in the author's server. rearrange_e2e = the arm's real move_to_buffer + move_from_buffer for every layer and every rank with P2P transport stubbed and tiny weights (index mapping only). Three primitives kept as secondary metrics. All units ms (bench.py times in ms).
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,15 +44,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > Author removes multiple gpu-cpu transfers in `move_from_buffer` and reimplements `get_ep_ranks_with_expert`, `move_to_buffer`, and `move_from_buffer` in numpy, yielding ~20-25% average gain per primitive. Adds a `preserve_intragpu_slots` primitive that post-processes rebalance results so experts assigned to move within the same GPU stay in their slots, avoiding unnecessary GPU memcopies. Adds a `log_balancedness_interval` config parameter to tune balancedness-logging frequency and reduce logging collectives, and fixes a bug in EPLB config post-processing.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **rearrange_e2e** (ms): reported 1370 -> 1077 ms. workload: `python3 /task/bench.py` author: profile of eplb_state.py rearrange on one rank incl. P2P + GPU copies (1s370ms -> 1s77ms); ours: CPU index-mapping path for all 8 ranks x 48 layers, no transport -- compare the ratio, not the absolute
-- **get_ep_ranks_with_expert** (ms): no number reported in the PR.
-- **move_to_buffer** (ms): no number reported in the PR.
-- **move_from_buffer** (ms): no number reported in the PR.
-- note: EPLB rebalance index logic on CPU, Qwen3-Next-80B -dp 8 geometry (8 ranks x 68 local = 544 physical experts, 48 MoE layers) as in the author's server. rearrange_e2e = the arm's real move_to_buffer + move_from_buffer for every layer and every rank with P2P transport stubbed and tiny weights (index mapping only). Three primitives kept as secondary metrics. All units ms (bench.py times in ms).
-
 ## Reported numbers (PR author)
 - gain: 27% (rearrange 1370->1077ms E2E); 20-25% per primitive (pct)
 - evidence: ~27% speedup
@@ -41,4 +52,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

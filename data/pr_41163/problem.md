@@ -1,10 +1,27 @@
 # Task PR #41163 — [Perf] Optimize `AllPool.forward` by slicing first, 51% faster in the method level benchmark (#41163)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **allpool_forward_median** in `us` (microseconds (1e-6 s)); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **allpool_forward_median** (headline) — `us` (microseconds (1e-6 s)), ↓ lower is better. reported 59.89 -> 39.65 us.
+
+Workload command (run per arm): `python3 /task/bench.py`
+Mechanism / note: bench.py is the author's method-level benchmark from the PR body, verbatim (64 reqs x 128 tokens, subgroup 32, hidden 4096, bf16; median of 5 x 4000 iters). /task = tasks/pr_41163 mounted read-only in the task image.
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,12 +41,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > Slice the subgroup out of the full hidden_states tensor once using its group start/end bounds, then split that contiguous slice by per-request token counts (`num_scheduled_tokens_cpu`) instead of iterating and slicing per request. This avoids the extra host-visible syncs from `.tolist()`/`.item()` in the hot path and cuts method-level time from 59.89 us to 39.65 us (~51% faster).
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **allpool_forward_median** (us): reported 59.89 -> 39.65 us. workload: `python3 /task/bench.py`
-- note: bench.py is the author's method-level benchmark from the PR body, verbatim (64 reqs x 128 tokens, subgroup 32, hidden 4096, bf16; median of 5 x 4000 iters). /task = tasks/pr_41163 mounted read-only in the task image.
-
 ## Reported numbers (PR author)
 - gain: 51% (pct)
 - evidence: PR 41163: [Perf] Optimize `AllPool.forward` by slicing first, 51% faster in the method level benchmark
@@ -38,4 +49,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

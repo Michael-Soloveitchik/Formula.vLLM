@@ -1,10 +1,30 @@
 # Task PR #41043 — [Perf][Spec Decode] Avoid per-step numpy allocation in prepare_next_t… (#41043)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **prepare_next_token_ids_b16** in `us` (microseconds (1e-6 s)); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **prepare_next_token_ids_b16** (headline) — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **prepare_next_token_ids_b256** — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **mean_tpot** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. reported 2.6 -> 2.58 ms.
+- **p99_tpot** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. reported 3.24 -> 2.94 ms.
+
+Workload command (run per arm): `python3 /task/bench.py`
+Mechanism / note: SpecDecodeBaseProposer.prepare_next_token_ids_padded (unbound, real CpuGpuBuffer, stand-in InputBatch/requests) for decode batches of 16 and 256 with 3 spec tokens; PR drops the per-step tolist/list-comp/np.array temporaries. Wall-clock us per call (host prep + Triton launch). Author numbers are e2e TPOT with Eagle3 (reported-only).
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,15 +44,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > The author writes directly into the pre-allocated pinned `CpuGpuBuffer` via a small Python loop over the requests, computing each backup token ID with `get_token_id(num_tokens_no_spec[i] - 1)` and storing it into `backup_next_token_ids.np[i]`. This removes the intermediate `.tolist()`, list comprehension, and `np.array()` allocation. They note the loop is trivially fast for typical spec-decode batch sizes (1–16) and the change applies to all spec-decode methods via `SpecDecodeBaseProposer`.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **prepare_next_token_ids_b16** (us): no number reported in the PR. workload: `python3 /task/bench.py`
-- **prepare_next_token_ids_b256** (us): no number reported in the PR.
-- **mean_tpot** (ms): reported 2.6 -> 2.58 ms.
-- **p99_tpot** (ms): reported 3.24 -> 2.94 ms.
-- note: SpecDecodeBaseProposer.prepare_next_token_ids_padded (unbound, real CpuGpuBuffer, stand-in InputBatch/requests) for decode batches of 16 and 256 with 3 spec tokens; PR drops the per-step tolist/list-comp/np.array temporaries. Wall-clock us per call (host prep + Triton launch). Author numbers are e2e TPOT with Eagle3 (reported-only).
-
 ## Reported numbers (PR author)
 - gain: 0.8%, 9.3% (pct)
 - evidence: | | Mean TPOT (ms) | P99 TPOT (ms) | |---|---|---| | Before (3 runs avg) | 2.60 | 3.24 | | After (3 runs avg) | 2.58 | 2.94 | | **Improvement** | **0.8%** | **9
@@ -41,4 +52,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

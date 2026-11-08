@@ -1,0 +1,38 @@
+{
+ "schema": "ai_solution_v1",
+ "pr": 13365,
+ "arm": "claude",
+ "repeats": 5,
+ "instrument": "pipeline/parse_workload.py",
+ "note": "CPU re-measure; speed is not the GPU number",
+ "scenarios": {
+  "ngram_match_cold_first_call": {
+   "unit": "s",
+   "gold": {
+    "mean": 0.4175,
+    "sd": 0.0601,
+    "n": 5
+   },
+   "claude": {
+    "mean": 0.0002,
+    "sd": 0.0001,
+    "n": 5
+   },
+   "ratio_arm_over_gold": 2087.5
+  },
+  "ngram_match_overhead": {
+   "unit": "s",
+   "gold": {
+    "mean": 1.1336,
+    "sd": 0.1228,
+    "n": 5
+   },
+   "claude": {
+    "mean": 24.5948,
+    "sd": 0.1121,
+    "n": 5
+   },
+   "ratio_arm_over_gold": 0.0461
+  }
+ }
+}

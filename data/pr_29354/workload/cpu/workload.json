@@ -1,0 +1,273 @@
+{
+ "schema": "workload_v2",
+ "pr": 29354,
+ "title": "Add unpermute-aware fused MoE path and small-batch fallback (#29354)",
+ "url": "https://github.com/vllm-project/vllm/pull/29354",
+ "field": "quantization",
+ "area": "model_executor/models",
+ "date": "2026-01-09",
+ "hw": "cpu",
+ "hw_override": null,
+ "base_sha": "657e9c0e183d4bdb157b07db987644d2d9d36245",
+ "merge_sha": "a4d5d663e295e3b90a515c79df74048bc715e804",
+ "source_files": [
+  "vllm/model_executor/layers/fused_moe/fused_moe.py"
+ ],
+ "test_files": [],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:29354",
+  "dockerfile": "data/pr_29354/workload/cpu/Dockerfile",
+  "template": "templates/Dockerfile.cpu-wheel",
+  "wheel": "0.14.0",
+  "wheel_note": "first PyPI release after merge (2026-01-20 > 2026-01-09); picked by gen_tasks.py from PyPI upload dates.",
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:29354 data/pr_29354/workload/cpu"
+ },
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_29354/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "needs": "gpu",
+  "cluster": "none_gpu",
+  "all_clusters": [
+   "none_gpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "data/pr_29354 (bench.py, tests/)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "fused_experts small-batch naive-block-assignment path: E=128 top_k=1 N=1024 K=5120 bf16 (Maverick TP8 shape), M in 1/4/16/32 (all on the new path), torch softmax+topk routing, CUDA-event us per call. Reported = author's benchmark_moe.py table (H100).",
+  "base_note": null
+ },
+ "policy": {
+  "source": "pipeline/run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "task.json:repeats (or hardware_overrides[<hw>].repeats)",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in data/pr_<n>/work/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> data/pr_<n>/work/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY task.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "fused_moe_e128_top1_m1",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": true,
+   "parse": "fused_moe_e128_top1_m1",
+   "reported": {
+    "baseline": 33.14,
+    "pr_solution": 28.19
+   },
+   "note": null
+  },
+  {
+   "name": "fused_moe_e128_top1_m4",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "fused_moe_e128_top1_m4",
+   "reported": {
+    "baseline": 49.42,
+    "pr_solution": 44.02
+   },
+   "note": null
+  },
+  {
+   "name": "fused_moe_e128_top1_m16",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "fused_moe_e128_top1_m16",
+   "reported": {
+    "baseline": 136.29,
+    "pr_solution": 130.47
+   },
+   "note": null
+  },
+  {
+   "name": "fused_moe_e128_top1_m32",
+   "unit": "us",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "fused_moe_e128_top1_m32",
+   "reported": {
+    "baseline": 234.63,
+    "pr_solution": 228.19
+   },
+   "note": null
+  }
+ ],
+ "headline": "fused_moe_e128_top1_m1",
+ "reported": {
+  "gain": "up to 17.56% faster for small-batch MoE (M=1, Llama-4-Maverick TP8)",
+  "gain_kind": "pct",
+  "gain_evidence": "faster unpermute MoE path, benchmark speedups",
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
+  "author_hardware_args": [
+   {
+    "line": 21,
+    "text": "python3 benchmarks/kernels/benchmark_moe.py \\"
+   },
+   {
+    "line": 29,
+    "text": "| 1  | 33.14             | 28.19                 | **-17.56%** |"
+   },
+   {
+    "line": 30,
+    "text": "| 2  | 36.05             | 30.70                 | **-17.43%** |"
+   },
+   {
+    "line": 31,
+    "text": "| 4  | 49.42             | 44.02                 | **-12.27%** |"
+   },
+   {
+    "line": 32,
+    "text": "| 8  | 76.77             | 71.41                 | **-7.51%**  |"
+   },
+   {
+    "line": 33,
+    "text": "| 16 | 136.29            | 130.47                | **-4.46%**  |"
+   },
+   {
+    "line": 34,
+    "text": "| 24 | 183.81            | 175.97                | **-4.46%**  |"
+   },
+   {
+    "line": 35,
+    "text": "| 32 | 234.63            | 228.19                | **-2.82%**  |"
+   },
+   {
+    "line": 36,
+    "text": "| 48 | 309.59            | 309.73                | 0.05%    |"
+   },
+   {
+    "line": 37,
+    "text": "| 64 | 382.59            | 382.68                | 0.02%    |"
+   },
+   {
+    "line": 38,
+    "text": "| 96 | 513.39            | 512.00                | -0.27%   |"
+   },
+   {
+    "line": 44,
+    "text": "python3 benchmarks/kernels/benchmark_moe.py \\"
+   },
+   {
+    "line": 52,
+    "text": "| 1  | 70.69             | 65.55                 | **-7.84%**  |"
+   },
+   {
+    "line": 53,
+    "text": "| 2  | 83.58            | 78.20                 | **-6.87%** |"
+   },
+   {
+    "line": 54,
+    "text": "| 4  | 112.80            | 108.65                | **-3.8%** |"
+   },
+   {
+    "line": 55,
+    "text": "| 8  | 171.68            | 172.13                | 0.2%          |"
+   },
+   {
+    "line": 56,
+    "text": "| 16 | 338.09            | 338.50                | 0.12%       |"
+   },
+   {
+    "line": 62,
+    "text": "python3 benchmarks/kernels/benchmark_moe.py \\"
+   },
+   {
+    "line": 70,
+    "text": "| 1  | 69.76            | 64.48                 | **-8.18%**  |"
+   },
+   {
+    "line": 71,
+    "text": "| 2  | 85.90            | 80.07                 | **-7.28%** |"
+   }
+  ],
+  "source": "data/pr_29354/pr.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.14.0",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ },
+ "reproduced": null,
+ "gap": {
+  "verdict": "not analysed",
+  "note": null,
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:29354 data/pr_29354/workload/cpu",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_29354:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:29354 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_29354:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:29354 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": "perf-only small-batch MoE path; the diff's test (tests/kernels/moe/test_moe.py) is a large kernel suite - dropped from the oracle, bench.py checks finiteness only (same kernel both arms)."
+}

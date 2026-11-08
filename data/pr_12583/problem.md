@@ -1,10 +1,27 @@
 # Task PR #12583 — Expert Parallelism (EP) Support for DeepSeek V2 (#12583)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **fused_moe_kernel** in `us` (microseconds (1e-6 s)); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **fused_moe_kernel** (headline) — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+
+Workload command (run per arm): `python3 benchmarks/kernels/benchmark_moe.py --model mistralai/Mixtral-8x7B-Instruct-v0.1 --tp-size 2 --dtype auto --seed 0`
+Mechanism / note: FusedMoE Triton kernel microbench, GPU-only. PR gives no before/after numbers (design doc).
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -31,12 +48,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 >
 > Existing semantic notes in [12583.sem.json](./12583.sem.json) are derived annotations. They are not a substitute for this patch or the original discussion.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **fused_moe_kernel** (us): no number reported in the PR. workload: `python3 benchmarks/kernels/benchmark_moe.py --model mistralai/Mixtral-8x7B-Instruct-v0.1 --tp-size 2 --dtype auto --seed 0`
-- note: FusedMoE Triton kernel microbench, GPU-only. PR gives no before/after numbers (design doc).
-
 ## Reported numbers (PR author)
 - gain: 30% (pct)
 - evidence: I noticed that after enabling EP on a 16-card setup, the time taken for the all-reduce kernel has doubled, and the throughput has dropped by 30%.
@@ -45,4 +56,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

@@ -1,10 +1,30 @@
 # Task PR #20839 — [Model] Replace Mamba2 RMSNorm Gated with Fused Triton Kernel (#20839)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **rmsnorm_gated_16k** in `us` (microseconds (1e-6 s)); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **rmsnorm_gated_16k** (headline) — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **rmsnorm_gated_32k** — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **latency_16k** — `s` (seconds), ↓ lower is better. reported 0.6323 -> 0.5812 s.
+- **latency_32k** — `s` (seconds), ↓ lower is better. reported 1.28 -> 1.179 s.
+
+Workload command (run per arm): `python3 /task/bench.py`
+Mechanism / note: Mixer2RMSNormGated.forward_cuda on Bamba-9B-v2 shapes (hidden 8192, bf16, 16k/32k tokens); baseline = python silu-gate + ops.rms_norm, PR's solution = fused Triton rms_norm_gated. TP helpers stubbed to world_size 1. CUDA-event us per call. Author numbers are whole-model benchmark_latency (kept reported-only).
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,15 +44,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > Replace the current unfused RMSNormGated implementation with a fused Triton kernel taken from the mamba_ssm repo's `layernorm_gated.py`. The author scopes it to TP=1 and ngroups=1 for now, noting broader use cases likely need similar fixes, and validates output quality e2e via lm_eval gsm8k and performance via benchmark_latency.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **rmsnorm_gated_16k** (us): no number reported in the PR. workload: `python3 /task/bench.py`
-- **rmsnorm_gated_32k** (us): no number reported in the PR.
-- **latency_16k** (s): reported 0.6323 -> 0.5812 s.
-- **latency_32k** (s): reported 1.28 -> 1.179 s.
-- note: Mixer2RMSNormGated.forward_cuda on Bamba-9B-v2 shapes (hidden 8192, bf16, 16k/32k tokens); baseline = python silu-gate + ops.rms_norm, PR's solution = fused Triton rms_norm_gated. TP helpers stubbed to world_size 1. CUDA-event us per call. Author numbers are whole-model benchmark_latency (kept reported-only).
-
 ## Reported numbers (PR author)
 - gain: 9% (pct)
 - evidence: **Approximately 8~9% latency improvements observed.**
@@ -41,4 +52,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

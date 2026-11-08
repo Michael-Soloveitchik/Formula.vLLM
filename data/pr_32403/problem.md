@@ -1,10 +1,30 @@
 # Task PR #32403 — [Performance] Improve Triton prefill attention kernel's performance  (#32403)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **prefill_attn_b8_s2048** in `us` (microseconds (1e-6 s)); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **prefill_attn_b8_s2048** (headline) — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **prefill_attn_b16_s1024** — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **offline_latency_b8_2048** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. reported 113.1 -> 110 ms.
+- **offline_throughput_b8_2048** — `req/s` (requests per second), ↑ higher is better. reported 34 -> 34.97 req/s.
+
+Workload command (run per arm): `python3 /task/bench.py`
+Mechanism / note: context_attention_fwd (Triton prefill attention) on batch 8 x 2048 and 16 x 1024, 32/8 heads, head 128, bf16, causal; PR = FA2-style exp2 rewrite (-1e8 mask, sm_scale/ln2). CUDA-event us per call. Author numbers are offline e2e (reported-only).
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -23,15 +43,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 >
 > Existing semantic notes in [32403.sem.json](./32403.sem.json) are derived annotations. They are not a substitute for this patch or the original discussion.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **prefill_attn_b8_s2048** (us): no number reported in the PR. workload: `python3 /task/bench.py`
-- **prefill_attn_b16_s1024** (us): no number reported in the PR.
-- **offline_latency_b8_2048** (ms): reported 113.1 -> 110 ms.
-- **offline_throughput_b8_2048** (req/s): reported 34 -> 34.97 req/s.
-- note: context_attention_fwd (Triton prefill attention) on batch 8 x 2048 and 16 x 1024, 32/8 heads, head 128, bf16, causal; PR = FA2-style exp2 rewrite (-1e8 mask, sm_scale/ln2). CUDA-event us per call. Author numbers are offline e2e (reported-only).
-
 ## Reported numbers (PR author)
 - gain: — (audit)
 - evidence: exp2 fusion speeds Triton prefill kernel
@@ -40,4 +51,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

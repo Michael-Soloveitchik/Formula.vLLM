@@ -1,10 +1,29 @@
 # Task PR #42311 — [Model] [Perf] Use flatten for Qwen3.5's GDN output projection (#42311)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **gdn_output_projection** in `us` (microseconds (1e-6 s)); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **gdn_output_projection** (headline) — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+- **merge_heads_op** — `us` (microseconds (1e-6 s)), ↓ lower is better. reported 23.26 -> 2.828 us.
+- **serving_mean_tpot** — `ms` (milliseconds (1e-3 s)), ↓ lower is better. reported 88.38 -> 67.59 ms.
+
+Workload command (run per arm): `python3 /task/bench.py`
+Mechanism / note: GatedDeltaNetAttention._output_projection (unbound, minimal self with real RMSNormGated + Linear out_proj) on Qwen3.5-0.8B shapes (16 x 128 heads, hidden 1024, 8 decode tokens, fp16, eager); PR = einops rearrange -> flatten(-2). Wall-clock us per call. Author numbers are per-op profiler events (reported-only) + e2e serving.
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,14 +43,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > Replace einops's `rearrange(core_attn_out, "... h d -> ... (h d)")` with the PyTorch-native equivalent `core_attn_out.flatten(-2)` to merge the last two dimensions, avoiding expensive Python-level pattern string parsing and validation on every GDN forward call. The author verified correctness via PPL comparison on Qwen3.5-0.8B (19.510 flatten vs 19.510 rearrange, both ~0.63% from HF expected), confirming the reshape does not alter tensor ordering or model output.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **gdn_output_projection** (us): no number reported in the PR. workload: `python3 /task/bench.py`
-- **merge_heads_op** (us): reported 23.26 -> 2.828 us.
-- **serving_mean_tpot** (ms): reported 88.38 -> 67.59 ms.
-- note: GatedDeltaNetAttention._output_projection (unbound, minimal self with real RMSNormGated + Linear out_proj) on Qwen3.5-0.8B shapes (16 x 128 heads, hidden 1024, 8 decode tokens, fp16, eager); PR = einops rearrange -> flatten(-2). Wall-clock us per call. Author numbers are per-op profiler events (reported-only) + e2e serving.
-
 ## Reported numbers (PR author)
 - gain: 21.41x (pct)
 - evidence: Per-call average speedup: `21.41x`
@@ -40,4 +51,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

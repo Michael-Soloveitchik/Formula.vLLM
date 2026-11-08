@@ -1,10 +1,28 @@
 # Task PR #27673 — [Core] Early return in SlidingWindowManager.remove_skipped_blocks (#27673)
 
 ## Objective
-Optimize the code in `./vllm` so the hidden correctness tests PASS **and** the
-workload runs **as fast as or faster than the PR's solution**.
-You are given the PR author's known solution below. You may reproduce it, but you
-are explicitly asked to **try to beat it** — find a faster correct version.
+Edit the code under `./vllm` so that:
+1. the hidden correctness tests still PASS, and
+2. the workload runs **at least as fast as the PR's merged solution** — ideally faster.
+
+The headline metric is **remove_skipped_blocks** in `us` (microseconds (1e-6 s)); minimize it (lower is better).
+
+## How you are measured
+The SAME workload is timed three times, all on this machine:
+- **baseline** — the code before the PR (`base_sha`).
+- **PR's solution** — the code after the PR landed (`merge_sha`); this is the bar to beat.
+- **your edit** — baseline tree + your changes.
+
+Each metric below is parsed from the workload's stdout and averaged over repeated runs.
+You win a metric when your edit is faster than the PR's solution on it; equal speed ties.
+
+### Metrics
+
+- **remove_skipped_blocks** (headline) — `us` (microseconds (1e-6 s)), ↓ lower is better. reported 6.3 -> 1.6 us.
+- **remove_skipped_blocks_short_ctx** — `us` (microseconds (1e-6 s)), ↓ lower is better. no number reported in the PR.
+
+Workload command (run per arm): `python3 /task/bench.py`
+Mechanism / note: Real BlockPool + SlidingWindowManager (block 16, window 4096, 2048 blocks for one request); times the two no-op paths the PR short-circuits: steady state (blocks below the window already freed) and context shorter than the window. us per call, CPU only.
 
 ## The problem (issue)
 (from `solution.md`, quoted)
@@ -24,13 +42,6 @@ are explicitly asked to **try to beat it** — find a faster correct version.
 
 > Author leverages that most remove_skipped_blocks invocations remove no blocks, adding lightweight up-front checks to early-return and skip the function body's list comprehensions over empty lists. This eliminates redundant work in the common case, reducing per-call cost from 6.3us to 1.6us when early stop triggers.
 
-## Workload + experiments (what will be measured)
-Each experiment is timed before-merge (baseline) and after-merge (the PR's solution). Your
-edit is timed on the SAME workload. Beat the PR's solution on these metrics:
-- **remove_skipped_blocks** (us): reported 6.3 -> 1.6 us. workload: `python3 /task/bench.py`
-- **remove_skipped_blocks_short_ctx** (us): no number reported in the PR.
-- note: Real BlockPool + SlidingWindowManager (block 16, window 4096, 2048 blocks for one request); times the two no-op paths the PR short-circuits: steady state (blocks below the window already freed) and context shorter than the window. us per call, CPU only.
-
 ## Reported numbers (PR author)
 - gain: 75% (6.3us→1.6us) (unit)
 - evidence: When early stop happened, the cost reduced from 6.3us to 1.6us now.
@@ -39,4 +50,4 @@ edit is timed on the SAME workload. Beat the PR's solution on these metrics:
 ## Rules
 - Edit only files under `./vllm`.
 - Keep behavior correct (hidden pytest must pass).
-- Faster than the PR's solution on the measured experiments wins. Same speed = ties the PR's solution.
+- Beating the PR's solution on the headline metric wins; equal speed ties it.

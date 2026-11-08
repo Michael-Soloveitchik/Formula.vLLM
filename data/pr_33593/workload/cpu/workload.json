@@ -1,0 +1,204 @@
+{
+ "schema": "workload_v2",
+ "pr": 33593,
+ "title": "[Perf] Optimize Python Slice for Structured Output using `islice` instead of [:] (#33593)",
+ "url": "https://github.com/vllm-project/vllm/pull/33593",
+ "field": "decoding_tpot",
+ "area": "vllm/reasoning",
+ "date": "2026-02-24",
+ "hw": "cpu",
+ "hw_override": null,
+ "base_sha": "c38b8d5a317da356353a0a9ae1ab87f612267fb3",
+ "merge_sha": "9ce8fad2a9fe010ede46b085f6cb4099c8ec402d",
+ "source_files": [
+  "vllm/reasoning/abs_reasoning_parsers.py",
+  "vllm/reasoning/basic_parsers.py",
+  "vllm/reasoning/deepseek_v3_reasoning_parser.py",
+  "vllm/reasoning/identity_reasoning_parser.py",
+  "vllm/reasoning/mistral_reasoning_parser.py",
+  "vllm/reasoning/step3_reasoning_parser.py",
+  "vllm/reasoning/step3p5_reasoning_parser.py",
+  "vllm/v1/structured_output/__init__.py"
+ ],
+ "test_files": [],
+ "image": {
+  "mode": "wheel",
+  "tag": "vllm-task:33593",
+  "dockerfile": "data/pr_33593/workload/cpu/Dockerfile",
+  "template": "templates/Dockerfile.cpu-wheel",
+  "wheel": "0.16.0",
+  "wheel_note": "first PyPI release after merge (2026-02-26 > 2026-02-24); picked by gen_tasks.py from PyPI upload dates.",
+  "torch_fix": null,
+  "extra_pip": null,
+  "swap": "tree",
+  "swap_note": null,
+  "build": "docker build -t vllm-task:33593 data/pr_33593/workload/cpu"
+ },
+ "workload": {
+  "kind": "microbench_in_pr",
+  "script": "data/pr_33593/bench.py",
+  "cmd": "python3 /task/bench.py",
+  "needs": "gpu",
+  "cluster": "none_cpu",
+  "all_clusters": [
+   "none_cpu"
+  ],
+  "model": null,
+  "weights": {
+   "hf_id": null,
+   "size": "0",
+   "cache": null
+  },
+  "env": [
+   "ARM=<arm>",
+   "CUDA_VISIBLE_DEVICES=0",
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "mounts": {
+   "/arm": "the arm's tree (read-only)",
+   "/gold": "the PR's merge tree (tests/, benchmarks/)",
+   "/task": "data/pr_33593 (bench.py, tests/)",
+   "/root/.cache/huggingface": ".weights/hf"
+  },
+  "repeats": null,
+  "note": "Arm's real call sites: StructuredOutputManager.should_advance (unbound; delta = whole 1M-token sequence) and BaseThinkingReasoningParser.extract_content_ids on a DeepSeekR1 parser over a stub vocab; no end token present. Seconds per call, best of 5. Metric names follow the author's list[:N]-vs-islice microbench (SIZE 2M / N 1M); reported numbers are that microbench's.",
+  "base_note": null
+ },
+ "policy": {
+  "source": "pipeline/run_one.sh + config.yaml:measure (extracted at generation time)",
+  "repeats_default": 5,
+  "repeats_fallback": 5,
+  "repeats_task_override": "task.json:repeats (or hardware_overrides[<hw>].repeats)",
+  "one_run_is": "one `docker run` of the workload cmd per arm per repeat (same image, arm tree swapped in by the prelude)",
+  "interleave": "ABBA across arms per repeat (A,B,B,A,A,B,...)",
+  "gpu_flag_default": "--gpus device=0",
+  "container_env": [
+   "CUDA_DEVICE_ORDER=PCI_BUS_ID",
+   "CUDA_VISIBLE_DEVICES=0",
+   "HF_HUB_DISABLE_PROGRESS_BARS=1"
+  ],
+  "shm_size": "2g",
+  "wl_timeout_default": "20m",
+  "gpu_warmup_s": 2.0,
+  "contention_gate": {
+   "enabled": true,
+   "max_wait_s": 600,
+   "rules": "wait while another tenant uses the GPU (>5 % util or a foreign compute process >1 GiB) or the CPU (load1 > nproc/2)",
+   "then": "run anyway, flagged in data/pr_<n>/work/contended_<arm>_<i>.txt"
+  },
+  "machine_snapshot": "machine.py snapshot per workload run -> data/pr_<n>/work/machine_<arm>_<i>.json",
+  "arm_isolation": {
+   "tree": "wipe the wheel's vllm/*.py, copy the arm's vllm/ over site-packages (compiled .so stay)",
+   "files": "overlay ONLY task.json:source_files from the arm over the wheel's own tree",
+   "tests_benchmarks": "copied from the PR's merge tree to /t without a sibling vllm/ package"
+  },
+  "noise_model": "measure.py: paired log-speedup, MAD sigma, theta = clip(k*sigma, theta_min, theta_max) with k/theta from config.yaml:measure"
+ },
+ "metrics": [
+  {
+   "name": "create_slice",
+   "unit": "s",
+   "higher_is_better": false,
+   "headline": true,
+   "parse": "create best",
+   "reported": {
+    "baseline": 0.0034,
+    "pr_solution": 1e-06
+   },
+   "note": null
+  },
+  {
+   "name": "sum_slice",
+   "unit": "s",
+   "higher_is_better": false,
+   "headline": false,
+   "parse": "sum best",
+   "reported": {
+    "baseline": 0.0056,
+    "pr_solution": 0.0047
+   },
+   "note": null
+  }
+ ],
+ "headline": "create_slice",
+ "reported": {
+  "gain": "0.5%",
+  "gain_kind": "pct",
+  "gain_evidence": "OK added in the title, the e2e perf improvement is smaller than < 0.5% so hidden in fluctuations.",
+  "experiments_note": "reported = numbers from the PR body (author's machine)",
+  "author_hardware_args": [
+   {
+    "line": 13,
+    "text": "Python split -> islice (iterator) and get perf improvement."
+   },
+   {
+    "line": 53,
+    "text": "`vllm serve deepseek-ai/DeepSeek-R1-Distill-Qwen-7B   --reasoning-parser deepseek_r1   --port 8000`"
+   },
+   {
+    "line": 54,
+    "text": "`python benchmarks/benchmark_serving_structured_output.py   --backend vllm   --model deepseek-ai/DeepSeek-R1-Distill-Qwen-7B   --dataset xgrammar_bench   --structured-output-ratio 1.0   --request-rate 5   --num-prompts 600   --output-len 10"
+   },
+   {
+    "line": 65,
+    "text": "Output token throughput (tok/s):         4711.02"
+   },
+   {
+    "line": 73,
+    "text": "-----Time per Output Token (excl. 1st token)------"
+   },
+   {
+    "line": 101,
+    "text": "Output token throughput (tok/s):         4692.52"
+   },
+   {
+    "line": 109,
+    "text": "-----Time per Output Token (excl. 1st token)------"
+   }
+  ],
+  "source": "data/pr_33593/pr.md",
+  "hardware_tag": [
+   "agnostic"
+  ]
+ },
+ "requirements": {
+  "hardware": {
+   "gpu": true,
+   "gpu_count": 1,
+   "vram_gb": 8,
+   "compute_cap_min": 7.0,
+   "compute_cap_max": null,
+   "gpu_hint": null,
+   "ram_gb": 8,
+   "disk_gb": 30
+  },
+  "software": {
+   "docker": true,
+   "nvidia_container_runtime": true,
+   "git": true,
+   "python3": true,
+   "hf_cli": false,
+   "hf_token": false,
+   "vllm_wheel": "0.16.0",
+   "models": [],
+   "datasets": [],
+   "env": [],
+   "needs_server": false,
+   "pipeline": "wheel"
+  }
+ },
+ "reproduced": null,
+ "gap": {
+  "verdict": "not analysed",
+  "note": null,
+  "source": "BASELINE_GAP.md"
+ },
+ "standalone": {
+  "build": "docker build -t vllm-task:33593 data/pr_33593/workload/cpu",
+  "run_baseline": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_33593:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=baseline vllm-task:33593 -lc 'A=/base; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "run_pr_solution": "docker run --rm --gpus device=0 --shm-size=2g -e CUDA_VISIBLE_DEVICES=0 -e CUDA_DEVICE_ORDER=PCI_BUS_ID -e HF_HUB_DISABLE_PROGRESS_BARS=1 -v $PWD/data/pr_33593:/task:ro -v $PWD/.weights/hf:/root/.cache/huggingface -e ARM=pr_solution vllm-task:33593 -lc 'A=/gold; site=$(python3 -c \"import vllm,os;print(os.path.dirname(os.path.dirname(vllm.__file__)))\"); find \"$site/vllm\" -name \"*.py\" -delete; cp -a $A/vllm/. \"$site/vllm/\"; ln -sfn $A /src; rm -rf /t && mkdir -p /t && cd /gold && for d in tests benchmarks pyproject.toml conftest.py; do [ -e \"$d\" ] && cp -a \"$d\" /t/; done; cd /t; python3 /task/bench.py'",
+  "note": "The image already holds both trees (/base = baseline commit, /gold = the PR's merge commit); the one-liner swaps the chosen tree over the installed wheel exactly like run_one.sh's prelude, then runs the workload cmd from /t (the merge tree's tests/ + benchmarks/)."
+ },
+ "test_note": "perf-only (list slice -> islice); no test in the diff."
+}
