@@ -37,13 +37,14 @@ No `hardware_overrides[rtx5070ti]` in task.json: identical to `workload/default/
 
 ## Reproduced here
 
-- source `data/pr_22940/results.rtx5070ti.json` (2026-11-07T10:44:17Z), image mode `wheel` wheel `0.10.1`, repeats 5, tests baseline=`PASS` PR's solution=`PASS`, verdict **reproduced** (median ratio ×1.002 vs reported ×1.021)
+- source `data/pr_22940/results.rtx5070ti.json` (2026-11-08T01:40:24Z), image mode `wheel` wheel `0.10.1`, repeats 5, tests baseline=`PASS` PR's solution=`PASS`, verdict **reproduced** (median ratio ×1.037 vs reported ×1.021)
+- machine: NVIDIA GeForce RTX 5070 Ti driver 591.86 CUDA 13.1, Intel(R) Core(TM) i7-14700KF, 6.18.33.2-microsoft-standard-WSL2
 
 | metric | reported baseline → PR's solution | reproduced baseline → PR's solution (mean ± sd, n) | ratio ours / reported | verdict |
 |---|---|---|---|---|
-| `throughput_output_tok_s` | 2261 → 2308 tok/s | 2261 ± 16 → 2266 ± 17.73 tok/s (n=5) | ×1.002 / 0.982 | reproduced |
-| `throughput_total_tok_s` | — | 2.638e+04 ± 186.5 → 2.643e+04 ± 206.8 tok/s (n=5) | ×1.002 / — | no_reported_number |
-| `throughput_req_s` | — | 30.15 ± 0.213 → 30.21 ± 0.2366 req/s (n=5) | ×1.002 / — | no_reported_number |
+| `throughput_output_tok_s` | 8666 → 8845 tok/s | 8666 ± 0 → 8990 ± 0 tok/s (n=1) | ×1.037 / 1.016 | reproduced |
+| `throughput_total_tok_s` | — | 1.011e+05 ± 0 → 1.049e+05 ± 0 tok/s (n=1) | ×1.037 / — | no_reported_number |
+| `throughput_req_s` | — | 115.5 ± 0 → 119.9 ± 0 req/s (n=1) | ×1.037 / — | no_reported_number |
 
 ## Gap between the author's absolute numbers and ours
 

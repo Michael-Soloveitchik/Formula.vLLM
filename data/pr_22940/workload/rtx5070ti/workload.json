@@ -216,11 +216,11 @@
  "reproduced": {
   "source": "data/pr_22940/results.rtx5070ti.json",
   "hw_slug": "rtx5070ti",
-  "ts": "2026-11-07T10:44:17Z",
+  "ts": "2026-11-08T01:40:24Z",
   "image": {
    "mode": "wheel",
    "wheel": "0.10.1",
-   "workload_cmd": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 2000 --dtype float16",
+   "workload_cmd": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 30000 --dtype float16 --max-num-seqs 1024 --max-num-batched-tokens 16384",
    "repeats": 5
   },
   "tests": {
@@ -228,16 +228,71 @@
    "gold": "PASS"
   },
   "verdict": "reproduced",
-  "reproduced_ratio_median": 1.0022,
+  "reproduced_ratio_median": 1.0374,
   "reported_ratio_median": 1.0207,
-  "machine": null,
+  "machine": {
+   "ts": "2026-11-08T01:28:26Z",
+   "host": {
+    "hostname": "DESKTOP-michael",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "wsl2": true,
+    "os": "Ubuntu 24.04.3 LTS"
+   },
+   "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Ti",
+    "driver": "591.86",
+    "cuda": "13.1",
+    "sm_mhz": 180.0,
+    "sm_max_mhz": 3090.0,
+    "mem_mhz": 405.0,
+    "mem_max_mhz": 14001.0,
+    "vram_total_mib": 16303.0,
+    "vram_used_mib": 275.0,
+    "util_pct": 0.0,
+    "power_w": 30.67,
+    "power_limit_w": 300.0,
+    "temp_c": 36.0,
+    "pstate": "P8",
+    "throttle_reasons": "0x0000000000000000",
+    "processes": [
+     {
+      "pid": 2903,
+      "name": "python main.py --listen 0.0.0.0 --port 8188",
+      "mem_mib": null
+     }
+    ]
+   },
+   "cpu": {
+    "model": "Intel(R) Core(TM) i7-14700KF",
+    "nproc": 12,
+    "load1": 2.79833984375,
+    "load5": 1.5927734375,
+    "load15": 1.345703125,
+    "top_cpu_procs": [
+     {
+      "pid": 1089687,
+      "pcpu": 5.2,
+      "comm": "python3"
+     }
+    ]
+   },
+   "ram": {
+    "total_gb": 94.3,
+    "free_gb": 4.1,
+    "available_gb": 88.9
+   },
+   "docker": {
+    "version": "Docker version 29.8.1, build 4a63305",
+    "engine": "docker"
+   }
+  },
   "experiments": [
    {
     "name": "throughput_output_tok_s",
     "unit": "tok/s",
     "reported": {
-     "baseline": 2260.996,
-     "pr_solution": 2307.798617,
+     "baseline": 8665.81,
+     "pr_solution": 8845.192267,
      "how": "our baseline ± %",
      "marker": "*",
      "raw": "2.07% gain, no baseline number",
@@ -245,13 +300,13 @@
      "ratio": 1.0207,
      "pct": 2.07
     },
-    "baseline": 2260.996,
-    "baseline_sd": 15.9951,
-    "pr_solution": 2265.852,
-    "pr_solution_sd": 17.7261,
-    "n": 5,
-    "ratio": 1.002148,
-    "ratio_of_ratios": 0.982,
+    "baseline": 8665.81,
+    "baseline_sd": 0.0,
+    "pr_solution": 8989.64,
+    "pr_solution_sd": 0.0,
+    "n": 1,
+    "ratio": 1.037369,
+    "ratio_of_ratios": 1.016,
     "verdict": "reproduced",
     "reliability": {
      "flag": "ok",
@@ -271,12 +326,12 @@
      "ratio": null,
      "pct": null
     },
-    "baseline": 26377.464,
-    "baseline_sd": 186.527,
-    "pr_solution": 26434.172,
-    "pr_solution_sd": 206.8499,
-    "n": 5,
-    "ratio": 1.00215,
+    "baseline": 101098.03,
+    "baseline_sd": 0.0,
+    "pr_solution": 104875.71,
+    "pr_solution_sd": 0.0,
+    "n": 1,
+    "ratio": 1.037367,
     "ratio_of_ratios": null,
     "verdict": "no_reported_number",
     "reliability": {
@@ -297,12 +352,12 @@
      "ratio": null,
      "pct": null
     },
-    "baseline": 30.146,
-    "baseline_sd": 0.213,
-    "pr_solution": 30.212,
-    "pr_solution_sd": 0.2366,
-    "n": 5,
-    "ratio": 1.002189,
+    "baseline": 115.54,
+    "baseline_sd": 0.0,
+    "pr_solution": 119.86,
+    "pr_solution_sd": 0.0,
+    "n": 1,
+    "ratio": 1.03739,
     "ratio_of_ratios": null,
     "verdict": "no_reported_number",
     "reliability": {

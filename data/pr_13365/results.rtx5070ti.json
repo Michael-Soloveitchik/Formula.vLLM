@@ -11,13 +11,13 @@
    },
    "arms": {
     "base": {
-     "mean": 0.1652,
-     "sd": 0.0022,
+     "mean": 44.8381,
+     "sd": 0.1085,
      "n": 5
     },
     "gold": {
-     "mean": 0.0026,
-     "sd": 0.0004,
+     "mean": 0.5214,
+     "sd": 0.0037,
      "n": 5
     }
    },
@@ -35,17 +35,66 @@
      "pct": 2757.89
     },
     "reproduced": {
-     "baseline": 0.1652,
-     "pr_solution": 0.0026,
-     "ratio_sd": 9.811702,
-     "baseline_sd": 0.0022,
-     "pr_solution_sd": 0.0004,
-     "ratio": 63.538462,
-     "pct": 6253.85
+     "baseline": 44.8381,
+     "pr_solution": 0.5214,
+     "ratio_sd": 0.644753,
+     "baseline_sd": 0.1085,
+     "pr_solution_sd": 0.0037,
+     "ratio": 85.995589,
+     "pct": 8499.56
     },
     "reproduced_vs_reported": {
-     "ratio_of_ratios": 2.223,
+     "ratio_of_ratios": 3.009,
      "verdict": "reproduced"
+    },
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  },
+  {
+   "name": "ngram_match_cold_first_call",
+   "unit": "s",
+   "workload": "python3 /task/bench.py",
+   "reported": null,
+   "arms": {
+    "base": {
+     "mean": 0.0001,
+     "sd": 0.0,
+     "n": 5
+    },
+    "gold": {
+     "mean": 0.2655,
+     "sd": 0.012,
+     "n": 5
+    }
+   },
+   "derived": {
+    "unit": "s",
+    "higher_is_better": false,
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "reproduced": {
+     "baseline": 0.0001,
+     "pr_solution": 0.2655,
+     "ratio_sd": 1.7e-05,
+     "baseline_sd": 0.0,
+     "pr_solution_sd": 0.012,
+     "ratio": 0.000377,
+     "pct": -99.96
+    },
+    "reproduced_vs_reported": {
+     "ratio_of_ratios": null,
+     "verdict": "regression"
     },
     "reliability": {
      "flag": "ok",
@@ -62,6 +111,8 @@
  "gain_kind": "pct",
  "base_sha": "c8d70e2437feecdb3762ce17298df33439ae1bd1",
  "merge_sha": "4c822298981a8f7521492075ff72659985fc4c3f",
+ "hw_slug": "rtx5070ti",
+ "hw_override": null,
  "image": {
   "mode": "wheel",
   "wheel": "0.7.3",
@@ -81,16 +132,29 @@
  "improved": false,
  "latency": {
   "scenarios": {
-   "ngram_match_overhead": {
+   "ngram_match_cold_first_call": {
     "unit": "s",
     "base": {
-     "mean": 0.1652,
-     "sd": 0.0022,
+     "mean": 0.0001,
+     "sd": 0.0,
      "n": 5
     },
     "gold": {
-     "mean": 0.0026,
-     "sd": 0.0004,
+     "mean": 0.2655,
+     "sd": 0.012,
+     "n": 5
+    }
+   },
+   "ngram_match_overhead": {
+    "unit": "s",
+    "base": {
+     "mean": 44.8381,
+     "sd": 0.1085,
+     "n": 5
+    },
+    "gold": {
+     "mean": 0.5214,
+     "sd": 0.0037,
      "n": 5
     }
    }
@@ -105,10 +169,66 @@
    "workload_runs": 5
   }
  },
- "ts": "2026-11-07T16:18:11Z",
+ "ts": "2026-11-08T01:16:10Z",
+ "machine": {
+  "ts": "2026-11-08T01:11:21Z",
+  "host": {
+   "hostname": "DESKTOP-michael",
+   "kernel": "6.18.33.2-microsoft-standard-WSL2",
+   "wsl2": true,
+   "os": "Ubuntu 24.04.3 LTS"
+  },
+  "gpu": {
+   "name": "NVIDIA GeForce RTX 5070 Ti",
+   "driver": "591.86",
+   "cuda": "13.1",
+   "sm_mhz": 180.0,
+   "sm_max_mhz": 3090.0,
+   "mem_mhz": 405.0,
+   "mem_max_mhz": 14001.0,
+   "vram_total_mib": 16303.0,
+   "vram_used_mib": 275.0,
+   "util_pct": 0.0,
+   "power_w": 30.48,
+   "power_limit_w": 300.0,
+   "temp_c": 36.0,
+   "pstate": "P8",
+   "throttle_reasons": "0x0000000000000000",
+   "processes": [
+    {
+     "pid": 2903,
+     "name": "python main.py --listen 0.0.0.0 --port 8188",
+     "mem_mib": null
+    }
+   ]
+  },
+  "cpu": {
+   "model": "Intel(R) Core(TM) i7-14700KF",
+   "nproc": 12,
+   "load1": 1.951171875,
+   "load5": 1.37060546875,
+   "load15": 1.3154296875,
+   "top_cpu_procs": [
+    {
+     "pid": 1077108,
+     "pcpu": 5.8,
+     "comm": "python3"
+    }
+   ]
+  },
+  "ram": {
+   "total_gb": 94.3,
+   "free_gb": 5.3,
+   "available_gb": 88.1
+  },
+  "docker": {
+   "version": "Docker version 29.8.1, build 4a63305",
+   "engine": "docker"
+  }
+ },
  "summary": {
-  "experiments": 1,
-  "measured": 1,
+  "experiments": 2,
+  "measured": 2,
   "headline": "ngram_match_overhead",
   "headline_derived": {
    "unit": "s",
@@ -124,16 +244,16 @@
     "pct": 2757.89
    },
    "reproduced": {
-    "baseline": 0.1652,
-    "pr_solution": 0.0026,
-    "ratio_sd": 9.811702,
-    "baseline_sd": 0.0022,
-    "pr_solution_sd": 0.0004,
-    "ratio": 63.538462,
-    "pct": 6253.85
+    "baseline": 44.8381,
+    "pr_solution": 0.5214,
+    "ratio_sd": 0.644753,
+    "baseline_sd": 0.1085,
+    "pr_solution_sd": 0.0037,
+    "ratio": 85.995589,
+    "pct": 8499.56
    },
    "reproduced_vs_reported": {
-    "ratio_of_ratios": 2.223,
+    "ratio_of_ratios": 3.009,
     "verdict": "reproduced"
    },
    "reliability": {
@@ -141,14 +261,13 @@
     "note": ""
    }
   },
-  "reproduced_ratio_median": 63.5385,
-  "reproduced_ratio_max": 63.5385,
+  "reproduced_ratio_median": 42.998,
+  "reproduced_ratio_max": 85.9956,
   "reported_ratio_median": 28.5789,
   "verdict": "reproduced",
   "tests": {
    "base": "SKIP",
    "gold": "SKIP"
   }
- },
- "hw_slug": "rtx5070ti"
+ }
 }

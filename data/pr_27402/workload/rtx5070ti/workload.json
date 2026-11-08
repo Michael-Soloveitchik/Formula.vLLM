@@ -237,7 +237,238 @@
    "pipeline": "wheel"
   }
  },
- "reproduced": null,
+ "reproduced": {
+  "source": "data/pr_27402/results.rtx5070ti.json",
+  "hw_slug": "rtx5070ti",
+  "ts": "2026-11-08T00:08:47Z",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.11.1",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "tests": {
+   "base": "SKIP",
+   "gold": "SKIP"
+  },
+  "verdict": "regression",
+  "reproduced_ratio_median": 0.8031,
+  "reported_ratio_median": 1.0059,
+  "machine": {
+   "ts": "2026-11-08T00:07:03Z",
+   "host": {
+    "hostname": "DESKTOP-michael",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "wsl2": true,
+    "os": "Ubuntu 24.04.3 LTS"
+   },
+   "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Ti",
+    "driver": "591.86",
+    "cuda": "13.1",
+    "sm_mhz": 180.0,
+    "sm_max_mhz": 3090.0,
+    "mem_mhz": 405.0,
+    "mem_max_mhz": 14001.0,
+    "vram_total_mib": 16303.0,
+    "vram_used_mib": 276.0,
+    "util_pct": 0.0,
+    "power_w": 30.24,
+    "power_limit_w": 300.0,
+    "temp_c": 36.0,
+    "pstate": "P8",
+    "throttle_reasons": "0x0000000000000000",
+    "processes": [
+     {
+      "pid": 2903,
+      "name": "python main.py --listen 0.0.0.0 --port 8188",
+      "mem_mib": null
+     }
+    ]
+   },
+   "cpu": {
+    "model": "Intel(R) Core(TM) i7-14700KF",
+    "nproc": 12,
+    "load1": 2.43115234375,
+    "load5": 1.66357421875,
+    "load15": 1.4248046875,
+    "top_cpu_procs": [
+     {
+      "pid": 1015230,
+      "pcpu": 12.5,
+      "comm": "python3"
+     }
+    ]
+   },
+   "ram": {
+    "total_gb": 94.3,
+    "free_gb": 14.5,
+    "available_gb": 88.4
+   },
+   "docker": {
+    "version": "Docker version 29.8.1, build 4a63305",
+    "engine": "docker"
+   }
+  },
+  "experiments": [
+   {
+    "name": "lora_shrink_expand_1slice_t16",
+    "unit": "us",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 129.3806,
+    "baseline_sd": 31.9172,
+    "pr_solution": 148.5456,
+    "pr_solution_sd": 27.3328,
+    "n": 5,
+    "ratio": 0.870982,
+    "ratio_of_ratios": null,
+    "verdict": "regression",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "lora_shrink_expand_1slice_t256",
+    "unit": "us",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 113.3798,
+    "baseline_sd": 12.1207,
+    "pr_solution": 143.9464,
+    "pr_solution_sd": 28.2712,
+    "n": 5,
+    "ratio": 0.787653,
+    "ratio_of_ratios": null,
+    "verdict": "regression",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "lora_shrink_expand_3slice_t16",
+    "unit": "us",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 128.1724,
+    "baseline_sd": 23.881,
+    "pr_solution": 165.8752,
+    "pr_solution_sd": 32.1627,
+    "n": 5,
+    "ratio": 0.772704,
+    "ratio_of_ratios": null,
+    "verdict": "regression",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "lora_shrink_expand_3slice_t256",
+    "unit": "us",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 130.3248,
+    "baseline_sd": 33.9992,
+    "pr_solution": 159.2264,
+    "pr_solution_sd": 28.7034,
+    "n": 5,
+    "ratio": 0.818487,
+    "ratio_of_ratios": null,
+    "verdict": "regression",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "serving_output_throughput",
+    "unit": "us",
+    "reported": {
+     "baseline": 1382.92,
+     "pr_solution": 1468.21,
+     "how": "absolute",
+     "marker": "",
+     "raw": "1382.92 -> 1468.21 us",
+     "note": "author gave absolute numbers",
+     "ratio": 0.941909,
+     "pct": -5.81
+    },
+    "baseline": null,
+    "baseline_sd": null,
+    "pr_solution": null,
+    "pr_solution_sd": null,
+    "n": null,
+    "ratio": null,
+    "ratio_of_ratios": null,
+    "verdict": "unknown",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "serving_mean_tpot",
+    "unit": "us",
+    "reported": {
+     "baseline": 63.67,
+     "pr_solution": 59.51,
+     "how": "absolute",
+     "marker": "",
+     "raw": "63.67 -> 59.51 us",
+     "note": "author gave absolute numbers",
+     "ratio": 1.069904,
+     "pct": 6.99
+    },
+    "baseline": null,
+    "baseline_sd": null,
+    "pr_solution": null,
+    "pr_solution_sd": null,
+    "n": null,
+    "ratio": null,
+    "ratio_of_ratios": null,
+    "verdict": "unknown",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  ]
+ },
  "gap": {
   "verdict": "not analysed",
   "note": null,

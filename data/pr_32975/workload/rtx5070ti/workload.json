@@ -153,7 +153,7 @@
  "reproduced": {
   "source": "data/pr_32975/results.rtx5070ti.json",
   "hw_slug": "rtx5070ti",
-  "ts": "2026-11-07T22:15:26Z",
+  "ts": "2026-11-08T00:55:10Z",
   "image": {
    "mode": "wheel",
    "wheel": "0.16.0",
@@ -165,10 +165,10 @@
    "gold": "SKIP"
   },
   "verdict": "no_reported_number",
-  "reproduced_ratio_median": 1.053,
+  "reproduced_ratio_median": 1.0311,
   "reported_ratio_median": null,
   "machine": {
-   "ts": "2026-11-07T22:13:43Z",
+   "ts": "2026-11-08T00:53:27Z",
    "host": {
     "hostname": "DESKTOP-michael",
     "kernel": "6.18.33.2-microsoft-standard-WSL2",
@@ -184,11 +184,11 @@
     "mem_mhz": 405.0,
     "mem_max_mhz": 14001.0,
     "vram_total_mib": 16303.0,
-    "vram_used_mib": 275.0,
+    "vram_used_mib": 273.0,
     "util_pct": 0.0,
-    "power_w": 30.18,
+    "power_w": 30.62,
     "power_limit_w": 300.0,
-    "temp_c": 35.0,
+    "temp_c": 38.0,
     "pstate": "P8",
     "throttle_reasons": "0x0000000000000000",
     "processes": [
@@ -202,15 +202,21 @@
    "cpu": {
     "model": "Intel(R) Core(TM) i7-14700KF",
     "nproc": 12,
-    "load1": 2.2421875,
-    "load5": 1.5947265625,
-    "load15": 1.103515625,
-    "top_cpu_procs": []
+    "load1": 2.7021484375,
+    "load5": 1.85888671875,
+    "load15": 1.42626953125,
+    "top_cpu_procs": [
+     {
+      "pid": 1061541,
+      "pcpu": 5.8,
+      "comm": "python3"
+     }
+    ]
    },
    "ram": {
     "total_gb": 94.3,
-    "free_gb": 37.2,
-    "available_gb": 89.1
+    "free_gb": 14.4,
+    "available_gb": 88.4
    },
    "docker": {
     "version": "Docker version 29.8.1, build 4a63305",
@@ -231,12 +237,12 @@
      "ratio": null,
      "pct": null
     },
-    "baseline": 24.4438,
-    "baseline_sd": 0.4408,
-    "pr_solution": 23.2144,
-    "pr_solution_sd": 0.19,
+    "baseline": 24.4489,
+    "baseline_sd": 0.2411,
+    "pr_solution": 23.7111,
+    "pr_solution_sd": 0.6146,
     "n": 5,
-    "ratio": 1.052959,
+    "ratio": 1.031116,
     "ratio_of_ratios": null,
     "verdict": "no_reported_number",
     "reliability": {

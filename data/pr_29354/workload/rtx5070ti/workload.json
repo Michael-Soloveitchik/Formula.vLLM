@@ -257,7 +257,186 @@
    "pipeline": "wheel"
   }
  },
- "reproduced": null,
+ "reproduced": {
+  "source": "data/pr_29354/results.rtx5070ti.json",
+  "hw_slug": "rtx5070ti",
+  "ts": "2026-11-08T00:10:46Z",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.14.0",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "tests": {
+   "base": "SKIP",
+   "gold": "SKIP"
+  },
+  "verdict": "reproduced",
+  "reproduced_ratio_median": 0.9908,
+  "reported_ratio_median": 1.0836,
+  "machine": {
+   "ts": "2026-11-08T00:08:56Z",
+   "host": {
+    "hostname": "DESKTOP-michael",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "wsl2": true,
+    "os": "Ubuntu 24.04.3 LTS"
+   },
+   "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Ti",
+    "driver": "591.86",
+    "cuda": "13.1",
+    "sm_mhz": 180.0,
+    "sm_max_mhz": 3090.0,
+    "mem_mhz": 405.0,
+    "mem_max_mhz": 14001.0,
+    "vram_total_mib": 16303.0,
+    "vram_used_mib": 273.0,
+    "util_pct": 0.0,
+    "power_w": 31.04,
+    "power_limit_w": 300.0,
+    "temp_c": 38.0,
+    "pstate": "P8",
+    "throttle_reasons": "0x0000000000000000",
+    "processes": [
+     {
+      "pid": 2903,
+      "name": "python main.py --listen 0.0.0.0 --port 8188",
+      "mem_mib": null
+     }
+    ]
+   },
+   "cpu": {
+    "model": "Intel(R) Core(TM) i7-14700KF",
+    "nproc": 12,
+    "load1": 2.107421875,
+    "load5": 1.84375,
+    "load15": 1.51953125,
+    "top_cpu_procs": [
+     {
+      "pid": 1019361,
+      "pcpu": 5.8,
+      "comm": "python3"
+     }
+    ]
+   },
+   "ram": {
+    "total_gb": 94.3,
+    "free_gb": 25.3,
+    "available_gb": 88.8
+   },
+   "docker": {
+    "version": "Docker version 29.8.1, build 4a63305",
+    "engine": "docker"
+   }
+  },
+  "experiments": [
+   {
+    "name": "fused_moe_e128_top1_m1",
+    "unit": "us",
+    "reported": {
+     "baseline": 33.14,
+     "pr_solution": 28.19,
+     "how": "absolute",
+     "marker": "",
+     "raw": "33.14 -> 28.19 us",
+     "note": "author gave absolute numbers",
+     "ratio": 1.175594,
+     "pct": 17.56
+    },
+    "baseline": 219.3068,
+    "baseline_sd": 56.5628,
+    "pr_solution": 211.8982,
+    "pr_solution_sd": 52.5843,
+    "n": 5,
+    "ratio": 1.034963,
+    "ratio_of_ratios": 0.88,
+    "verdict": "reproduced",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "fused_moe_e128_top1_m4",
+    "unit": "us",
+    "reported": {
+     "baseline": 49.42,
+     "pr_solution": 44.02,
+     "how": "absolute",
+     "marker": "",
+     "raw": "49.42 -> 44.02 us",
+     "note": "author gave absolute numbers",
+     "ratio": 1.122672,
+     "pct": 12.27
+    },
+    "baseline": 204.5956,
+    "baseline_sd": 38.3316,
+    "pr_solution": 209.6822,
+    "pr_solution_sd": 33.4808,
+    "n": 5,
+    "ratio": 0.975741,
+    "ratio_of_ratios": 0.869,
+    "verdict": "regression",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "fused_moe_e128_top1_m16",
+    "unit": "us",
+    "reported": {
+     "baseline": 136.29,
+     "pr_solution": 130.47,
+     "how": "absolute",
+     "marker": "",
+     "raw": "136.29 -> 130.47 us",
+     "note": "author gave absolute numbers",
+     "ratio": 1.044608,
+     "pct": 4.46
+    },
+    "baseline": 636.5892,
+    "baseline_sd": 2.2658,
+    "pr_solution": 632.8402,
+    "pr_solution_sd": 2.5748,
+    "n": 5,
+    "ratio": 1.005924,
+    "ratio_of_ratios": 0.963,
+    "verdict": "reproduced",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "fused_moe_e128_top1_m32",
+    "unit": "us",
+    "reported": {
+     "baseline": 234.63,
+     "pr_solution": 228.19,
+     "how": "absolute",
+     "marker": "",
+     "raw": "234.63 -> 228.19 us",
+     "note": "author gave absolute numbers",
+     "ratio": 1.028222,
+     "pct": 2.82
+    },
+    "baseline": 1035.5544,
+    "baseline_sd": 4.3117,
+    "pr_solution": 1131.4318,
+    "pr_solution_sd": 4.3398,
+    "n": 5,
+    "ratio": 0.91526,
+    "ratio_of_ratios": 0.89,
+    "verdict": "regression",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  ]
+ },
  "gap": {
   "verdict": "not analysed",
   "note": null,

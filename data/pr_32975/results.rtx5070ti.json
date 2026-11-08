@@ -11,13 +11,13 @@
    },
    "arms": {
     "base": {
-     "mean": 24.4438,
-     "sd": 0.4408,
+     "mean": 24.4489,
+     "sd": 0.2411,
      "n": 5
     },
     "gold": {
-     "mean": 23.2144,
-     "sd": 0.19,
+     "mean": 23.7111,
+     "sd": 0.6146,
      "n": 5
     }
    },
@@ -35,13 +35,13 @@
      "pct": null
     },
     "reproduced": {
-     "baseline": 24.4438,
-     "pr_solution": 23.2144,
-     "ratio_sd": 0.020852,
-     "baseline_sd": 0.4408,
-     "pr_solution_sd": 0.19,
-     "ratio": 1.052959,
-     "pct": 5.3
+     "baseline": 24.4489,
+     "pr_solution": 23.7111,
+     "ratio_sd": 0.028596,
+     "baseline_sd": 0.2411,
+     "pr_solution_sd": 0.6146,
+     "ratio": 1.031116,
+     "pct": 3.11
     },
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
@@ -62,6 +62,8 @@
  "gain_kind": "pct",
  "base_sha": "97fa8f65909d4d8f2eb0edc2137fb22f576a5b25",
  "merge_sha": "e1060a71a1bb96103ce9ca98345184dcdc982467",
+ "hw_slug": "rtx5070ti",
+ "hw_override": null,
  "image": {
   "mode": "wheel",
   "wheel": "0.16.0",
@@ -84,13 +86,13 @@
    "detokenize": {
     "unit": "us/tok",
     "base": {
-     "mean": 24.4438,
-     "sd": 0.4408,
+     "mean": 24.4489,
+     "sd": 0.2411,
      "n": 5
     },
     "gold": {
-     "mean": 23.2144,
-     "sd": 0.19,
+     "mean": 23.7111,
+     "sd": 0.6146,
      "n": 5
     }
    }
@@ -105,9 +107,9 @@
    "workload_runs": 5
   }
  },
- "ts": "2026-11-07T22:15:26Z",
+ "ts": "2026-11-08T00:55:10Z",
  "machine": {
-  "ts": "2026-11-07T22:13:43Z",
+  "ts": "2026-11-08T00:53:27Z",
   "host": {
    "hostname": "DESKTOP-michael",
    "kernel": "6.18.33.2-microsoft-standard-WSL2",
@@ -123,11 +125,11 @@
    "mem_mhz": 405.0,
    "mem_max_mhz": 14001.0,
    "vram_total_mib": 16303.0,
-   "vram_used_mib": 275.0,
+   "vram_used_mib": 273.0,
    "util_pct": 0.0,
-   "power_w": 30.18,
+   "power_w": 30.62,
    "power_limit_w": 300.0,
-   "temp_c": 35.0,
+   "temp_c": 38.0,
    "pstate": "P8",
    "throttle_reasons": "0x0000000000000000",
    "processes": [
@@ -141,15 +143,21 @@
   "cpu": {
    "model": "Intel(R) Core(TM) i7-14700KF",
    "nproc": 12,
-   "load1": 2.2421875,
-   "load5": 1.5947265625,
-   "load15": 1.103515625,
-   "top_cpu_procs": []
+   "load1": 2.7021484375,
+   "load5": 1.85888671875,
+   "load15": 1.42626953125,
+   "top_cpu_procs": [
+    {
+     "pid": 1061541,
+     "pcpu": 5.8,
+     "comm": "python3"
+    }
+   ]
   },
   "ram": {
    "total_gb": 94.3,
-   "free_gb": 37.2,
-   "available_gb": 89.1
+   "free_gb": 14.4,
+   "available_gb": 88.4
   },
   "docker": {
    "version": "Docker version 29.8.1, build 4a63305",
@@ -174,13 +182,13 @@
     "pct": null
    },
    "reproduced": {
-    "baseline": 24.4438,
-    "pr_solution": 23.2144,
-    "ratio_sd": 0.020852,
-    "baseline_sd": 0.4408,
-    "pr_solution_sd": 0.19,
-    "ratio": 1.052959,
-    "pct": 5.3
+    "baseline": 24.4489,
+    "pr_solution": 23.7111,
+    "ratio_sd": 0.028596,
+    "baseline_sd": 0.2411,
+    "pr_solution_sd": 0.6146,
+    "ratio": 1.031116,
+    "pct": 3.11
    },
    "reproduced_vs_reported": {
     "ratio_of_ratios": null,
@@ -191,14 +199,13 @@
     "note": ""
    }
   },
-  "reproduced_ratio_median": 1.053,
-  "reproduced_ratio_max": 1.053,
+  "reproduced_ratio_median": 1.0311,
+  "reproduced_ratio_max": 1.0311,
   "reported_ratio_median": null,
   "verdict": "no_reported_number",
   "tests": {
    "base": "SKIP",
    "gold": "SKIP"
   }
- },
- "hw_slug": "rtx5070ti"
+ }
 }

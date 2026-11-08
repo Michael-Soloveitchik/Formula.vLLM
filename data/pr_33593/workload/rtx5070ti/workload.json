@@ -191,7 +191,7 @@
  "reproduced": {
   "source": "data/pr_33593/results.rtx5070ti.json",
   "hw_slug": "rtx5070ti",
-  "ts": "2026-11-07T17:15:17Z",
+  "ts": "2026-11-08T00:57:31Z",
   "image": {
    "mode": "wheel",
    "wheel": "0.16.0",
@@ -202,10 +202,65 @@
    "base": "SKIP",
    "gold": "SKIP"
   },
-  "verdict": "unknown",
-  "reproduced_ratio_median": null,
+  "verdict": "regression",
+  "reproduced_ratio_median": 0.9704,
   "reported_ratio_median": 1700.5957,
-  "machine": null,
+  "machine": {
+   "ts": "2026-11-08T00:56:04Z",
+   "host": {
+    "hostname": "DESKTOP-michael",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "wsl2": true,
+    "os": "Ubuntu 24.04.3 LTS"
+   },
+   "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Ti",
+    "driver": "591.86",
+    "cuda": "13.1",
+    "sm_mhz": 180.0,
+    "sm_max_mhz": 3090.0,
+    "mem_mhz": 405.0,
+    "mem_max_mhz": 14001.0,
+    "vram_total_mib": 16303.0,
+    "vram_used_mib": 275.0,
+    "util_pct": 0.0,
+    "power_w": 30.63,
+    "power_limit_w": 300.0,
+    "temp_c": 38.0,
+    "pstate": "P8",
+    "throttle_reasons": "0x0000000000000000",
+    "processes": [
+     {
+      "pid": 2903,
+      "name": "python main.py --listen 0.0.0.0 --port 8188",
+      "mem_mib": null
+     }
+    ]
+   },
+   "cpu": {
+    "model": "Intel(R) Core(TM) i7-14700KF",
+    "nproc": 12,
+    "load1": 1.73876953125,
+    "load5": 1.7158203125,
+    "load15": 1.4287109375,
+    "top_cpu_procs": [
+     {
+      "pid": 1065053,
+      "pcpu": 6.2,
+      "comm": "python3"
+     }
+    ]
+   },
+   "ram": {
+    "total_gb": 94.3,
+    "free_gb": 13.7,
+    "available_gb": 88.1
+   },
+   "docker": {
+    "version": "Docker version 29.8.1, build 4a63305",
+    "engine": "docker"
+   }
+  },
   "experiments": [
    {
     "name": "create_slice",
@@ -220,14 +275,14 @@
      "ratio": 3400.0,
      "pct": 339900.0
     },
-    "baseline": null,
-    "baseline_sd": null,
-    "pr_solution": null,
-    "pr_solution_sd": null,
-    "n": null,
-    "ratio": null,
-    "ratio_of_ratios": null,
-    "verdict": "unknown",
+    "baseline": 0.0049,
+    "baseline_sd": 0.0,
+    "pr_solution": 0.0051,
+    "pr_solution_sd": 0.0001,
+    "n": 5,
+    "ratio": 0.960784,
+    "ratio_of_ratios": 0.0,
+    "verdict": "regression",
     "reliability": {
      "flag": "ok",
      "note": ""
@@ -246,14 +301,14 @@
      "ratio": 1.191489,
      "pct": 19.15
     },
-    "baseline": null,
-    "baseline_sd": null,
-    "pr_solution": null,
-    "pr_solution_sd": null,
-    "n": null,
-    "ratio": null,
-    "ratio_of_ratios": null,
-    "verdict": "unknown",
+    "baseline": 0.0049,
+    "baseline_sd": 0.0001,
+    "pr_solution": 0.005,
+    "pr_solution_sd": 0.0001,
+    "n": 5,
+    "ratio": 0.98,
+    "ratio_of_ratios": 0.823,
+    "verdict": "regression",
     "reliability": {
      "flag": "ok",
      "note": ""

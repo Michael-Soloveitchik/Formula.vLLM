@@ -158,7 +158,7 @@
  "reproduced": {
   "source": "data/pr_13365/results.rtx5070ti.json",
   "hw_slug": "rtx5070ti",
-  "ts": "2026-11-07T16:18:11Z",
+  "ts": "2026-11-08T01:16:10Z",
   "image": {
    "mode": "wheel",
    "wheel": "0.7.3",
@@ -170,9 +170,64 @@
    "gold": "SKIP"
   },
   "verdict": "reproduced",
-  "reproduced_ratio_median": 63.5385,
+  "reproduced_ratio_median": 42.998,
   "reported_ratio_median": 28.5789,
-  "machine": null,
+  "machine": {
+   "ts": "2026-11-08T01:11:21Z",
+   "host": {
+    "hostname": "DESKTOP-michael",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "wsl2": true,
+    "os": "Ubuntu 24.04.3 LTS"
+   },
+   "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Ti",
+    "driver": "591.86",
+    "cuda": "13.1",
+    "sm_mhz": 180.0,
+    "sm_max_mhz": 3090.0,
+    "mem_mhz": 405.0,
+    "mem_max_mhz": 14001.0,
+    "vram_total_mib": 16303.0,
+    "vram_used_mib": 275.0,
+    "util_pct": 0.0,
+    "power_w": 30.48,
+    "power_limit_w": 300.0,
+    "temp_c": 36.0,
+    "pstate": "P8",
+    "throttle_reasons": "0x0000000000000000",
+    "processes": [
+     {
+      "pid": 2903,
+      "name": "python main.py --listen 0.0.0.0 --port 8188",
+      "mem_mib": null
+     }
+    ]
+   },
+   "cpu": {
+    "model": "Intel(R) Core(TM) i7-14700KF",
+    "nproc": 12,
+    "load1": 1.951171875,
+    "load5": 1.37060546875,
+    "load15": 1.3154296875,
+    "top_cpu_procs": [
+     {
+      "pid": 1077108,
+      "pcpu": 5.8,
+      "comm": "python3"
+     }
+    ]
+   },
+   "ram": {
+    "total_gb": 94.3,
+    "free_gb": 5.3,
+    "available_gb": 88.1
+   },
+   "docker": {
+    "version": "Docker version 29.8.1, build 4a63305",
+    "engine": "docker"
+   }
+  },
   "experiments": [
    {
     "name": "ngram_match_overhead",
@@ -187,14 +242,40 @@
      "ratio": 28.578947,
      "pct": 2757.89
     },
-    "baseline": 0.1652,
-    "baseline_sd": 0.0022,
-    "pr_solution": 0.0026,
-    "pr_solution_sd": 0.0004,
+    "baseline": 44.8381,
+    "baseline_sd": 0.1085,
+    "pr_solution": 0.5214,
+    "pr_solution_sd": 0.0037,
     "n": 5,
-    "ratio": 63.538462,
-    "ratio_of_ratios": 2.223,
+    "ratio": 85.995589,
+    "ratio_of_ratios": 3.009,
     "verdict": "reproduced",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "ngram_match_cold_first_call",
+    "unit": "s",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 0.0001,
+    "baseline_sd": 0.0,
+    "pr_solution": 0.2655,
+    "pr_solution_sd": 0.012,
+    "n": 5,
+    "ratio": 0.000377,
+    "ratio_of_ratios": null,
+    "verdict": "regression",
     "reliability": {
      "flag": "ok",
      "note": ""

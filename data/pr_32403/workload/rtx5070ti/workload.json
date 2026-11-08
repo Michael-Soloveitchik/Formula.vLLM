@@ -242,7 +242,186 @@
    "pipeline": "wheel"
   }
  },
- "reproduced": null,
+ "reproduced": {
+  "source": "data/pr_32403/results.rtx5070ti.json",
+  "hw_slug": "rtx5070ti",
+  "ts": "2026-11-08T00:12:11Z",
+  "image": {
+   "mode": "wheel",
+   "wheel": "0.14.0",
+   "workload_cmd": "python3 /task/bench.py",
+   "repeats": 5
+  },
+  "tests": {
+   "base": "SKIP",
+   "gold": "SKIP"
+  },
+  "verdict": "no_reported_number",
+  "reproduced_ratio_median": 1.1045,
+  "reported_ratio_median": 1.0004,
+  "machine": {
+   "ts": "2026-11-08T00:10:48Z",
+   "host": {
+    "hostname": "DESKTOP-michael",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "wsl2": true,
+    "os": "Ubuntu 24.04.3 LTS"
+   },
+   "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Ti",
+    "driver": "591.86",
+    "cuda": "13.1",
+    "sm_mhz": 2542.0,
+    "sm_max_mhz": 3090.0,
+    "mem_mhz": 13801.0,
+    "mem_max_mhz": 14001.0,
+    "vram_total_mib": 16303.0,
+    "vram_used_mib": 273.0,
+    "util_pct": 0.0,
+    "power_w": 54.54,
+    "power_limit_w": 300.0,
+    "temp_c": 39.0,
+    "pstate": "P1",
+    "throttle_reasons": "0x0000000000000000",
+    "processes": [
+     {
+      "pid": 2903,
+      "name": "python main.py --listen 0.0.0.0 --port 8188",
+      "mem_mib": null
+     }
+    ]
+   },
+   "cpu": {
+    "model": "Intel(R) Core(TM) i7-14700KF",
+    "nproc": 12,
+    "load1": 1.34423828125,
+    "load5": 1.67724609375,
+    "load15": 1.49462890625,
+    "top_cpu_procs": [
+     {
+      "pid": 1023411,
+      "pcpu": 11.1,
+      "comm": "python3"
+     }
+    ]
+   },
+   "ram": {
+    "total_gb": 94.3,
+    "free_gb": 25.3,
+    "available_gb": 88.9
+   },
+   "docker": {
+    "version": "Docker version 29.8.1, build 4a63305",
+    "engine": "docker"
+   }
+  },
+  "experiments": [
+   {
+    "name": "prefill_attn_b8_s2048",
+    "unit": "us",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 4249.0416,
+    "baseline_sd": 2.918,
+    "pr_solution": 3830.087,
+    "pr_solution_sd": 7.5125,
+    "n": 5,
+    "ratio": 1.109385,
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "prefill_attn_b16_s1024",
+    "unit": "us",
+    "reported": {
+     "baseline": null,
+     "pr_solution": null,
+     "how": null,
+     "marker": "",
+     "raw": "no number in the PR",
+     "note": "",
+     "ratio": null,
+     "pct": null
+    },
+    "baseline": 2324.4014,
+    "baseline_sd": 5.1987,
+    "pr_solution": 2113.8044,
+    "pr_solution_sd": 6.9824,
+    "n": 5,
+    "ratio": 1.099629,
+    "ratio_of_ratios": null,
+    "verdict": "no_reported_number",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "offline_latency_b8_2048",
+    "unit": "us",
+    "reported": {
+     "baseline": 113.12,
+     "pr_solution": 109.99,
+     "how": "absolute",
+     "marker": "",
+     "raw": "113.12 -> 109.99 us",
+     "note": "author gave absolute numbers",
+     "ratio": 1.028457,
+     "pct": 2.85
+    },
+    "baseline": null,
+    "baseline_sd": null,
+    "pr_solution": null,
+    "pr_solution_sd": null,
+    "n": null,
+    "ratio": null,
+    "ratio_of_ratios": null,
+    "verdict": "unknown",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   },
+   {
+    "name": "offline_throughput_b8_2048",
+    "unit": "us",
+    "reported": {
+     "baseline": 33.9996,
+     "pr_solution": 34.969,
+     "how": "absolute",
+     "marker": "",
+     "raw": "33.9996 -> 34.969 us",
+     "note": "author gave absolute numbers",
+     "ratio": 0.972278,
+     "pct": -2.77
+    },
+    "baseline": null,
+    "baseline_sd": null,
+    "pr_solution": null,
+    "pr_solution_sd": null,
+    "n": null,
+    "ratio": null,
+    "ratio_of_ratios": null,
+    "verdict": "unknown",
+    "reliability": {
+     "flag": "ok",
+     "note": ""
+    }
+   }
+  ]
+ },
  "gap": {
   "verdict": "not analysed",
   "note": null,

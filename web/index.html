@@ -684,8 +684,9 @@ function statRows(){
    verdict:(d.reproduced_vs_reported||{}).verdict||'', rel:(d.reliability||{}).flag||'ok'});}
  return out;
 }
-const TABS=[['gapratio','gap ratio · PR'],['fgapratio','gap ratio · field'],['gaps','gaps · PR'],
-            ['baseratio','baseline · PR'],['fbaseratio','baseline · field'],['fgaps','gaps · field']];
+// top row = per PR (global), bottom row = per field, same order in both rows
+const TABS=[['gapratio','gap ratio · PR'],['gaps','gaps · PR'],['baseratio','baseline · PR'],
+            ['fgapratio','gap ratio · field'],['fgaps','gaps · field'],['fbaseratio','baseline · field']];
 // gap = PR's solution − baseline. Relative gap = (baseline − PR's solution) ÷ baseline, so a 30 % faster run is +0.30
 // whatever the unit (throughput units: (PR's solution − baseline) ÷ baseline). Gap ratio = reproduced gap ÷ reported gap.
 function gapRows(){

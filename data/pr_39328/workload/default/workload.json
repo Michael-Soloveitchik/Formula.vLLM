@@ -169,7 +169,7 @@
   "rtx5070ti": {
    "source": "data/pr_39328/results.rtx5070ti.json",
    "hw_slug": "rtx5070ti",
-   "ts": "2026-11-07T17:23:35Z",
+   "ts": "2026-11-08T01:05:06Z",
    "image": {
     "mode": "wheel",
     "wheel": "0.20.0",
@@ -180,11 +180,11 @@
     "base": "SKIP",
     "gold": "SKIP"
    },
-   "verdict": "partial",
-   "reproduced_ratio_median": 1.0,
+   "verdict": "reproduced",
+   "reproduced_ratio_median": 717.9575,
    "reported_ratio_median": 2.0121,
    "machine": {
-    "ts": "2026-11-07T17:20:58Z",
+    "ts": "2026-11-08T01:03:05Z",
     "host": {
      "hostname": "DESKTOP-michael",
      "kernel": "6.18.33.2-microsoft-standard-WSL2",
@@ -200,11 +200,11 @@
      "mem_mhz": 405.0,
      "mem_max_mhz": 14001.0,
      "vram_total_mib": 16303.0,
-     "vram_used_mib": 263.0,
+     "vram_used_mib": 275.0,
      "util_pct": 0.0,
-     "power_w": 30.19,
+     "power_w": 30.49,
      "power_limit_w": 300.0,
-     "temp_c": 34.0,
+     "temp_c": 37.0,
      "pstate": "P8",
      "throttle_reasons": "0x0000000000000000",
      "processes": [
@@ -218,21 +218,21 @@
     "cpu": {
      "model": "Intel(R) Core(TM) i7-14700KF",
      "nproc": 12,
-     "load1": 2.09375,
-     "load5": 1.58056640625,
-     "load15": 1.3486328125,
+     "load1": 1.78662109375,
+     "load5": 1.4912109375,
+     "load15": 1.39501953125,
      "top_cpu_procs": [
       {
-       "pid": 812071,
-       "pcpu": 7.1,
+       "pid": 1070804,
+       "pcpu": 5.8,
        "comm": "python3"
       }
      ]
     },
     "ram": {
      "total_gb": 94.3,
-     "free_gb": 0.6,
-     "available_gb": 89.6
+     "free_gb": 3.0,
+     "available_gb": 88.0
     },
     "docker": {
      "version": "Docker version 29.8.1, build 4a63305",
@@ -253,17 +253,17 @@
       "ratio": 2.876106,
       "pct": 187.61
      },
-     "baseline": 0.0003,
-     "baseline_sd": 0.0,
-     "pr_solution": 0.0003,
-     "pr_solution_sd": 0.0,
+     "baseline": 1939.7059,
+     "baseline_sd": 7.1128,
+     "pr_solution": 2.7017,
+     "pr_solution_sd": 0.0463,
      "n": 5,
-     "ratio": 1.0,
-     "ratio_of_ratios": 0.348,
-     "verdict": "partial",
+     "ratio": 717.957545,
+     "ratio_of_ratios": 249.628,
+     "verdict": "reproduced",
      "reliability": {
-      "flag": "below_host_floor",
-      "note": "baseline 0.0003 ms < 100 us per call: dominated by host launch/sync latency on this machine; ratio unreliable, absolute meaningless"
+      "flag": "ok",
+      "note": ""
      }
     },
     {

@@ -4,7 +4,7 @@
   {
    "name": "throughput_output_tok_s",
    "unit": "tok/s",
-   "workload": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 2000 --dtype float16",
+   "workload": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 30000 --dtype float16 --max-num-seqs 1024 --max-num-batched-tokens 16384",
    "reported": {
     "pct": 2.07,
     "comparable": false,
@@ -13,14 +13,14 @@
    },
    "arms": {
     "base": {
-     "mean": 2260.996,
-     "sd": 15.9951,
-     "n": 5
+     "mean": 8665.81,
+     "sd": 0.0,
+     "n": 1
     },
     "gold": {
-     "mean": 2265.852,
-     "sd": 17.7261,
-     "n": 5
+     "mean": 8989.64,
+     "sd": 0.0,
+     "n": 1
     },
     "claude": {
      "mean": 2279.932,
@@ -37,8 +37,8 @@
     "unit": "tok/s",
     "higher_is_better": true,
     "reported": {
-     "baseline": 2260.996,
-     "pr_solution": 2307.798617,
+     "baseline": 8665.81,
+     "pr_solution": 8845.192267,
      "how": "our baseline \u00b1 %",
      "marker": "*",
      "raw": "2.07% gain, no baseline number",
@@ -47,16 +47,16 @@
      "pct": 2.07
     },
     "reproduced": {
-     "baseline": 2260.996,
-     "pr_solution": 2265.852,
-     "ratio_sd": 0.01057,
-     "baseline_sd": 15.9951,
-     "pr_solution_sd": 17.7261,
-     "ratio": 1.002148,
-     "pct": 0.21
+     "baseline": 8665.81,
+     "pr_solution": 8989.64,
+     "ratio_sd": 0.0,
+     "baseline_sd": 0.0,
+     "pr_solution_sd": 0.0,
+     "ratio": 1.037369,
+     "pct": 3.74
     },
     "reproduced_vs_reported": {
-     "ratio_of_ratios": 0.982,
+     "ratio_of_ratios": 1.016,
      "verdict": "reproduced"
     },
     "reliability": {
@@ -68,18 +68,18 @@
   {
    "name": "throughput_total_tok_s",
    "unit": "tok/s",
-   "workload": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 2000 --dtype float16",
+   "workload": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 30000 --dtype float16 --max-num-seqs 1024 --max-num-batched-tokens 16384",
    "reported": null,
    "arms": {
     "base": {
-     "mean": 26377.464,
-     "sd": 186.527,
-     "n": 5
+     "mean": 101098.03,
+     "sd": 0.0,
+     "n": 1
     },
     "gold": {
-     "mean": 26434.172,
-     "sd": 206.8499,
-     "n": 5
+     "mean": 104875.71,
+     "sd": 0.0,
+     "n": 1
     },
     "claude": {
      "mean": 26598.382,
@@ -106,13 +106,13 @@
      "pct": null
     },
     "reproduced": {
-     "baseline": 26377.464,
-     "pr_solution": 26434.172,
-     "ratio_sd": 0.01057,
-     "baseline_sd": 186.527,
-     "pr_solution_sd": 206.8499,
-     "ratio": 1.00215,
-     "pct": 0.21
+     "baseline": 101098.03,
+     "pr_solution": 104875.71,
+     "ratio_sd": 0.0,
+     "baseline_sd": 0.0,
+     "pr_solution_sd": 0.0,
+     "ratio": 1.037367,
+     "pct": 3.74
     },
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
@@ -127,18 +127,18 @@
   {
    "name": "throughput_req_s",
    "unit": "req/s",
-   "workload": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 2000 --dtype float16",
+   "workload": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 30000 --dtype float16 --max-num-seqs 1024 --max-num-batched-tokens 16384",
    "reported": null,
    "arms": {
     "base": {
-     "mean": 30.146,
-     "sd": 0.213,
-     "n": 5
+     "mean": 115.54,
+     "sd": 0.0,
+     "n": 1
     },
     "gold": {
-     "mean": 30.212,
-     "sd": 0.2366,
-     "n": 5
+     "mean": 119.86,
+     "sd": 0.0,
+     "n": 1
     },
     "claude": {
      "mean": 30.398,
@@ -165,13 +165,13 @@
      "pct": null
     },
     "reproduced": {
-     "baseline": 30.146,
-     "pr_solution": 30.212,
-     "ratio_sd": 0.010571,
-     "baseline_sd": 0.213,
-     "pr_solution_sd": 0.2366,
-     "ratio": 1.002189,
-     "pct": 0.22
+     "baseline": 115.54,
+     "pr_solution": 119.86,
+     "ratio_sd": 0.0,
+     "baseline_sd": 0.0,
+     "pr_solution_sd": 0.0,
+     "ratio": 1.03739,
+     "pct": 3.74
     },
     "reproduced_vs_reported": {
      "ratio_of_ratios": null,
@@ -192,10 +192,12 @@
  "gain_kind": "pct",
  "base_sha": "df5afa82e5c41be7d87ddd1968e13891d22003a7",
  "merge_sha": "6e670778cdd87c282c42002a2304cb0a4a165904",
+ "hw_slug": "rtx5070ti",
+ "hw_override": null,
  "image": {
   "mode": "wheel",
   "wheel": "0.10.1",
-  "workload_cmd": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 2000 --dtype float16",
+  "workload_cmd": "VLLM_USE_V1=1 python3 benchmarks/benchmark_throughput.py --model facebook/opt-125m --backend vllm --input-len 800 --output-len 75 --num-prompts 30000 --dtype float16 --max-num-seqs 1024 --max-num-batched-tokens 16384",
   "repeats": 5
  },
  "arms": {
@@ -222,14 +224,14 @@
    "throughput_output_tok_s": {
     "unit": "tok/s",
     "base": {
-     "mean": 2260.996,
-     "sd": 15.9951,
-     "n": 5
+     "mean": 8665.81,
+     "sd": 0.0,
+     "n": 1
     },
     "gold": {
-     "mean": 2265.852,
-     "sd": 17.7261,
-     "n": 5
+     "mean": 8989.64,
+     "sd": 0.0,
+     "n": 1
     },
     "claude": {
      "mean": 2279.932,
@@ -245,14 +247,14 @@
    "throughput_req_s": {
     "unit": "req/s",
     "base": {
-     "mean": 30.146,
-     "sd": 0.213,
-     "n": 5
+     "mean": 115.54,
+     "sd": 0.0,
+     "n": 1
     },
     "gold": {
-     "mean": 30.212,
-     "sd": 0.2366,
-     "n": 5
+     "mean": 119.86,
+     "sd": 0.0,
+     "n": 1
     },
     "claude": {
      "mean": 30.398,
@@ -268,14 +270,14 @@
    "throughput_total_tok_s": {
     "unit": "tok/s",
     "base": {
-     "mean": 26377.464,
-     "sd": 186.527,
-     "n": 5
+     "mean": 101098.03,
+     "sd": 0.0,
+     "n": 1
     },
     "gold": {
-     "mean": 26434.172,
-     "sd": 206.8499,
-     "n": 5
+     "mean": 104875.71,
+     "sd": 0.0,
+     "n": 1
     },
     "claude": {
      "mean": 26598.382,
@@ -295,16 +297,16 @@
   "base": {
    "tests": {
     "bytes": 727,
-    "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n......                                                                   [100%]\n6 passed in 1.61s\n"
+    "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n......                                                                   [100%]\n6 passed in 1.05s\n"
    },
-   "workload_runs": 5
+   "workload_runs": 1
   },
   "gold": {
    "tests": {
     "bytes": 727,
-    "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n......                                                                   [100%]\n6 passed in 1.11s\n"
+    "tail": "/usr/local/lib/python3.10/dist-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n......                                                                   [100%]\n6 passed in 1.24s\n"
    },
-   "workload_runs": 5
+   "workload_runs": 1
   },
   "claude": {
    "tests": {
@@ -331,9 +333,65 @@
    "patch_bytes": 3457
   }
  },
- "ts": "2026-11-07T10:44:17Z",
+ "ts": "2026-11-08T01:40:24Z",
+ "machine": {
+  "ts": "2026-11-08T01:28:26Z",
+  "host": {
+   "hostname": "DESKTOP-michael",
+   "kernel": "6.18.33.2-microsoft-standard-WSL2",
+   "wsl2": true,
+   "os": "Ubuntu 24.04.3 LTS"
+  },
+  "gpu": {
+   "name": "NVIDIA GeForce RTX 5070 Ti",
+   "driver": "591.86",
+   "cuda": "13.1",
+   "sm_mhz": 180.0,
+   "sm_max_mhz": 3090.0,
+   "mem_mhz": 405.0,
+   "mem_max_mhz": 14001.0,
+   "vram_total_mib": 16303.0,
+   "vram_used_mib": 275.0,
+   "util_pct": 0.0,
+   "power_w": 30.67,
+   "power_limit_w": 300.0,
+   "temp_c": 36.0,
+   "pstate": "P8",
+   "throttle_reasons": "0x0000000000000000",
+   "processes": [
+    {
+     "pid": 2903,
+     "name": "python main.py --listen 0.0.0.0 --port 8188",
+     "mem_mib": null
+    }
+   ]
+  },
+  "cpu": {
+   "model": "Intel(R) Core(TM) i7-14700KF",
+   "nproc": 12,
+   "load1": 2.79833984375,
+   "load5": 1.5927734375,
+   "load15": 1.345703125,
+   "top_cpu_procs": [
+    {
+     "pid": 1089687,
+     "pcpu": 5.2,
+     "comm": "python3"
+    }
+   ]
+  },
+  "ram": {
+   "total_gb": 94.3,
+   "free_gb": 4.1,
+   "available_gb": 88.9
+  },
+  "docker": {
+   "version": "Docker version 29.8.1, build 4a63305",
+   "engine": "docker"
+  }
+ },
  "solver_arms_from": {
-  "ts": "2026-11-05T14:13:13Z",
+  "ts": "2026-11-07T10:44:17Z",
   "arms": [
    "claude",
    "claude + PR's solution"
@@ -348,8 +406,8 @@
    "unit": "tok/s",
    "higher_is_better": true,
    "reported": {
-    "baseline": 2260.996,
-    "pr_solution": 2307.798617,
+    "baseline": 8665.81,
+    "pr_solution": 8845.192267,
     "how": "our baseline \u00b1 %",
     "marker": "*",
     "raw": "2.07% gain, no baseline number",
@@ -358,16 +416,16 @@
     "pct": 2.07
    },
    "reproduced": {
-    "baseline": 2260.996,
-    "pr_solution": 2265.852,
-    "ratio_sd": 0.01057,
-    "baseline_sd": 15.9951,
-    "pr_solution_sd": 17.7261,
-    "ratio": 1.002148,
-    "pct": 0.21
+    "baseline": 8665.81,
+    "pr_solution": 8989.64,
+    "ratio_sd": 0.0,
+    "baseline_sd": 0.0,
+    "pr_solution_sd": 0.0,
+    "ratio": 1.037369,
+    "pct": 3.74
    },
    "reproduced_vs_reported": {
-    "ratio_of_ratios": 0.982,
+    "ratio_of_ratios": 1.016,
     "verdict": "reproduced"
    },
    "reliability": {
@@ -375,14 +433,13 @@
     "note": ""
    }
   },
-  "reproduced_ratio_median": 1.0022,
-  "reproduced_ratio_max": 1.0022,
+  "reproduced_ratio_median": 1.0374,
+  "reproduced_ratio_max": 1.0374,
   "reported_ratio_median": 1.0207,
   "verdict": "reproduced",
   "tests": {
    "base": "PASS",
    "gold": "PASS"
   }
- },
- "hw_slug": "rtx5070ti"
+ }
 }

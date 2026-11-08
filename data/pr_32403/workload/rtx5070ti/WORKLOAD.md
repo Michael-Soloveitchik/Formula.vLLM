@@ -38,7 +38,15 @@ No `hardware_overrides[rtx5070ti]` in task.json: identical to `workload/default/
 
 ## Reproduced here
 
-- not measured yet (no `data/pr_32403/results.rtx5070ti.json`)
+- source `data/pr_32403/results.rtx5070ti.json` (2026-11-08T00:12:11Z), image mode `wheel` wheel `0.14.0`, repeats 5, tests baseline=`SKIP` PR's solution=`SKIP`, verdict **no_reported_number** (median ratio ×1.105 vs reported ×1)
+- machine: NVIDIA GeForce RTX 5070 Ti driver 591.86 CUDA 13.1, Intel(R) Core(TM) i7-14700KF, 6.18.33.2-microsoft-standard-WSL2
+
+| metric | reported baseline → PR's solution | reproduced baseline → PR's solution (mean ± sd, n) | ratio ours / reported | verdict |
+|---|---|---|---|---|
+| `prefill_attn_b8_s2048` | — | 4249 ± 2.918 → 3830 ± 7.513 us (n=5) | ×1.109 / — | no_reported_number |
+| `prefill_attn_b16_s1024` | — | 2324 ± 5.199 → 2114 ± 6.982 us (n=5) | ×1.1 / — | no_reported_number |
+| `offline_latency_b8_2048` | 113.1 → 110 us | — | ×— / — | unknown |
+| `offline_throughput_b8_2048` | 34 → 34.97 us | — | ×— / — | unknown |
 
 ## Gap between the author's absolute numbers and ours
 

@@ -38,13 +38,15 @@ No `hardware_overrides[rtx5070ti]` in task.json: identical to `workload/default/
 
 ## Reproduced here
 
-- source `data/pr_29499/results.rtx5070ti.json` (2026-11-07T16:42:54Z), image mode `wheel` wheel `0.14.0`, repeats 5, tests baseline=`FAIL` PR's solution=`PASS`, verdict **regression** (median ratio ×0.7379 vs reported ×—)
+- source `data/pr_29499/results.rtx5070ti.json` (2026-11-08T01:19:17Z), image mode `wheel` wheel `0.14.0`, repeats 5, tests baseline=`FAIL` PR's solution=`PASS`, verdict **reproduced** (median ratio ×2.676 vs reported ×1.272)
+- machine: NVIDIA GeForce RTX 5070 Ti driver 591.86 CUDA 13.1, Intel(R) Core(TM) i7-14700KF, 6.18.33.2-microsoft-standard-WSL2
 
 | metric | reported baseline → PR's solution | reproduced baseline → PR's solution (mean ± sd, n) | ratio ours / reported | verdict |
 |---|---|---|---|---|
-| `move_from_buffer` | — | 0.0015 ± 0 → 0.004 ± 0 us (n=5) | ×0.375 / — | regression (below_host_floor) |
-| `get_ep_ranks_with_expert` | — | 16.33 ± 0.1054 → 1.982 ± 0.0036 us (n=5) | ×8.238 / — | no_reported_number (below_host_floor) |
-| `move_to_buffer` | — | 0.0228 ± 0.0001 → 0.0309 ± 0.0005 us (n=5) | ×0.7379 / — | regression (below_host_floor) |
+| `rearrange_e2e` | 1370 → 1077 ms | 1205 ± 64.94 → 479.5 ± 1.749 ms (n=5) | ×2.512 / 1.975 | reproduced |
+| `get_ep_ranks_with_expert` | — | 8.516 ± 0.5575 → 2.999 ± 0.0257 ms (n=5) | ×2.839 / — | no_reported_number |
+| `move_to_buffer` | — | 0.3357 ± 0.0029 → 0.0259 ± 0.0004 ms (n=5) | ×12.96 / — | no_reported_number |
+| `move_from_buffer` | — | 0.0058 ± 0.0001 → 0.0043 ± 0.0001 ms (n=5) | ×1.349 / — | no_reported_number (below_host_floor) |
 
 ## Gap between the author's absolute numbers and ours
 
