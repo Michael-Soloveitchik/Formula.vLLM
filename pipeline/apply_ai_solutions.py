@@ -102,6 +102,39 @@ def make_arm_tree(pr, arm, base_full, work):
     return dst
 
 
+def emit_patch(pr, arm, base_full):
+    """Write data/pr_<n>/files/<arm>.patch = unified diff of ONLY the rows the arm changed
+    (baseline -> overlay), per file. Remote box applies it with one command instead of copying
+    whole trees:  cd <vllm_site> && git apply data/pr_<n>/files/<arm>.patch   (or patch -p1 <).
+    """
+    overlay = os.path.join(files_root(pr), arm)
+    rels = []
+    for root, _, fs in os.walk(overlay):
+        for f in fs:
+            rels.append(os.path.relpath(os.path.join(root, f), overlay))
+    chunks = []
+    for rel in sorted(rels):
+        old = os.path.join(base_full, rel)
+        new = os.path.join(overlay, rel)
+        old_arg = old if os.path.isfile(old) else "/dev/null"
+        # diff exits 1 when files differ (expected); label paths a/<rel> b/<rel> for git apply -p1
+        d = subprocess.run(["diff", "-u", old_arg, new], capture_output=True, text=True).stdout
+        if not d:
+            continue
+        lines = d.splitlines()
+        lines[0] = f"--- {'/dev/null' if old_arg == '/dev/null' else 'a/' + rel}"
+        lines[1] = f"+++ b/{rel}"
+        chunks.append("\n".join(lines))
+    out = os.path.join(files_root(pr), f"{arm}.patch")
+    if chunks:
+        with open(out, "w") as fh:
+            fh.write("\n".join(chunks) + "\n")
+        print(f"  patch -> {layout.rel(out)}  (apply: cd <vllm_site> && git apply {layout.rel(out)})")
+    elif os.path.isfile(out):
+        os.remove(out)
+    return out
+
+
 def run_bench(pr, img, arm, tree, i, work):
     """one docker run of bench.py on <tree> at /src; log = wl_<arm>_<i>.log (parse_workload reads this)."""
     task = layout.pr_dir(pr)
@@ -137,6 +170,7 @@ def apply_one(pr, arm):
     os.makedirs(work, exist_ok=True)
     base_full, gold_full = export_trees(pr, img, work)
     arm_tree = make_arm_tree(pr, arm, base_full, work)
+    emit_patch(pr, arm, base_full)
 
     # clear old logs for these two arms so parse sees only this run
     for f in os.listdir(work):

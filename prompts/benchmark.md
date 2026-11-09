@@ -28,6 +28,8 @@ data/pr_<n>/            # EVERYTHING about one PR
                                 #   the gpu-wheel image: same shas/trees/deps, torch CPU wheel, no CUDA)
   files/<arm>/                  solver OUTPUT: a vllm/ tree overlay the arm edited (one dir per arm).
                                 #   cp -a files/<arm>/. over the base tree = that arm's applied solution.
+  files/<arm>.patch             generated: unified diff (base→overlay) of ONLY the changed rows.
+                                #   remote applies with one cmd: cd <vllm_site> && git apply files/<arm>.patch
   results.<hw-slug>.json        written by a run (record.py) — one per hardware the PR ran on
   results.ai.<arm>.json         written by apply_ai_solutions.py — files/<arm>/ re-measured vs gold on CPU
   logs/<hw-slug>/  work/        written by a run (git-ignored)
@@ -140,6 +142,11 @@ exports /base + /gold, overlays `files/<arm>/` on base, runs the task's bench cm
 `REPEATS` times, folds with `parse_workload.py` (SAME instrument as `record.py`), and writes
 `results.ai.<arm>.json {scenario:{gold,<arm>,ratio_arm_over_gold}}`. The absolute number is not
 the GPU speed — it proves the saved solution compiles, applies cleanly, and the instrument reads it.
+
+It also writes `files/<arm>.patch` — a unified diff of ONLY the rows the arm changed (baseline →
+overlay). The remote GPU box applies a solution without copying whole trees:
+`cd <vllm_site> && git apply data/pr_<n>/files/<arm>.patch` (or `patch -p1 < ...`). The full
+`files/<arm>/` overlay is kept too (fallback `cp -a files/<arm>/. <vllm_site>/`).
 
 ---
 
