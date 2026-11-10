@@ -55,12 +55,15 @@ The dashboard shows, per PR, the serving machine's slug when it has a result, el
 Top-level:
 
 ```
-pipeline/     run.sh run_one.sh queue.sh health_check.sh run_workloads.sh (bash) · record.py parse_workload.py
-              measure.py aggregate.py derive.py machine.py requirements.py next_prs.py reproduce_report.py
+run/          runFormula.sh (the dispatcher, 6 flags) apply.sh (standalone patch applier: patch -p1 + .bak)
+pipeline/     run_one.sh run_workloads.sh health_check.sh (bash) · apply_ai_solutions.py (CPU gate)
+              select_prs.py (the one selection rule) record.py parse_workload.py measure.py aggregate.py
+              derive.py machine.py requirements.py next_prs.py reproduce_report.py
 gen/          layout.py (+layout.sh: the ONE owner of paths) gen_index.py gen_requirements.py gen_workloads.py
               gen_tasks.py conf.py migrate_layout.py
+hardware/     validation.py   the GPU gate: needs-GPU + task-hardware match + machine-change confirm
 tools/        check_terms.py (terminology lint) serve.py serve.sh (dashboard server)
-stats/        build_stats.py stats.ipynb → prs.csv fields.csv status.csv gaps.png   [gen: stats/build_stats.py]
+stats/        build_stats.py stats.ipynb → prs.csv fields.csv status.csv ai_arms.csv gaps.png · hardware.csv (machine ledger)
 templates/    Dockerfile.gpu-wheel (the per-PR template) · Dockerfile.gpu-source, Dockerfile.cpu-bench (legacy, unused)
 web/          index.html — the live dashboard (reads index.json, results/manifest.json, data/pr_<n>/…)
               header shows one progress bar (no stat cards): total PRs / processed / measured / re-produced /
@@ -71,7 +74,7 @@ web/          index.html — the live dashboard (reads index.json, results/manif
 results/      all.json + manifest.json   [gen: pipeline/aggregate.py]  the web aggregate, nothing else
 index.json    202-PR catalog              [gen: gen/gen_index.py from data/pr_*/task.json]
 clusters.json config.yaml dict_of_harnesses.json   [hand]  model clusters · knobs · solver arms
-run.sh run_one.sh queue.sh serve.sh   thin root wrappers (exec pipeline/… or tools/…)
+runFormula.sh run_one.sh serve.sh   thin root wrappers (exec run/… pipeline/… or tools/…)
 .work/        run.lock, vllm_releases.json, queue logs   (git-ignored)
 ```
 
@@ -147,17 +150,32 @@ vs measured), diagonal fill. Full spec: `prompts/numeric_solution.md` (numbers) 
 
 ## <img src="web/shots/h/run.svg" height="40" alt="Run">
 
+`./runFormula.sh` (root wrapper → `run/runFormula.sh`) takes exactly ONE flag. CPU flags are a
+compile+apply GATE (apply a patch via `run/apply.sh` → bench → recover from `.bak`; prove it
+applies+imports+runs, writing a verdict stamp `results.ai.<arm>.json` — NOT a GPU number). GPU
+flags are real measurements that fill `results.<slug>.json` and pass `hardware/validation.py`
+first. Runs on Linux (GPU box) and macOS (dev box) — both need docker.
+
 ```bash
-./run.sh --reproduce 37225 21222   # baseline vs PR's solution on this box, no solvers, no API keys
-./run.sh --reproduce --next 10     # the next 10 not-yet-measured workload PRs (requirements checked first)
-./run.sh --run-formula-harnesses 37225   # solver arms (claude / codex) on an already-reproduced PR
-./run.sh                           # default set from config.yaml (interesting)
-./run.sh workloads                 # GPU box: cluster weights, run per-PR workload images
+# CPU gate (any box; apply.sh → run → recover, verdict stamp only, no measurement):
+./runFormula.sh --apply-pr-on-cpu 21222            # apply data/pr_<n>/pr.diff
+./runFormula.sh --apply-solution-on-cpu 21281 --arm claude   # apply solutions/<arm>/<arm>.patch
+
+# GPU measurement (needs a GPU; blocked on a cpu box or a machine mismatch unless --force):
+./runFormula.sh --apply-pr-and-measure-on-gpu 37225 21222    # baseline vs PR's solution
+./runFormula.sh --apply-solution-and-measure-on-gpu 37225 --arm claude   # measure a saved solver arm
+./runFormula.sh --resolve 37225                    # run the solver to PRODUCE solutions/<arm>/<arm>.patch
+./runFormula.sh --run-workloads-on-gpu             # cluster weights, run per-PR workload images
+
 ./serve.sh                         # dashboard at http://localhost:8000/web/ (gzip, serves from root)
 python3 pipeline/next_prs.py --status        # measured | failed | unmet | pending per workload PR
 python3 pipeline/requirements.py 37225       # can THIS machine run it?
 DRY_RUN=1 ./run_one.sh 37225                 # print every step, no docker
 ```
+
+Selection (every flag): give PR numbers → exactly those; give none → the next NOT-yet-processed
+PRs of that flow (ascending); add `--force` → the whole set (redo, and override the
+hardware-change confirm). No flag → prints usage.
 
 GPU tasks self-skip without CUDA. Weights download on-demand, clustered by model, never
 committed. Mixtral (~90 GB) is gated + last.

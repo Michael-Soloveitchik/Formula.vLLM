@@ -855,12 +855,12 @@ function render(){
  const N=IDX.length, nP=processed.length, nM=measured.length;
  const solvedN=IDX.filter(r=>isSolved(r.pr)).length;
  // re-produced = our run matched the author's reported gap (verdict "reproduced").
- // re-solved  = a solver arm's saved solution was CPU re-measured (results.ai.<arm>.json, >=1 scenario).
+ // re-solved  = a solver arm's saved solution passed the CPU compile+apply gate (results.ai.<arm>.json, ok==true).
  const verdictOf=res=>{const s=res&&res.summary||{}; return s.verdict||((s.headline_derived||{}).reproduced_vs_reported||{}).verdict||'';};
  const reproducedN=measured.filter(r=>verdictOf(RES[r.pr])==='reproduced').length;
  const AI=HW.ai||{};
- const resolvedN=Object.keys(AI).filter(pr=>Object.values(AI[pr]||{}).some(a=>(a.scenarios||0)>0)).length;
- const resolvedArms=Object.values(AI).reduce((s,m)=>s+Object.values(m).filter(a=>(a.scenarios||0)>0).length,0);
+ const resolvedN=Object.keys(AI).filter(pr=>Object.values(AI[pr]||{}).some(a=>a.ok)).length;
+ const resolvedArms=Object.values(AI).reduce((s,m)=>s+Object.values(m).filter(a=>a.ok).length,0);
  $('#ts').textContent = nP? ('updated '+ ((RES[processed[0].pr]||{}).ts||'')+(HW.current?' · hw '+HW.current:'')) : '';
  const pct=x=>N?(x/N*100):0;
  $('#stats').innerHTML=
