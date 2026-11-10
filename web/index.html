@@ -205,10 +205,17 @@ sup.mark{font-weight:700;color:#d97706;margin-left:2px;cursor:help}
  .restab.exp{table-layout:fixed}
  .restab.exp .c-row{width:300px}
  .restab.exp .c-val{width:140px}
- .restab.exp .c-d{width:88px}
- .restab.exp .c-r{width:58px}
+ .restab.exp .c-d{width:120px}
+ .restab.exp .c-r{width:120px}
  .restab.exp th.r-rep{color:#a66e00;background:#fff4d6}
  .restab.exp th.r-meas{color:#0b6fc0;background:#edf6ff}
+ .restab th .r-rep{color:#b97a00} .restab th .r-meas{color:#0b8ce8}
+ /* merged Δ / × cols: cell color tells reported (orange) from measured (blue) */
+ .restab td.num.c-rep{color:#b97a00} .restab td.num.c-meas{color:#0b6fc0}
+ .restab th.sorth{cursor:pointer;user-select:none} .restab th.sorth:hover{color:var(--acc)}
+ .restab th.sorth.asc::after{content:" ▲";font-size:9px} .restab th.sorth.desc::after{content:" ▼";font-size:9px}
+ .restab.exp tbody tr{cursor:grab} .restab.exp tbody tr.dragging{opacity:.4;background:#eef4ff}
+ .restab.exp tbody tr.dragover td{border-top:2px solid var(--acc)}
  .restab.exp td.num .mv{display:inline-block;width:60px;text-align:right}
  .restab.exp td.num .var{color:var(--faint);display:inline-block;width:62px;text-align:left;margin-left:3px;font-size:11.5px}
  .scalebox{margin:-8px 0 16px;padding:8px 12px;border-radius:0 0 12px 12px;background:#fff9ef;
@@ -543,17 +550,17 @@ function resolveReported(rep,baseV,unit,derived){
 // Δ vs baseline in task units. positive = improvement (direction-aware).
 function deltaVs(val,baseV,unit){if(val==null||baseV==null)return null;
  return higherBetter(unit)? val-baseV : baseV-val;}
-function dcell(d,unit){if(d==null)return '<td class="num muted">—</td>';
- const s=d>=0?'+':'−'; return `<td class="num">${s}${Math.abs(d).toFixed(3)} <span class="muted">${esc(unit)}</span></td>`;}
-function rcell(r){return r==null?'<td class="num muted">—</td>':`<td class="num">${r.toFixed(2)}×</td>`;}
+// cls colors the cell: "r-rep" orange (reported), "r-meas" blue (measured).
+function dcell(d,unit,cls){if(d==null)return '<td class="num muted">—</td>';
+ const s=d>=0?'+':'−'; return `<td class="num ${cls||''}">${s}${Math.abs(d).toFixed(3)} <span class="muted">${esc(unit)}</span></td>`;}
+function rcell(r,cls){return r==null?'<td class="num muted">—</td>':`<td class="num ${cls||''}">${r.toFixed(2)}×</td>`;}
 function gcells(val,baseV,unit){return dcell(deltaVs(val,baseV,unit),unit)+rcell(gainVs(val,baseV,unit));}
-const dblank='<td class="num muted">—</td>', rblank='<td class="num muted">—</td>';
-// REPORTED (orange) rows: fill Δ/× vs the author's REPORTED baseline; measured pair blank.
+// TWO merged metric cols (Δ, × factor). reported rows paint orange vs author baseline…
 function gcellsRep(val,repB,unit){
- return dcell(deltaVs(val,repB,unit),unit)+rcell(gainVs(val,repB,unit))+dblank+rblank;}
-// MEASURED (blue) rows: reported pair blank; fill Δ/× vs OUR MEASURED baseline.
+ return dcell(deltaVs(val,repB,unit),unit,'c-rep')+rcell(gainVs(val,repB,unit),'c-rep');}
+// …measured rows paint blue vs OUR baseline, in the SAME two columns.
 function gcellsMeas(val,measB,unit){
- return dblank+rblank+dcell(deltaVs(val,measB,unit),unit)+rcell(gainVs(val,measB,unit));}
+ return dcell(deltaVs(val,measB,unit),unit,'c-meas')+rcell(gainVs(val,measB,unit),'c-meas');}
 function expTable(exp){
  const a=exp.arms||{}, unit=exp.unit||'value';
  const baseV=(a.base||{}).mean;                     // before-merge baseline value, in unit
@@ -561,10 +568,11 @@ function expTable(exp){
  const bh='';   // baseline value lives in the table row, not the header
  let h=`<div class="expwrap"><div class="expH" onclick="toggleExp(this)"><span class="ecaret">▾</span>${esc(exp.name)} <span class="eu">${esc(unit)}</span>${bh}`+
    (exp.workload?`<span class="ew" title="${esc(exp.workload)}">${esc(exp.workload)}</span>`:'')+`</div><div class="expbody">`;
- h+=`<table class="restab exp"><colgroup><col class="c-row"><col class="c-val"><col class="c-d"><col class="c-r"><col class="c-d"><col class="c-r"><col class="c-src"></colgroup>`+
-   `<thead><tr><th>row</th><th class="num">value · ${esc(unit)}</th>`+
-   `<th class="num r-rep">Δ vs reported</th><th class="num r-rep">× vs reported</th>`+
-   `<th class="num r-meas">Δ vs measured</th><th class="num r-meas">× vs measured</th><th>source <span class="muted" title="* = author gave only a ratio/% — applied to our reproduced baseline&#10;+ = author gave only a difference — applied to our reproduced baseline">(<sup class="mark">*</sup> ratio applied, <sup class="mark">+</sup> diff applied to our baseline)</span></th></tr></thead><tbody>`;
+ h+=`<table class="restab exp"><colgroup><col class="c-row"><col class="c-val"><col class="c-d"><col class="c-r"><col class="c-src"></colgroup>`+
+   `<thead><tr><th class="sorth" onclick="sortExp(this,0,'s')">row</th><th class="num sorth" onclick="sortExp(this,1,'n')">value · ${esc(unit)}</th>`+
+   `<th class="num sorth" onclick="sortExp(this,2,'n')">Δ <span class="muted">(<span class="r-rep">reported</span>/<span class="r-meas">measured</span>)</span></th>`+
+   `<th class="num sorth" onclick="sortExp(this,3,'n')">× factor <span class="muted">(<span class="r-rep">reported</span>/<span class="r-meas">measured</span>)</span></th>`+
+   `<th>source <span class="muted" title="* = author gave only a ratio/% — applied to our reproduced baseline&#10;+ = author gave only a difference — applied to our reproduced baseline">(<sup class="mark">*</sup> ratio applied, <sup class="mark">+</sup> diff applied to our baseline)</span></th></tr></thead><tbody>`;
  // FOUR rows, two colors, grouped by WHICH-CODE (baselines together, solutions together):
  //   within each pair, reported (orange) comes FIRST, measured (blue) AFTER.
  // row order: baseline(reported) -> baseline(measured) -> solution(reported) -> solution(measured)
@@ -583,14 +591,14 @@ function expTable(exp){
      gcellsRep(+rep.base,repB,unit)+`<td class="src">PR author, old code</td></tr>`
    : (()=>{const miss = rep&&rep.pct!=null?'a ratio/%':(rep&&rep.delta!=null?'a delta':'no number');
        return `<tr class="r-reported"><td>baseline ${SR}</td><td class="num muted">—</td>`+
-       `<td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="src">author gave ${esc(miss)} — using our baseline as reference</td></tr>`;})();
+       `<td class="num muted">—</td><td class="num muted">—</td><td class="src">author gave ${esc(miss)} — using our baseline as reference</td></tr>`;})();
  // R2. PR's author solution (reported by PR's author) — author's NEW-code number, or — if absent.
  const rowRepSol = Rr
    // marker: * = ratio/% applied to our baseline, + = delta applied to our baseline (author gave no baseline number)
    ? (()=>{const mk=Rr.marker?`<sup class="mark" title="${esc(Rr.note)}">${Rr.marker}</sup>`:'';
        return `<tr class="r-reported"><td>PR's author solution ${SR}</td><td class="num">${num(Rr.value,0)}${mk}</td>`+
        gcellsRep(Rr.value,Rr.authorBase,unit)+`<td class="src" title="${esc(Rr.note)}">PR author <span class="muted">(${esc(Rr.how)})${Rr.raw?' — reported: '+esc(Rr.raw):''}</span></td></tr>`;})()
-   : `<tr class="r-reported"><td>PR's author solution ${SR}</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="src">no number in PR</td></tr>`;
+   : `<tr class="r-reported"><td>PR's author solution ${SR}</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="src">no number in PR</td></tr>`;
  // M1. baseline (measured by us) — our run of before-merge tree. 1.00x reference.
  const rowMeasBase = `<tr class="baserow r-measured"><td>baseline ${SM}</td><td class="num">${num(baseV,(a.base||{}).sd)}</td>`+
     gcellsMeas(baseV,baseV,unit)+`<td class="src" title="our run of before-merge tree (base_sha) — 1.00× reference">our run of before-merge tree (base_sha) — 1.00× reference</td></tr>`;
@@ -606,7 +614,7 @@ function expTable(exp){
       gcellsMeas(arm.mean,baseV,unit)+
       `<td class="src">solver arm</td></tr>`;
   }else{
-   h+=`<tr><td>${esc(k)}</td><td class="num muted">pending</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="src">not run yet</td></tr>`;}
+   h+=`<tr><td>${esc(k)}</td><td class="num muted">pending</td><td class="num muted">—</td><td class="num muted">—</td><td class="src">not run yet</td></tr>`;}
  });
  h+='</tbody></table>';
  // scale / comparability banner — makes the reported-vs-measured divergence fix VISIBLE
@@ -621,6 +629,33 @@ function expTable(exp){
  }
  h+='</div></div>';   // close .expbody + .expwrap
  return h;
+}
+// click a numeric/text column header -> sort the experiment table's body rows by that column.
+// 'n' = numeric (parse first number, sign-aware), 's' = string. toggles asc/desc.
+function sortExp(th,col,type){
+ const tbl=th.closest('table'), tb=tbl.tBodies[0]; if(!tb) return;
+ const asc=!th.classList.contains('asc');
+ tbl.querySelectorAll('th.sorth').forEach(h=>h.classList.remove('asc','desc'));
+ th.classList.add(asc?'asc':'desc');
+ const key=tr=>{const td=tr.children[col]; const t=td?td.textContent.trim():'';
+  if(type==='n'){const m=t.replace(/−/g,'-').match(/-?\d+(\.\d+)?/); return m?parseFloat(m[0]):(asc?Infinity:-Infinity);}
+  return t.toLowerCase();};
+ Array.from(tb.rows).sort((a,b)=>{const ka=key(a),kb=key(b); return (ka<kb?-1:ka>kb?1:0)*(asc?1:-1);})
+  .forEach(r=>tb.appendChild(r));
+}
+// drag a row by click+hold to reorder it within its table body.
+let DRAGROW=null;
+function wireExpDrag(root){
+ (root||document).querySelectorAll('.restab.exp tbody tr').forEach(tr=>{
+  tr.draggable=true;
+  tr.addEventListener('dragstart',e=>{DRAGROW=tr;tr.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
+  tr.addEventListener('dragend',()=>{tr.classList.remove('dragging');DRAGROW=null;tr.parentElement.querySelectorAll('tr.dragover').forEach(r=>r.classList.remove('dragover'));});
+  tr.addEventListener('dragover',e=>{e.preventDefault();if(DRAGROW&&DRAGROW.parentElement===tr.parentElement&&tr!==DRAGROW){tr.classList.add('dragover');}});
+  tr.addEventListener('dragleave',()=>tr.classList.remove('dragover'));
+  tr.addEventListener('drop',e=>{e.preventDefault();tr.classList.remove('dragover');
+   if(DRAGROW&&DRAGROW!==tr&&DRAGROW.parentElement===tr.parentElement){
+    const rows=Array.from(tr.parentElement.rows); tr.parentElement.insertBefore(DRAGROW, rows.indexOf(DRAGROW)<rows.indexOf(tr)?tr.nextSibling:tr);}});
+ });
 }
 function harnessTable(res,pr){
  const exps=experimentsOf(res,pr);
@@ -692,6 +727,7 @@ async function showPR(pr){
    <div class="dbody"><div class="md" id="mdbody"><span class="muted">loading detail…</span></div></div>
   </div>
  </div>`;
+ wireExpDrag(D);
  const p=mdPath(pr);
  try{
   const t=await fetch(p,{cache:'no-store'}).then(x=>{if(!x.ok)throw 0;return x.text();});
@@ -877,6 +913,7 @@ function render(){
   latRows.filter(r=>!pinnedSet.has(r.pr)).forEach(r=>{
    h+=prTable(r,r.pr===SEL?' sel':'',r.pr===SEL?' <span class="chip field">selected</span>':'');});
   $('#restabWrap').innerHTML='<h2 class="secH">experiment results</h2>'+h;
+  wireExpDrag($('#restabWrap'));
  } else $('#restabWrap').innerHTML='<table class="restab"><tbody><tr><td class="muted">no results yet — run <code>./run.sh</code></td></tr></tbody></table>';
 
  // per-PR cards
