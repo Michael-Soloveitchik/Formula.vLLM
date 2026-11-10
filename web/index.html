@@ -576,29 +576,28 @@ function expTable(exp){
  const Rr=resolveReported(rep,baseV,unit,exp.derived);
  const goldV=(a.gold||{}).mean;
  const SM='<span class="tag-m">(measured by us)</span>', SR='<span class="tag-r">(reported by author)</span>';
- // 1. baseline (reported by PR's author) — author's OLD-code number, or — if absent.
- if(authorHasBase){
-  h+=`<tr class="r-reported"><td>baseline ${SR}</td><td class="num">${num(+rep.base,0)}</td>`+
-     gcellsRep(+rep.base,repB,unit)+`<td class="src">PR author, old code</td></tr>`;
- }else{
-  const miss = rep&&rep.pct!=null?'a ratio/%':(rep&&rep.delta!=null?'a delta':'no number');
-  h+=`<tr class="r-reported"><td>baseline ${SR}</td><td class="num muted">—</td>`+
-     `<td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="src">author gave ${esc(miss)} — using our baseline as reference</td></tr>`;
- }
- // 2. baseline (measured by us) — our run of before-merge tree. 1.00x reference.
- h+=`<tr class="baserow r-measured"><td>baseline ${SM}</td><td class="num">${num(baseV,(a.base||{}).sd)}</td>`+
+ // reported rows FIRST (both author numbers), then our measured rows. row builders:
+ // R1. baseline (reported by PR's author) — author's OLD-code number, or — if absent.
+ const rowRepBase = authorHasBase
+   ? `<tr class="r-reported"><td>baseline ${SR}</td><td class="num">${num(+rep.base,0)}</td>`+
+     gcellsRep(+rep.base,repB,unit)+`<td class="src">PR author, old code</td></tr>`
+   : (()=>{const miss = rep&&rep.pct!=null?'a ratio/%':(rep&&rep.delta!=null?'a delta':'no number');
+       return `<tr class="r-reported"><td>baseline ${SR}</td><td class="num muted">—</td>`+
+       `<td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="src">author gave ${esc(miss)} — using our baseline as reference</td></tr>`;})();
+ // R2. PR's author solution (reported by PR's author) — author's NEW-code number, or — if absent.
+ const rowRepSol = Rr
+   // marker: * = ratio/% applied to our baseline, + = delta applied to our baseline (author gave no baseline number)
+   ? (()=>{const mk=Rr.marker?`<sup class="mark" title="${esc(Rr.note)}">${Rr.marker}</sup>`:'';
+       return `<tr class="r-reported"><td>PR's author solution ${SR}</td><td class="num">${num(Rr.value,0)}${mk}</td>`+
+       gcellsRep(Rr.value,Rr.authorBase,unit)+`<td class="src" title="${esc(Rr.note)}">PR author <span class="muted">(${esc(Rr.how)})${Rr.raw?' — reported: '+esc(Rr.raw):''}</span></td></tr>`;})()
+   : `<tr class="r-reported"><td>PR's author solution ${SR}</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="src">no number in PR</td></tr>`;
+ // M1. baseline (measured by us) — our run of before-merge tree. 1.00x reference.
+ const rowMeasBase = `<tr class="baserow r-measured"><td>baseline ${SM}</td><td class="num">${num(baseV,(a.base||{}).sd)}</td>`+
     gcellsMeas(baseV,baseV,unit)+`<td class="src" title="our run of before-merge tree (base_sha) — 1.00× reference">our run of before-merge tree (base_sha) — 1.00× reference</td></tr>`;
- // 3. PR's author solution (reported by PR's author) — author's NEW-code number, or — if absent.
- if(Rr){
-  // marker: * = ratio/% applied to our baseline, + = delta applied to our baseline (author gave no baseline number)
-  const mk=Rr.marker?`<sup class="mark" title="${esc(Rr.note)}">${Rr.marker}</sup>`:'';
-  h+=`<tr class="r-reported"><td>PR's author solution ${SR}</td><td class="num">${num(Rr.value,0)}${mk}</td>`+
-     gcellsRep(Rr.value,Rr.authorBase,unit)+`<td class="src" title="${esc(Rr.note)}">PR author <span class="muted">(${esc(Rr.how)})${Rr.raw?' — reported: '+esc(Rr.raw):''}</span></td></tr>`;
- }else{
-  h+=`<tr class="r-reported"><td>PR's author solution ${SR}</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="src">no number in PR</td></tr>`;}
- // 4. PR's author solution (measured by us) — our run of after-merge tree.
- h+=`<tr class="r-measured"><td>PR's author solution ${SM}</td><td class="num">${num(goldV,(a.gold||{}).sd)}</td>`+
+ // M2. PR's author solution (measured by us) — our run of after-merge tree.
+ const rowMeasSol = `<tr class="r-measured"><td>PR's author solution ${SM}</td><td class="num">${num(goldV,(a.gold||{}).sd)}</td>`+
     gcellsMeas(goldV,baseV,unit)+`<td class="src" title="our run of after-merge tree (merge_sha)">our run of after-merge tree (merge_sha)</td></tr>`;
+ h+= rowRepBase + rowRepSol + rowMeasBase + rowMeasSol;
  // harness arms — ALWAYS show claude + codex (+ any extra arm present), pending if absent
  const keys=HARNESSES.concat(Object.keys(a).filter(k=>!['base','gold'].includes(k)&&!HARNESSES.includes(k)));
  keys.forEach(k=>{const arm=a[k];
