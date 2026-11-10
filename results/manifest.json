@@ -1,5 +1,5 @@
 {
- "current": "rtx5070ti",
+ "current": "cpu",
  "prs": [
   6442,
   6779,
@@ -249,6 +249,26 @@
   },
   "42311": {
    "rtx5070ti": "data/pr_42311/results.rtx5070ti.json"
+  }
+ },
+ "ai": {
+  "13365": {
+   "claude": {
+    "scenarios": 2,
+    "file": "data/pr_13365/results.ai.claude.json"
+   }
+  },
+  "21222": {
+   "claude": {
+    "scenarios": 10,
+    "file": "data/pr_21222/results.ai.claude.json"
+   }
+  },
+  "21281": {
+   "claude": {
+    "scenarios": 10,
+    "file": "data/pr_21281/results.ai.claude.json"
+   }
   }
  }
 }

@@ -249,7 +249,18 @@ sup.mark{font-weight:700;color:#d97706;margin-left:2px;cursor:help}
  .secH span{font-size:11px;font-weight:600;letter-spacing:0;text-transform:none;-webkit-text-fill-color:var(--mut)}
  .prHead{margin:14px 0 4px;font-weight:700;font-size:13px;display:flex;align-items:center;gap:8px}
  .prHead.sel{background:var(--sel);border:1px solid #bfe0fb;border-radius:10px;padding:6px 10px;margin-top:6px}
+ .prHead.pinned{background:#fff6e8;border:1px solid #ffd99a;border-radius:10px;padding:6px 10px;margin-top:6px}
  .prHead a{color:var(--acc);text-decoration:none}
+ .unpin{margin-left:auto;flex:none;width:18px;height:18px;line-height:15px;text-align:center;border-radius:50%;border:1px solid var(--border2);background:#fff;color:var(--mut);font-weight:800;font-size:13px;cursor:pointer;padding:0;transition:.12s}
+ .unpin:hover{border-color:var(--red);color:var(--red);box-shadow:0 0 0 3px rgba(229,83,63,.12)}
+ .pindiv{height:0;border-top:1px dashed var(--border2);margin:12px 10px 4px;position:relative}
+ .pindiv::after{content:"pinned ↑ · ordered ↓";position:absolute;right:0;top:-8px;background:var(--bg);padding:0 8px;font-size:10px;font-weight:600;color:var(--faint);letter-spacing:.04em}
+ .pinbar{display:flex;align-items:center;gap:8px;margin:0 0 4px}
+ .pinbar input{width:150px;background:var(--panel);border:1px solid var(--border2);border-radius:9px;padding:6px 10px;font:13px var(--ui);color:var(--fg)}
+ .pinbar input:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px rgba(11,140,232,.18)}
+ .pinbar .pinclear{width:20px;height:20px;line-height:17px;text-align:center;border-radius:50%;border:1px solid var(--border2);background:#fff;color:var(--mut);font-weight:800;cursor:pointer;padding:0}
+ .pinbar .pinclear:hover{border-color:var(--red);color:var(--red)}
+ .pinbar .pinhint{font-size:11px;color:var(--faint)}
  .muted{color:var(--faint)}
  footer{color:var(--faint);font-size:11px;text-align:center;padding:16px}
  ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:20px;border:2px solid var(--bg)}::-webkit-scrollbar-thumb:hover{background:var(--faint)}
@@ -315,6 +326,7 @@ const esc=s=>(s==null?'':(''+s)).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>
 let IDX=[], RES={}, IDXBY={};   // IDXBY: pr -> index.json entry (catalog + reported-only experiments)
 let HW={current:null, files:{}, shown:{}};   // results/manifest.json: hardware slugs per PR; shown[pr] = slug displayed
 let SEL=null;    // PR selected in the tree: its results go to the top of the list
+let PINS=[];     // PR numbers pinned via the results-panel search: shown above the ordered list
 let TFILT='all';   // tree scope: all | run (has a measured result) | solved (has a harness arm)
 // run  = we executed the workload (result exists in RES)
 // solved = a solver harness arm (not baseline / PR solution) landed in that result
@@ -357,7 +369,8 @@ async function loadResults(){
  const man=await fetch('../results/manifest.json',no).then(r=>r.ok?r.json():null).catch(()=>null);
  const out={};
  if(man&&man.files){
-  HW.current=man.current||null; HW.files={}; HW.shown={};
+  HW.current=man.current||null; HW.files={}; HW.shown={}; HW.ai={};
+  Object.keys(man.ai||{}).forEach(pr=>{HW.ai[+pr]=man.ai[pr];});
   Object.keys(man.files).forEach(pr=>{HW.files[+pr]=man.files[pr]; HW.shown[+pr]=pickSlug(Object.keys(man.files[pr]));});
   const prs=Object.keys(HW.files).map(Number);
   const rows=await Promise.all(prs.map(pr=>fetch(resPath(pr),no).then(r=>r.ok?r.json():null).catch(()=>null)));
@@ -623,6 +636,15 @@ try{FOLD=Object.assign(FOLD,JSON.parse(localStorage.getItem('fvllm.fold')||'{}')
 function toggleSec(h){const sec=h.parentElement; sec.classList.toggle('folded');
  FOLD[sec.dataset.k]=sec.classList.contains('folded'); try{localStorage.setItem('fvllm.fold',JSON.stringify(FOLD));}catch(e){}}
 function toggleExp(h){h.parentElement.classList.toggle('efold');}   // per-experiment table fold; default unfolded
+// ----- results-panel pin search: bring a PR (by number) to the top; keep the rest ordered -----
+function pinSearch(ev){
+ if(ev && ev.key && ev.key!=='Enter') return;
+ const el=$('#pinq'); if(!el) return;
+ const n=parseInt((el.value||'').replace(/[^0-9]/g,''),10);
+ if(!isNaN(n)){ if(!PINS.includes(n)) PINS.unshift(n); el.value=''; render(); }
+}
+function unpin(pr){ PINS=PINS.filter(p=>p!==pr); render(); }
+function clearPins(){ PINS=[]; render(); }
 async function showPR(pr){
  SEL=pr; await loadOne(pr); render(); window.scrollTo({top:0,behavior:'smooth'});
  const r=IDX.find(x=>x.pr===pr)||{pr}, res=RES[pr];
@@ -786,10 +808,12 @@ function render(){
  const N=IDX.length, nP=processed.length, nM=measured.length;
  const solvedN=IDX.filter(r=>isSolved(r.pr)).length;
  // re-produced = our run matched the author's reported gap (verdict "reproduced").
- // re-solved  = a solver arm (claude/codex/…) produced + measured a solution.
+ // re-solved  = a solver arm's saved solution was CPU re-measured (results.ai.<arm>.json, >=1 scenario).
  const verdictOf=res=>{const s=res&&res.summary||{}; return s.verdict||((s.headline_derived||{}).reproduced_vs_reported||{}).verdict||'';};
  const reproducedN=measured.filter(r=>verdictOf(RES[r.pr])==='reproduced').length;
- const resolvedN=solvedN;
+ const AI=HW.ai||{};
+ const resolvedN=Object.keys(AI).filter(pr=>Object.values(AI[pr]||{}).some(a=>(a.scenarios||0)>0)).length;
+ const resolvedArms=Object.values(AI).reduce((s,m)=>s+Object.values(m).filter(a=>(a.scenarios||0)>0).length,0);
  $('#ts').textContent = nP? ('updated '+ ((RES[processed[0].pr]||{}).ts||'')+(HW.current?' · hw '+HW.current:'')) : '';
  const pct=x=>N?(x/N*100):0;
  $('#stats').innerHTML=[
@@ -799,7 +823,7 @@ function render(){
   ['re-produced',reproducedN,'g'],
   ['re-solved',resolvedN,'a'],
   ['improved',imp,'g'],
- ].map(([k,v,c])=>`<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="pc">${k==='total PRs'?'202 real vLLM perf PRs':(pct(v).toFixed(0)+'% of '+N)}</div></div>`).join('')
+ ].map(([k,v,c])=>`<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="pc">${k==='total PRs'?'202 real vLLM perf PRs':k==='re-solved'?(resolvedArms+' arm(s) CPU re-measured'):(pct(v).toFixed(0)+'% of '+N)}</div></div>`).join('')
  + `<div class="stat prog" style="grid-column:1/-1"><div class="k">progress <span class="kk">processed → measured → improved · of ${N} PRs</span></div>
     <div class="bar">
      <i class="seg s-meas" style="width:${pct(nM)}%" title="measured: ${nM}"></i>
@@ -815,26 +839,35 @@ function render(){
     </div></div>`;
 
  // top results · one table per (PR, experiment). baseline (measured) = 1.00× ref.
- // order: PRs WITH a real gap ratio (needs the author's reported number) first, closest
- // to 1.0 on top; PRs with no reported number (no gap ratio) sink to the bottom.
+ // ORDER: (1) resolved PRs — a solver arm landed — come before unresolved ones;
+ //        (2) within each group, gap ratio closest to 1.0 first (no reported number => last).
  const gapRatioOf=res=>{const d=(res&&res.summary&&res.summary.headline_derived)||null; if(!d) return null;
   const rr=d.reported||{}, rp=d.reproduced||{}; if(rr.ratio==null||rp.ratio==null) return null;
   const up=/\/s$|tok\/s|req\/s/.test(d.unit||'');
   const repGap=up?rr.ratio-1:1-1/rr.ratio, measGap=up?rp.ratio-1:1-1/rp.ratio;
   return (repGap&&isFinite(repGap)&&repGap!==0)?measGap/repGap:null;};
  const dist=res=>{const g=gapRatioOf(res); return g!=null&&isFinite(g)?Math.abs(g-1):Infinity;};
+ const resolved=res=>isSolved(res.pr)?0:1;   // resolved first
  let latRows=measured.map(r=>RES[r.pr]).filter(r=>experimentsOf(r).length);
- latRows.sort((a,b)=>dist(a)-dist(b)||a.pr-b.pr);
+ latRows.sort((a,b)=>resolved(a)-resolved(b)||dist(a)-dist(b)||a.pr-b.pr);
  if(SEL!=null){const i=latRows.findIndex(r=>r.pr===SEL); if(i>0){const [x]=latRows.splice(i,1); latRows.unshift(x);}}
  if(latRows.length||SEL!=null){
-  let h='';
-  if(SEL!=null&&!latRows.some(r=>r.pr===SEL)){const ix=IDX.find(r=>r.pr===SEL)||{};
+  const prTable=(r,cls,chip,unpinBtn)=>{
+   const prCell=`<a href="${r.pr_url||('https://github.com/vllm-project/vllm/pull/'+r.pr)}" target="_blank">#${r.pr}</a> <span class="muted">${esc(shortTitle(r.title))}</span>`;
+   return `<div class="prHead${cls}">${prCell}${chip||''}${unpinBtn||''}</div>`+experimentsOf(r).map(expTable).join('');};
+  // pinned PRs (by number, via the panel search) float above everything, newest-pinned first
+  const pinned=PINS.map(p=>RES[p]).filter(r=>r&&experimentsOf(r).length);
+  const pinnedSet=new Set(pinned.map(r=>r.pr));
+  // search bar + clear-all control
+  let h=`<div class="pinbar"><input id="pinq" placeholder="pin PR #… (Enter)" onkeydown="pinSearch(event)">`+
+   `<button class="pinclear" title="unpin all" onclick="clearPins()">−</button>`+
+   `<span class="pinhint">${PINS.length?PINS.length+' pinned · click − to unpin':'type a PR number to pin it to the top'}</span></div>`;
+  pinned.forEach(r=>{h+=prTable(r,' pinned',' <span class="chip field">pinned</span>',`<button class="unpin" title="unpin #${r.pr}" onclick="unpin(${r.pr})">−</button>`);});
+  if(SEL!=null&&!pinnedSet.has(SEL)&&!latRows.some(r=>r.pr===SEL)){const ix=IDX.find(r=>r.pr===SEL)||{};
    h+=`<div class="prHead sel"><a href="https://github.com/vllm-project/vllm/pull/${SEL}" target="_blank">#${SEL}</a> <span class="muted">${esc(shortTitle(ix.title))}</span> <span class="chip pend">no measured results yet</span></div>`;}
-  latRows.forEach(r=>{
-   const prCell=`<a href="${r.pr_url}" target="_blank">#${r.pr}</a> <span class="muted">${esc(shortTitle(r.title))}</span>`;
-   h+=`<div class="prHead${r.pr===SEL?' sel':''}">${prCell}${r.pr===SEL?' <span class="chip field">selected</span>':''}</div>`;
-   h+=experimentsOf(r).map(expTable).join('');
-  });
+  if(pinned.length) h+=`<div class="pindiv"></div>`;   // thin divider between pinned and the ordered list
+  latRows.filter(r=>!pinnedSet.has(r.pr)).forEach(r=>{
+   h+=prTable(r,r.pr===SEL?' sel':'',r.pr===SEL?' <span class="chip field">selected</span>':'');});
   $('#restabWrap').innerHTML='<h2 class="secH">experiment results</h2>'+h;
  } else $('#restabWrap').innerHTML='<table class="restab"><tbody><tr><td class="muted">no results yet — run <code>./run.sh</code></td></tr></tbody></table>';
 
