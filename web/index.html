@@ -893,6 +893,32 @@ function render(){
  const resolved=res=>isSolved(res.pr)?0:1;   // resolved first
  let latRows=measured.map(r=>RES[r.pr]).filter(r=>experimentsOf(r).length);
  latRows.sort((a,b)=>resolved(a)-resolved(b)||dist(a)-dist(b)||a.pr-b.pr);
+ // GLOBAL AVERAGE across every measured PR's headline experiment. Same rows as a per-PR
+ // table, but only Δ and × factor — Δ in raw units can't be averaged across different
+ // workloads, so Δ here is the unitless gap % ((×−1) throughput, (1−1/×) latency).
+ const headDerivedOf=res=>(res&&res.summary&&res.summary.headline_derived)||null;
+ const gapOf=(ratio,u)=>ratio==null||!isFinite(ratio)||ratio<=0?null:(u?ratio-1:1-1/ratio);
+ const stat=arr=>{const v=arr.filter(x=>x!=null&&isFinite(x)); if(!v.length) return null;
+  const m=v.reduce((s,x)=>s+x,0)/v.length;
+  const sd=v.length>1?Math.sqrt(v.reduce((s,x)=>s+(x-m)*(x-m),0)/(v.length-1)):0;
+  return {m,sd,n:v.length};};
+ const gRow=(label,cls,gaps,ratios)=>{const g=stat(gaps),r=stat(ratios);
+  const gc=g?`<td class="num ${cls}">${(g.m>=0?'+':'−')}${Math.abs(g.m*100).toFixed(1)}% <span class="var">(±${(g.sd*100).toFixed(1)})</span></td>`:'<td class="num muted">—</td>';
+  const rc=r?`<td class="num ${cls}">${r.m.toFixed(2)}× <span class="var">(±${r.sd.toFixed(2)})</span></td>`:'<td class="num muted">—</td>';
+  return `<tr class="${cls==='c-rep'?'r-reported':'r-measured'}"><td>${label}</td>${gc}${rc}<td class="src muted">mean ± sd over ${(g||r||{}).n||0} PRs</td></tr>`;};
+ const GH=latRows.map(headDerivedOf).filter(Boolean);
+ const gup=d=>/\/s$|tok\/s|req\/s/.test(d.unit||'');
+ const repRatios=GH.map(d=>(d.reported||{}).ratio), repGaps=GH.map(d=>gapOf((d.reported||{}).ratio,gup(d)));
+ const meaRatios=GH.map(d=>(d.reproduced||{}).ratio), meaGaps=GH.map(d=>gapOf((d.reproduced||{}).ratio,gup(d)));
+ const globalTable=!GH.length?'':`<div class="expwrap"><div class="expH" onclick="toggleExp(this)"><span class="ecaret">▾</span>global average <span class="eu">${GH.length} PRs</span><span class="ew">mean Δ (gap %) and × factor across every measured PR's headline experiment · ± sd</span></div><div class="expbody">`+
+  `<table class="restab exp gavg"><colgroup><col class="c-row"><col class="c-d"><col class="c-r"><col class="c-src"></colgroup>`+
+  `<thead><tr><th class="sorth" onclick="sortExp(this,0,'s')">row</th><th class="num sorth" onclick="sortExp(this,1,'n')">Δ <span class="muted">gap % (<span class="r-rep">rep</span>/<span class="r-meas">meas</span>)</span></th>`+
+  `<th class="num sorth" onclick="sortExp(this,2,'n')">× factor <span class="muted">(<span class="r-rep">rep</span>/<span class="r-meas">meas</span>)</span></th><th>source</th></tr></thead><tbody>`+
+  gRow("baseline (reported by author)",'c-rep',GH.map(()=>0),GH.map(()=>1))+
+  gRow("PR's author solution (reported by author)",'c-rep',repGaps,repRatios)+
+  gRow("baseline (measured by us)",'c-meas',GH.map(()=>0),GH.map(()=>1))+
+  gRow("PR's author solution (measured by us)",'c-meas',meaGaps,meaRatios)+
+  `</tbody></table></div></div>`;
  if(SEL!=null){const i=latRows.findIndex(r=>r.pr===SEL); if(i>0){const [x]=latRows.splice(i,1); latRows.unshift(x);}}
  if(latRows.length||SEL!=null){
   const prTable=(r,cls,chip,unpinBtn)=>{
@@ -912,7 +938,7 @@ function render(){
   if(pinned.length) h+=`<div class="pindiv"></div>`;   // thin divider between pinned and the ordered list
   latRows.filter(r=>!pinnedSet.has(r.pr)).forEach(r=>{
    h+=prTable(r,r.pr===SEL?' sel':'',r.pr===SEL?' <span class="chip field">selected</span>':'');});
-  $('#restabWrap').innerHTML='<h2 class="secH">experiment results</h2>'+h;
+  $('#restabWrap').innerHTML='<h2 class="secH">experiment results</h2>'+(globalTable?'<div class="gavgwrap">'+globalTable+'</div>':'')+h;
   wireExpDrag($('#restabWrap'));
  } else $('#restabWrap').innerHTML='<table class="restab"><tbody><tr><td class="muted">no results yet — run <code>./run.sh</code></td></tr></tbody></table>';
 
