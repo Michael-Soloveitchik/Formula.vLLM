@@ -28,6 +28,7 @@ import pandas as pd
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 from gen import layout  # noqa: E402
+from stats import metrics  # noqa: E402
 
 OUT = os.path.dirname(os.path.abspath(__file__))
 BLUE, ORANGE = "#0b8ce8", "#e39b00"   # reproduced / reported (same as the dashboard)
@@ -35,16 +36,6 @@ PR_COLS = ["pr", "field", "hardware", "headline", "unit",
            "reported_baseline", "reported_pr_solution", "reported_marker", "reported_ratio", "reported_gap",
            "reproduced_baseline", "reproduced_pr_solution", "reproduced_ratio", "reproduced_ratio_sd", "reproduced_gap",
            "gap_ratio", "verdict", "reliability", "tests", "title"]
-
-
-def _up(unit):
-    return bool(pd.Series([unit or ""]).str.contains(r"/s$|tok/s|req/s").iloc[0])
-
-
-def _gap(ratio, up):
-    if ratio is None or not np.isfinite(ratio) or ratio <= 0:
-        return np.nan
-    return ratio - 1 if up else 1 - 1 / ratio
 
 
 def load_prs(hw=None):
@@ -60,9 +51,10 @@ def load_prs(hw=None):
             continue
         h = s.get("headline_derived") or {}
         rp, rr = h.get("reproduced") or {}, h.get("reported") or {}
-        up = _up(h.get("unit"))
         rep_ratio, meas_ratio = rr.get("ratio"), rp.get("ratio")
-        rg, mg = _gap(rep_ratio, up), _gap(meas_ratio, up)
+        nan = lambda v: np.nan if v is None else v
+        rg, mg = nan(metrics.reported_gap(h)), nan(metrics.reproduced_gap(h))
+        gr = nan(metrics.gap_ratio(h))
         rows.append(dict(
             pr=pr, field=d.get("field"), hardware=d.get("hw_slug") or os.path.basename(p).split(".")[1],
             headline=s.get("headline"), unit=h.get("unit"),
@@ -70,7 +62,7 @@ def load_prs(hw=None):
             reported_ratio=rep_ratio, reported_gap=rg,
             reproduced_baseline=rp.get("baseline"), reproduced_pr_solution=rp.get("pr_solution"),
             reproduced_ratio=meas_ratio, reproduced_ratio_sd=rp.get("ratio_sd"), reproduced_gap=mg,
-            gap_ratio=(mg / rg) if (rg and np.isfinite(rg) and np.isfinite(mg)) else np.nan,
+            gap_ratio=gr,
             verdict=s.get("verdict"), reliability=(h.get("reliability") or {}).get("flag"),
             tests=f"{(s.get('tests') or {}).get('base')}/{(s.get('tests') or {}).get('gold')}", title=d.get("title")))
     return pd.DataFrame(rows, columns=PR_COLS).sort_values("pr").reset_index(drop=True)
@@ -83,6 +75,20 @@ def per_field(df):
     return pd.DataFrame({"n": g.size(), "gap_ratio_med": g.gap_ratio.median(), "gap_ratio_min": g.gap_ratio.min(),
                          "gap_ratio_max": g.gap_ratio.max(), "reported_gap_med": g.reported_gap.median(),
                          "reproduced_gap_med": g.reproduced_gap.median()}).sort_index()
+
+
+def best_metrics(df):
+    """One-row summary: the PR whose reproduced gap most faithfully matches the author's
+    reported gap (gap_ratio closest to 1.0). Distance = |gap_ratio − 1|."""
+    g = df[df.gap_ratio.notna() & np.isfinite(df.gap_ratio)].copy()
+    if g.empty:
+        return pd.DataFrame(columns=["metric", "pr", "field", "headline", "gap_ratio",
+                                     "distance_from_1", "reported_gap", "reproduced_gap", "reliability"])
+    g["distance_from_1"] = (g.gap_ratio - 1).abs()
+    b = g.loc[g.distance_from_1.idxmin()]
+    return pd.DataFrame([{"metric": "best_gap_ratio_closest_to_1", "pr": int(b.pr), "field": b.field,
+                          "headline": b.headline, "gap_ratio": b.gap_ratio, "distance_from_1": b.distance_from_1,
+                          "reported_gap": b.reported_gap, "reproduced_gap": b.reproduced_gap, "reliability": b.reliability}])
 
 
 def status_rows():
@@ -137,6 +143,43 @@ def plot(df, pf, out_png):
     return fig
 
 
+def ai_rows():
+    """One row per (PR, arm) solver solution saved under data/pr_<n>/files/<arm>/.
+    Reports whether the overlay, the .patch, and the CPU re-measure (results.ai.<arm>.json)
+    exist, plus the headline ratio_arm_over_gold. This is the AI-arm status the GPU
+    reproduce stats (prs.csv) do not cover — it is the solver side of the benchmark.
+    """
+    rows = []
+    for pr in layout.prs():
+        froot = os.path.join(layout.pr_dir(pr), "files")
+        if not os.path.isdir(froot):
+            continue
+        for arm in sorted(d for d in os.listdir(froot) if os.path.isdir(os.path.join(froot, d))):
+            overlay = os.path.join(froot, arm)
+            files = [os.path.relpath(os.path.join(r, f), overlay)
+                     for r, _, fs in os.walk(overlay) for f in fs]
+            patch = os.path.join(froot, f"{arm}.patch")
+            resf = os.path.join(layout.pr_dir(pr), f"results.ai.{arm}.json")
+            ratio = measured = note = None
+            if os.path.isfile(resf):
+                res = json.load(open(resf))
+                scs = res.get("scenarios", {})
+                measured = sum(1 for e in scs.values() if e.get("ratio_arm_over_gold") is not None)
+                note = res.get("note")
+                head = next((e.get("ratio_arm_over_gold") for e in scs.values()
+                             if e.get("ratio_arm_over_gold") is not None), None)
+                ratio = head
+            rows.append({
+                "pr": pr, "arm": arm, "files": len(files),
+                "patch": "yes" if os.path.isfile(patch) else "no",
+                "remeasured": "yes" if os.path.isfile(resf) else "no",
+                "scenarios_measured": measured, "ratio_arm_over_pr": ratio,
+                "status": "measured" if measured else ("solved" if files else "empty"),
+                "note": note,
+            })
+    return rows
+
+
 def main():
     os.environ.setdefault("MPLBACKEND", "Agg")
     a = sys.argv[1:]
@@ -147,14 +190,24 @@ def main():
     pf = per_field(df)
     df.to_csv(os.path.join(out, "prs.csv"), index=False, float_format="%.6g")
     pf.reset_index().rename(columns={"index": "field"}).to_csv(os.path.join(out, "fields.csv"), index=False, float_format="%.6g")
+    bm = best_metrics(df)
+    bm.to_csv(os.path.join(out, "metrics.csv"), index=False, float_format="%.6g")
     st = status_rows()
     with open(os.path.join(out, "status.csv"), "w", newline="") as f:
         wr = csv.DictWriter(f, fieldnames=["pr", "field", "hardware", "status", "reason", "title"])
         wr.writeheader(); wr.writerows(st)
+    ai = ai_rows()
+    with open(os.path.join(out, "ai_arms.csv"), "w", newline="") as f:
+        wr = csv.DictWriter(f, fieldnames=["pr", "arm", "files", "patch", "remeasured",
+                                           "scenarios_measured", "ratio_arm_over_pr", "status", "note"])
+        wr.writeheader(); wr.writerows(ai)
     plot(df, pf, os.path.join(out, "gaps.png"))
     n_ok = int((df.verdict == "reproduced").sum()) if not df.empty else 0
+    best = (f"best gap ratio PR #{int(bm.iloc[0].pr)} = {bm.iloc[0].gap_ratio:.3g}× (closest to 1.0) · "
+            if not bm.empty else "")
     print(f"{len(df)} PRs reproduced ({hw or layout.hw_slug()}) · {n_ok} match the reported ratio (≥0.8 of it) · "
-          f"{sum(1 for r in st if r['status'] == 'measured')}/{len(st)} workload PRs measured -> {layout.rel(out)}/{{prs,fields,status}}.csv + gaps.png")
+          f"{best}{sum(1 for r in st if r['status'] == 'measured')}/{len(st)} workload PRs measured -> "
+          f"{layout.rel(out)}/{{prs,fields,status,metrics}}.csv + gaps.png")
 
 
 if __name__ == "__main__":

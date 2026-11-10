@@ -1,0 +1,4 @@
+pr,arm,files,patch,remeasured,scenarios_measured,ratio_arm_over_pr,status,note
+13365,claude,1,yes,yes,2,2087.5,measured,CPU re-measure; speed is not the GPU number
+21222,claude,2,yes,yes,0,,solved,CPU re-measure; speed is not the GPU number
+21281,claude,1,no,no,,,solved,

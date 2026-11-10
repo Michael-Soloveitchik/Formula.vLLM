@@ -1,0 +1,2 @@
+metric,pr,field,headline,gap_ratio,distance_from_1,reported_gap,reproduced_gap,reliability
+best_gap_ratio_closest_to_1,13365,decoding_tpot,ngram_match_overhead,1.02421,0.0242094,0.965009,0.988371,ok

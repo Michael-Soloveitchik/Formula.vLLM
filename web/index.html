@@ -149,7 +149,11 @@ sup.mark{font-weight:700;color:#d97706;margin-left:2px;cursor:help}
  .dsec.folded .dsecH{margin-bottom:0}
  .fhint{margin-left:auto;font-weight:500;text-transform:none;letter-spacing:0;color:var(--faint);font-size:10.5px}
  .detail .restab{margin-bottom:12px}
- .expH{font-size:14px;font-weight:700;margin:8px 0 4px;display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
+ .expH{font-size:14px;font-weight:700;margin:8px 0 4px;display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;cursor:pointer;user-select:none}
+ .expH:hover{color:var(--acc)}
+ .ecaret{font-size:11px;color:var(--mut);transition:transform .12s;flex:none}
+ .expwrap.efold .ecaret{transform:rotate(-90deg)}
+ .expwrap.efold .expbody{display:none}
  .expH .eu{font-family:var(--mono);font-size:10px;color:var(--acc);font-weight:600}
  .expH .ew{font-size:10px;color:var(--faint);font-weight:500;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
  .lat.d{margin-top:9px;border-top:1px dashed var(--border);padding-top:8px}
@@ -537,8 +541,8 @@ function expTable(exp){
  const baseV=(a.base||{}).mean;                     // before-merge baseline value, in unit
  const num=(m,sd)=> m==null?'—':`<span class="mv">${(+m).toFixed(3)}</span>${sd==null?'':`<span class="var">(±${(+sd).toFixed(3)})</span>`}`;
  const bh='';   // baseline value lives in the table row, not the header
- let h=`<div class="expH">${esc(exp.name)} <span class="eu">${esc(unit)}</span>${bh}`+
-   (exp.workload?`<span class="ew" title="${esc(exp.workload)}">${esc(exp.workload)}</span>`:'')+`</div>`;
+ let h=`<div class="expwrap"><div class="expH" onclick="toggleExp(this)"><span class="ecaret">▾</span>${esc(exp.name)} <span class="eu">${esc(unit)}</span>${bh}`+
+   (exp.workload?`<span class="ew" title="${esc(exp.workload)}">${esc(exp.workload)}</span>`:'')+`</div><div class="expbody">`;
  h+=`<table class="restab exp"><colgroup><col class="c-row"><col class="c-val"><col class="c-d"><col class="c-r"><col class="c-d"><col class="c-r"><col class="c-src"></colgroup>`+
    `<thead><tr><th>row</th><th class="num">value · ${esc(unit)}</th>`+
    `<th class="num r-rep">Δ vs reported</th><th class="num r-rep">× vs reported</th>`+
@@ -598,6 +602,7 @@ function expTable(exp){
      (rep.scale_note?`<div class="sb-l" title="${esc(rep.scale_note)}"><b>details ▸</b> <span class="sb-full">${esc(rep.scale_note)}</span></div>`:'')+
      `</div>`;
  }
+ h+='</div></div>';   // close .expbody + .expwrap
  return h;
 }
 function harnessTable(res,pr){
@@ -617,6 +622,7 @@ let FOLD={results:false,objective:true,info:false};
 try{FOLD=Object.assign(FOLD,JSON.parse(localStorage.getItem('fvllm.fold')||'{}'));}catch(e){}
 function toggleSec(h){const sec=h.parentElement; sec.classList.toggle('folded');
  FOLD[sec.dataset.k]=sec.classList.contains('folded'); try{localStorage.setItem('fvllm.fold',JSON.stringify(FOLD));}catch(e){}}
+function toggleExp(h){h.parentElement.classList.toggle('efold');}   // per-experiment table fold; default unfolded
 async function showPR(pr){
  SEL=pr; await loadOne(pr); render(); window.scrollTo({top:0,behavior:'smooth'});
  const r=IDX.find(x=>x.pr===pr)||{pr}, res=RES[pr];
@@ -779,12 +785,19 @@ function render(){
  const imp=processed.filter(r=>RES[r.pr].improved).length;
  const N=IDX.length, nP=processed.length, nM=measured.length;
  const solvedN=IDX.filter(r=>isSolved(r.pr)).length;
+ // re-produced = our run matched the author's reported gap (verdict "reproduced").
+ // re-solved  = a solver arm (claude/codex/…) produced + measured a solution.
+ const verdictOf=res=>{const s=res&&res.summary||{}; return s.verdict||((s.headline_derived||{}).reproduced_vs_reported||{}).verdict||'';};
+ const reproducedN=measured.filter(r=>verdictOf(RES[r.pr])==='reproduced').length;
+ const resolvedN=solvedN;
  $('#ts').textContent = nP? ('updated '+ ((RES[processed[0].pr]||{}).ts||'')+(HW.current?' · hw '+HW.current:'')) : '';
  const pct=x=>N?(x/N*100):0;
  $('#stats').innerHTML=[
   ['total PRs',N,'a'],
   ['processed',nP,'a'],
   ['measured',nM,'c'],
+  ['re-produced',reproducedN,'g'],
+  ['re-solved',resolvedN,'a'],
   ['improved',imp,'g'],
  ].map(([k,v,c])=>`<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="pc">${k==='total PRs'?'202 real vLLM perf PRs':(pct(v).toFixed(0)+'% of '+N)}</div></div>`).join('')
  + `<div class="stat prog" style="grid-column:1/-1"><div class="k">progress <span class="kk">processed → measured → improved · of ${N} PRs</span></div>
@@ -802,7 +815,16 @@ function render(){
     </div></div>`;
 
  // top results · one table per (PR, experiment). baseline (measured) = 1.00× ref.
+ // order: PRs WITH a real gap ratio (needs the author's reported number) first, closest
+ // to 1.0 on top; PRs with no reported number (no gap ratio) sink to the bottom.
+ const gapRatioOf=res=>{const d=(res&&res.summary&&res.summary.headline_derived)||null; if(!d) return null;
+  const rr=d.reported||{}, rp=d.reproduced||{}; if(rr.ratio==null||rp.ratio==null) return null;
+  const up=/\/s$|tok\/s|req\/s/.test(d.unit||'');
+  const repGap=up?rr.ratio-1:1-1/rr.ratio, measGap=up?rp.ratio-1:1-1/rp.ratio;
+  return (repGap&&isFinite(repGap)&&repGap!==0)?measGap/repGap:null;};
+ const dist=res=>{const g=gapRatioOf(res); return g!=null&&isFinite(g)?Math.abs(g-1):Infinity;};
  let latRows=measured.map(r=>RES[r.pr]).filter(r=>experimentsOf(r).length);
+ latRows.sort((a,b)=>dist(a)-dist(b)||a.pr-b.pr);
  if(SEL!=null){const i=latRows.findIndex(r=>r.pr===SEL); if(i>0){const [x]=latRows.splice(i,1); latRows.unshift(x);}}
  if(latRows.length||SEL!=null){
   let h='';
