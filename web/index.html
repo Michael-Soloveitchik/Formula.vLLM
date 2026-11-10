@@ -253,13 +253,18 @@ sup.mark{font-weight:700;color:#d97706;margin-left:2px;cursor:help}
  .prHead a{color:var(--acc);text-decoration:none}
  .unpin{margin-left:auto;flex:none;width:18px;height:18px;line-height:15px;text-align:center;border-radius:50%;border:1px solid var(--border2);background:#fff;color:var(--mut);font-weight:800;font-size:13px;cursor:pointer;padding:0;transition:.12s}
  .unpin:hover{border-color:var(--red);color:var(--red);box-shadow:0 0 0 3px rgba(229,83,63,.12)}
- .pindiv{height:0;border-top:1px dashed var(--border2);margin:12px 10px 4px;position:relative}
- .pindiv::after{content:"pinned ↑ · ordered ↓";position:absolute;right:0;top:-8px;background:var(--bg);padding:0 8px;font-size:10px;font-weight:600;color:var(--faint);letter-spacing:.04em}
+ .pindiv{height:0;border-top:2px solid var(--red);margin:12px 10px 4px;position:relative}
+ .pindiv::after{content:"pinned ↑ · ordered ↓";position:absolute;right:0;top:-8px;background:var(--bg);padding:0 8px;font-size:10px;font-weight:600;color:var(--red);letter-spacing:.04em}
  .pinbar{display:flex;align-items:center;gap:8px;margin:0 0 4px}
- .pinbar input{width:150px;background:var(--panel);border:1px solid var(--border2);border-radius:9px;padding:6px 10px;font:13px var(--ui);color:var(--fg)}
+ .pinwrap{position:relative}
+ .pinbar input{width:230px;background:var(--panel);border:1px solid var(--border2);border-radius:9px;padding:6px 10px;font:13px var(--ui);color:var(--fg)}
  .pinbar input:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px rgba(11,140,232,.18)}
- .pinbar .pinclear{width:20px;height:20px;line-height:17px;text-align:center;border-radius:50%;border:1px solid var(--border2);background:#fff;color:var(--mut);font-weight:800;cursor:pointer;padding:0}
- .pinbar .pinclear:hover{border-color:var(--red);color:var(--red)}
+ .pinsug{display:none;position:absolute;left:0;top:calc(100% + 4px);z-index:30;min-width:260px;max-height:260px;overflow:auto;background:var(--panel);border:1px solid var(--border2);border-radius:9px;box-shadow:0 6px 24px rgba(0,0,0,.12)}
+ .pinsug.open{display:block}
+ .pinopt{padding:6px 10px;font:13px var(--ui);cursor:pointer;white-space:nowrap}
+ .pinopt:hover{background:rgba(11,140,232,.1)}
+ .pinbar .pinclear{margin-left:auto;width:24px;height:24px;line-height:21px;text-align:center;border-radius:50%;border:1px solid var(--border2);background:#fff;color:var(--red);font-weight:800;font-size:16px;cursor:pointer;padding:0}
+ .pinbar .pinclear:hover{border-color:var(--red);background:var(--red);color:#fff}
  .pinbar .pinhint{font-size:11px;color:var(--faint)}
  .muted{color:var(--faint)}
  footer{color:var(--faint);font-size:11px;text-align:center;padding:16px}
@@ -637,12 +642,19 @@ function toggleSec(h){const sec=h.parentElement; sec.classList.toggle('folded');
  FOLD[sec.dataset.k]=sec.classList.contains('folded'); try{localStorage.setItem('fvllm.fold',JSON.stringify(FOLD));}catch(e){}}
 function toggleExp(h){h.parentElement.classList.toggle('efold');}   // per-experiment table fold; default unfolded
 // ----- results-panel pin search: bring a PR (by number) to the top; keep the rest ordered -----
-function pinSearch(ev){
- if(ev && ev.key && ev.key!=='Enter') return;
- const el=$('#pinq'); if(!el) return;
- const n=parseInt((el.value||'').replace(/[^0-9]/g,''),10);
- if(!isNaN(n)){ if(!PINS.includes(n)) PINS.unshift(n); el.value=''; render(); }
+// search only SUGGESTS matching PR numbers; selection happens on click (pinPick)
+function pinMatches(q){
+ const s=(q||'').replace(/[^0-9]/g,''); if(!s) return [];
+ return IDX.filter(r=>String(r.pr).startsWith(s)&&!PINS.includes(r.pr)).slice(0,12);
 }
+function pinSuggest(ev){
+ const el=$('#pinq'), box=$('#pinsug'); if(!el||!box) return;
+ if(ev&&ev.key==='Enter'){const m=pinMatches(el.value); if(m.length){pinPick(m[0].pr);} return;}
+ const m=pinMatches(el.value);
+ box.innerHTML=m.map(r=>`<div class="pinopt" onmousedown="pinPick(${r.pr})">#${r.pr} <span class="muted">${esc(shortTitle(r.title))}</span></div>`).join('');
+ box.classList.toggle('open', m.length>0);
+}
+function pinPick(pr){ if(!PINS.includes(pr)) PINS.unshift(pr); render(); }   // click = actual selection
 function unpin(pr){ PINS=PINS.filter(p=>p!==pr); render(); }
 function clearPins(){ PINS=[]; render(); }
 async function showPR(pr){
@@ -816,20 +828,15 @@ function render(){
  const resolvedArms=Object.values(AI).reduce((s,m)=>s+Object.values(m).filter(a=>(a.scenarios||0)>0).length,0);
  $('#ts').textContent = nP? ('updated '+ ((RES[processed[0].pr]||{}).ts||'')+(HW.current?' · hw '+HW.current:'')) : '';
  const pct=x=>N?(x/N*100):0;
- $('#stats').innerHTML=[
-  ['total PRs',N,'a'],
-  ['processed',nP,'a'],
-  ['measured',nM,'c'],
-  ['re-produced',reproducedN,'g'],
-  ['re-solved',resolvedN,'a'],
-  ['improved',imp,'g'],
- ].map(([k,v,c])=>`<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="pc">${k==='total PRs'?'202 real vLLM perf PRs':k==='re-solved'?(resolvedArms+' arm(s) CPU re-measured'):(pct(v).toFixed(0)+'% of '+N)}</div></div>`).join('')
- + `<div class="stat prog" style="grid-column:1/-1"><div class="k">progress <span class="kk">processed → measured → improved · of ${N} PRs</span></div>
+ $('#stats').innerHTML=
+   `<div class="stat prog" style="grid-column:1/-1"><div class="k">progress <span class="kk">processed → measured → improved · of ${N} PRs</span></div>
     <div class="bar">
      <i class="seg s-meas" style="width:${pct(nM)}%" title="measured: ${nM}"></i>
      <i class="seg s-proc" style="width:${pct(nP-nM)}%" title="processed, not yet measured: ${nP-nM}"></i>
      <i class="seg s-pend" style="flex:1" title="pending: ${N-nP}"></i></div>
     <div class="legend">
+     <span>total PRs <b>${N}</b></span>
+     <span class="sep"></span>
      <span><i class="sw s-proc"></i>processed <b>${nP}</b></span>
      <span><i class="sw s-meas"></i>measured <b>${nM}</b></span>
      <span><i class="sw s-imp"></i>re-produced <b>${reproducedN}</b></span>
@@ -860,9 +867,10 @@ function render(){
   const pinned=PINS.map(p=>RES[p]).filter(r=>r&&experimentsOf(r).length);
   const pinnedSet=new Set(pinned.map(r=>r.pr));
   // search bar + clear-all control
-  let h=`<div class="pinbar"><input id="pinq" placeholder="pin PR #… (Enter)" onkeydown="pinSearch(event)">`+
+  let h=`<div class="pinbar"><div class="pinwrap"><input id="pinq" placeholder="search PR #… (click a match to pin)" oninput="pinSuggest(event)" onkeydown="pinSuggest(event)" autocomplete="off"><div id="pinsug" class="pinsug"></div></div>`+
+   `<span class="pinhint">${PINS.length?PINS.length+' pinned · click − to unpin':'type a PR number, click a match to pin it'}</span>`+
    (PINS.length?`<button class="pinclear" title="unpin all" onclick="clearPins()">−</button>`:``)+
-   `<span class="pinhint">${PINS.length?PINS.length+' pinned · click − to unpin':'type a PR number to pin it to the top'}</span></div>`;
+   `</div>`;
   pinned.forEach(r=>{h+=prTable(r,' pinned',' <span class="chip field">pinned</span>',`<button class="unpin" title="unpin #${r.pr}" onclick="unpin(${r.pr})">−</button>`);});
   if(SEL!=null&&!pinnedSet.has(SEL)&&!latRows.some(r=>r.pr===SEL)){const ix=IDX.find(r=>r.pr===SEL)||{};
    h+=`<div class="prHead sel"><a href="https://github.com/vllm-project/vllm/pull/${SEL}" target="_blank">#${SEL}</a> <span class="muted">${esc(shortTitle(ix.title))}</span> <span class="chip pend">no measured results yet</span></div>`;}

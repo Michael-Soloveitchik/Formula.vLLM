@@ -63,6 +63,11 @@ tools/        check_terms.py (terminology lint) serve.py serve.sh (dashboard ser
 stats/        build_stats.py stats.ipynb → prs.csv fields.csv status.csv gaps.png   [gen: stats/build_stats.py]
 templates/    Dockerfile.gpu-wheel (the per-PR template) · Dockerfile.gpu-source, Dockerfile.cpu-bench (legacy, unused)
 web/          index.html — the live dashboard (reads index.json, results/manifest.json, data/pr_<n>/…)
+              header shows one progress bar (no stat cards): total PRs / processed / measured / re-produced /
+              re-solved / improved / pending as its legend. Results panel has a PR-number search that only
+              SUGGESTS matches as you type; clicking a match pins that PR to the top (above a red divider).
+              Each pinned PR has a "−" to unpin it; a right-edge "−" (shown only when something is pinned)
+              clears all. Clicking an experiment name folds/unfolds its table.
 results/      all.json + manifest.json   [gen: pipeline/aggregate.py]  the web aggregate, nothing else
 index.json    202-PR catalog              [gen: gen/gen_index.py from data/pr_*/task.json]
 clusters.json config.yaml dict_of_harnesses.json   [hand]  model clusters · knobs · solver arms
