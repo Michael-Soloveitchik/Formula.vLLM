@@ -861,7 +861,7 @@ function render(){
   const pinnedSet=new Set(pinned.map(r=>r.pr));
   // search bar + clear-all control
   let h=`<div class="pinbar"><input id="pinq" placeholder="pin PR #… (Enter)" onkeydown="pinSearch(event)">`+
-   `<button class="pinclear" title="unpin all" onclick="clearPins()">−</button>`+
+   (PINS.length?`<button class="pinclear" title="unpin all" onclick="clearPins()">−</button>`:``)+
    `<span class="pinhint">${PINS.length?PINS.length+' pinned · click − to unpin':'type a PR number to pin it to the top'}</span></div>`;
   pinned.forEach(r=>{h+=prTable(r,' pinned',' <span class="chip field">pinned</span>',`<button class="unpin" title="unpin #${r.pr}" onclick="unpin(${r.pr})">−</button>`);});
   if(SEL!=null&&!pinnedSet.has(SEL)&&!latRows.some(r=>r.pr===SEL)){const ix=IDX.find(r=>r.pr===SEL)||{};
