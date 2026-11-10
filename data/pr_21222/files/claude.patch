@@ -1,0 +1,127 @@
+--- a/vllm/v1/core/block_pool.py
++++ b/vllm/v1/core/block_pool.py
+@@ -214,21 +214,20 @@
+             raise ValueError(
+                 f"Cannot get {num_blocks} free blocks from the pool")
+ 
+-        ret: list[KVCacheBlock] = []
+-        idx = 0
+-        while idx < num_blocks:
+-            # First allocate blocks.
+-            curr_block = self.free_block_queue.popleft()
+-            assert curr_block.ref_cnt == 0
++        # Pop the first num_blocks free blocks in a single bulk splice.
++        ret = self.free_block_queue.popleft_n(num_blocks)
+ 
+-            # If the block is cached, evict it.
+-            if self.enable_caching:
++        if self.enable_caching:
++            for curr_block in ret:
++                assert curr_block.ref_cnt == 0
++                # If the block is cached, evict it.
+                 self._maybe_evict_cached_block(curr_block)
++                curr_block.incr_ref()
++        else:
++            for curr_block in ret:
++                assert curr_block.ref_cnt == 0
++                curr_block.incr_ref()
+ 
+-            curr_block.incr_ref()
+-            ret.append(curr_block)
+-            idx += 1
+-
+         return ret
+ 
+     def _maybe_evict_cached_block(self, block: KVCacheBlock) -> bool:
+@@ -289,11 +288,14 @@
+             ordered_blocks: A list of blocks to free ordered by their eviction
+                 priority.
+         """
++        blocks_to_free: list[KVCacheBlock] = []
+         for block in ordered_blocks:
+             block.decr_ref()
+             # null_block should not be added to the free list.
+             if block.ref_cnt == 0 and not block.is_null:
+-                self.free_block_queue.append(block)
++                blocks_to_free.append(block)
++        # Append all newly-freed blocks in a single bulk splice.
++        self.free_block_queue.append_n(blocks_to_free)
+ 
+     def reset_prefix_cache(self) -> bool:
+         """Reset prefix cache. This function may be used in RLHF
+--- a/vllm/v1/core/kv_cache_utils.py
++++ b/vllm/v1/core/kv_cache_utils.py
+@@ -272,7 +272,40 @@
+ 
+         self.num_free_blocks -= 1
+         return first_block
++
++    def popleft_n(self, n: int) -> list[KVCacheBlock]:
++        """Pop the first n free blocks and reduce num_free_blocks by n.
++
++        Args:
++            n: The number of blocks to pop.
++
++        Returns:
++            A list of the first n free blocks.
++        """
++        if n == 0:
++            return []
++        assert self.num_free_blocks >= n
++
++        ret: list[KVCacheBlock] = []
++        curr_block = self.fake_free_list_head.next_free_block
++        # Collect n blocks and detach them from the list in a single pass.
++        for _ in range(n):
++            assert curr_block is not None
++            next_block = curr_block.next_free_block
++            curr_block.prev_free_block = None
++            curr_block.next_free_block = None
++            ret.append(curr_block)
++            curr_block = next_block
++
++        # Reconnect the fake head to the block right after the popped segment
++        # (either the new first block or the fake tail) with a single splice.
++        assert curr_block is not None
++        self.fake_free_list_head.next_free_block = curr_block
++        curr_block.prev_free_block = self.fake_free_list_head
+ 
++        self.num_free_blocks -= n
++        return ret
++
+     def remove(self, block: KVCacheBlock) -> None:
+         """Remove a block in the free list and reduce num_free_blocks by 1.
+ 
+@@ -314,7 +347,32 @@
+         self.fake_free_list_tail.prev_free_block = block
+ 
+         self.num_free_blocks += 1
++
++    def append_n(self, blocks: list[KVCacheBlock]) -> None:
++        """Put a list of blocks back into the free list and increase
++        num_free_blocks by len(blocks).
++
++        Args:
++            blocks: The blocks to append.
++        """
++        if not blocks:
++            return
++
++        last_block = self.fake_free_list_tail.prev_free_block
++        assert last_block is not None
+ 
++        # Chain the new blocks together in a single pass.
++        for block in blocks:
++            block.prev_free_block = last_block
++            last_block.next_free_block = block
++            last_block = block
++
++        # Connect the fake tail after the last appended block.
++        last_block.next_free_block = self.fake_free_list_tail
++        self.fake_free_list_tail.prev_free_block = last_block
++
++        self.num_free_blocks += len(blocks)
++
+     def get_all_free_blocks(self) -> list[KVCacheBlock]:
+         """Get all free blocks in the free list. Mainly used for testing.
+ 

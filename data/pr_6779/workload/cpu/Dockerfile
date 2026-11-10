@@ -17,8 +17,10 @@ RUN pip install --upgrade pip \
  && pip install --index-url https://download.pytorch.org/whl/cpu torch \
  && pip install pytest pytest-asyncio tabulate pandas datasets \
       numpy pydantic psutil cloudpickle msgspec typing_extensions transformers \
-      regex filelock huggingface_hub cachetools py-cpuinfo prometheus_client requests
-# Optional torch swap (kept for parity with the gpu template; usually empty on CPU):
+      regex filelock huggingface_hub cachetools py-cpuinfo prometheus_client requests \
+      cbor2 einops pyzmq blake3 pillow pybase64 fastapi openai diskcache aiohttp
+# Optional torch swap (kept for parity with the gpu template; EMPTY on CPU — the CPU torch
+# wheel is already installed above and the task's torch_fix is a CUDA pin that must not apply):
 ARG TORCH_FIX=""
 RUN [ -z "$TORCH_FIX" ] || pip install --force-reinstall $TORCH_FIX
 # Optional extra pins/packages the bench or tests need (task.json:"extra_pip", e.g. "numba"):

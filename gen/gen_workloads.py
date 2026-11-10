@@ -77,8 +77,11 @@ def render_dockerfile(pr, t, hw):
     tpl = _read(layout.template(dockerfile_template(hw)))
     # drop the template's own header (everything up to the AUTO-GENERATED line)
     tpl = tpl[tpl.index("# AUTO-GENERATED"):]
+    # torch_fix is a CUDA torch pin for the GPU image; on the CPU mirror the CPU torch
+    # wheel is already installed, so the (cu128) pin would wrongly force-reinstall CUDA torch.
+    torch_fix = "" if hw == "cpu" else (t.get("torch_fix") or "")
     vals = {"pr": str(pr), "title": (t.get("title") or "").replace('"', "'"), "hw": hw,
-            "wheel": t.get("wheel") or "", "torch_fix": t.get("torch_fix") or "", "extra_pip": t.get("extra_pip") or "",
+            "wheel": t.get("wheel") or "", "torch_fix": torch_fix, "extra_pip": t.get("extra_pip") or "",
             "base_sha": t.get("base_sha") or "", "merge_sha": t.get("merge_sha") or ""}
     return re.sub(r"\{\{(\w+)\}\}", lambda m: vals.get(m.group(1), m.group(0)), tpl)
 

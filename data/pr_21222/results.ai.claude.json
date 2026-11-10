@@ -1,0 +1,150 @@
+{
+ "schema": "ai_solution_v1",
+ "pr": 21222,
+ "arm": "claude",
+ "repeats": 5,
+ "instrument": "pipeline/parse_workload.py",
+ "note": "CPU re-measure; speed is not the GPU number",
+ "scenarios": {
+  "free_blocks_a10": {
+   "unit": "ms",
+   "gold": {
+    "mean": 0.002,
+    "sd": 0.0003,
+    "n": 5
+   },
+   "claude": {
+    "mean": 0.0046,
+    "sd": 0.0026,
+    "n": 5
+   },
+   "ratio_arm_over_gold": 0.4348
+  },
+  "free_blocks_a100": {
+   "unit": "ms",
+   "gold": {
+    "mean": 0.0166,
+    "sd": 0.0044,
+    "n": 5
+   },
+   "claude": {
+    "mean": 0.0248,
+    "sd": 0.0102,
+    "n": 5
+   },
+   "ratio_arm_over_gold": 0.6694
+  },
+  "free_blocks_a1000": {
+   "unit": "ms",
+   "gold": {
+    "mean": 0.826,
+    "sd": 1.209,
+    "n": 5
+   },
+   "claude": {
+    "mean": 0.2384,
+    "sd": 0.032,
+    "n": 5
+   },
+   "ratio_arm_over_gold": 3.4648
+  },
+  "free_blocks_a50": {
+   "unit": "ms",
+   "gold": {
+    "mean": 0.0085,
+    "sd": 0.0016,
+    "n": 5
+   },
+   "claude": {
+    "mean": 0.0137,
+    "sd": 0.0076,
+    "n": 5
+   },
+   "ratio_arm_over_gold": 0.6204
+  },
+  "free_blocks_a500": {
+   "unit": "ms",
+   "gold": {
+    "mean": 0.1034,
+    "sd": 0.0196,
+    "n": 5
+   },
+   "claude": {
+    "mean": 0.1227,
+    "sd": 0.0083,
+    "n": 5
+   },
+   "ratio_arm_over_gold": 0.8427
+  },
+  "get_new_blocks_a10": {
+   "unit": "ms",
+   "gold": {
+    "mean": 0.0024,
+    "sd": 0.0003,
+    "n": 5
+   },
+   "claude": {
+    "mean": 0.0057,
+    "sd": 0.0036,
+    "n": 5
+   },
+   "ratio_arm_over_gold": 0.4211
+  },
+  "get_new_blocks_a100": {
+   "unit": "ms",
+   "gold": {
+    "mean": 0.0224,
+    "sd": 0.0069,
+    "n": 5
+   },
+   "claude": {
+    "mean": 0.0322,
+    "sd": 0.0094,
+    "n": 5
+   },
+   "ratio_arm_over_gold": 0.6957
+  },
+  "get_new_blocks_a1000": {
+   "unit": "ms",
+   "gold": {
+    "mean": 0.81,
+    "sd": 1.0816,
+    "n": 5
+   },
+   "claude": {
+    "mean": 0.32,
+    "sd": 0.0613,
+    "n": 5
+   },
+   "ratio_arm_over_gold": 2.5312
+  },
+  "get_new_blocks_a50": {
+   "unit": "ms",
+   "gold": {
+    "mean": 0.0117,
+    "sd": 0.0027,
+    "n": 5
+   },
+   "claude": {
+    "mean": 0.017,
+    "sd": 0.0069,
+    "n": 5
+   },
+   "ratio_arm_over_gold": 0.6882
+  },
+  "get_new_blocks_a500": {
+   "unit": "ms",
+   "gold": {
+    "mean": 0.1445,
+    "sd": 0.0146,
+    "n": 5
+   },
+   "claude": {
+    "mean": 0.1662,
+    "sd": 0.0183,
+    "n": 5
+   },
+   "ratio_arm_over_gold": 0.8694
+  }
+ }
+}

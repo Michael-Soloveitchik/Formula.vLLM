@@ -128,6 +128,16 @@ def results_files(pr):
     return out
 
 
+def results_ai_files(pr):
+    """{arm: path} of every results.ai.<arm>.json this PR has (CPU re-solve of a solver arm)."""
+    out = {}
+    for f in sorted(glob.glob(os.path.join(pr_dir(pr), "results.ai.*.json"))):
+        m = re.fullmatch(r"results\.ai\.([a-z0-9-]+)\.json", os.path.basename(f))
+        if m:
+            out[m.group(1)] = f
+    return out
+
+
 def results_json_any(pr, hw=None):
     """this machine's results file if present, else the first available slug's (or None)."""
     p = results_json(pr, hw)

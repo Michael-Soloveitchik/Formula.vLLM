@@ -44,7 +44,7 @@ def atomic_write_json(path, obj):
 
 
 def rebuild_locked():
-    agg, slugs, files = [], {}, {}
+    agg, slugs, files, ai = [], {}, {}, {}
     for pr, hw, p in layout.all_results_files():
         try:
             d = json.load(open(p))
@@ -55,9 +55,18 @@ def rebuild_locked():
         agg.append(d)
         slugs.setdefault(str(pr), []).append(hw)
         files.setdefault(str(pr), {})[hw] = layout.rel(p)
+    # re-solved: CPU re-measures of solver arms (results.ai.<arm>.json), per PR -> {arm: measured_scenarios}
+    for pr in layout.prs():
+        for arm, ap in layout.results_ai_files(pr).items():
+            try:
+                scs = (json.load(open(ap)).get("scenarios") or {})
+            except ValueError:
+                continue
+            n = sum(1 for e in scs.values() if e.get("ratio_arm_over_gold") is not None)
+            ai.setdefault(str(pr), {})[arm] = {"scenarios": n, "file": layout.rel(ap)}
     atomic_write_json(layout.all_json(), agg)
     atomic_write_json(layout.manifest_json(), {"current": layout.hw_slug(), "prs": sorted(int(k) for k in slugs),
-                                               "slugs": slugs, "files": files})
+                                               "slugs": slugs, "files": files, "ai": ai})
     return len(agg), len(slugs)
 
 

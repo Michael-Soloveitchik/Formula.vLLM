@@ -139,7 +139,7 @@ def run_bench(pr, img, arm, tree, i, work):
     """one docker run of bench.py on <tree> at /src; log = wl_<arm>_<i>.log (parse_workload reads this)."""
     task = layout.pr_dir(pr)
     log = os.path.join(work, f"wl_{arm}_{i}.log")
-    prelude = "rm -rf /src && ln -sfn /arm /src; export PYTHONPATH=/src:$PYTHONPATH"
+    prelude = "rm -rf /src && ln -sfn /arm /src; export PYTHONPATH=/src:$PYTHONPATH; cd /src"
     wl_cmd = (layout.load_task(pr).get("workload") or {}).get("cmd") or "python3 /task/bench.py"
     cmd = (
         f'{ENGINE} run --rm -e ARM={arm} '
